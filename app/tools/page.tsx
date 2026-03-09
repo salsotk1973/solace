@@ -1,121 +1,125 @@
 import Link from "next/link";
 
-const toolCards = [
+const tools = [
   {
-    href: "/clarity",
-    label: "CLARITY",
-    title: "When the mind feels tangled",
+    slug: "clarity",
+    title: "Clarity Tool",
     description:
-      "Untangle crowded thoughts and bring one calmer next step into view.",
-    cta: "Open Clarity Calculator",
-    arrow: "→",
-    background:
-      "linear-gradient(180deg, rgba(244,239,255,0.92) 0%, rgba(255,255,255,0.72) 100%)",
-    border: "rgba(221, 210, 255, 0.95)",
-    shadow: "rgba(140, 120, 210, 0.10)",
+      "Untangle difficult decisions with a calmer, clearer frame.",
+    surface:
+      "linear-gradient(180deg, rgba(107,139,170,0.08), rgba(255,255,255,0.74))",
   },
   {
-    href: "/overthinking-breaker",
-    label: "DIRECTION",
-    title: "When a thought keeps looping",
+    slug: "overthinking-breaker",
+    title: "Overthinking Breaker",
     description:
-      "A gentle way to loosen repetitive thinking and regain direction.",
-    cta: "Open Overthinking Breaker",
-    arrow: "→",
-    background:
-      "linear-gradient(180deg, rgba(232,247,239,0.92) 0%, rgba(255,255,255,0.72) 100%)",
-    border: "rgba(203, 232, 214, 0.95)",
-    shadow: "rgba(100, 160, 120, 0.10)",
+      "Slow the mental loop and see what actually needs attention.",
+    surface:
+      "linear-gradient(180deg, rgba(156,175,164,0.08), rgba(255,255,255,0.74))",
   },
   {
-    href: "/decision-filter",
-    label: "FOCUS",
-    title: "When everything feels urgent",
+    slug: "decision-filter",
+    title: "Decision Filter",
     description:
-      "Separate what matters now from what can wait a little longer.",
-    cta: "Open Decision Filter",
-    arrow: "→",
-    background:
-      "linear-gradient(180deg, rgba(236,242,255,0.94) 0%, rgba(255,255,255,0.74) 100%)",
-    border: "rgba(209, 223, 250, 0.95)",
-    shadow: "rgba(100, 130, 190, 0.10)",
+      "Separate what matters from what is only adding pressure.",
+    surface:
+      "linear-gradient(180deg, rgba(154,140,210,0.08), rgba(255,255,255,0.74))",
   },
 ];
 
 export default function ToolsPage() {
   return (
-    <main className="solace-page">
-      <section className="solace-section">
-        <div style={{ display: "grid", gap: 28, maxWidth: 860 }}>
-          <div className="solace-badge">Calm digital tools for clearer thinking</div>
-
-          <h1 className="solace-title">A few quiet tools for clearer thinking.</h1>
-
-          <p className="solace-body-xl">
-            Each tool focuses on one small shift: untangling thoughts, softening
-            pressure, and helping the next step become visible.
-          </p>
-        </div>
-
-        <div
-          className="solace-grid"
+    <main className="solace-shell section-space">
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          marginBottom: "2rem",
+          maxWidth: "44rem",
+        }}
+      >
+        <h1
           style={{
-            marginTop: 60,
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            alignItems: "stretch",
+            margin: 0,
+            fontSize: "clamp(2.5rem, 6vw, 4.2rem)",
+            lineHeight: 1.02,
+            letterSpacing: "-0.06em",
+            color: "var(--color-text)",
+            maxWidth: "12ch",
           }}
         >
-          {toolCards.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="solace-tool-link"
+          What brings you here today?
+        </h1>
+
+        <p
+          style={{
+            margin: 0,
+            maxWidth: "38rem",
+            fontSize: "1.08rem",
+            lineHeight: 1.85,
+            color: "var(--color-text-muted)",
+          }}
+        >
+          Choose a tool and start with one clear question.
+        </p>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "1rem",
+        }}
+      >
+        {tools.map((tool) => (
+          <Link
+            key={tool.slug}
+            href={`/tools/${tool.slug}`}
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              display: "block",
+            }}
+          >
+            <div
+              className="surface-card"
               style={{
-                padding: 32,
-                background: tool.background,
-                border: `1px solid ${tool.border}`,
-                boxShadow: `0 20px 60px ${tool.shadow}, inset 0 1px 0 rgba(255,255,255,0.82)`,
-                minHeight: 330,
-                textDecoration: "none",
+                minHeight: "215px",
+                padding: "1.35rem",
+                display: "grid",
+                gap: "0.9rem",
+                alignContent: "start",
+                background: tool.surface,
+                border: "1px solid rgba(55,65,81,0.05)",
+                boxShadow: "0 10px 28px rgba(31,41,55,0.03)",
               }}
             >
-              <div style={{ display: "grid", gap: 20, height: "100%" }}>
-                <div className="solace-label" style={{ fontSize: "0.82rem" }}>
-                  {tool.label}
-                </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "1.35rem",
+                  lineHeight: 1.12,
+                  letterSpacing: "-0.035em",
+                  color: "var(--color-text)",
+                }}
+              >
+                {tool.title}
+              </h2>
 
-                <h3
-                  className="solace-h3"
-                  style={{
-                    fontSize: "1.08rem",
-                    lineHeight: 1.28,
-                    maxWidth: 250,
-                  }}
-                >
-                  {tool.title}
-                </h3>
-
-                <p
-                  className="solace-body"
-                  style={{
-                    margin: 0,
-                    maxWidth: 260,
-                    fontSize: "1.02rem",
-                    lineHeight: 1.72,
-                  }}
-                >
-                  {tool.description}
-                </p>
-
-                <div className="solace-tool-cta">
-                  <span>{tool.cta}</span>
-                  <span className="solace-tool-arrow">{tool.arrow}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.98rem",
+                  lineHeight: 1.75,
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                {tool.description}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </main>
   );
 }

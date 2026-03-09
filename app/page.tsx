@@ -1,216 +1,264 @@
 import Link from "next/link";
-import Section from "@/components/solace/Section";
-import Surface from "@/components/solace/Surface";
 
-const featuredTools = [
+const entryCards = [
   {
-    href: "/clarity",
-    title: "Clarity Calculator",
-    description: "Untangle competing thoughts and find a calmer next step.",
-    cta: "Open Clarity Calculator",
-    background:
-      "linear-gradient(180deg, rgba(244,239,255,0.92) 0%, rgba(255,255,255,0.72) 100%)",
-    border: "rgba(221, 210, 255, 0.95)",
-    shadow: "rgba(140, 120, 210, 0.10)",
+    href: "/tools/clarity",
+    eyebrow: "Decision clarity",
+    title: "I can’t decide",
+    description:
+      "Untangle competing priorities and see what is actually making the decision feel heavy.",
+    accent: "linear-gradient(135deg, rgba(107,139,170,0.18), rgba(107,139,170,0.04))",
   },
   {
-    href: "/decision-filter",
-    title: "Decision Filter",
-    description: "Bring structure to difficult decisions with gentle prioritisation.",
-    cta: "Open Decision Filter",
-    background:
-      "linear-gradient(180deg, rgba(236,242,255,0.94) 0%, rgba(255,255,255,0.74) 100%)",
-    border: "rgba(209, 223, 250, 0.95)",
-    shadow: "rgba(100, 130, 190, 0.10)",
+    href: "/tools/overthinking-breaker",
+    eyebrow: "Overthinking reset",
+    title: "My mind won’t stop thinking",
+    description:
+      "Slow the loop, reduce repetition, and bring the real issue back into focus.",
+    accent: "linear-gradient(135deg, rgba(156,175,164,0.18), rgba(156,175,164,0.04))",
   },
   {
-    href: "/overthinking-breaker",
-    title: "Overthinking Breaker",
-    description: "Interrupt loops, slow the mind, and return to something workable.",
-    cta: "Open Overthinking Breaker",
-    background:
-      "linear-gradient(180deg, rgba(232,247,239,0.92) 0%, rgba(255,255,255,0.72) 100%)",
-    border: "rgba(203, 232, 214, 0.95)",
-    shadow: "rgba(100, 160, 120, 0.10)",
+    href: "/tools/decision-filter",
+    eyebrow: "Noise reduction",
+    title: "I need to filter the noise",
+    description:
+      "Separate what matters from what is only adding pressure and mental clutter.",
+    accent: "linear-gradient(135deg, rgba(154,140,210,0.16), rgba(154,140,210,0.04))",
   },
 ];
 
 export default function HomePage() {
   return (
-    <>
-      <Section>
-        <Surface tone="lavender" padding={46}>
-          <div
+    <main className="solace-shell section-space">
+      <section
+        style={{
+          display: "grid",
+          gap: "1.4rem",
+          justifyItems: "center",
+          textAlign: "center",
+          paddingTop: "3.5rem",
+          paddingBottom: "4.75rem",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.94rem",
+            color: "var(--color-text-muted)",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Calm thinking tools for noisy moments
+        </p>
+
+        <h1
+          style={{
+            margin: 0,
+            fontSize: "clamp(3rem, 8vw, 5.6rem)",
+            lineHeight: 0.96,
+            letterSpacing: "-0.07em",
+            color: "var(--color-text)",
+            maxWidth: "10ch",
+          }}
+        >
+          A calm place to think clearly.
+        </h1>
+
+        <p
+          style={{
+            margin: 0,
+            maxWidth: "40rem",
+            fontSize: "1.08rem",
+            lineHeight: 1.9,
+            color: "var(--color-text-muted)",
+          }}
+        >
+          Solace helps people slow down, untangle what feels heavy, and see
+          their situation with greater clarity.
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "0.85rem",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginTop: "0.35rem",
+          }}
+        >
+          <Link
+            href="/tools"
             style={{
-              display: "grid",
-              gap: 30,
-              maxWidth: 920,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.98rem 1.45rem",
+              borderRadius: "999px",
+              background: "rgba(107,139,170,0.16)",
+              color: "var(--color-text)",
+              textDecoration: "none",
+              fontSize: "0.98rem",
+              lineHeight: 1,
+              border: "1px solid rgba(107,139,170,0.12)",
+              boxShadow: "var(--shadow-soft)",
+              backdropFilter: "blur(8px)",
             }}
           >
-            <div className="solace-badge">A calm place to think more clearly</div>
+            Enter the tools
+          </Link>
 
-            <div
-              style={{
-                display: "grid",
-                gap: 20,
-                maxWidth: 920,
-              }}
-            >
-              <h1
-                className="solace-title"
-                style={{
-                  maxWidth: 980,
-                }}
-              >
-                Reduce noise. Find clarity. Move forward gently.
-              </h1>
+          <Link
+            href="/principles"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.98rem 1.45rem",
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.68)",
+              color: "var(--color-text)",
+              textDecoration: "none",
+              fontSize: "0.98rem",
+              lineHeight: 1,
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            Read the principles
+          </Link>
+        </div>
+      </section>
 
-              <p
-                className="solace-body-xl"
-                style={{
-                  margin: 0,
-                  maxWidth: 820,
-                }}
-              >
-                Solace is a collection of calm digital tools designed to help people
-                think through decisions, mental loops, and moments of overwhelm.
-              </p>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                gap: 14,
-                flexWrap: "wrap",
-              }}
-            >
-              <Link href="/clarity" className="solace-button">
-                Begin reflection
-              </Link>
-
-              <Link href="/tools" className="solace-button solace-button--secondary">
-                Explore tools
-              </Link>
-            </div>
-          </div>
-        </Surface>
-      </Section>
-
-      <Section>
+      <section
+        className="surface-card"
+        style={{
+          padding: "2.15rem",
+          display: "grid",
+          gap: "1.5rem",
+          marginBottom: "2rem",
+          background: "rgba(255,255,255,0.58)",
+        }}
+      >
         <div
           style={{
             display: "grid",
-            gap: 22,
-            maxWidth: 960,
-            marginBottom: 30,
+            gap: "0.9rem",
+            maxWidth: "40rem",
           }}
         >
-          <p className="solace-label" style={{ margin: 0 }}>
-            Featured tools
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.94rem",
+              color: "var(--color-text-muted)",
+            }}
+          >
+            Start gently
           </p>
 
           <h2
-            className="solace-h2"
             style={{
-              maxWidth: 980,
+              margin: 0,
+              fontSize: "clamp(2rem, 5vw, 3.3rem)",
+              lineHeight: 1.02,
+              letterSpacing: "-0.055em",
+              color: "var(--color-text)",
+              maxWidth: "12ch",
             }}
           >
-            Same calm language. Different atmospheres. Different ways of thinking.
+            What feels closest to what you’re experiencing right now?
           </h2>
+
+          <p
+            style={{
+              margin: 0,
+              maxWidth: "34rem",
+              fontSize: "1.03rem",
+              lineHeight: 1.85,
+              color: "var(--color-text-muted)",
+            }}
+          >
+            Solace is designed to help people who feel stuck, mentally noisy, or
+            emotionally heavy find a calmer starting point.
+          </p>
         </div>
 
         <div
-          className="solace-grid"
           style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            alignItems: "stretch",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "1rem",
           }}
         >
-          {featuredTools.map((tool) => (
+          {entryCards.map((card) => (
             <Link
-              key={tool.href}
-              href={tool.href}
-              className="solace-tool-link"
+              key={card.href}
+              href={card.href}
               style={{
-                padding: 32,
-                background: tool.background,
-                border: `1px solid ${tool.border}`,
-                boxShadow: `0 20px 60px ${tool.shadow}, inset 0 1px 0 rgba(255,255,255,0.82)`,
-                minHeight: 250,
                 textDecoration: "none",
+                color: "inherit",
               }}
             >
-              <div style={{ display: "grid", gap: 18, height: "100%" }}>
-                <h3
-                  className="solace-h3"
+              <div
+                className="surface-card"
+                style={{
+                  minHeight: "210px",
+                  padding: "1.35rem",
+                  display: "grid",
+                  gap: "0.8rem",
+                  alignContent: "start",
+                  background: card.accent,
+                  border: "1px solid rgba(55,65,81,0.06)",
+                }}
+              >
+                <div
                   style={{
-                    fontSize: "1.08rem",
-                    lineHeight: 1.28,
-                    maxWidth: 240,
+                    width: "2.25rem",
+                    height: "2.25rem",
+                    borderRadius: "999px",
+                    background: "rgba(255,255,255,0.62)",
+                    border: "1px solid rgba(255,255,255,0.5)",
+                    boxShadow: "0 8px 20px rgba(31,41,55,0.04)",
+                  }}
+                />
+
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.88rem",
+                    color: "var(--color-text-muted)",
                   }}
                 >
-                  {tool.title}
+                  {card.eyebrow}
+                </p>
+
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "1.35rem",
+                    lineHeight: 1.12,
+                    letterSpacing: "-0.035em",
+                    color: "var(--color-text)",
+                    maxWidth: "14ch",
+                  }}
+                >
+                  {card.title}
                 </h3>
 
                 <p
-                  className="solace-body"
                   style={{
                     margin: 0,
-                    maxWidth: 250,
-                    fontSize: "1rem",
-                    lineHeight: 1.72,
+                    fontSize: "0.98rem",
+                    lineHeight: 1.75,
+                    color: "var(--color-text-muted)",
                   }}
                 >
-                  {tool.description}
+                  {card.description}
                 </p>
-
-                <div className="solace-tool-cta">
-                  <span>{tool.cta}</span>
-                  <span className="solace-tool-arrow">→</span>
-                </div>
               </div>
             </Link>
           ))}
         </div>
-      </Section>
-
-      <Section>
-        <Surface tone="cloud" padding={40}>
-          <div
-            style={{
-              display: "grid",
-              gap: 18,
-              maxWidth: 860,
-            }}
-          >
-            <p className="solace-label" style={{ margin: 0 }}>
-              Human Behaviour Lab
-            </p>
-
-            <h2 className="solace-h2" style={{ maxWidth: 860 }}>
-              A quiet research layer behind every tool.
-            </h2>
-
-            <p
-              className="solace-body-xl"
-              style={{
-                margin: 0,
-                maxWidth: 860,
-              }}
-            >
-              Solace studies the kinds of questions people ask when they are
-              overwhelmed, uncertain, or trying to make sense of something
-              difficult. Each tool is designed from those patterns.
-            </p>
-
-            <div>
-              <Link href="/lab" className="solace-button solace-button--secondary">
-                Enter the lab
-              </Link>
-            </div>
-          </div>
-        </Surface>
-      </Section>
-    </>
+      </section>
+    </main>
   );
 }
