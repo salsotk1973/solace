@@ -1,0 +1,167 @@
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+type ReflectRequestBody = {
+  question?: string;
+  toolSlug?: string;
+};
+
+export async function POST(request: Request) {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: "OPENAI_API_KEY is missing from .env.local" },
+        { status: 500 }
+      );
+    }
+
+    const body = (await request.json()) as ReflectRequestBody;
+    const question = body.question?.trim() ?? "";
+    const toolSlug = body.toolSlug ?? "clarity";
+
+    if (!question) {
+      return NextResponse.json(
+        { error: "Question is required." },
+        { status: 400 }
+      );
+    }
+
+    const systemPrompt = `
+You are Solace.
+
+Solace is a calm reflection tool.
+Solace is not a chatbot.
+Solace is not a financial advisor.
+Solace is not a therapist.
+Solace is not a productivity coach.
+
+Your task is to help the user see their question more clearly.
+
+Style:
+- calm
+- brief
+- human
+- grounded
+- warm
+- clear
+- never robotic
+- never corporate
+- never overly analytical
+- never generic
+
+Very important:
+- keep the whole answer short
+- do not repeat the user's question directly
+- do not paraphrase the full question back to them
+- do not begin with "you're wondering whether"
+- do not begin with "you are deciding whether"
+- do not give step-by-step advice
+- do not sound like an expert blog
+- do not sound like a consultant
+- do not use bullet points
+- do not use headings
+- do not use markdown
+- do not overload the user
+
+Stay tightly anchored to the actual question.
+
+Output:
+- exactly 2 short paragraphs
+- each paragraph must be 1 sentence only
+- each sentence should be compact
+- plain text only
+
+Structure:
+Paragraph 1:
+Name the kind of tension or trade-off underneath the question.
+
+Paragraph 2:
+Offer one calm lens that helps the user see it more clearly.
+
+For money questions:
+Reflect the trade-off first, not the answer.
+
+For career questions:
+Reflect the tension first, not the strategy.
+
+For emotional questions:
+Stay grounded and simple.
+`;
+
+    const toolPrompt =
+      toolSlug === "clarity"
+        ? "This is the Clarity Tool. Help the user untangle one decision calmly."
+        : toolSlug === "overthinking-reset"
+          ? "This is the Overthinking Reset Tool. Help the user reduce mental looping."
+          : "This is the Decision Filter Tool. Help the user separate what matters from what is just noise.";
+
+    const response = await client.responses.create({
+      model: "gpt-4.1-mini",
+      store: false,
+      input: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text: systemPrompt,
+            },
+          ],
+        },
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text: toolPrompt,
+            },
+          ],
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text: question,
+            },
+          ],
+        },
+      ],
+    });
+
+    const rawText = response.output_text.trim();
+
+    const reflection = rawText
+      .split(/\n\s*\n/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .slice(0, 2);
+
+    return NextResponse.json({
+      reflection: reflection.length > 0 ? reflection : [rawText],
+      followUpPrompts: [],
+      relatedToolSlug: "clarity",
+      matchedContext: "solace-reflection",
+      state: "ready_for_next_question",
+      needsClarification: false,
+      previousResponseId: response.id,
+    });
+  } catch (error: any) {
+    console.error("Reflect route failed:", error);
+
+    return NextResponse.json(
+      {
+        error: "OpenAI request failed.",
+        details: error?.message ?? "Unknown error",
+        status: error?.status ?? null,
+        code: error?.code ?? null,
+        type: error?.type ?? null,
+      },
+      { status: 500 }
+    );
+  }
+}

@@ -1,77 +1,59 @@
-import Section from "@/components/solace/Section";
-import Surface from "@/components/solace/Surface";
+type PrincipleCard = {
+  title: string;
+  body: string;
+};
 
-const principles = [
+const principles: PrincipleCard[] = [
   {
     title: "One question at a time",
     body: "Solace avoids noise by reducing each interaction to a single calm step. Less friction. Less overwhelm. More clarity.",
-    tone: "cloud" as const,
   },
   {
     title: "Atmosphere matters",
     body: "Digital environments affect emotional state. Solace uses gentle gradients, breathing room, and soft contrast to reduce tension.",
-    tone: "lavender" as const,
   },
   {
     title: "Reflection before results",
     body: "A moment of pause can change the way insight is received. Solace slows the mind before offering direction.",
-    tone: "mint" as const,
   },
 ];
 
 export default function PrinciplesPage() {
   return (
-    <Section>
-      <div style={{ display: "grid", gap: 32 }}>
-        <div style={{ display: "grid", gap: 18, maxWidth: 900 }}>
-          <div className="solace-badge">Principles</div>
+    <main className="solace-page-shell">
+      <section className="space-y-5">
+        <div className="solace-page-pill">Principles</div>
 
-          <h1 className="solace-title" style={{ maxWidth: 980 }}>
-            The design philosophy behind Solace.
-          </h1>
+        <h1 className="solace-hero-title max-w-5xl">
+          The design philosophy behind Solace.
+        </h1>
 
-          <p className="solace-body-xl" style={{ margin: 0, maxWidth: 860 }}>
-            Solace is built on calm interaction patterns that reduce mental
-            friction and make digital tools feel more human.
-          </p>
-        </div>
+        <p className="solace-body">
+          Solace is built on calm interaction patterns that reduce mental
+          friction and make digital tools feel more human.
+        </p>
+      </section>
 
-        <div
-          className="solace-grid"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            alignItems: "stretch",
-          }}
-        >
+      <section className="mt-12">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {principles.map((item) => (
-            <Surface key={item.title} tone={item.tone} padding={36}>
-              <div
-                style={{
-                  display: "grid",
-                  gap: 18,
-                  minHeight: 190,
-                }}
-              >
-                <h2 className="solace-h3" style={{ fontSize: "1.25rem" }}>
+            <div
+              key={item.title}
+              className="solace-surface-neutral min-h-[220px] p-8"
+            >
+              <div className="grid gap-5">
+                <h2 className="text-[1.42rem] font-semibold leading-[1.08] tracking-[-0.035em] text-neutral-900">
                   {item.title}
                 </h2>
 
-                <p
-                  className="solace-body"
-                  style={{
-                    margin: 0,
-                    fontSize: "1.02rem",
-                    lineHeight: 1.8,
-                    maxWidth: "34ch",
-                  }}
-                >
+                <p className="max-w-[34ch] text-[1rem] leading-8 text-neutral-600">
                   {item.body}
                 </p>
               </div>
-            </Surface>
+            </div>
           ))}
         </div>
-      </div>
-    </Section>
+      </section>
+    </main>
   );
 }

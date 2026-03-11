@@ -1,31 +1,44 @@
-import Section from "@/components/solace/Section";
-import ToolCard from "@/components/solace/ToolCard";
-
 export default function AboutPage() {
   return (
-    <Section>
-      <div style={{ display: "grid", gap: 24 }}>
-        <div style={{ display: "grid", gap: 16, maxWidth: 780 }}>
-          <div className="solace-badge">About Solace</div>
-          <h1 className="solace-title">A calmer way to design digital help.</h1>
-          <p className="solace-body-xl" style={{ margin: 0 }}>
-            Solace exists to create simple digital environments that reduce noise and guide
-            people toward clarity. Each tool is designed to feel supportive, spacious, and
-            human.
-          </p>
-        </div>
+    <main className="solace-page-shell">
+      <section className="space-y-5">
+        <div className="solace-page-pill">About Solace</div>
 
-        <ToolCard tone="clarity" padding={30}>
-          <div style={{ display: "grid", gap: 14, maxWidth: 760 }}>
-            <h2 className="solace-h2">What makes Solace different</h2>
-            <p className="solace-body" style={{ margin: 0 }}>
-              It is not built like a productivity dashboard. It is not trying to overwhelm
-              people with inputs, numbers, and noise. It focuses on one calm question at a
-              time.
+        <h1 className="solace-hero-title max-w-5xl">
+          A calmer way to design digital help.
+        </h1>
+
+        <p className="solace-body">
+          Solace exists to create simple digital environments that reduce noise
+          and guide people toward clarity. Each tool is designed to feel
+          supportive, spacious, and human.
+        </p>
+      </section>
+
+      <section className="mt-12">
+        <div
+          className="
+            rounded-[28px]
+            border
+            border-[rgba(214,214,214,0.82)]
+            bg-[rgba(255,255,255,0.9)]
+            p-8
+            shadow-[0_8px_30px_rgba(0,0,0,0.04)]
+          "
+        >
+          <div className="grid gap-4 max-w-3xl">
+            <h2 className="text-[1.85rem] font-semibold leading-[1.06] tracking-[-0.04em] text-neutral-900">
+              What makes Solace different
+            </h2>
+
+            <p className="text-[1.03rem] leading-8 text-neutral-600">
+              It is not built like a productivity dashboard. It is not trying to
+              overwhelm people with inputs, numbers, and noise. It focuses on
+              one calm question at a time.
             </p>
           </div>
-        </ToolCard>
-      </div>
-    </Section>
+        </div>
+      </section>
+    </main>
   );
 }

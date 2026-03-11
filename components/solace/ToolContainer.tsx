@@ -2,257 +2,495 @@
 
 import { useMemo, useState } from "react";
 
-type ToolMode = "clarity" | "overthinking-breaker" | "decision-filter";
-
 type ToolContainerProps = {
-  placeholder?: string;
-  mode: ToolMode;
+  toolSlug: string;
+  title: string;
+  description: string;
 };
 
-function getLastMeaningfulLine(text: string): string {
-  const lines = text
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+type ReflectApiResponse = {
+  reflection?: string[];
+  error?: string;
+};
 
-  return lines.length ? lines[lines.length - 1] : "";
-}
+type ReflectionEntry = {
+  question: string;
+  reflection: string[];
+  feedback?: "helpful" | "not-quite" | null;
+};
 
-function looksLikeGibberish(text: string): boolean {
-  const cleaned = text.replace(/[^a-zA-Z\s?]/g, "").trim();
-  if (!cleaned) return true;
-
-  const words = cleaned.split(/\s+/).filter(Boolean);
-  if (words.length === 1 && words[0].length > 14) return true;
-
-  const vowels = (cleaned.match(/[aeiouAEIOU]/g) || []).length;
-  const letters = (cleaned.match(/[a-zA-Z]/g) || []).length;
-  if (letters > 0 && vowels / letters < 0.18) return true;
-
-  return false;
-}
-
-function buildClarityResponse(question: string): string {
-  const lower = question.toLowerCase();
-
-  if (looksLikeGibberish(question)) {
-    return `This does not seem like a clear question yet.
-
-Try writing one real decision in a simple sentence, and Solace will reflect on that.`;
+function getToolTheme(toolSlug: string) {
+  if (toolSlug === "clarity") {
+    return {
+      border: "rgba(96, 165, 250, 0.95)",
+      borderSoft: "rgba(147, 197, 253, 0.72)",
+      fill: "rgba(219, 234, 254, 0.58)",
+      fillStrong: "rgba(191, 219, 254, 0.58)",
+      glow: "rgba(96, 165, 250, 0.14)",
+      orbTop: "rgba(191, 219, 254, 1)",
+      orbBottom: "rgba(96, 165, 250, 1)",
+      orbBorder: "rgba(59, 130, 246, 0.75)",
+      thinkingBg:
+        "radial-gradient(circle at 50% 40%, rgba(191,219,254,0.56) 0%, rgba(236,246,255,0.94) 54%, rgba(255,255,255,0.98) 100%)",
+    };
   }
 
-  if (
-    lower.includes("job") ||
-    lower.includes("work") ||
-    lower.includes("career") ||
-    lower.includes("role")
-  ) {
-    return `It sounds like this may not only be a work decision, but a life-direction decision.
-
-Part of the weight may be coming from what each option represents: stability, growth, freedom, or identity.
-
-A useful next step may be to ask which risk feels harder to carry: the risk of change, or the risk of staying where friction already exists.`;
+  if (toolSlug === "overthinking-reset") {
+    return {
+      border: "rgba(74, 222, 128, 0.95)",
+      borderSoft: "rgba(134, 239, 172, 0.72)",
+      fill: "rgba(220, 252, 231, 0.58)",
+      fillStrong: "rgba(187, 247, 208, 0.58)",
+      glow: "rgba(74, 222, 128, 0.14)",
+      orbTop: "rgba(187, 247, 208, 1)",
+      orbBottom: "rgba(74, 222, 128, 1)",
+      orbBorder: "rgba(34, 197, 94, 0.75)",
+      thinkingBg:
+        "radial-gradient(circle at 50% 40%, rgba(187,247,208,0.56) 0%, rgba(236,253,245,0.94) 54%, rgba(255,255,255,0.98) 100%)",
+    };
   }
 
-  if (
-    lower.includes("colombia") ||
-    lower.includes("australia") ||
-    lower.includes("europe") ||
-    lower.includes("sydney") ||
-    lower.includes("melbourne") ||
-    lower.includes("move") ||
-    lower.includes("stay")
-  ) {
-    return `It sounds like this decision may be carrying more than geography. It may also be about belonging, lifestyle, future direction, or identity.
-
-Place-based decisions often feel heavy because they quietly reshape many other parts of life at once.
-
-A useful next step may be to ask what each place represents for you emotionally, not only practically.`;
-  }
-
-  if (
-    lower.includes("married") ||
-    lower.includes("single") ||
-    lower.includes("relationship") ||
-    lower.includes("partner")
-  ) {
-    return `It sounds like this question may be less about the label itself and more about what kind of future or connection feels true for you.
-
-Relationship decisions often become heavy when they carry hope, fear, timing, and identity all at once.
-
-A useful next step may be to ask whether you are choosing from clarity, fear, or pressure.`;
-  }
-
-  return `It sounds like this decision may be carrying more than one layer at the same time.
-
-Part of the weight may be coming not only from the choice itself, but from what that choice could change in your life.
-
-A useful next step may be to ask which part feels hardest right now: the practical outcome, the emotional cost, or the identity shift behind it.`;
-}
-
-function buildOverthinkingResponse(question: string): string {
-  const lower = question.toLowerCase();
-
-  if (looksLikeGibberish(question)) {
-    return `This does not seem like a clear thought yet.
-
-Try writing the thought that keeps repeating in one simple sentence.`;
-  }
-
-  if (
-    lower.includes("conversation") ||
-    lower.includes("said") ||
-    lower.includes("text") ||
-    lower.includes("message")
-  ) {
-    return `It sounds like your mind may be replaying an interaction in search of closure or certainty.
-
-When a conversation keeps looping, it often means the emotional meaning of it has stayed active longer than the words themselves.
-
-A useful next step may be to ask what is still unresolved for you: what was said, what it meant, or what you wish had happened instead.`;
-  }
-
-  return `It sounds like the same thought may be circling repeatedly, not because it is helping, but because your mind is still trying to settle something.
-
-When thinking turns repetitive, the loop itself can start creating pressure that makes the issue feel larger.
-
-A useful next step may be to separate what truly needs action from what is only mental repetition.`;
-}
-
-function buildDecisionFilterResponse(question: string): string {
-  const lower = question.toLowerCase();
-
-  if (looksLikeGibberish(question)) {
-    return `This does not seem like a clear question yet.
-
-Try writing the situation in one clean sentence so Solace can filter the noise more accurately.`;
-  }
-
-  if (
-    lower.includes("family") ||
-    lower.includes("money") ||
-    lower.includes("career") ||
-    lower.includes("work") ||
-    lower.includes("mortgage")
-  ) {
-    return `It sounds like this situation may contain both practical pressure and emotional pressure at the same time.
-
-When several serious factors sit in the same frame, everything can start to feel equally urgent even when it is not.
-
-A useful next step may be to sort this into three layers: what is essential, what is important but not urgent, and what is only adding noise.`;
-  }
-
-  return `It sounds like there may be too many active factors competing for attention at once.
-
-When everything feels equally important, the mind often struggles to identify what should actually lead the decision.
-
-A useful next step may be to reduce the frame and ask what is truly essential here, and what is only making the situation louder.`;
-}
-
-function buildReflection(mode: ToolMode, question: string): string {
-  switch (mode) {
-    case "clarity":
-      return buildClarityResponse(question);
-    case "overthinking-breaker":
-      return buildOverthinkingResponse(question);
-    case "decision-filter":
-      return buildDecisionFilterResponse(question);
-    default:
-      return "";
-  }
+  return {
+    border: "rgba(192, 132, 252, 0.95)",
+    borderSoft: "rgba(216, 180, 254, 0.72)",
+    fill: "rgba(243, 232, 255, 0.6)",
+    fillStrong: "rgba(233, 213, 255, 0.58)",
+    glow: "rgba(192, 132, 252, 0.14)",
+    orbTop: "rgba(233, 213, 255, 1)",
+    orbBottom: "rgba(192, 132, 252, 1)",
+    orbBorder: "rgba(168, 85, 247, 0.75)",
+    thinkingBg:
+      "radial-gradient(circle at 50% 40%, rgba(233,213,255,0.56) 0%, rgba(250,245,255,0.94) 54%, rgba(255,255,255,0.98) 100%)",
+  };
 }
 
 export default function ToolContainer({
-  placeholder = "Write your question here...",
-  mode,
+  toolSlug,
+  title,
+  description,
 }: ToolContainerProps) {
-  const [text, setText] = useState("");
-  const [response, setResponse] = useState("");
-  const [isBreathing, setIsBreathing] = useState(false);
-  const [isWorking, setIsWorking] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [entry, setEntry] = useState<ReflectionEntry | null>(null);
+  const [isThinking, setIsThinking] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const activeQuestion = useMemo(() => getLastMeaningfulLine(text), [text]);
-  const canSend = Boolean(activeQuestion);
+  const theme = getToolTheme(toolSlug);
+
+  const canReflect = useMemo(
+    () => question.trim().length > 0 && !isThinking,
+    [question, isThinking]
+  );
 
   async function handleReflect() {
-    if (!activeQuestion || isWorking) return;
+    const cleanQuestion = question.trim();
 
-    setIsWorking(true);
-    setIsBreathing(true);
-    setResponse("");
+    if (!cleanQuestion || isThinking) return;
 
-    await new Promise((resolve) => setTimeout(resolve, 1700));
+    setIsThinking(true);
+    setErrorMessage("");
 
-    const result = buildReflection(mode, activeQuestion);
+    try {
+      const response = await fetch("/api/reflect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: cleanQuestion,
+          toolSlug,
+        }),
+      });
 
-    setIsBreathing(false);
-    setResponse(result);
-    setIsWorking(false);
+      const data = (await response.json()) as ReflectApiResponse;
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong while reflecting.");
+      }
+
+      const reflection =
+        Array.isArray(data.reflection) && data.reflection.length > 0
+          ? data.reflection
+          : ["Something went wrong while reflecting."];
+
+      setEntry({
+        question: cleanQuestion,
+        reflection,
+        feedback: null,
+      });
+
+      setQuestion("");
+    } catch (error: any) {
+      setErrorMessage(
+        error?.message || "Something went wrong while reflecting."
+      );
+    } finally {
+      setIsThinking(false);
+    }
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      handleReflect();
+    }
+  }
+
+  function setFeedback(feedback: "helpful" | "not-quite") {
+    setEntry((current) => (current ? { ...current, feedback } : current));
+  }
+
+  function resetReflection() {
+    setEntry(null);
+    setQuestion("");
+    setErrorMessage("");
+    setIsThinking(false);
   }
 
   return (
     <div
-      className={`surface-card ${isBreathing ? "solace-breathing-card" : ""}`}
       style={{
-        minHeight: 500,
-        padding: "2rem",
         display: "grid",
-        gap: "1.5rem",
-        alignContent: "start",
-        background: "rgba(255,255,255,0.88)",
-        border: "1px solid rgba(55,65,81,0.05)",
-        boxShadow: "0 10px 24px rgba(31,41,55,0.035)",
+        gap: 28,
+        padding: 28,
+        borderRadius: 32,
+        border: "1px solid rgba(174, 194, 229, 0.9)",
+        background:
+          "linear-gradient(180deg, rgba(236,241,251,0.96) 0%, rgba(233,238,247,0.96) 100%)",
+        boxShadow:
+          "0 20px 46px rgba(99, 110, 141, 0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
       }}
     >
-      <textarea
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        placeholder={placeholder}
-        rows={8}
-        style={{
-          width: "100%",
-          resize: "vertical",
-          minHeight: 230,
-          background: "transparent",
-          border: "none",
-          outline: "none",
-          color: "var(--color-text)",
-          fontSize: "1.15rem",
-          lineHeight: 1.8,
-        }}
-      />
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <button
-          type="button"
-          onClick={handleReflect}
-          disabled={!canSend || isWorking}
-          className="solace-send-button"
-        >
-          {isWorking ? "Reflecting..." : "Get reflection"}
-        </button>
-      </div>
-
-      {response && (
-        <div
-          className="fade-up"
+      <div style={{ display: "grid", gap: 10 }}>
+        <h1
           style={{
-            paddingTop: "1.35rem",
-            borderTop: "1px solid rgba(55,65,81,0.08)",
-            fontSize: "1.08rem",
-            lineHeight: 1.95,
-            color: "var(--color-text)",
-            whiteSpace: "pre-wrap",
+            margin: 0,
+            fontSize: "3rem",
+            lineHeight: 0.95,
+            letterSpacing: "-0.055em",
+            fontWeight: 650,
+            color: "rgb(17,24,39)",
           }}
         >
-          {response}
+          {title}
+        </h1>
+
+        <p
+          style={{
+            margin: 0,
+            fontSize: "1.02rem",
+            lineHeight: 1.85,
+            color: "rgb(82,82,91)",
+            maxWidth: "38rem",
+          }}
+        >
+          {description}
+        </p>
+      </div>
+
+      {!entry && !isThinking ? (
+        <div
+          style={{
+            display: "grid",
+            gap: 14,
+            borderRadius: 30,
+            background: "rgba(250,250,250,0.92)",
+            border: "1px solid rgba(227,227,227,0.92)",
+            padding: "22px 22px 18px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.96rem",
+              color: "rgb(120,120,120)",
+              fontWeight: 500,
+            }}
+          >
+            Bring one question into view
+          </div>
+
+          <textarea
+            value={question}
+            onChange={(event) => setQuestion(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Place one decision or tension here"
+            rows={4}
+            style={{
+              width: "100%",
+              resize: "vertical",
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              fontSize: "1.02rem",
+              lineHeight: 1.9,
+              color: "rgb(31,41,55)",
+              padding: 0,
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleReflect}
+              disabled={!canReflect}
+              style={{
+                minWidth: 126,
+                minHeight: 66,
+                borderRadius: 999,
+                border: "1px solid rgba(212,212,216,0.96)",
+                background: canReflect
+                  ? "rgba(255,255,255,0.96)"
+                  : "rgba(245,245,245,0.92)",
+                color: canReflect ? "rgb(82,82,91)" : "rgb(161,161,170)",
+                fontSize: "1.02rem",
+                fontWeight: 500,
+                boxShadow: canReflect
+                  ? "0 8px 18px rgba(15,23,42,0.05)"
+                  : "none",
+                cursor: canReflect ? "pointer" : "not-allowed",
+              }}
+            >
+              Reflect
+            </button>
+          </div>
         </div>
-      )}
+      ) : null}
+
+      {isThinking ? (
+        <div
+          style={{
+            borderRadius: 28,
+            background: `linear-gradient(180deg, ${theme.fillStrong} 0%, ${theme.fill} 100%)`,
+            border: `1.5px solid ${theme.border}`,
+            boxShadow: `0 14px 30px ${theme.glow}`,
+            padding: "24px 28px",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                fontSize: "0.95rem",
+                color: "rgb(120,120,120)",
+                fontWeight: 500,
+              }}
+            >
+              Solace
+            </div>
+
+            <div
+              style={{
+                minHeight: 118,
+                display: "grid",
+                placeItems: "center",
+                borderRadius: 24,
+                background: theme.thinkingBg,
+                border: `1px solid ${theme.borderSoft}`,
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  placeItems: "center",
+                  gap: 14,
+                }}
+              >
+                <div
+                  style={{
+                    width: 74,
+                    height: 74,
+                    borderRadius: "999px",
+                    background: `radial-gradient(circle at 34% 28%, rgba(255,255,255,0.92) 0 14%, transparent 15%), linear-gradient(180deg, ${theme.orbTop} 0%, ${theme.orbBottom} 100%)`,
+                    border: `1px solid ${theme.orbBorder}`,
+                    boxShadow: `0 16px 34px ${theme.glow}, inset 0 1px 0 rgba(255,255,255,0.82)`,
+                    animation: "solaceBreath 2.6s ease-in-out infinite",
+                  }}
+                />
+
+                <div
+                  style={{
+                    fontSize: "1rem",
+                    color: "rgb(102,102,120)",
+                  }}
+                >
+                  Solace is reflecting…
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div
+          style={{
+            borderRadius: 22,
+            border: "1px solid rgba(239,68,68,0.2)",
+            background: "rgba(254,242,242,0.92)",
+            padding: "16px 18px",
+            color: "rgb(153,27,27)",
+            fontSize: "0.98rem",
+            lineHeight: 1.75,
+          }}
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {entry ? (
+        <div style={{ display: "grid", gap: 18 }}>
+          <div
+            style={{
+              borderRadius: 28,
+              background: "rgba(250,250,250,0.92)",
+              border: "1px solid rgba(227,227,227,0.92)",
+              padding: "22px 28px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "0.95rem",
+                color: "rgb(120,120,120)",
+                marginBottom: 12,
+                fontWeight: 500,
+              }}
+            >
+              You
+            </div>
+
+            <div
+              style={{
+                fontSize: "1rem",
+                lineHeight: 1.8,
+                color: "rgb(31,41,55)",
+              }}
+            >
+              {entry.question}
+            </div>
+          </div>
+
+          <div
+            style={{
+              borderRadius: 28,
+              background: `linear-gradient(180deg, ${theme.fillStrong} 0%, ${theme.fill} 100%)`,
+              border: `1.5px solid ${theme.border}`,
+              boxShadow: `0 14px 30px ${theme.glow}`,
+              padding: "24px 28px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "0.95rem",
+                color: "rgb(120,120,120)",
+                marginBottom: 14,
+                fontWeight: 500,
+              }}
+            >
+              Solace
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              {entry.reflection.map((paragraph, paragraphIndex) => (
+                <p
+                  key={paragraphIndex}
+                  style={{
+                    margin: 0,
+                    fontSize: "1rem",
+                    lineHeight: 1.85,
+                    color: "rgb(31,41,55)",
+                    maxWidth: "60rem",
+                  }}
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                marginTop: 22,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setFeedback("helpful")}
+                style={{
+                  minHeight: 44,
+                  padding: "0 18px",
+                  borderRadius: 999,
+                  border:
+                    entry.feedback === "helpful"
+                      ? `1px solid ${theme.border}`
+                      : "1px solid rgba(212,212,216,0.96)",
+                  background:
+                    entry.feedback === "helpful"
+                      ? "rgba(255,255,255,0.78)"
+                      : "rgba(255,255,255,0.94)",
+                  color: "rgb(82,82,91)",
+                  fontSize: "0.96rem",
+                  cursor: "pointer",
+                }}
+              >
+                Helpful
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFeedback("not-quite")}
+                style={{
+                  minHeight: 44,
+                  padding: "0 18px",
+                  borderRadius: 999,
+                  border:
+                    entry.feedback === "not-quite"
+                      ? "1px solid rgba(161,161,170,0.96)"
+                      : "1px solid rgba(212,212,216,0.96)",
+                  background:
+                    entry.feedback === "not-quite"
+                      ? "rgba(244,244,245,0.96)"
+                      : "rgba(255,255,255,0.94)",
+                  color: "rgb(82,82,91)",
+                  fontSize: "0.96rem",
+                  cursor: "pointer",
+                }}
+              >
+                Not quite
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={resetReflection}
+              style={{
+                minHeight: 50,
+                padding: "0 20px",
+                borderRadius: 999,
+                border: "1px solid rgba(212,212,216,0.96)",
+                background: "rgba(255,255,255,0.96)",
+                color: "rgb(82,82,91)",
+                fontSize: "0.98rem",
+                fontWeight: 500,
+                cursor: "pointer",
+                boxShadow: "0 8px 18px rgba(15,23,42,0.05)",
+              }}
+            >
+              Start a new reflection
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

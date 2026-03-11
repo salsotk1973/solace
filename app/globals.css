@@ -1,4 +1,8 @@
-@import "../styles/tokens.css";
+@import "tailwindcss";
+
+/* --------------------------------------------------
+   RESET
+-------------------------------------------------- */
 
 *,
 *::before,
@@ -7,7 +11,6 @@
 }
 
 html {
-  text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -15,168 +18,226 @@ html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #172033;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(180deg, #eef1f8 0%, #e8ecf5 100%);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+/* --------------------------------------------------
+   ROOT SHELL
+-------------------------------------------------- */
 
-button,
-input,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.site-frame {
+.solace-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.site-main {
-  flex: 1;
-}
-
-.solace-shell {
-  width: min(var(--content-max), calc(100% - 2rem));
+.solace-page {
+  width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
 }
 
-.solace-shell--narrow {
-  width: min(var(--content-max-narrow), calc(100% - 2rem));
+.solace-page-shell {
+  width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
+  padding-top: 34px;
+  padding-bottom: 84px;
 }
 
-.surface-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-soft);
-  transition:
-    transform var(--transition-medium),
-    box-shadow var(--transition-medium),
-    background var(--transition-medium),
-    border-color var(--transition-medium);
+.solace-page-shell > section:first-child {
+  margin-top: 0;
 }
 
-.muted {
-  color: var(--color-text-muted);
+/* --------------------------------------------------
+   TYPOGRAPHY
+-------------------------------------------------- */
+
+.solace-hero-title {
+  margin: 0;
+  font-size: clamp(3.4rem, 6.1vw, 5.1rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  font-weight: 800;
+  color: #10192d;
+  text-wrap: balance;
 }
 
-.section-space {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+.solace-section-title {
+  margin: 0;
+  font-size: clamp(2.35rem, 4.3vw, 3.55rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 800;
+  color: #10192d;
+  text-wrap: balance;
 }
 
-@media (min-width: 768px) {
-  .section-space {
-    padding-top: 5.5rem;
-    padding-bottom: 5.5rem;
-  }
+.solace-body {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: rgba(79, 91, 116, 0.9);
+  max-width: 54rem;
 }
 
-.fade-in {
-  animation: fadeIn 260ms ease forwards;
-}
+/* --------------------------------------------------
+   PILLS
+-------------------------------------------------- */
 
-.fade-up {
-  animation: fadeUp 320ms ease forwards;
-}
-
-.solace-breathing-card {
-  animation: solaceCardBreathe 2.4s ease-in-out infinite;
-  border-color: rgba(107, 139, 170, 0.12);
-  box-shadow:
-    0 12px 30px rgba(107, 139, 170, 0.06),
-    0 2px 10px rgba(31, 41, 55, 0.025);
-}
-
-.solace-send-button {
+.solace-page-pill,
+.solace-nav-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 174px;
-  padding: 0.98rem 1.35rem;
+  min-height: 46px;
+  padding: 0 20px;
   border-radius: 999px;
-  border: 1px solid rgba(107, 139, 170, 0.12);
-  background: rgba(107, 139, 170, 0.14);
-  color: var(--color-text);
-  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.04);
+  text-decoration: none;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #4b5673;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(245, 246, 251, 0.92) 100%
+  );
+  border: 1px solid rgba(194, 199, 214, 0.78);
+  box-shadow:
+    0 16px 34px rgba(118, 126, 155, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition:
-    transform var(--transition-fast),
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    opacity var(--transition-fast);
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
 }
 
-.solace-send-button:hover {
+.solace-page-pill:hover,
+.solace-nav-link:hover {
   transform: translateY(-1px);
-  background: rgba(107, 139, 170, 0.18);
+  box-shadow:
+    0 18px 38px rgba(118, 126, 155, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
-.solace-send-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+/* --------------------------------------------------
+   SURFACES / CARDS
+-------------------------------------------------- */
+
+.solace-surface-neutral {
+  border-radius: 28px;
+  text-decoration: none;
+  color: inherit;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+.solace-surface-blue {
+  border-radius: 28px;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 242, 252, 0.98) 0%,
+    rgba(227, 235, 248, 0.98) 100%
+  );
+  border: 1px solid rgba(166, 195, 243, 0.82);
+  box-shadow:
+    0 18px 42px rgba(103, 134, 191, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 0 0 1px rgba(166, 195, 243, 0.12);
+}
+
+.solace-surface-green {
+  border-radius: 28px;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 245, 239, 0.98) 0%,
+    rgba(229, 239, 233, 0.98) 100%
+  );
+  border: 1px solid rgba(181, 219, 192, 0.82);
+  box-shadow:
+    0 18px 42px rgba(101, 145, 119, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 0 0 1px rgba(181, 219, 192, 0.12);
+}
+
+.solace-surface-purple {
+  border-radius: 28px;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(244, 239, 251, 0.98) 0%,
+    rgba(236, 230, 247, 0.98) 100%
+  );
+  border: 1px solid rgba(208, 186, 244, 0.82);
+  box-shadow:
+    0 18px 42px rgba(126, 104, 188, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 0 0 1px rgba(208, 186, 244, 0.12);
+}
+
+/* --------------------------------------------------
+   FOOTER
+-------------------------------------------------- */
+
+.solace-footer {
+  padding-top: 18px;
+  padding-bottom: 56px;
+}
+
+.solace-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(131, 139, 164, 0.22);
+}
+
+.solace-footer .solace-body {
+  max-width: none;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: rgba(90, 101, 124, 0.88);
+}
+
+/* --------------------------------------------------
+   RESPONSIVE
+-------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .solace-page,
+  .solace-page-shell {
+    width: min(1120px, calc(100% - 32px));
   }
-  to {
-    opacity: 1;
+
+  .solace-hero-title {
+    font-size: clamp(2.7rem, 9vw, 4.1rem);
+  }
+
+  .solace-section-title {
+    font-size: clamp(2rem, 7vw, 3rem);
   }
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes solaceCardBreathe {
-  0% {
-    transform: scale(0.997);
-    box-shadow:
-      0 8px 18px rgba(107, 139, 170, 0.03),
-      0 2px 10px rgba(31, 41, 55, 0.02);
+@media (max-width: 640px) {
+  .solace-page-shell {
+    padding-top: 26px;
+    padding-bottom: 64px;
   }
 
-  50% {
-    transform: scale(1);
-    box-shadow:
-      0 14px 32px rgba(107, 139, 170, 0.08),
-      0 4px 14px rgba(31, 41, 55, 0.025);
-  }
-
-  100% {
-    transform: scale(0.997);
-    box-shadow:
-      0 8px 18px rgba(107, 139, 170, 0.03),
-      0 2px 10px rgba(31, 41, 55, 0.02);
+  .solace-page-pill,
+  .solace-nav-link {
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 0.94rem;
   }
 }
