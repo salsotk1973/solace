@@ -1,20 +1,29 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import SiteShell from "@/components/solace/SiteShell";
-import SolaceStyles from "@/components/solace/SolaceStyles";
+import "./globals.css"
+import SiteHeader from "@/components/SiteHeader"
 
-export const metadata: Metadata = {
-  title: "Solace",
-  description: "Calm digital tools designed to reduce noise and guide people toward clarity.",
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
-        <SolaceStyles />
-        <SiteShell>{children}</SiteShell>
+
+        <SiteHeader />
+
+        {/* GLOBAL PAGE WIDTH */}
+        <main
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "40px 24px",
+          }}
+        >
+          {children}
+        </main>
+
       </body>
     </html>
-  );
+  )
 }

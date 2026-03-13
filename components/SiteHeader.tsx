@@ -1,90 +1,232 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
+import { useState } from "react";
 
-const navItems = [
-  { href: "/tools", label: "Tools" },
-  { href: "/principles", label: "Principles" },
-  { href: "/lab", label: "Lab" },
-  { href: "/about", label: "About" },
-];
+type NavKey = "tools" | "principles" | "lab" | "about" | null;
+
+const basePillStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "10px 18px",
+  borderRadius: 999,
+  textDecoration: "none",
+  fontSize: 16,
+  fontWeight: 500,
+  lineHeight: 1,
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  transition:
+    "transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease, color 220ms ease",
+  transform: "translateY(0)",
+};
+
+function getPillStyle(
+  key: Exclude<NavKey, null>,
+  hovered: boolean
+): CSSProperties {
+  const rest: Record<Exclude<NavKey, null>, CSSProperties> = {
+    tools: {
+      border: "1px solid rgba(112,123,157,0.22)",
+      color: "#566482",
+      background: "rgba(255,255,255,0.22)",
+      boxShadow: "0 6px 20px rgba(169,153,228,0.04)",
+    },
+    principles: {
+      border: "1px solid rgba(112,123,157,0.22)",
+      color: "#566482",
+      background: "rgba(255,255,255,0.22)",
+      boxShadow: "0 6px 20px rgba(169,153,228,0.04)",
+    },
+    lab: {
+      border: "1px solid rgba(112,123,157,0.22)",
+      color: "#566482",
+      background: "rgba(255,255,255,0.22)",
+      boxShadow: "0 6px 20px rgba(169,153,228,0.04)",
+    },
+    about: {
+      border: "1px solid rgba(112,123,157,0.22)",
+      color: "#566482",
+      background: "rgba(255,255,255,0.22)",
+      boxShadow: "0 6px 20px rgba(169,153,228,0.04)",
+    },
+  };
+
+  const hover: Record<Exclude<NavKey, null>, CSSProperties> = {
+    tools: {
+      border: "1px solid rgba(171,163,229,0.68)",
+      color: "#5b6386",
+      background: "rgba(255,255,255,0.48)",
+      boxShadow:
+        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(169,153,228,0.12), 0 20px 44px rgba(169,153,228,0.18), 0 0 28px rgba(171,163,229,0.28)",
+      transform: "translateY(-4px)",
+    },
+    principles: {
+      border: "1px solid rgba(171,163,229,0.68)",
+      color: "#5b6386",
+      background: "rgba(255,255,255,0.48)",
+      boxShadow:
+        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(169,153,228,0.12), 0 20px 44px rgba(169,153,228,0.18), 0 0 28px rgba(171,163,229,0.28)",
+      transform: "translateY(-4px)",
+    },
+    lab: {
+      border: "1px solid rgba(188,176,228,0.68)",
+      color: "#645f84",
+      background: "rgba(255,255,255,0.48)",
+      boxShadow:
+        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(188,176,228,0.12), 0 20px 44px rgba(188,176,228,0.18), 0 0 28px rgba(188,176,228,0.26)",
+      transform: "translateY(-4px)",
+    },
+    about: {
+      border: "1px solid rgba(180,176,202,0.64)",
+      color: "#666b82",
+      background: "rgba(255,255,255,0.46)",
+      boxShadow:
+        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(170,170,190,0.10), 0 20px 44px rgba(170,170,190,0.16), 0 0 26px rgba(180,176,202,0.22)",
+      transform: "translateY(-4px)",
+    },
+  };
+
+  return {
+    ...basePillStyle,
+    ...(hovered ? hover[key] : rest[key]),
+  };
+}
 
 export default function SiteHeader() {
+  const [hovered, setHovered] = useState<NavKey>(null);
+
   return (
     <header
       style={{
-        width: "min(1120px, calc(100% - 40px))",
-        margin: "0 auto",
-        paddingTop: 22,
-        paddingBottom: 10,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 20,
-        flexWrap: "wrap",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 50,
+        pointerEvents: "none",
       }}
     >
-      <Link
-        href="/"
-        aria-label="Solace home"
+      <div
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          textDecoration: "none",
-          flex: "0 0 auto",
-        }}
-      >
-        <Image
-          src="/brand/solace-logo.png"
-          alt="Solace"
-          width={320}
-          height={92}
-          priority
-          style={{
-            width: "220px",
-            height: "auto",
-            display: "block",
-            filter: "drop-shadow(0 10px 22px rgba(122, 108, 221, 0.14))",
-          }}
-        />
-      </Link>
-
-      <nav
-        aria-label="Primary"
-        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "24px 24px 0 24px",
           display: "flex",
-          gap: 12,
-          flexWrap: "wrap",
-          justifyContent: "flex-end",
-          alignItems: "center",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
         }}
       >
-        {navItems.map((item) => (
+        <div
+          style={{
+            position: "relative",
+            width: 430,
+            height: 130,
+            pointerEvents: "auto",
+          }}
+        >
           <Link
-            key={item.href}
-            href={item.href}
+            href="/"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 44,
-              padding: "0 18px",
-              borderRadius: 999,
-              textDecoration: "none",
-              color: "#2f3852",
-              fontSize: "0.98rem",
-              fontWeight: 500,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(246,246,251,0.9) 100%)",
-              border: "1px solid rgba(120, 128, 160, 0.14)",
-              boxShadow:
-                "0 12px 30px rgba(111, 118, 150, 0.08), inset 0 1px 0 rgba(255,255,255,0.85)",
-              backdropFilter: "blur(12px)",
+              position: "absolute",
+              top: -38,
+              left: -38,
+              width: 130,
+              height: 130,
+              display: "block",
             }}
           >
-            {item.label}
+            <Image
+              src="/hero/solace-orb.png"
+              alt="Solace orb"
+              width={130}
+              height={130}
+              priority
+              style={{
+                display: "block",
+                width: "130px",
+                height: "130px",
+                objectFit: "contain",
+              }}
+            />
           </Link>
-        ))}
-      </nav>
+
+          <Link
+            href="/"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 65,
+              textDecoration: "none",
+              display: "block",
+            }}
+          >
+            <div
+              style={{
+                fontFamily:
+                  'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+                fontSize: 40,
+                lineHeight: 0.9,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "#5A6685",
+                whiteSpace: "nowrap",
+              }}
+            >
+              SOLACE
+            </div>
+          </Link>
+        </div>
+
+        <nav
+          style={{
+            display: "flex",
+            gap: 16,
+            alignItems: "center",
+            flexShrink: 0,
+            pointerEvents: "auto",
+          }}
+        >
+          <Link
+            href="/tools"
+            style={getPillStyle("tools", hovered === "tools")}
+            onMouseEnter={() => setHovered("tools")}
+            onMouseLeave={() => setHovered(null)}
+          >
+            Tools
+          </Link>
+
+          <Link
+            href="/principles"
+            style={getPillStyle("principles", hovered === "principles")}
+            onMouseEnter={() => setHovered("principles")}
+            onMouseLeave={() => setHovered(null)}
+          >
+            Principles
+          </Link>
+
+          <Link
+            href="/lab"
+            style={getPillStyle("lab", hovered === "lab")}
+            onMouseEnter={() => setHovered("lab")}
+            onMouseLeave={() => setHovered(null)}
+          >
+            Lab
+          </Link>
+
+          <Link
+            href="/about"
+            style={getPillStyle("about", hovered === "about")}
+            onMouseEnter={() => setHovered("about")}
+            onMouseLeave={() => setHovered(null)}
+          >
+            About
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }

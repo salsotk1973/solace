@@ -1,7 +1,14 @@
-export default function Container({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from "react";
+
+export default function Container({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 sm:px-8">
+    <div
+      style={{
+        width: "min(1360px, calc(100% - 64px))",
+        margin: "0 auto",
+      }}
+    >
       {children}
     </div>
-  )
+  );
 }

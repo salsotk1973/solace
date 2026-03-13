@@ -1,187 +1,141 @@
 import Link from "next/link";
-import Section from "@/components/solace/Section";
 
-const tools = [
+const toolCards = [
   {
-    href: "/tools/clarity",
-    title: "Clarity Tool",
-    description: "A quiet space to untangle difficult decisions.",
-    tone: {
-      border: "rgba(147, 197, 253, 0.95)",
-      fill: "rgba(219, 234, 254, 0.42)",
-      glow: "rgba(96, 165, 250, 0.10)",
-      hoverGlow: "rgba(96, 165, 250, 0.18)",
-    },
+    title: "I can’t decide",
+    description: "Untangle difficult decisions with a calmer frame.",
+    background: "rgba(219, 232, 255, 0.55)",
+    border: "rgba(139, 173, 242, 0.45)",
   },
   {
-    href: "/tools/overthinking-breaker",
-    title: "Overthinking Reset",
-    description: "A calmer way to step out of looping thoughts.",
-    tone: {
-      border: "rgba(167, 243, 208, 0.95)",
-      fill: "rgba(220, 252, 231, 0.42)",
-      glow: "rgba(74, 222, 128, 0.10)",
-      hoverGlow: "rgba(74, 222, 128, 0.18)",
-    },
+    title: "My mind won’t stop thinking",
+    description: "Step out of mental loops and regain perspective.",
+    background: "rgba(221, 232, 224, 0.72)",
+    border: "rgba(152, 190, 160, 0.42)",
   },
   {
-    href: "/tools/priority-reset",
-    title: "Decision Filter",
-    description: "A clear way to separate what matters from what is just noise.",
-    tone: {
-      border: "rgba(216, 180, 254, 0.95)",
-      fill: "rgba(243, 232, 255, 0.45)",
-      glow: "rgba(192, 132, 252, 0.10)",
-      hoverGlow: "rgba(192, 132, 252, 0.18)",
-    },
+    title: "Everything feels noisy",
+    description: "Sort what matters from what is only adding pressure.",
+    background: "rgba(236, 226, 246, 0.72)",
+    border: "rgba(190, 170, 228, 0.45)",
   },
 ];
 
 export default function ToolsPage() {
   return (
-    <Section>
-      <style>{`
-        .tools-page {
-          width: 100%;
-          max-width: 1180px;
-          margin: 0 auto;
-          display: grid;
-          gap: 42px;
-        }
-
-        .tools-hero {
-          display: grid;
-          gap: 16px;
-          max-width: 760px;
-        }
-
-        .tools-badge {
-          display: inline-flex;
-          align-items: center;
-          width: fit-content;
-          min-height: 48px;
-          padding: 0 20px;
-          border-radius: 999px;
-          border: 1px solid rgba(212, 212, 216, 0.96);
-          background: rgba(255, 255, 255, 0.78);
-          color: rgb(82, 82, 91);
-          font-size: 0.98rem;
-          font-weight: 500;
-        }
-
-        .tools-title {
-          margin: 0;
-          font-size: clamp(3rem, 6vw, 4.6rem);
-          line-height: 0.96;
-          letter-spacing: -0.06em;
-          font-weight: 650;
-          color: rgb(15, 23, 42);
-        }
-
-        .tools-subtitle {
-          margin: 0;
-          font-size: 1.08rem;
-          line-height: 1.85;
-          color: rgb(82, 82, 91);
-          max-width: 34rem;
-        }
-
-        .tools-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
-          align-items: stretch;
-        }
-
-        .tool-link {
-          display: block;
-          text-decoration: none;
-          color: inherit;
-        }
-
-        .tool-card {
-          min-height: 172px;
-          height: 100%;
-          display: grid;
-          gap: 14px;
-          align-content: start;
-          padding: 22px;
-          border-radius: 28px;
-          transition:
-            transform 180ms ease,
-            box-shadow 180ms ease,
-            border-color 180ms ease;
-          will-change: transform, box-shadow;
-        }
-
-        .tool-link:hover .tool-card,
-        .tool-link:focus-visible .tool-card {
-          transform: translateY(-4px);
-        }
-
-        .tool-link:focus-visible {
-          outline: none;
-        }
-
-        .tool-title {
-          margin: 0;
-          font-size: 1.2rem;
-          line-height: 1.25;
-          font-weight: 500;
-          color: rgb(39, 39, 42);
-        }
-
-        .tool-description {
-          margin: 0;
-          font-size: 1rem;
-          line-height: 1.8;
-          color: rgb(82, 82, 91);
-          max-width: 26ch;
-        }
-
-        @media (max-width: 980px) {
-          .tools-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
-
-      <div className="tools-page">
-        <div className="tools-hero">
-          <div className="tools-badge">Tools</div>
-
-          <h1 className="tools-title">Choose a starting point</h1>
-
-          <p className="tools-subtitle">
-            Begin where the feeling feels closest.
-          </p>
+    <main
+      style={{
+        width: "100%",
+        paddingTop: 86,
+        paddingBottom: 96,
+        display: "grid",
+        gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+        columnGap: 24,
+      }}
+    >
+      <div style={{ gridColumn: "1 / span 8" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            padding: "10px 16px",
+            borderRadius: 999,
+            border: "1px solid rgba(112,123,157,0.18)",
+            background: "rgba(255,255,255,0.34)",
+            color: "#566482",
+            fontSize: 16,
+            fontWeight: 500,
+          }}
+        >
+          Tools
         </div>
 
-        <div className="tools-grid">
-          {tools.map((tool) => (
-            <Link key={tool.href} href={tool.href} className="tool-link">
-              <div
-                className="tool-card"
+        <h1
+          style={{
+            margin: "26px 0 0 0",
+            fontSize: "clamp(54px, 6vw, 76px)",
+            lineHeight: 0.94,
+            letterSpacing: "-0.055em",
+            fontWeight: 700,
+            color: "#4f5c84",
+            maxWidth: 760,
+          }}
+        >
+          Start from how it feels
+        </h1>
+
+        <p
+          style={{
+            marginTop: 24,
+            marginBottom: 0,
+            fontSize: 18,
+            lineHeight: 1.9,
+            color: "rgba(79,92,132,0.82)",
+            maxWidth: 820,
+          }}
+        >
+          Each tool begins from a different mental state. Choose the one that feels
+          closest and let the conversation unfold naturally.
+        </p>
+      </div>
+
+      <div
+        style={{
+          gridColumn: "1 / -1",
+          marginTop: 44,
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 18,
+        }}
+      >
+        {toolCards.map((card) => (
+          <Link
+            key={card.title}
+            href="/tools"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              display: "block",
+            }}
+          >
+            <article
+              style={{
+                minHeight: 228,
+                borderRadius: 30,
+                padding: "30px 30px 26px",
+                background: card.background,
+                border: `1px solid ${card.border}`,
+                boxShadow: "0 18px 40px rgba(168, 154, 228, 0.08)",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+              }}
+            >
+              <h3
                 style={{
-                  border: `1.5px solid ${tool.tone.border}`,
-                  background: `linear-gradient(180deg, ${tool.tone.fill} 0%, rgba(255,255,255,0.58) 100%)`,
-                  boxShadow: `0 12px 24px ${tool.tone.glow}`,
+                  margin: 0,
+                  fontSize: 22,
+                  lineHeight: 1.2,
+                  fontWeight: 700,
+                  color: "#161b29",
                 }}
               >
-                <style>{`
-                  .tool-link[href="${tool.href}"]:hover .tool-card,
-                  .tool-link[href="${tool.href}"]:focus-visible .tool-card {
-                    box-shadow: 0 18px 34px ${tool.tone.hoverGlow};
-                  }
-                `}</style>
+                {card.title}
+              </h3>
 
-                <h2 className="tool-title">{tool.title}</h2>
-                <p className="tool-description">{tool.description}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+              <p
+                style={{
+                  marginTop: 20,
+                  marginBottom: 0,
+                  fontSize: 16,
+                  lineHeight: 1.8,
+                  color: "rgba(22,27,41,0.82)",
+                }}
+              >
+                {card.description}
+              </p>
+            </article>
+          </Link>
+        ))}
       </div>
-    </Section>
+    </main>
   );
 }
