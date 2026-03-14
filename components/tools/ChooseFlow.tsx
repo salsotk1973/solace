@@ -1,27 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type ReflectionOutput = {
   answer: string;
-};
-
-const settlingShellStyle: CSSProperties = {
-  marginTop: 34,
-  minHeight: 270,
-  borderRadius: 34,
-  border: "1px solid rgba(255,255,255,0.46)",
-  background: "rgba(255,255,255,0.16)",
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
-  boxShadow: "0 18px 40px rgba(168,154,228,0.05)",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "36px 24px",
-  textAlign: "center",
 };
 
 const toolCardStyle: CSSProperties = {
@@ -71,68 +54,58 @@ const textAreaStyle: CSSProperties = {
 const reflectionBoxStyle: CSSProperties = {
   marginTop: 28,
   borderRadius: 26,
-  border: "1px solid rgba(255,255,255,0.5)",
-  background: "rgba(255,255,255,0.2)",
-  padding: "24px 24px 26px",
-};
-
-const primaryButtonBaseStyle: CSSProperties = {
-  minHeight: 54,
-  padding: "0 22px",
-  borderRadius: 999,
-  fontSize: 15,
-  lineHeight: 1.2,
-  fontWeight: 600,
-  cursor: "pointer",
-  border: "1px solid rgba(76,122,214,0.38)",
-  background: "rgba(209,223,255,0.9)",
-  color: "#4f5c84",
-  boxShadow: "0 10px 22px rgba(109,156,246,0.1)",
-  transition:
-    "transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, opacity 180ms ease, color 180ms ease",
-};
-
-const primaryButtonHoverStyle: CSSProperties = {
-  border: "1px solid rgba(76,122,214,0.62)",
-  background: "rgba(218,230,255,0.98)",
-  color: "#3f4d77",
+  border: "1px solid rgba(120,156,255,0.82)",
+  background: "rgba(255,255,255,0.24)",
   boxShadow:
-    "0 14px 28px rgba(109,156,246,0.14), 0 0 0 1px rgba(109,156,246,0.1) inset",
+    "0 10px 24px rgba(109,156,246,0.08), inset 0 1px 0 rgba(255,255,255,0.35)",
+  padding: "24px 28px 26px",
+};
+
+const actionButtonBaseStyle: CSSProperties = {
+  minHeight: 60,
+  padding: "0 24px",
+  borderRadius: 999,
+  fontSize: 16,
+  lineHeight: 1.2,
+  fontWeight: 700,
+  letterSpacing: "-0.01em",
+  cursor: "pointer",
+  border: "1px solid rgba(58, 77, 168, 0.96)",
+  color: "#ffffff",
+  background:
+    "linear-gradient(180deg, rgba(79, 99, 199, 1) 0%, rgba(60, 79, 176, 1) 100%)",
+  boxShadow:
+    "0 14px 28px rgba(60, 79, 176, 0.22), inset 0 1px 0 rgba(255,255,255,0.22)",
+  transition:
+    "transform 140ms ease, background 140ms ease, box-shadow 140ms ease, border-color 140ms ease, opacity 140ms ease",
+};
+
+const actionButtonHoverStyle: CSSProperties = {
+  border: "1px solid rgba(48, 67, 154, 1)",
+  background:
+    "linear-gradient(180deg, rgba(68, 88, 189, 1) 0%, rgba(53, 70, 160, 1) 100%)",
+  boxShadow:
+    "0 18px 32px rgba(53, 70, 160, 0.28), inset 0 1px 0 rgba(255,255,255,0.2)",
   transform: "translateY(-1px)",
 };
 
-const primaryButtonDisabledStyle: CSSProperties = {
-  border: "1px solid rgba(109,156,246,0.18)",
-  background: "rgba(214,223,242,0.6)",
-  color: "rgba(79,92,132,0.56)",
+const actionButtonPressedStyle: CSSProperties = {
+  border: "1px solid rgba(36, 51, 124, 1)",
+  background:
+    "linear-gradient(180deg, rgba(46, 63, 148, 1) 0%, rgba(36, 51, 124, 1) 100%)",
+  boxShadow:
+    "inset 0 4px 10px rgba(0,0,0,0.2), 0 6px 12px rgba(36, 51, 124, 0.16)",
+  transform: "translateY(1px)",
+};
+
+const actionButtonDisabledStyle: CSSProperties = {
+  border: "1px solid rgba(148,161,210,0.46)",
+  background:
+    "linear-gradient(180deg, rgba(188,198,232,0.88) 0%, rgba(174,185,222,0.88) 100%)",
+  color: "rgba(255,255,255,0.88)",
   boxShadow: "none",
   cursor: "default",
-  opacity: 0.7,
-};
-
-const secondaryButtonBaseStyle: CSSProperties = {
-  minHeight: 54,
-  padding: "0 22px",
-  borderRadius: 999,
-  fontSize: 15,
-  lineHeight: 1.2,
-  fontWeight: 500,
-  cursor: "pointer",
-  border: "1px solid rgba(109,156,246,0.3)",
-  background: "rgba(228,235,252,0.78)",
-  color: "#4f5c84",
-  boxShadow: "0 8px 18px rgba(109,156,246,0.06)",
-  transition:
-    "transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, opacity 180ms ease, color 180ms ease",
-};
-
-const secondaryButtonHoverStyle: CSSProperties = {
-  border: "1px solid rgba(109,156,246,0.54)",
-  background: "rgba(236,241,255,0.96)",
-  color: "#3f4d77",
-  boxShadow:
-    "0 12px 24px rgba(109,156,246,0.1), 0 0 0 1px rgba(109,156,246,0.08) inset",
-  transform: "translateY(-1px)",
+  opacity: 0.76,
 };
 
 function buildReflection(decisionText: string): ReflectionOutput {
@@ -154,7 +127,9 @@ function buildReflection(decisionText: string): ReflectionOutput {
     normalized.includes("move") ||
     normalized.includes("stay") ||
     normalized.includes("leave") ||
-    normalized.includes("relocat")
+    normalized.includes("relocat") ||
+    normalized.includes("city") ||
+    normalized.includes("country")
   ) {
     answer =
       "This feels like a decision between familiarity and change. One path may offer continuity, while the other may offer movement, risk, or expansion. The real question may be which kind of discomfort you are more willing to carry. It may help to ask yourself which option you would regret not exploring a year from now.";
@@ -192,25 +167,26 @@ function buildReflection(decisionText: string): ReflectionOutput {
   ) {
     answer =
       "This may not only be about the car itself. It may also reflect how you think about convenience, cost, and the future. One option may feel more familiar today, while the other may feel more aligned with where things are going. It may help to imagine explaining each choice to your future self five years from now and notice which one feels easier to stand behind.";
+  } else if (
+    normalized.includes("college") ||
+    normalized.includes("uni") ||
+    normalized.includes("university")
+  ) {
+    answer =
+      "This may be about more than the institution itself. It may also reflect how you think about independence, cost, learning style, and long-term direction. It can help to imagine which environment would allow you to grow more comfortably over time, not just which one sounds better on paper.";
   }
 
   return { answer };
 }
 
 export default function ChooseFlow() {
-  const [isSettled, setIsSettled] = useState(false);
   const [decisionText, setDecisionText] = useState("");
   const [hasReflected, setHasReflected] = useState(false);
-  const [isReflectHovered, setIsReflectHovered] = useState(false);
-  const [isExploreHovered, setIsExploreHovered] = useState(false);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setIsSettled(true);
-    }, 1800);
-
-    return () => window.clearTimeout(timeout);
-  }, []);
+  const [hoverReflect, setHoverReflect] = useState(false);
+  const [pressReflect, setPressReflect] = useState(false);
+  const [hoverExplore, setHoverExplore] = useState(false);
+  const [pressExplore, setPressExplore] = useState(false);
 
   const canReflect = useMemo(() => decisionText.trim().length > 0, [decisionText]);
   const reflection = useMemo(() => buildReflection(decisionText), [decisionText]);
@@ -220,155 +196,113 @@ export default function ChooseFlow() {
     setHasReflected(true);
   }
 
-  function handleNewDecision() {
+  function handleReset() {
     setDecisionText("");
     setHasReflected(false);
+    setHoverExplore(false);
+    setPressExplore(false);
   }
 
-  const reflectButtonStyle: CSSProperties = canReflect
-    ? {
-        ...primaryButtonBaseStyle,
-        ...(isReflectHovered ? primaryButtonHoverStyle : {}),
-      }
-    : {
-        ...primaryButtonBaseStyle,
-        ...primaryButtonDisabledStyle,
-      };
+  const reflectStyle: CSSProperties = !canReflect
+    ? { ...actionButtonBaseStyle, ...actionButtonDisabledStyle }
+    : pressReflect
+    ? { ...actionButtonBaseStyle, ...actionButtonPressedStyle }
+    : hoverReflect
+    ? { ...actionButtonBaseStyle, ...actionButtonHoverStyle }
+    : actionButtonBaseStyle;
 
-  const exploreButtonStyle: CSSProperties = {
-    ...secondaryButtonBaseStyle,
-    ...(isExploreHovered ? secondaryButtonHoverStyle : {}),
-  };
+  const exploreStyle: CSSProperties = pressExplore
+    ? { ...actionButtonBaseStyle, ...actionButtonPressedStyle }
+    : hoverExplore
+    ? { ...actionButtonBaseStyle, ...actionButtonHoverStyle }
+    : actionButtonBaseStyle;
 
   return (
-    <div>
-      {!isSettled ? (
-        <div style={settlingShellStyle}>
-          <div className="choose-settling-orb" />
+    <>
+      <div style={toolCardStyle}>
+        <h2 style={titleStyle}>What decision are you facing?</h2>
 
-          <p
+        <p style={bodyStyle}>
+          Write it in the simplest way you can. You do not need to explain
+          everything.
+        </p>
+
+        <textarea
+          style={textAreaStyle}
+          value={decisionText}
+          placeholder="I’m deciding whether to..."
+          onChange={(e) => setDecisionText(e.target.value)}
+        />
+
+        {!hasReflected ? (
+          <div
             style={{
-              margin: "22px 0 0",
-              fontSize: 16,
-              lineHeight: 1.8,
-              color: "rgba(79,92,132,0.76)",
-              maxWidth: 420,
+              marginTop: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
             }}
           >
-            Take a breath. You do not need to solve the whole decision at once.
-          </p>
-
-          <style jsx>{`
-            .choose-settling-orb {
-              width: 98px;
-              height: 98px;
-              border-radius: 999px;
-              background: radial-gradient(
-                circle at 35% 30%,
-                rgba(255, 255, 255, 0.92) 0%,
-                rgba(216, 190, 255, 0.9) 20%,
-                rgba(186, 155, 255, 0.8) 45%,
-                rgba(186, 155, 255, 0.2) 76%,
-                rgba(186, 155, 255, 0.04) 100%
-              );
-              box-shadow:
-                0 0 50px rgba(186, 155, 255, 0.34),
-                inset 0 0 30px rgba(255, 255, 255, 0.28);
-              animation: chooseSettlingBreath 6s ease-in-out infinite;
-            }
-
-            @keyframes chooseSettlingBreath {
-              0% {
-                transform: scale(0.94);
-                opacity: 0.72;
-              }
-              50% {
-                transform: scale(1.08);
-                opacity: 1;
-              }
-              100% {
-                transform: scale(0.94);
-                opacity: 0.72;
-              }
-            }
-          `}</style>
-        </div>
-      ) : (
-        <>
-          <div style={toolCardStyle}>
-            <h2 style={titleStyle}>What decision are you facing?</h2>
-
-            <p style={bodyStyle}>
-              Write it in the simplest way you can. You do not need to explain
-              everything.
-            </p>
-
-            <textarea
-              style={textAreaStyle}
-              placeholder="I’m deciding whether to..."
-              value={decisionText}
-              onChange={(event) => setDecisionText(event.target.value)}
-            />
-
-            <div
-              style={{
-                marginTop: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
+            <button
+              type="button"
+              onClick={handleReflect}
+              disabled={!canReflect}
+              onMouseEnter={() => canReflect && setHoverReflect(true)}
+              onMouseLeave={() => {
+                setHoverReflect(false);
+                setPressReflect(false);
               }}
+              onMouseDown={() => canReflect && setPressReflect(true)}
+              onMouseUp={() => setPressReflect(false)}
+              style={reflectStyle}
             >
-              <button
-                type="button"
-                onClick={handleReflect}
-                disabled={!canReflect}
-                onMouseEnter={() => canReflect && setIsReflectHovered(true)}
-                onMouseLeave={() => setIsReflectHovered(false)}
-                style={reflectButtonStyle}
-              >
-                Reflect on this decision
-              </button>
-            </div>
-
-            {hasReflected ? (
-              <div style={reflectionBoxStyle}>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 16,
-                    lineHeight: 1.95,
-                    color: "rgba(79,92,132,0.82)",
-                  }}
-                >
-                  {reflection.answer}
-                </p>
-              </div>
-            ) : null}
+              See a clearer view
+            </button>
           </div>
+        ) : null}
 
-          {hasReflected ? (
-            <div
+        {hasReflected ? (
+          <div style={reflectionBoxStyle}>
+            <p
               style={{
-                marginTop: 18,
-                marginLeft: 32,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
+                margin: 0,
+                fontSize: 16,
+                lineHeight: 1.95,
+                color: "rgba(79,92,132,0.82)",
               }}
             >
-              <button
-                type="button"
-                onClick={handleNewDecision}
-                onMouseEnter={() => setIsExploreHovered(true)}
-                onMouseLeave={() => setIsExploreHovered(false)}
-                style={exploreButtonStyle}
-              >
-                Explore another decision
-              </button>
-            </div>
-          ) : null}
-        </>
-      )}
-    </div>
+              {reflection.answer}
+            </p>
+          </div>
+        ) : null}
+      </div>
+
+      {hasReflected ? (
+        <div
+          style={{
+            marginTop: 18,
+            marginLeft: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleReset}
+            onMouseEnter={() => setHoverExplore(true)}
+            onMouseLeave={() => {
+              setHoverExplore(false);
+              setPressExplore(false);
+            }}
+            onMouseDown={() => setPressExplore(true)}
+            onMouseUp={() => setPressExplore(false)}
+            style={exploreStyle}
+          >
+            Explore another decision
+          </button>
+        </div>
+      ) : null}
+    </>
   );
 }
