@@ -1,39 +1,29 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import HeroPresence from "@/components/hero/HeroPresence";
 import Link from "next/link";
+import { tools, type SolaceToolSlug } from "@/lib/solace-content/tools";
 
-type CardKey = "decide" | "thinking" | "noisy" | null;
-
-const entryCards = [
-  {
-    key: "decide" as const,
-    title: "I can’t decide",
-    description: "Untangle difficult decisions with a calmer frame.",
-    href: "/tools",
-  },
-  {
-    key: "thinking" as const,
-    title: "My mind won’t stop thinking",
-    description: "Step out of mental loops and regain perspective.",
-    href: "/tools",
-  },
-  {
-    key: "noisy" as const,
-    title: "Everything feels noisy",
-    description: "Sort what matters from what is only adding pressure.",
-    href: "/tools",
-  },
-];
+type CardSlug = SolaceToolSlug | null;
 
 const cardTitleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 17,
-  lineHeight: 1.25,
+  margin: "10px 0 0",
+  fontSize: 26,
+  lineHeight: 1.02,
+  letterSpacing: "-0.04em",
   fontWeight: 700,
   color: "#161b29",
+};
+
+const feelingStyle: CSSProperties = {
+  margin: 0,
+  fontSize: 13,
+  lineHeight: 1.4,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "rgba(22,27,41,0.5)",
 };
 
 const cardDescriptionStyle: CSSProperties = {
@@ -44,66 +34,83 @@ const cardDescriptionStyle: CSSProperties = {
   color: "rgba(22,27,41,0.82)",
 };
 
-function getCardStyle(key: CardKey, hovered: boolean): CSSProperties {
-  const rest: Record<string, CSSProperties> = {
-    decide: {
+function getCardRestStyle(slug: SolaceToolSlug): CSSProperties {
+  if (slug === "choose") {
+    return {
       border: "1px solid rgba(139,173,242,0.45)",
       background: "rgba(219,232,255,0.55)",
       boxShadow: "0 18px 40px rgba(168,154,228,0.08)",
       transform: "translateY(0)",
-    },
-    thinking: {
+    };
+  }
+
+  if (slug === "slow-down") {
+    return {
       border: "1px solid rgba(152,190,160,0.42)",
       background: "rgba(221,232,224,0.72)",
       boxShadow: "0 18px 40px rgba(168,154,228,0.08)",
       transform: "translateY(0)",
-    },
-    noisy: {
-      border: "1px solid rgba(223,169,123,0.46)",
-      background: "rgba(249,234,223,0.78)",
-      boxShadow: "0 18px 40px rgba(168,154,228,0.08)",
-      transform: "translateY(0)",
-    },
-  };
+    };
+  }
 
-  const hover: Record<string, CSSProperties> = {
-    decide: {
+  return {
+    border: "1px solid rgba(223,169,123,0.46)",
+    background: "rgba(249,234,223,0.78)",
+    boxShadow: "0 18px 40px rgba(168,154,228,0.08)",
+    transform: "translateY(0)",
+  };
+}
+
+function getCardHoverStyle(slug: SolaceToolSlug): CSSProperties {
+  if (slug === "choose") {
+    return {
       border: "1px solid rgba(109,156,246,0.68)",
       background: "rgba(223,235,255,0.78)",
       boxShadow:
         "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(139,173,242,0.16), 0 0 26px rgba(139,173,242,0.28)",
       transform: "translateY(-6px)",
-    },
-    thinking: {
+    };
+  }
+
+  if (slug === "slow-down") {
+    return {
       border: "1px solid rgba(122,175,137,0.62)",
       background: "rgba(225,235,228,0.84)",
       boxShadow:
         "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(152,190,160,0.14), 0 0 26px rgba(152,190,160,0.24)",
       transform: "translateY(-6px)",
-    },
-    noisy: {
-      border: "1px solid rgba(230,150,84,0.72)",
-      background: "rgba(252,237,227,0.9)",
-      boxShadow:
-        "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(230,150,84,0.16), 0 0 26px rgba(230,150,84,0.28)",
-      transform: "translateY(-6px)",
-    },
-  };
+    };
+  }
 
   return {
-    minHeight: 184,
+    border: "1px solid rgba(230,150,84,0.72)",
+    background: "rgba(252,237,227,0.9)",
+    boxShadow:
+      "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(230,150,84,0.16), 0 0 26px rgba(230,150,84,0.28)",
+    transform: "translateY(-6px)",
+  };
+}
+
+function getCardStyle(slug: SolaceToolSlug, hovered: boolean): CSSProperties {
+  return {
+    minHeight: 212,
     borderRadius: 30,
-    padding: "26px 26px 24px",
+    padding: "24px 26px 24px",
     backdropFilter: "blur(10px)",
     WebkitBackdropFilter: "blur(10px)",
     transition:
       "transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease, background 240ms ease",
-    ...(hovered ? hover[key!] : rest[key!]),
+    ...(hovered ? getCardHoverStyle(slug) : getCardRestStyle(slug)),
   };
 }
 
 export default function HomePage() {
-  const [hoveredCard, setHoveredCard] = useState<CardKey>(null);
+  const [hoveredCard, setHoveredCard] = useState<CardSlug>(null);
+
+  const orderedTools = useMemo(
+    () => [...tools].sort((a, b) => a.order - b.order),
+    []
+  );
 
   return (
     <main
@@ -205,21 +212,22 @@ export default function HomePage() {
             gap: 18,
           }}
         >
-          {entryCards.map((card) => (
+          {orderedTools.map((tool) => (
             <Link
-              key={card.title}
-              href={card.href}
+              key={tool.slug}
+              href={`/tools/${tool.slug}`}
               style={{
                 textDecoration: "none",
                 color: "inherit",
                 display: "block",
               }}
-              onMouseEnter={() => setHoveredCard(card.key)}
+              onMouseEnter={() => setHoveredCard(tool.slug)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              <article style={getCardStyle(card.key, hoveredCard === card.key)}>
-                <h3 style={cardTitleStyle}>{card.title}</h3>
-                <p style={cardDescriptionStyle}>{card.description}</p>
+              <article style={getCardStyle(tool.slug, hoveredCard === tool.slug)}>
+                <p style={feelingStyle}>{tool.feeling}</p>
+                <h3 style={cardTitleStyle}>{tool.name}</h3>
+                <p style={cardDescriptionStyle}>{tool.description}</p>
               </article>
             </Link>
           ))}

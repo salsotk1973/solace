@@ -57,36 +57,36 @@ function getPillStyle(
 
   const hover: Record<Exclude<NavKey, null>, CSSProperties> = {
     tools: {
-      border: "1px solid rgba(171,163,229,0.68)",
+      border: "1px solid rgba(171,163,229,0.65)",
       color: "#5b6386",
       background: "rgba(255,255,255,0.48)",
       boxShadow:
-        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(169,153,228,0.12), 0 20px 44px rgba(169,153,228,0.18), 0 0 28px rgba(171,163,229,0.28)",
-      transform: "translateY(-4px)",
+        "0 6px 10px rgba(0,0,0,0.05), 0 14px 28px rgba(140,130,220,0.18), 0 0 28px rgba(171,163,229,0.32)",
+      transform: "translateY(-3px)",
     },
     principles: {
-      border: "1px solid rgba(171,163,229,0.68)",
+      border: "1px solid rgba(171,163,229,0.65)",
       color: "#5b6386",
       background: "rgba(255,255,255,0.48)",
       boxShadow:
-        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(169,153,228,0.12), 0 20px 44px rgba(169,153,228,0.18), 0 0 28px rgba(171,163,229,0.28)",
-      transform: "translateY(-4px)",
+        "0 6px 10px rgba(0,0,0,0.05), 0 14px 28px rgba(140,130,220,0.18), 0 0 28px rgba(171,163,229,0.32)",
+      transform: "translateY(-3px)",
     },
     lab: {
-      border: "1px solid rgba(188,176,228,0.68)",
-      color: "#645f84",
+      border: "1px solid rgba(171,163,229,0.65)",
+      color: "#5b6386",
       background: "rgba(255,255,255,0.48)",
       boxShadow:
-        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(188,176,228,0.12), 0 20px 44px rgba(188,176,228,0.18), 0 0 28px rgba(188,176,228,0.26)",
-      transform: "translateY(-4px)",
+        "0 6px 10px rgba(0,0,0,0.05), 0 14px 28px rgba(140,130,220,0.18), 0 0 28px rgba(171,163,229,0.32)",
+      transform: "translateY(-3px)",
     },
     about: {
-      border: "1px solid rgba(180,176,202,0.64)",
-      color: "#666b82",
-      background: "rgba(255,255,255,0.46)",
+      border: "1px solid rgba(171,163,229,0.65)",
+      color: "#5b6386",
+      background: "rgba(255,255,255,0.48)",
       boxShadow:
-        "0 1px 2px rgba(0,0,0,0.04), 0 10px 22px rgba(170,170,190,0.10), 0 20px 44px rgba(170,170,190,0.16), 0 0 26px rgba(180,176,202,0.22)",
-      transform: "translateY(-4px)",
+        "0 6px 10px rgba(0,0,0,0.05), 0 14px 28px rgba(140,130,220,0.18), 0 0 28px rgba(171,163,229,0.32)",
+      transform: "translateY(-3px)",
     },
   };
 
