@@ -1,17 +1,8 @@
 import type { CSSProperties } from "react";
 import ChooseFlow from "@/components/tools/ChooseFlow";
 
-const eyebrowStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 12,
-  lineHeight: 1.4,
-  letterSpacing: "0.18em",
-  textTransform: "uppercase",
-  color: "rgba(79,92,132,0.6)",
-};
-
 const titleStyle: CSSProperties = {
-  margin: "22px 0 0",
+  margin: 0,
   fontSize: "clamp(44px,4.6vw,68px)",
   lineHeight: 0.94,
   letterSpacing: "-0.06em",
@@ -45,8 +36,6 @@ export default function ChoosePage() {
         }}
       >
         <div style={{ maxWidth: 860 }}>
-          <p style={eyebrowStyle}>Tool</p>
-
           <h1 style={titleStyle}>Choose</h1>
 
           <p style={introTextStyle}>
