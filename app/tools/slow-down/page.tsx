@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react";
-import ChooseFlow from "@/components/tools/ChooseFlow";
+import SlowDownFlow from "@/components/tools/SlowDownFlow";
 
 const pageWrapStyle: CSSProperties = {
   width: "100%",
-  paddingTop: 120,   // increased spacing from header
+  paddingTop: 120,
   paddingBottom: 120,
 };
 
@@ -42,21 +42,21 @@ const toolSectionStyle: CSSProperties = {
   padding: "0 24px",
 };
 
-export default function ChoosePage() {
+export default function SlowDownPage() {
   return (
     <main style={pageWrapStyle}>
       <section style={introSectionStyle}>
         <div style={introInnerStyle}>
-          <h1 style={titleStyle}>Choose</h1>
+          <h1 style={titleStyle}>Slow Down</h1>
 
           <p style={introTextStyle}>
-            Compare options calmly and move toward a clearer next step.
+            Make a racing mind feel more manageable.
           </p>
         </div>
       </section>
 
       <section style={toolSectionStyle}>
-        <ChooseFlow />
+        <SlowDownFlow />
       </section>
     </main>
   );
