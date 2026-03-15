@@ -1,50 +1,60 @@
+// /app/api/solace/choose/route.ts
+
 import { NextResponse } from "next/server";
-import { createSolaceResponse } from "@/lib/solace/openai";
-import { buildChoosePrompt } from "@/lib/solace/prompts";
-import type { ChooseRequest, SolaceApiResponse } from "@/lib/solace/types";
+import OpenAI from "openai";
+import { CHOOSE_SYSTEM_PROMPT, buildChooseUserPrompt } from "@/lib/solace/prompts";
 
-function cleanDecision(value: unknown): string {
-  if (typeof value !== "string") {
-    return "";
-  }
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-  return value.trim().slice(0, 1200);
-}
+type ChooseRequestBody = {
+  input?: string;
+};
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = (await request.json()) as Partial<ChooseRequest>;
-    const decision = cleanDecision(body.decision);
+    const body = (await req.json()) as ChooseRequestBody;
+    const input = body?.input?.trim();
 
-    if (!decision) {
-      const response: SolaceApiResponse = {
-        ok: false,
-        message:
-          "I’m not yet seeing the decision clearly. Try writing it in one sentence.",
-      };
-
-      return NextResponse.json(response, { status: 400 });
+    if (!input) {
+      return NextResponse.json(
+        { error: "Input is required." },
+        { status: 400 }
+      );
     }
 
-    const prompt = buildChoosePrompt(decision);
-    const message = await createSolaceResponse(prompt);
+    const response = await client.responses.create({
+      model: "gpt-5.4-mini",
+      input: [
+        {
+          role: "system",
+          content: CHOOSE_SYSTEM_PROMPT,
+        },
+        {
+          role: "user",
+          content: buildChooseUserPrompt(input),
+        },
+      ],
+      max_output_tokens: 140,
+    });
 
-    const response: SolaceApiResponse = {
-      ok: true,
-      message,
-      nextTool: "slow-down",
-    };
+    const text = (response.output_text || "").trim();
 
-    return NextResponse.json(response);
+    if (!text) {
+      return NextResponse.json(
+        { error: "No response generated." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ text });
   } catch (error) {
-    console.error("Choose route error:", error);
+    console.error("Solace Choose API error:", error);
 
-    const response: SolaceApiResponse = {
-      ok: false,
-      message:
-        "Something interrupted the reflection for a moment. Please try again.",
-    };
-
-    return NextResponse.json(response, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong while generating the reflection." },
+      { status: 500 }
+    );
   }
 }
