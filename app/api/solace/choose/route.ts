@@ -2,7 +2,14 @@
 
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { CHOOSE_SYSTEM_PROMPT, getChooseUserPrompt } from "@/lib/solace/prompts";
+import {
+  CHOOSE_SYSTEM_PROMPT,
+  getChooseUserPrompt,
+  type ChooseDecisionContext,
+  type ChooseDecisionType,
+  type ChooseEmotionalWeight,
+  type ChooseToneMode,
+} from "@/lib/solace/prompts";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -215,6 +222,101 @@ function getValidationReflection(input: string): string | null {
   return null;
 }
 
+function classifyDecisionType(input: string): ChooseDecisionType {
+  const text = normalizeText(input);
+
+  if (/\bforgive|forgiveness|hurt me|hurt you|betray|trust\b/.test(text)) {
+    return "forgiveness";
+  }
+
+  if (
+    /\bpartner|wife|husband|boyfriend|girlfriend|marry|marriage|relationship|love|feel about her|feel about him|text my ex|ex\b/.test(
+      text
+    )
+  ) {
+    return "relationship";
+  }
+
+  if (/\bjob|career|work|quit|salary|income|promotion|startup\b/.test(text)) {
+    return "career";
+  }
+
+  if (
+    /\bchild|baby|have a child|have a baby|move to another city|move city|move overseas|another city|marry\b/.test(
+      text
+    )
+  ) {
+    return "major-life";
+  }
+
+  if (
+    /\bdog|cat|pet|wake up earlier|routine|cook|eat out|holiday|apartment|buy a home|buy a place\b/.test(
+      text
+    )
+  ) {
+    return "lifestyle";
+  }
+
+  if (/\bbuy|wait|leave|stay|move|start|stop|change\b/.test(text)) {
+    return "practical";
+  }
+
+  return "general";
+}
+
+function classifyEmotionalWeight(
+  input: string,
+  decisionType: ChooseDecisionType
+): ChooseEmotionalWeight {
+  const text = normalizeText(input);
+
+  if (
+    decisionType === "forgiveness" ||
+    /\bhurt|trust|betray|leave my partner|break up|marry|child|baby|forgive|love|wife|husband\b/.test(
+      text
+    )
+  ) {
+    return "heavy";
+  }
+
+  if (
+    decisionType === "relationship" ||
+    decisionType === "career" ||
+    decisionType === "major-life"
+  ) {
+    return "medium";
+  }
+
+  return "light";
+}
+
+function classifyToneMode(
+  decisionType: ChooseDecisionType,
+  emotionalWeight: ChooseEmotionalWeight
+): ChooseToneMode {
+  if (emotionalWeight === "heavy") return "careful";
+  if (
+    emotionalWeight === "medium" ||
+    decisionType === "relationship" ||
+    decisionType === "career"
+  ) {
+    return "warm";
+  }
+  return "plain";
+}
+
+function buildDecisionContext(input: string): ChooseDecisionContext {
+  const decisionType = classifyDecisionType(input);
+  const emotionalWeight = classifyEmotionalWeight(input, decisionType);
+  const toneMode = classifyToneMode(decisionType, emotionalWeight);
+
+  return {
+    decisionType,
+    emotionalWeight,
+    toneMode,
+  };
+}
+
 function cleanupSentenceText(text: string): string {
   return text
     .replace(/\s+/g, " ")
@@ -231,12 +333,23 @@ function splitIntoSentences(text: string): string[] {
 
   if (!normalized) return [];
 
-  const rawParts = normalized
-    .split(/(?<=[.!?])\s+(?=[A-Z“"'])/)
-    .map((part) => cleanupSentenceText(part))
+  const paragraphLines = normalized
+    .split(/\n+/)
+    .map((line) => cleanupSentenceText(line))
     .filter(Boolean);
 
-  return rawParts;
+  const sentenceParts: string[] = [];
+
+  for (const line of paragraphLines) {
+    const parts = line
+      .split(/(?<=[.!?])\s+(?=[A-Z“"'])/)
+      .map((part) => cleanupSentenceText(part))
+      .filter(Boolean);
+
+    sentenceParts.push(...parts);
+  }
+
+  return sentenceParts;
 }
 
 function formatReflectionText(text: string): string {
@@ -246,7 +359,8 @@ function formatReflectionText(text: string): string {
     return cleanupSentenceText(text);
   }
 
-  return sentences.join("\n\n");
+  const limited = sentences.slice(0, 4);
+  return limited.join("\n\n");
 }
 
 export async function POST(req: Request) {
@@ -285,11 +399,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ text: validationReflection });
     }
 
+    const context = buildDecisionContext(input);
     const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
     const response = await client.responses.create({
       model,
-      max_output_tokens: 140,
+      max_output_tokens: 150,
       input: [
         {
           role: "system",
@@ -297,7 +412,7 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: [{ type: "input_text", text: getChooseUserPrompt(input) }],
+          content: [{ type: "input_text", text: getChooseUserPrompt(input, context) }],
         },
       ],
     });
