@@ -1,9 +1,10 @@
-// /app/api/solace/choose/route.ts
+// app/api/solace/choose/route.ts
 
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import {
   CHOOSE_SYSTEM_PROMPT,
+  NATURALNESS_REWRITE_SYSTEM_PROMPT,
   getChooseUserPrompt,
   type ChooseDecisionContext,
   type ChooseDecisionType,
@@ -392,6 +393,50 @@ function formatReflectionText(text: string): string {
   return sentences.slice(0, 3).join("\n\n");
 }
 
+function needsNaturalnessRewrite(text: string): boolean {
+  const normalized = normalizeText(text);
+
+  const bannedPatterns = [
+    /\bit's normal to\b/,
+    /\bit is normal to\b/,
+    /\blife often\b/,
+    /\bthis kind of choice\b/,
+    /\bthis moment\b/,
+    /\beither way\b/,
+    /\bwhatever you decide\b/,
+    /\byou might feel\b/,
+    /\byou may feel\b/,
+  ];
+
+  return bannedPatterns.some((pattern) => pattern.test(normalized));
+}
+
+async function rewriteForNaturalness(text: string): Promise<string> {
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+
+  const response = await client.responses.create({
+    model,
+    max_output_tokens: 140,
+    input: [
+      {
+        role: "system",
+        content: [{ type: "input_text", text: NATURALNESS_REWRITE_SYSTEM_PROMPT }],
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: `Rewrite this Solace reflection:\n\n${text}`,
+          },
+        ],
+      },
+    ],
+  });
+
+  return (response.output_text || "").trim();
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -447,7 +492,12 @@ export async function POST(req: Request) {
     });
 
     const rawText = (response.output_text || "").trim();
-    const text = formatReflectionText(rawText);
+    let text = formatReflectionText(rawText);
+
+    if (needsNaturalnessRewrite(text)) {
+      const rewritten = await rewriteForNaturalness(text);
+      text = formatReflectionText(rewritten);
+    }
 
     if (!text) {
       return NextResponse.json(

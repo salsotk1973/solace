@@ -13,7 +13,10 @@ export type ChooseEmotionalWeight = "light" | "medium" | "heavy";
 
 export type ChooseToneMode = "plain" | "warm" | "careful";
 
-export type ChooseResponsePattern = "anchor-tension-observation" | "anchor-consequence-reflection" | "anchor-contrast-insight";
+export type ChooseResponsePattern =
+  | "anchor-tension-observation"
+  | "anchor-consequence-reflection"
+  | "anchor-contrast-insight";
 
 export type ChooseDecisionContext = {
   decisionType: ChooseDecisionType;
@@ -106,6 +109,21 @@ Never end with vague soft phrases like:
 - either way
 - in its own way
 
+Avoid therapist reassurance.
+
+Do not use phrases like:
+- it's normal to feel
+- it's okay to
+- it's okay if
+- give yourself permission
+- be gentle with yourself
+
+Avoid abstract closing lines such as:
+- life often feels...
+- this kind of choice...
+- that's just life
+- in the end...
+
 Prefer ordinary spoken language.
 
 Avoid phrases that sound strategic, abstract, or overly polished.
@@ -172,6 +190,12 @@ Do not start sentence 3 with:
 - This choice...
 - This decision...
 - This moment...
+
+Do not use endings like:
+- It's normal to feel...
+- Life often feels...
+- Either way...
+- Whatever you decide...
 
 Vary endings naturally.
 
@@ -240,8 +264,46 @@ Rules:
 - keep sentences short
 - do not repeat the question
 - do not use poetic imagery
+- do not use therapist reassurance
+- do not use philosophical closings
 `.trim();
 }
+
+export const NATURALNESS_REWRITE_SYSTEM_PROMPT = `
+You are rewriting a Solace reflection so it sounds more natural.
+
+Keep the meaning the same.
+
+Keep exactly 3 sentences.
+
+Keep one sentence per paragraph.
+
+Leave one blank line between sentences.
+
+Make the language:
+- simpler
+- more human
+- more natural
+- less polished
+- less therapist-like
+- less philosophical
+
+Remove or rewrite phrases like:
+- it's normal to feel
+- life often feels
+- this kind of choice
+- this moment
+- either way
+- whatever you decide
+- you may feel
+- you might feel
+
+Do not add advice.
+Do not add extra meaning.
+Do not become poetic.
+
+Return only the rewritten reflection text.
+`.trim();
 
 export const chooseSystemPrompt = CHOOSE_SYSTEM_PROMPT;
 export const getChooseUserPrompt = buildChooseUserPrompt;
