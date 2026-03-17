@@ -38,22 +38,24 @@ export default function ReflectionOrb({
       <style jsx>{`
         .orb-shell {
           position: relative;
-          width: 330px;
-          height: 330px;
+          width: 398px;
+          height: 398px;
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: shellBreath 7.2s ease-in-out infinite;
+          animation: shellBreath 6.4s ease-in-out infinite;
           transform-origin: center center;
-          will-change: transform;
+          will-change: transform, filter;
         }
 
         .orb-shell.active {
-          animation-duration: 5.2s;
+          animation-duration: 3.8s;
+          filter: brightness(1.1) saturate(1.04);
         }
 
         .orb-shell.settled {
-          animation-duration: 7.8s;
+          animation-duration: 6.9s;
+          filter: brightness(1.04);
         }
 
         .orb-aura,
@@ -64,73 +66,105 @@ export default function ReflectionOrb({
         }
 
         .aura-far {
-          inset: -66px;
+          inset: -96px;
           background: radial-gradient(
             circle,
-            rgba(191, 255, 222, 0.16) 0%,
-            rgba(191, 255, 222, 0.08) 24%,
-            rgba(191, 255, 222, 0.025) 48%,
-            rgba(191, 255, 222, 0) 74%
+            rgba(196, 255, 226, 0.24) 0%,
+            rgba(196, 255, 226, 0.12) 22%,
+            rgba(196, 255, 226, 0.05) 42%,
+            rgba(196, 255, 226, 0) 72%
           );
-          filter: blur(22px);
-          animation: auraFar 7.2s ease-in-out infinite;
+          filter: blur(32px);
+          animation: auraFar 6.4s ease-in-out infinite;
         }
 
         .aura-mid {
-          inset: -34px;
+          inset: -52px;
           background: radial-gradient(
             circle,
-            rgba(205, 255, 231, 0.16) 0%,
-            rgba(205, 255, 231, 0.08) 30%,
-            rgba(205, 255, 231, 0.02) 54%,
-            rgba(205, 255, 231, 0) 76%
+            rgba(208, 255, 232, 0.24) 0%,
+            rgba(208, 255, 232, 0.12) 28%,
+            rgba(208, 255, 232, 0.04) 52%,
+            rgba(208, 255, 232, 0) 76%
           );
-          filter: blur(12px);
-          animation: auraMid 7.2s ease-in-out infinite;
+          filter: blur(18px);
+          animation: auraMid 6.4s ease-in-out infinite;
         }
 
         .aura-near {
-          inset: -10px;
+          inset: -18px;
           background: radial-gradient(
             circle,
-            rgba(226, 255, 241, 0.11) 0%,
-            rgba(226, 255, 241, 0.05) 34%,
-            rgba(226, 255, 241, 0) 68%
+            rgba(232, 255, 244, 0.16) 0%,
+            rgba(232, 255, 244, 0.08) 34%,
+            rgba(232, 255, 244, 0) 68%
           );
-          filter: blur(6px);
-          animation: auraNear 7.2s ease-in-out infinite;
+          filter: blur(9px);
+          animation: auraNear 6.4s ease-in-out infinite;
         }
 
         .orb-sphere {
-          inset: 52px;
+          inset: 56px;
           overflow: hidden;
           background:
             radial-gradient(
               circle at 34% 24%,
-              rgba(255, 255, 255, 0.88) 0%,
-              rgba(245, 252, 248, 0.76) 18%,
-              rgba(223, 248, 232, 0.52) 40%,
-              rgba(180, 233, 198, 0.28) 68%,
-              rgba(112, 187, 142, 0.12) 100%
+              rgba(255, 255, 255, 0.98) 0%,
+              rgba(247, 253, 250, 0.9) 16%,
+              rgba(231, 251, 240, 0.7) 36%,
+              rgba(192, 241, 213, 0.42) 62%,
+              rgba(129, 203, 161, 0.2) 100%
             );
           box-shadow:
-            inset -14px -20px 32px rgba(38, 84, 59, 0.14),
-            inset 10px 10px 18px rgba(255, 255, 255, 0.14),
-            0 16px 40px rgba(120, 255, 194, 0.08);
-          animation: sphereBreath 7.2s ease-in-out infinite;
-          will-change: transform;
+            inset -16px -24px 38px rgba(33, 78, 55, 0.12),
+            inset 12px 12px 22px rgba(255, 255, 255, 0.18),
+            0 18px 48px rgba(137, 255, 202, 0.12),
+            0 0 42px rgba(169, 255, 218, 0.09);
+          animation: sphereBreath 6.4s ease-in-out infinite;
+          will-change: transform, box-shadow, filter;
         }
 
-        .orb-shell.active .orb-shell,
         .orb-shell.active .orb-aura,
         .orb-shell.active .orb-sphere {
-          animation-duration: 5.2s;
+          animation-duration: 3.8s;
         }
 
-        .orb-shell.settled .orb-shell,
         .orb-shell.settled .orb-aura,
         .orb-shell.settled .orb-sphere {
-          animation-duration: 7.8s;
+          animation-duration: 6.9s;
+        }
+
+        .orb-shell.active .aura-far {
+          opacity: 1;
+          filter: blur(36px);
+        }
+
+        .orb-shell.active .aura-mid {
+          opacity: 1;
+          filter: blur(22px);
+        }
+
+        .orb-shell.active .aura-near {
+          opacity: 1;
+          filter: blur(11px);
+        }
+
+        .orb-shell.active .orb-sphere {
+          box-shadow:
+            inset -16px -24px 38px rgba(33, 78, 55, 0.1),
+            inset 12px 12px 22px rgba(255, 255, 255, 0.2),
+            0 24px 64px rgba(137, 255, 202, 0.2),
+            0 0 68px rgba(187, 255, 227, 0.18),
+            0 0 120px rgba(145, 255, 208, 0.1);
+          filter: brightness(1.1);
+        }
+
+        .orb-shell.settled .orb-sphere {
+          box-shadow:
+            inset -16px -24px 38px rgba(33, 78, 55, 0.12),
+            inset 12px 12px 22px rgba(255, 255, 255, 0.18),
+            0 20px 52px rgba(137, 255, 202, 0.14),
+            0 0 48px rgba(169, 255, 218, 0.11);
         }
 
         .orb-rim {
@@ -138,23 +172,23 @@ export default function ReflectionOrb({
           inset: 0;
           border-radius: 9999px;
           box-shadow:
-            inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-            inset 0 0 26px rgba(222, 255, 240, 0.08);
-          opacity: 0.95;
+            inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+            inset 0 0 32px rgba(226, 255, 242, 0.1);
+          opacity: 0.96;
         }
 
         .orb-inner-glow {
           position: absolute;
-          inset: 18%;
+          inset: 16%;
           border-radius: 9999px;
           background: radial-gradient(
             circle,
-            rgba(220, 255, 237, 0.16) 0%,
-            rgba(220, 255, 237, 0.06) 42%,
-            rgba(220, 255, 237, 0) 76%
+            rgba(226, 255, 241, 0.24) 0%,
+            rgba(226, 255, 241, 0.1) 40%,
+            rgba(226, 255, 241, 0) 76%
           );
-          filter: blur(14px);
-          animation: innerGlow 7.2s ease-in-out infinite;
+          filter: blur(18px);
+          animation: innerGlow 6.4s ease-in-out infinite;
         }
 
         .orb-highlight {
@@ -164,34 +198,34 @@ export default function ReflectionOrb({
         }
 
         .highlight-main {
-          width: 30%;
+          width: 31%;
           height: 18%;
-          left: 22%;
-          top: 14%;
+          left: 21%;
+          top: 13%;
           background: radial-gradient(
             ellipse,
-            rgba(255, 255, 255, 0.48) 0%,
-            rgba(255, 255, 255, 0.14) 52%,
+            rgba(255, 255, 255, 0.56) 0%,
+            rgba(255, 255, 255, 0.18) 54%,
             rgba(255, 255, 255, 0) 100%
           );
-          filter: blur(4px);
+          filter: blur(5px);
           transform: rotate(-20deg);
-          animation: highlightPulse 8.6s ease-in-out infinite;
+          animation: highlightPulse 7.8s ease-in-out infinite;
         }
 
         .highlight-soft {
-          width: 20%;
+          width: 21%;
           height: 12%;
-          right: 18%;
+          right: 17%;
           bottom: 18%;
           background: radial-gradient(
             ellipse,
-            rgba(172, 255, 207, 0.18) 0%,
-            rgba(172, 255, 207, 0.06) 50%,
-            rgba(172, 255, 207, 0) 100%
+            rgba(182, 255, 214, 0.24) 0%,
+            rgba(182, 255, 214, 0.08) 50%,
+            rgba(182, 255, 214, 0) 100%
           );
-          filter: blur(8px);
-          animation: softPulse 7.8s ease-in-out infinite;
+          filter: blur(9px);
+          animation: softPulse 7.2s ease-in-out infinite;
         }
 
         .orb-mist {
@@ -205,11 +239,11 @@ export default function ReflectionOrb({
           inset: -8% -10% -2% -4%;
           background: radial-gradient(
             ellipse at 32% 34%,
-            rgba(255, 255, 255, 0.18) 0%,
-            rgba(255, 255, 255, 0.06) 22%,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0.08) 22%,
             rgba(255, 255, 255, 0) 46%
           );
-          filter: blur(12px);
+          filter: blur(14px);
           animation: mistDriftOne 11s ease-in-out infinite;
         }
 
@@ -217,11 +251,11 @@ export default function ReflectionOrb({
           inset: 6% 10% 10% 10%;
           background: radial-gradient(
             ellipse at 68% 70%,
-            rgba(176, 255, 212, 0.14) 0%,
-            rgba(176, 255, 212, 0.05) 20%,
-            rgba(176, 255, 212, 0) 44%
+            rgba(184, 255, 217, 0.18) 0%,
+            rgba(184, 255, 217, 0.06) 20%,
+            rgba(184, 255, 217, 0) 44%
           );
-          filter: blur(14px);
+          filter: blur(16px);
           animation: mistDriftTwo 13s ease-in-out infinite;
         }
 
@@ -229,11 +263,11 @@ export default function ReflectionOrb({
           inset: 20% 18% 18% 18%;
           background: radial-gradient(
             circle,
-            rgba(222, 255, 239, 0.08) 0%,
-            rgba(222, 255, 239, 0.03) 36%,
-            rgba(222, 255, 239, 0) 72%
+            rgba(228, 255, 242, 0.1) 0%,
+            rgba(228, 255, 242, 0.04) 36%,
+            rgba(228, 255, 242, 0) 72%
           );
-          filter: blur(18px);
+          filter: blur(20px);
           animation: mistPulse 9.8s ease-in-out infinite;
         }
 
@@ -246,8 +280,8 @@ export default function ReflectionOrb({
           position: absolute;
           display: block;
           border-radius: 9999px;
-          background: rgba(249, 255, 252, 0.9);
-          box-shadow: 0 0 12px rgba(228, 255, 241, 0.22);
+          background: rgba(249, 255, 252, 0.95);
+          box-shadow: 0 0 14px rgba(228, 255, 241, 0.3);
           animation: speckFloat 6.8s ease-in-out infinite;
         }
 
@@ -310,75 +344,77 @@ export default function ReflectionOrb({
         @keyframes shellBreath {
           0%,
           100% {
-            transform: scale(0.955);
+            transform: scale(0.95);
           }
           50% {
-            transform: scale(1.06);
+            transform: scale(1.1);
           }
         }
 
         @keyframes sphereBreath {
           0%,
           100% {
-            transform: scale(0.972);
+            transform: scale(0.965);
+            filter: brightness(1);
           }
           50% {
-            transform: scale(1.055);
+            transform: scale(1.09);
+            filter: brightness(1.06);
           }
         }
 
         @keyframes auraFar {
           0%,
           100% {
-            transform: scale(0.95);
-            opacity: 0.42;
+            transform: scale(0.9);
+            opacity: 0.46;
           }
           50% {
-            transform: scale(1.11);
-            opacity: 0.7;
+            transform: scale(1.28);
+            opacity: 1;
           }
         }
 
         @keyframes auraMid {
           0%,
           100% {
-            transform: scale(0.98);
-            opacity: 0.54;
+            transform: scale(0.95);
+            opacity: 0.58;
           }
           50% {
-            transform: scale(1.08);
-            opacity: 0.82;
+            transform: scale(1.2);
+            opacity: 1;
           }
         }
 
         @keyframes auraNear {
           0%,
           100% {
-            transform: scale(0.99);
-            opacity: 0.58;
+            transform: scale(0.98);
+            opacity: 0.64;
           }
           50% {
-            transform: scale(1.045);
-            opacity: 0.88;
+            transform: scale(1.12);
+            opacity: 0.98;
           }
         }
 
         @keyframes innerGlow {
           0%,
           100% {
-            transform: scale(0.96);
-            opacity: 0.64;
+            transform: scale(0.94);
+            opacity: 0.7;
           }
           50% {
-            transform: scale(1.06);
-            opacity: 0.9;
+            transform: scale(1.12);
+            opacity: 1;
           }
         }
 
         @keyframes highlightPulse {
           0%,
           100% {
-            opacity: 0.8;
+            opacity: 0.82;
           }
           50% {
             opacity: 1;
@@ -388,12 +424,12 @@ export default function ReflectionOrb({
         @keyframes softPulse {
           0%,
           100% {
-            opacity: 0.56;
+            opacity: 0.58;
             transform: scale(1);
           }
           50% {
-            opacity: 0.88;
-            transform: scale(1.14);
+            opacity: 0.96;
+            transform: scale(1.18);
           }
         }
 
@@ -401,7 +437,7 @@ export default function ReflectionOrb({
           0%,
           100% {
             transform: translate3d(0, 0, 0);
-            opacity: 0.7;
+            opacity: 0.74;
           }
           50% {
             transform: translate3d(5px, -7px, 0);
@@ -413,11 +449,11 @@ export default function ReflectionOrb({
           0%,
           100% {
             transform: translate3d(0, 0, 0);
-            opacity: 0.5;
+            opacity: 0.54;
           }
           50% {
             transform: translate3d(-8px, 6px, 0);
-            opacity: 0.82;
+            opacity: 0.88;
           }
         }
 
@@ -425,11 +461,11 @@ export default function ReflectionOrb({
           0%,
           100% {
             transform: scale(0.98);
-            opacity: 0.55;
+            opacity: 0.58;
           }
           50% {
-            transform: scale(1.06);
-            opacity: 0.84;
+            transform: scale(1.1);
+            opacity: 0.9;
           }
         }
 
@@ -437,30 +473,34 @@ export default function ReflectionOrb({
           0%,
           100% {
             transform: translate3d(0, 0, 0);
-            opacity: 0.72;
+            opacity: 0.76;
           }
           50% {
-            transform: translate3d(0, -4px, 0);
+            transform: translate3d(0, -5px, 0);
             opacity: 1;
           }
         }
 
         @media (max-width: 640px) {
           .orb-shell {
-            width: 282px;
-            height: 282px;
+            width: 332px;
+            height: 332px;
           }
 
           .orb-sphere {
-            inset: 44px;
+            inset: 46px;
           }
 
           .aura-far {
-            inset: -48px;
+            inset: -70px;
           }
 
           .aura-mid {
-            inset: -24px;
+            inset: -36px;
+          }
+
+          .aura-near {
+            inset: -14px;
           }
         }
       `}</style>

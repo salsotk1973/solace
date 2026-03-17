@@ -1,13 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import ReflectionOrb from "@/components/solace/ReflectionOrb";
 
 type OrbPhase = "idle" | "active" | "settled";
 
 const THINKING_DELAY_MS = 2800;
-const THINKING_COPY = "Clarity is forming...";
-const PLACEHOLDER_COPY = "A clearer view may begin to form here.";
+const THINKING_COPY = "SOLACE IS REFLECTING...";
 
 export default function ChoosePage() {
   const [input, setInput] = useState("");
@@ -15,6 +14,7 @@ export default function ChoosePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [orbPhase, setOrbPhase] = useState<OrbPhase>("idle");
   const [hasResult, setHasResult] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (!isLoading && !hasResult) {
@@ -22,24 +22,13 @@ export default function ChoosePage() {
     }
   }, [isLoading, hasResult]);
 
-  const placeholderLine = useMemo(() => {
-    if (isLoading) return THINKING_COPY;
-    if (hasResult) return "";
-    return PLACEHOLDER_COPY;
-  }, [isLoading, hasResult]);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const trimmed = input.trim();
-
-    if (!trimmed) {
-      setResult("Name the decision on your mind.");
-      setHasResult(true);
-      setOrbPhase("settled");
-      return;
+  useEffect(() => {
+    if (hasResult && !isLoading) {
+      inputRef.current?.focus();
     }
+  }, [hasResult, isLoading]);
 
+  async function runReflection(trimmed: string) {
     setIsLoading(true);
     setHasResult(false);
     setResult("");
@@ -82,12 +71,30 @@ export default function ChoosePage() {
     }
   }
 
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const trimmed = input.trim();
+
+    if (!trimmed) {
+      setResult("Describe what feels unclear.");
+      setHasResult(true);
+      setOrbPhase("settled");
+      return;
+    }
+
+    await runReflection(trimmed);
+  }
+
   function handleReset() {
     setInput("");
     setResult("");
     setHasResult(false);
     setIsLoading(false);
     setOrbPhase("idle");
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
   }
 
   return (
@@ -118,40 +125,51 @@ export default function ChoosePage() {
 
         <form className="decision-form" onSubmit={handleSubmit}>
           <label htmlFor="decision" className="prompt">
-            What decision is on your mind?
+            What decision is in your mind?
           </label>
 
           <textarea
             id="decision"
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type the decision here..."
+            placeholder="Should I..."
             rows={3}
             disabled={isLoading}
             className="decision-input"
           />
 
-          <div className="actions">
-            <button type="submit" disabled={isLoading} className="primary-button">
-              {isLoading ? "Reflecting..." : "Explore this decision"}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={isLoading}
-              className="secondary-button"
-            >
-              Explore another decision
-            </button>
-          </div>
+          {!hasResult && !isLoading && (
+            <div className="actions actions-initial">
+              <button type="submit" className="primary-button">
+                Help me see it clearly
+              </button>
+            </div>
+          )}
         </form>
 
-        <section className="response-zone">
-          {!hasResult ? (
-            <p className="response-placeholder">{placeholderLine}</p>
-          ) : (
-            <p className="response-text">{result}</p>
+        <section className="response-zone" aria-live="polite">
+          {isLoading ? (
+            <div className="loading-zone">
+              <p className="loading-copy">{THINKING_COPY}</p>
+            </div>
+          ) : !hasResult ? null : (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">Solace reflection</div>
+                <p className="response-text">{result}</p>
+              </div>
+
+              <div className="actions actions-followup">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="secondary-button"
+                >
+                  Explore another decision
+                </button>
+              </div>
+            </>
           )}
         </section>
       </section>
@@ -278,7 +296,7 @@ export default function ChoosePage() {
         .decision-form {
           width: 100%;
           max-width: 760px;
-          margin-top: -34px;
+          margin-top: 12px;
         }
 
         .prompt {
@@ -334,11 +352,18 @@ export default function ChoosePage() {
         }
 
         .actions {
-          margin-top: 18px;
           display: flex;
           gap: 14px;
           justify-content: center;
           flex-wrap: wrap;
+        }
+
+        .actions-initial {
+          margin-top: 18px;
+        }
+
+        .actions-followup {
+          margin-top: 16px;
         }
 
         .primary-button,
@@ -348,7 +373,7 @@ export default function ChoosePage() {
           min-height: 56px;
           padding: 0 24px;
           border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.18);
           color: rgba(246, 252, 249, 0.98);
           font-size: 0.98rem;
           font-weight: 550;
@@ -359,7 +384,8 @@ export default function ChoosePage() {
             transform 160ms ease,
             box-shadow 160ms ease,
             border-color 160ms ease,
-            background 160ms ease;
+            background 160ms ease,
+            opacity 160ms ease;
           overflow: hidden;
         }
 
@@ -373,8 +399,8 @@ export default function ChoosePage() {
           background:
             linear-gradient(
               180deg,
-              rgba(255, 255, 255, 0.14) 0%,
-              rgba(255, 255, 255, 0.02) 48%,
+              rgba(255, 255, 255, 0.1) 0%,
+              rgba(255, 255, 255, 0.025) 48%,
               rgba(255, 255, 255, 0.01) 100%
             );
         }
@@ -383,49 +409,75 @@ export default function ChoosePage() {
           background:
             linear-gradient(
               180deg,
-              rgba(145, 255, 208, 0.2) 0%,
-              rgba(106, 201, 171, 0.15) 100%
+              rgba(104, 154, 136, 0.52) 0%,
+              rgba(69, 112, 97, 0.62) 100%
             );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            inset 0 -10px 18px rgba(56, 121, 94, 0.12),
-            0 0 26px rgba(149, 255, 206, 0.08);
+            0 16px 34px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -10px 18px rgba(23, 46, 38, 0.22),
+            0 0 22px rgba(149, 255, 206, 0.05);
         }
 
         .secondary-button {
           background:
             linear-gradient(
               180deg,
-              rgba(255, 255, 255, 0.12) 0%,
-              rgba(255, 255, 255, 0.08) 100%
+              rgba(89, 132, 118, 0.5) 0%,
+              rgba(59, 96, 84, 0.6) 100%
             );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -10px 18px rgba(0, 0, 0, 0.08);
+            0 16px 34px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -10px 18px rgba(16, 34, 29, 0.22);
         }
 
         .primary-button:hover,
         .secondary-button:hover {
           transform: translateY(-1px);
+          border-color: rgba(255, 255, 255, 0.22);
         }
 
         .primary-button:hover {
-          border-color: rgba(200, 255, 226, 0.3);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(82, 127, 112, 0.66) 0%,
+              rgba(53, 87, 76, 0.78) 100%
+            );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.24),
-            inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            inset 0 -12px 20px rgba(56, 121, 94, 0.14),
-            0 0 30px rgba(149, 255, 206, 0.1);
+            0 18px 38px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -12px 20px rgba(16, 34, 29, 0.28),
+            0 0 24px rgba(149, 255, 206, 0.04);
         }
 
         .secondary-button:hover {
-          border-color: rgba(255, 255, 255, 0.28);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(76, 118, 105, 0.64) 0%,
+              rgba(48, 79, 69, 0.76) 100%
+            );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            inset 0 -12px 20px rgba(0, 0, 0, 0.1);
+            0 18px 38px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -12px 20px rgba(16, 34, 29, 0.28);
+        }
+
+        .primary-button:active,
+        .secondary-button:active {
+          transform: translateY(1px);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(58, 95, 83, 0.74) 0%,
+              rgba(34, 58, 50, 0.84) 100%
+            );
+          box-shadow:
+            0 10px 22px rgba(0, 0, 0, 0.26),
+            inset 0 2px 6px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
 
         .primary-button:disabled,
@@ -435,26 +487,103 @@ export default function ChoosePage() {
           transform: none;
         }
 
-        .response-zone {
-          margin-top: 28px;
-          min-height: 80px;
+        .loading-zone {
+          margin-top: 12px;
+          width: 100%;
           display: flex;
-          align-items: center;
           justify-content: center;
-          max-width: 760px;
         }
 
-        .response-placeholder {
+        .loading-copy {
           margin: 0;
-          color: rgba(228, 241, 235, 0.74);
-          text-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+          font-size: 0.75rem;
+          font-weight: 560;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(241, 249, 245, 0.96);
+          text-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.24),
+            0 0 10px rgba(190, 255, 223, 0.08);
+          animation: solaceBreathing 3.2s ease-in-out infinite;
+        }
+
+        .response-zone {
+          margin-top: 6px;
+          width: 100%;
+          max-width: 760px;
+          min-height: 80px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .response-card {
+          width: 100%;
+          max-width: 760px;
+          margin-top: 0;
+          padding: 22px 26px;
+          border-radius: 32px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(20, 31, 29, 0.72) 0%,
+              rgba(17, 28, 27, 0.68) 100%
+            );
+          box-shadow:
+            0 20px 44px rgba(0, 0, 0, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+            0 0 0 1px rgba(194, 255, 223, 0.03);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          animation: responseReveal 600ms ease forwards;
+          opacity: 0;
+          transform: translateY(12px);
+        }
+
+        .response-card-label {
+          margin-bottom: 12px;
+          font-size: 0.75rem;
+          font-weight: 560;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(226, 240, 233, 0.66);
         }
 
         .response-text {
           margin: 0;
           color: rgba(242, 250, 246, 0.96);
-          line-height: 1.76;
+          line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
+          white-space: pre-line;
+        }
+
+        @keyframes responseReveal {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes solaceBreathing {
+          0% {
+            transform: scale(0.98);
+            opacity: 0.85;
+          }
+          50% {
+            transform: scale(1.04);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(0.98);
+            opacity: 0.85;
+          }
         }
 
         @media (max-width: 900px) {
@@ -479,7 +608,7 @@ export default function ChoosePage() {
           }
 
           .decision-form {
-            margin-top: -20px;
+            margin-top: 0;
           }
 
           .actions {
@@ -489,6 +618,11 @@ export default function ChoosePage() {
           .primary-button,
           .secondary-button {
             width: 100%;
+          }
+
+          .response-card {
+            padding: 20px 20px 22px;
+            border-radius: 24px;
           }
         }
       `}</style>
