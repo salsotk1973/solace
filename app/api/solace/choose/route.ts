@@ -9,6 +9,7 @@ import {
   type ChooseDecisionType,
   type ChooseEmotionalWeight,
   type ChooseToneMode,
+  type ChooseResponsePattern,
 } from "@/lib/solace/prompts";
 
 const client = new OpenAI({
@@ -305,15 +306,44 @@ function classifyToneMode(
   return "plain";
 }
 
+function hashString(value: string): number {
+  let hash = 0;
+
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  }
+
+  return hash;
+}
+
+function selectResponsePattern(
+  input: string,
+  decisionType: ChooseDecisionType,
+  emotionalWeight: ChooseEmotionalWeight
+): ChooseResponsePattern {
+  const patterns: ChooseResponsePattern[] = [
+    "anchor-tension-observation",
+    "anchor-consequence-reflection",
+    "anchor-contrast-insight",
+  ];
+
+  const seed = `${normalizeText(input)}|${decisionType}|${emotionalWeight}`;
+  const index = hashString(seed) % patterns.length;
+
+  return patterns[index];
+}
+
 function buildDecisionContext(input: string): ChooseDecisionContext {
   const decisionType = classifyDecisionType(input);
   const emotionalWeight = classifyEmotionalWeight(input, decisionType);
   const toneMode = classifyToneMode(decisionType, emotionalWeight);
+  const responsePattern = selectResponsePattern(input, decisionType, emotionalWeight);
 
   return {
     decisionType,
     emotionalWeight,
     toneMode,
+    responsePattern,
   };
 }
 
@@ -359,8 +389,7 @@ function formatReflectionText(text: string): string {
     return cleanupSentenceText(text);
   }
 
-  const limited = sentences.slice(0, 4);
-  return limited.join("\n\n");
+  return sentences.slice(0, 3).join("\n\n");
 }
 
 export async function POST(req: Request) {
