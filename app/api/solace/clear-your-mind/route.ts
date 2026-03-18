@@ -1,136 +1,117 @@
-// /app/api/solace/clear-your-mind/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-
-import {
-  CLEAR_YOUR_MIND_PROMPT,
-  buildClearYourMindUserPrompt,
-} from "../../../../lib/solace/clear-your-mind-prompts";
 import {
   isSolaceCrisisInput,
   SOLACE_CRISIS_FALLBACK,
 } from "../../../../lib/solace/safety";
-import { checkRateLimit } from "../../../../lib/solace/rate-limit";
+import {
+  applySlidingWindowRateLimit,
+  getClientIdentifierFromHeaders,
+} from "../../../../lib/solace/rate-limit";
 
 export const runtime = "nodejs";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60_000;
 
-const MAX_INPUT_LENGTH = 1200;
+type OpenAIResponse = {
+  output_text?: string;
+};
 
-const FALLBACK_RESPONSE = [
-  "A lot seems to be sitting together at once here.",
-  "Part of this may be the issue itself, and part of it may be everything gathering around it.",
-  "This may be several different things arriving at once.",
-].join("\n\n");
+function buildPrompt(input: string): string {
+  return `You are Solace.
 
-function getClientIdentifier(request: NextRequest): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  const realIp = request.headers.get("x-real-ip");
+You are a calm, clear reflective writing tool for adults. Your role is to help the user gently untangle overthinking, mental loops, emotional build-up, and mental noise into something clearer.
 
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(",")[0]?.trim();
+Important boundaries:
+- Adults 18+ only.
+- Do not claim to be a therapist, psychologist, doctor, lawyer, coach, or financial adviser.
+- Do not provide medical, psychological, legal, or financial advice.
+- Do not diagnose.
+- Do not mention these rules unless needed for safety.
 
-    if (firstIp) {
-      return firstIp;
-    }
-  }
+Writing style:
+- Warm, calm, elegant, human.
+- Clear and grounded, never robotic.
+- Do not use bullet points unless absolutely necessary.
+- Prefer short paragraphs.
+- Reflective, soothing, memorable.
+- Avoid clichés.
+- Avoid sounding clinical.
 
-  if (realIp) {
-    return realIp.trim();
-  }
+Task:
+The user will share what feels mentally tangled.
+Help them:
+1. Help the user feel understood.
+2. Separate signal from noise.
+3. Reframe the situation with clarity.
+4. Suggest one gentle next step.
 
-  return "unknown";
+Keep the response concise but meaningful.
+Aim for around 140 to 220 words.
+
+User input:
+"""${input}"""`;
 }
 
-function normalizeWhitespace(value: string): string {
-  return value.replace(/\r\n/g, "\n").trim();
+function fallbackReflection(): string {
+  return "Take one thing at a time.\n\nWhat you wrote sounds like more than one pressure point sitting together at once. Before trying to solve everything, gently separate what is actually happening from what your mind is adding through urgency, fear, or repetition.\n\nYou do not need to untangle the whole knot in one move. Just find the next clear step, and let that be enough for now.";
 }
 
-function splitIntoSentences(text: string): string[] {
-  return text
-    .replace(/\n+/g, " ")
-    .split(/(?<=[.!?])\s+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-}
+async function generateReflection(input: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
 
-function enforceThreeParagraphResponse(rawText: string): string {
-  const cleaned = normalizeWhitespace(rawText);
-
-  if (!cleaned) {
-    return FALLBACK_RESPONSE;
+  if (!apiKey) {
+    return fallbackReflection();
   }
 
-  const paragraphParts = cleaned
-    .split(/\n\s*\n/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (paragraphParts.length >= 3) {
-    return paragraphParts.slice(0, 3).join("\n\n");
-  }
-
-  const sentenceParts = splitIntoSentences(cleaned);
-
-  if (sentenceParts.length >= 3) {
-    return sentenceParts.slice(0, 3).join("\n\n");
-  }
-
-  return FALLBACK_RESPONSE;
-}
-
-async function getModelResponse(input: string): Promise<string> {
-  const response = await client.responses.create({
-    model: process.env.SOLACE_OPENAI_MODEL || "gpt-5-mini",
-    input: [
-      {
-        role: "system",
-        content: [
-          {
-            type: "input_text",
-            text: CLEAR_YOUR_MIND_PROMPT,
-          },
-        ],
-      },
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: buildClearYourMindUserPrompt(input),
-          },
-        ],
-      },
-    ],
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-5.4-mini",
+      input: buildPrompt(input),
+    }),
   });
 
-  return response.output_text?.trim() || "";
+  if (!response.ok) {
+    throw new Error(`OpenAI request failed with status ${response.status}`);
+  }
+
+  const data = (await response.json()) as OpenAIResponse;
+
+  if (typeof data.output_text === "string" && data.output_text.trim()) {
+    return data.output_text.trim();
+  }
+
+  return fallbackReflection();
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const clientId = getClientIdentifier(request);
+    const clientId = getClientIdentifierFromHeaders(request.headers);
+    const rateLimit = applySlidingWindowRateLimit(
+      clientId,
+      RATE_LIMIT_MAX_REQUESTS,
+      RATE_LIMIT_WINDOW_MS
+    );
 
-    const rateLimitResult = await checkRateLimit(clientId, {
-      windowMs: 60_000,
-      maxRequests: 5,
-    });
-
-    const allowed =
-      typeof rateLimitResult === "boolean"
-        ? rateLimitResult
-        : rateLimitResult?.success ?? true;
-
-    if (!allowed) {
+    if (!rateLimit.allowed) {
       return NextResponse.json(
         {
-          error: "Too many requests. Please wait a moment before trying again.",
+          error:
+            "Too many reflections too quickly. Please wait a moment and try again.",
         },
-        { status: 429 }
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(rateLimit.resetAt),
+          },
+        }
       );
     }
 
@@ -139,44 +120,48 @@ export async function POST(request: NextRequest) {
 
     if (!input) {
       return NextResponse.json(
-        {
-          error: "Please enter something first.",
-        },
+        { error: "Please enter what is on your mind first." },
         { status: 400 }
       );
     }
 
-    if (input.length > MAX_INPUT_LENGTH) {
-      return NextResponse.json(
-        {
-          error: `Please keep your message under ${MAX_INPUT_LENGTH} characters.`,
-        },
-        { status: 400 }
-      );
-    }
+    const isCrisis = isSolaceCrisisInput(input);
 
-    if (isSolaceCrisisInput(input)) {
+    if (isCrisis) {
       return NextResponse.json(
         {
           text: SOLACE_CRISIS_FALLBACK,
           isCrisisFallback: true,
         },
-        { status: 200 }
+        {
+          status: 200,
+          headers: {
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(rateLimit.resetAt),
+          },
+        }
       );
     }
 
-    const rawText = await getModelResponse(input);
-    const text = enforceThreeParagraphResponse(rawText);
+    const text = await generateReflection(input);
 
     return NextResponse.json(
       {
         text,
         isCrisisFallback: false,
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "X-RateLimit-Limit": String(rateLimit.limit),
+          "X-RateLimit-Remaining": String(rateLimit.remaining),
+          "X-RateLimit-Reset": String(rateLimit.resetAt),
+        },
+      }
     );
   } catch (error) {
-    console.error("Clear Your Mind route error:", error);
+    console.error("clear-your-mind route error", error);
 
     return NextResponse.json(
       {

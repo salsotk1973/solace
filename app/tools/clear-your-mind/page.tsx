@@ -3,12 +3,31 @@
 // /app/tools/clear-your-mind/page.tsx
 
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import MindAnchor3D from "@/components/anchors/MindAnchor3D";
+import {
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 const MAX_INPUT_LENGTH = 1200;
-const BUTTON_READY_DELAY_MS = 1400;
+const MAX_BUBBLES = 12;
+const BUTTON_READY_DELAY_MS = 900;
 const THINKING_COPY = "SOLACE IS REFLECTING...";
+
+type BubbleItem = {
+  id: string;
+  text: string;
+  size: "small" | "medium" | "large";
+  width: number;
+  x: number;
+  y: number;
+  driftX: number;
+  driftY: number;
+  delay: number;
+};
 
 function getParagraphs(text: string): string[] {
   return text
@@ -17,29 +36,102 @@ function getParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
+function getBubbleSize(text: string): "small" | "medium" | "large" {
+  const length = text.trim().length;
+
+  if (length <= 42) return "small";
+  if (length <= 90) return "medium";
+  return "large";
+}
+
+function getBubbleWidth(size: "small" | "medium" | "large", text: string): number {
+  if (size === "small") {
+    return Math.min(190 + text.length * 1.6, 250);
+  }
+
+  if (size === "medium") {
+    return Math.min(240 + text.length * 1.2, 330);
+  }
+
+  return Math.min(300 + text.length * 0.85, 400);
+}
+
+function buildBubble(text: string, index: number): BubbleItem {
+  const size = getBubbleSize(text);
+  const width = getBubbleWidth(size, text);
+
+  const positions = [
+    { x: 50, y: 22 },
+    { x: 26, y: 50 },
+    { x: 74, y: 48 },
+    { x: 38, y: 76 },
+    { x: 63, y: 78 },
+    { x: 18, y: 26 },
+    { x: 82, y: 27 },
+    { x: 10, y: 62 },
+    { x: 90, y: 64 },
+    { x: 49, y: 58 },
+    { x: 31, y: 34 },
+    { x: 69, y: 35 },
+  ];
+
+  const drifts = [
+    { driftX: -8, driftY: -7 },
+    { driftX: 10, driftY: -9 },
+    { driftX: -7, driftY: 8 },
+    { driftX: 8, driftY: 7 },
+    { driftX: -6, driftY: -6 },
+    { driftX: 7, driftY: 5 },
+    { driftX: -9, driftY: 6 },
+    { driftX: 6, driftY: -8 },
+    { driftX: -5, driftY: 7 },
+    { driftX: 4, driftY: -5 },
+    { driftX: 5, driftY: 6 },
+    { driftX: -4, driftY: -6 },
+  ];
+
+  const pos = positions[index % positions.length];
+  const drift = drifts[index % drifts.length];
+
+  return {
+    id: `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`,
+    text,
+    size,
+    width,
+    x: pos.x,
+    y: pos.y,
+    driftX: drift.driftX,
+    driftY: drift.driftY,
+    delay: index * 120,
+  };
+}
+
 export default function ClearYourMindPage() {
-  const [input, setInput] = useState("");
+  const [draft, setDraft] = useState("");
+  const [bubbles, setBubbles] = useState<BubbleItem[]>([]);
   const [responseText, setResponseText] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCrisisFallback, setIsCrisisFallback] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
+
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const remainingCharacters = useMemo(
-    () => MAX_INPUT_LENGTH - input.length,
-    [input.length]
+    () => MAX_INPUT_LENGTH - draft.length,
+    [draft.length]
   );
 
+  const responseParagraphs = useMemo(
+    () => getParagraphs(responseText),
+    [responseText]
+  );
+
+  const hasBubbleContent = bubbles.length > 0;
+  const canSubmit = hasBubbleContent && !isLoading;
+
   useEffect(() => {
-    if (isLoading || responseText || error) {
-      setIsButtonReady(false);
-      return;
-    }
-
-    const trimmed = input.trim();
-
-    if (!trimmed) {
+    if (isLoading || responseText || error || !hasBubbleContent) {
       setIsButtonReady(false);
       return;
     }
@@ -53,7 +145,7 @@ export default function ClearYourMindPage() {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [input, isLoading, responseText, error]);
+  }, [hasBubbleContent, isLoading, responseText, error]);
 
   useEffect(() => {
     if (!isLoading && (responseText || error)) {
@@ -61,18 +153,41 @@ export default function ClearYourMindPage() {
     }
   }, [responseText, error, isLoading]);
 
+  function addBubbleFromDraft() {
+    const trimmed = draft.trim();
+
+    if (!trimmed) return;
+
+    setBubbles((current) => {
+      const next = [...current, buildBubble(trimmed, current.length)];
+      return next.slice(-MAX_BUBBLES);
+    });
+
+    setDraft("");
+    setResponseText("");
+    setError("");
+    setIsCrisisFallback(false);
+  }
+
+  function handleTextareaKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      addBubbleFromDraft();
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const trimmedInput = input.trim();
-
-    if (!trimmedInput) {
-      setError("Please enter what is on your mind first.");
+    if (!bubbles.length) {
+      setError("Add at least one thought first. Press Enter to turn it into a bubble.");
       setResponseText("");
       setIsCrisisFallback(false);
       setIsButtonReady(false);
       return;
     }
+
+    const combinedInput = bubbles.map((bubble) => bubble.text).join("\n\n");
 
     setIsLoading(true);
     setError("");
@@ -87,7 +202,7 @@ export default function ClearYourMindPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          input: trimmedInput,
+          input: combinedInput,
         }),
       });
 
@@ -117,7 +232,8 @@ export default function ClearYourMindPage() {
   }
 
   function handleReset() {
-    setInput("");
+    setDraft("");
+    setBubbles([]);
     setResponseText("");
     setError("");
     setIsLoading(false);
@@ -129,7 +245,9 @@ export default function ClearYourMindPage() {
     });
   }
 
-  const responseParagraphs = getParagraphs(responseText);
+  function removeBubble(id: string) {
+    setBubbles((current) => current.filter((bubble) => bubble.id !== id));
+  }
 
   return (
     <main className="mind-realm">
@@ -158,9 +276,43 @@ export default function ClearYourMindPage() {
           </p>
         </div>
 
-        <div className="anchor-stage" aria-hidden="true">
-          <MindAnchor3D />
-        </div>
+        <section className="bubble-stage" aria-label="Thought bubbles">
+          <div
+            className={`bubble-field ${
+              isLoading ? "bubble-field-gathering" : ""
+            } ${responseText ? "bubble-field-softened" : ""}`}
+          >
+            {bubbles.length === 0 ? (
+              <div className="bubble-empty">
+                Press Enter to turn each thought into a bubble.
+              </div>
+            ) : (
+              bubbles.map((bubble) => (
+                <button
+                  key={bubble.id}
+                  type="button"
+                  className={`thought-bubble thought-bubble-${bubble.size} ${
+                    isLoading ? "thought-bubble-gathering" : ""
+                  } ${responseText ? "thought-bubble-softened" : ""}`}
+                  style={
+                    {
+                      "--bubble-width": `${bubble.width}px`,
+                      "--bubble-x": `${bubble.x}%`,
+                      "--bubble-y": `${bubble.y}%`,
+                      "--bubble-drift-x": `${bubble.driftX}px`,
+                      "--bubble-drift-y": `${bubble.driftY}px`,
+                      "--bubble-delay": `${bubble.delay}ms`,
+                    } as React.CSSProperties
+                  }
+                  onClick={() => removeBubble(bubble.id)}
+                  title="Remove bubble"
+                >
+                  <span className="thought-bubble-text">{bubble.text}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </section>
 
         <form className="mind-form" onSubmit={handleSubmit}>
           <div className="scope-inline">
@@ -182,10 +334,11 @@ export default function ClearYourMindPage() {
           <textarea
             id="clear-your-mind-input"
             ref={inputRef}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={handleTextareaKeyDown}
             maxLength={MAX_INPUT_LENGTH}
-            placeholder="Write what feels tangled."
+            placeholder="Write one thought, then press Enter to bubble it."
             className="mind-input"
             disabled={isLoading}
           />
@@ -203,6 +356,7 @@ export default function ClearYourMindPage() {
                 className={`primary-button ${
                   isButtonReady ? "primary-button-ready" : ""
                 }`}
+                disabled={!canSubmit}
               >
                 Clear your mind
               </button>
@@ -409,15 +563,143 @@ export default function ClearYourMindPage() {
           text-shadow: 0 3px 16px rgba(0, 0, 0, 0.24);
         }
 
-        .anchor-stage {
+        .bubble-stage {
           width: 100%;
           max-width: 760px;
-          margin-top: 8px;
-          margin-bottom: -10px;
+          margin-top: 18px;
+          margin-bottom: 18px;
+        }
+
+        .bubble-field {
+          position: relative;
+          width: 100%;
+          height: 280px;
+          border-radius: 36px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: linear-gradient(
+            180deg,
+            rgba(18, 18, 30, 0.42) 0%,
+            rgba(13, 13, 22, 0.52) 100%
+          );
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 18px 40px rgba(0, 0, 0, 0.18);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          overflow: hidden;
+        }
+
+        .bubble-field::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(220, 196, 255, 0.06) 0%,
+            rgba(220, 196, 255, 0.02) 28%,
+            rgba(220, 196, 255, 0) 60%
+          );
+          pointer-events: none;
+        }
+
+        .bubble-field-gathering .thought-bubble {
+          animation-play-state: running;
+        }
+
+        .bubble-field-softened .thought-bubble {
+          opacity: 0.56;
+          filter: saturate(0.88);
+        }
+
+        .bubble-empty {
+          position: absolute;
+          inset: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          pointer-events: none;
+          padding: 28px;
+          color: rgba(241, 234, 249, 0.42);
+          font-size: 0.98rem;
+          line-height: 1.6;
+        }
+
+        .thought-bubble {
+          position: absolute;
+          left: var(--bubble-x);
+          top: var(--bubble-y);
+          width: var(--bubble-width);
+          max-width: min(var(--bubble-width), 84%);
+          transform: translate(-50%, -50%);
+          padding: 14px 18px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background:
+            radial-gradient(
+              circle at 28% 24%,
+              rgba(255, 255, 255, 0.18) 0%,
+              rgba(255, 255, 255, 0.06) 18%,
+              rgba(255, 255, 255, 0) 36%
+            ),
+            linear-gradient(
+              180deg,
+              rgba(178, 150, 224, 0.28) 0%,
+              rgba(118, 97, 165, 0.24) 100%
+            );
+          box-shadow:
+            0 14px 32px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -8px 16px rgba(39, 31, 58, 0.18),
+            0 0 24px rgba(219, 192, 255, 0.06);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          color: rgba(247, 244, 252, 0.96);
+          animation:
+            bubbleAppear 520ms cubic-bezier(0.22, 1, 0.36, 1),
+            bubbleFloat 7.8s ease-in-out infinite;
+          animation-delay: var(--bubble-delay), calc(var(--bubble-delay) * -1);
+          cursor: pointer;
+          text-align: center;
+        }
+
+        .thought-bubble:hover {
+          border-color: rgba(255, 255, 255, 0.24);
+        }
+
+        .thought-bubble-gathering {
+          animation:
+            bubbleAppear 520ms cubic-bezier(0.22, 1, 0.36, 1),
+            bubbleGather 1.8s ease-in-out forwards;
+        }
+
+        .thought-bubble-softened {
+          transition: opacity 260ms ease, filter 260ms ease;
+        }
+
+        .thought-bubble-small {
+          min-height: 54px;
+          font-size: 0.94rem;
+        }
+
+        .thought-bubble-medium {
+          min-height: 68px;
+          font-size: 0.98rem;
+        }
+
+        .thought-bubble-large {
+          min-height: 84px;
+          font-size: 1rem;
+          border-radius: 28px;
+          padding-top: 16px;
+          padding-bottom: 16px;
+        }
+
+        .thought-bubble-text {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          line-height: 1.45;
+          text-wrap: balance;
         }
 
         .mind-form {
@@ -473,7 +755,7 @@ export default function ClearYourMindPage() {
 
         .mind-input {
           width: 100%;
-          min-height: 176px;
+          min-height: 140px;
           padding: 22px 26px;
           border-radius: 32px;
           border: 1px solid rgba(255, 255, 255, 0.18);
@@ -773,6 +1055,50 @@ export default function ClearYourMindPage() {
           white-space: pre-line;
         }
 
+        @keyframes bubbleAppear {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        @keyframes bubbleFloat {
+          0% {
+            transform: translate(-50%, -50%) translate(0, 0) scale(1);
+          }
+          25% {
+            transform: translate(-50%, -50%)
+              translate(var(--bubble-drift-x), calc(var(--bubble-drift-y) * -0.4))
+              scale(1.02);
+          }
+          50% {
+            transform: translate(-50%, -50%)
+              translate(calc(var(--bubble-drift-x) * -0.55), var(--bubble-drift-y))
+              scale(0.995);
+          }
+          75% {
+            transform: translate(-50%, -50%)
+              translate(calc(var(--bubble-drift-x) * 0.4), calc(var(--bubble-drift-y) * 0.3))
+              scale(1.015);
+          }
+          100% {
+            transform: translate(-50%, -50%) translate(0, 0) scale(1);
+          }
+        }
+
+        @keyframes bubbleGather {
+          0% {
+            transform: translate(-50%, -50%) scale(1);
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(0.94);
+          }
+        }
+
         @keyframes responseReveal {
           from {
             opacity: 0;
@@ -812,9 +1138,13 @@ export default function ClearYourMindPage() {
             padding-right: 18px;
           }
 
-          .anchor-stage {
-            margin-top: 0;
-            margin-bottom: -6px;
+          .bubble-stage {
+            margin-top: 14px;
+          }
+
+          .bubble-field {
+            height: 250px;
+            border-radius: 28px;
           }
 
           .scope-inline {
@@ -828,7 +1158,7 @@ export default function ClearYourMindPage() {
           }
 
           .mind-input {
-            min-height: 168px;
+            min-height: 136px;
             padding: 20px 20px 22px;
             border-radius: 24px;
           }
@@ -845,6 +1175,12 @@ export default function ClearYourMindPage() {
           .response-card {
             padding: 20px 20px 22px;
             border-radius: 24px;
+          }
+
+          .thought-bubble {
+            max-width: 88%;
+            padding-left: 16px;
+            padding-right: 16px;
           }
         }
       `}</style>
