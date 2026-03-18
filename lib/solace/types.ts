@@ -1,9 +1,10 @@
-export type SolaceToolName = "slow-down" | "choose" | "signal-vs-noise";
+export type SolaceToolName = "choose" | "clear-your-mind" | "signal-vs-noise";
 
 export type SolaceApiSuccess = {
   ok: true;
   message: string;
   nextTool?: SolaceToolName;
+  isCrisisFallback?: boolean;
 };
 
 export type SolaceApiError = {
@@ -13,8 +14,8 @@ export type SolaceApiError = {
 
 export type SolaceApiResponse = SolaceApiSuccess | SolaceApiError;
 
-export type SlowDownRequest = {
-  thoughts: string[];
+export type ClearYourMindRequest = {
+  input: string;
 };
 
 export type ChooseRequest = {

@@ -88,7 +88,7 @@ function getCardRestStyle(slug: SolaceToolSlug): CSSProperties {
     };
   }
 
-  if (slug === "slow-down") {
+  if (slug === "clear-your-mind") {
     return {
       border: "1px solid rgba(152,190,160,0.4)",
       background: "rgba(221,232,224,0.62)",
@@ -116,7 +116,7 @@ function getCardHoverStyle(slug: SolaceToolSlug): CSSProperties {
     };
   }
 
-  if (slug === "slow-down") {
+  if (slug === "clear-your-mind") {
     return {
       border: "1px solid rgba(122,175,137,0.56)",
       background: "rgba(225,235,228,0.76)",

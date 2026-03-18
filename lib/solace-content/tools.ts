@@ -1,4 +1,4 @@
-export type SolaceToolSlug = "choose" | "slow-down" | "sort";
+export type SolaceToolSlug = "choose" | "clear-your-mind" | "sort";
 export type SolaceToolTheme = "blue" | "green" | "sand";
 
 export type SolaceTool = {
@@ -26,14 +26,14 @@ export const tools: readonly SolaceTool[] = [
     order: 1,
   },
   {
-    slug: "slow-down",
-    name: "Slow Down",
+    slug: "clear-your-mind",
+    name: "Clear Your Mind",
     feeling: "My mind won't stop thinking",
-    description: "Calm racing thoughts and regain perspective.",
+    description: "Untangle overthinking and regain perspective.",
     shortDescription: "For moments of overthinking.",
-    introTitle: "Slow Down",
+    introTitle: "Clear Your Mind",
     introText:
-      "Step out of mental loops and create a little more space to think.",
+      "Untangle mental loops and create a little more space to think clearly.",
     theme: "green",
     order: 2,
   },

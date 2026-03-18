@@ -44,7 +44,7 @@ function getCardRestStyle(slug: SolaceToolSlug): CSSProperties {
     };
   }
 
-  if (slug === "slow-down") {
+  if (slug === "clear-your-mind") {
     return {
       border: "1px solid rgba(152,190,160,0.42)",
       background: "rgba(221,232,224,0.72)",
@@ -72,7 +72,7 @@ function getCardHoverStyle(slug: SolaceToolSlug): CSSProperties {
     };
   }
 
-  if (slug === "slow-down") {
+  if (slug === "clear-your-mind") {
     return {
       border: "1px solid rgba(122,175,137,0.62)",
       background: "rgba(225,235,228,0.84)",
@@ -87,8 +87,8 @@ function getCardHoverStyle(slug: SolaceToolSlug): CSSProperties {
     background: "rgba(252,237,227,0.9)",
     boxShadow:
       "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(230,150,84,0.16), 0 0 26px rgba(230,150,84,0.28)",
-    transform: "translateY(-6px)",
-  };
+      transform: "translateY(-6px)",
+    };
 }
 
 function getCardStyle(slug: SolaceToolSlug, hovered: boolean): CSSProperties {

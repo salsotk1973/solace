@@ -1,39 +1,38 @@
 "use client";
 
+// /app/tools/clear-your-mind/page.tsx
+
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
-import ReflectionOrb from "@/components/solace/ReflectionOrb";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import MindAnchor3D from "@/components/anchors/MindAnchor3D";
 
-type OrbPhase = "idle" | "active" | "settled";
-
-const THINKING_DELAY_MS = 2800;
-const THINKING_COPY = "SOLACE IS REFLECTING...";
+const MAX_INPUT_LENGTH = 1200;
 const BUTTON_READY_DELAY_MS = 1400;
+const THINKING_COPY = "SOLACE IS REFLECTING...";
 
-export default function ChoosePage() {
+function getParagraphs(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+export default function ClearYourMindPage() {
   const [input, setInput] = useState("");
-  const [result, setResult] = useState("");
+  const [responseText, setResponseText] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [orbPhase, setOrbPhase] = useState<OrbPhase>("idle");
-  const [hasResult, setHasResult] = useState(false);
   const [isCrisisFallback, setIsCrisisFallback] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  useEffect(() => {
-    if (!isLoading && !hasResult) {
-      setOrbPhase("idle");
-    }
-  }, [isLoading, hasResult]);
+  const remainingCharacters = useMemo(
+    () => MAX_INPUT_LENGTH - input.length,
+    [input.length]
+  );
 
   useEffect(() => {
-    if (hasResult && !isLoading) {
-      inputRef.current?.focus();
-    }
-  }, [hasResult, isLoading]);
-
-  useEffect(() => {
-    if (isLoading || hasResult) {
+    if (isLoading || responseText || error) {
       setIsButtonReady(false);
       return;
     }
@@ -54,101 +53,86 @@ export default function ChoosePage() {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [input, isLoading, hasResult]);
+  }, [input, isLoading, responseText, error]);
 
-  async function runReflection(trimmed: string) {
+  useEffect(() => {
+    if (!isLoading && (responseText || error)) {
+      inputRef.current?.focus();
+    }
+  }, [responseText, error, isLoading]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput) {
+      setError("Please enter what is on your mind first.");
+      setResponseText("");
+      setIsCrisisFallback(false);
+      setIsButtonReady(false);
+      return;
+    }
+
     setIsLoading(true);
-    setHasResult(false);
-    setResult("");
+    setError("");
+    setResponseText("");
     setIsCrisisFallback(false);
     setIsButtonReady(false);
-    setOrbPhase("active");
-
-    const startedAt = Date.now();
 
     try {
-      const res = await fetch("/api/solace/choose", {
+      const response = await fetch("/api/solace/clear-your-mind", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ input: trimmed }),
+        body: JSON.stringify({
+          input: trimmedInput,
+        }),
       });
 
-      const data = await res.json().catch(() => null);
+      const data = await response.json().catch(() => null);
 
-      const elapsed = Date.now() - startedAt;
-      const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
-      await new Promise((resolve) => setTimeout(resolve, remaining));
-
-      if (!res.ok) {
-        const errorText =
+      if (!response.ok) {
+        setError(
           typeof data?.error === "string"
             ? data.error
-            : "Something interrupted the reflection for a moment. Please try again.";
-
-        setResult(errorText);
-        setIsCrisisFallback(false);
-        setHasResult(true);
-        setOrbPhase("settled");
+            : "Something went wrong. Please try again."
+        );
         return;
       }
 
-      const text = typeof data?.text === "string" ? data.text.trim() : "";
+      const text =
+        typeof data?.text === "string"
+          ? data.text.trim()
+          : "Something went wrong. Please try again.";
 
-      setResult(
-        text || "Something interrupted the reflection for a moment. Please try again."
-      );
+      setResponseText(text);
       setIsCrisisFallback(Boolean(data?.isCrisisFallback));
-      setHasResult(true);
-      setOrbPhase("settled");
     } catch {
-      const elapsed = Date.now() - startedAt;
-      const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
-      await new Promise((resolve) => setTimeout(resolve, remaining));
-
-      setResult("Something interrupted the reflection for a moment. Please try again.");
-      setIsCrisisFallback(false);
-      setHasResult(true);
-      setOrbPhase("settled");
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const trimmed = input.trim();
-
-    if (!trimmed) {
-      setResult("Describe what feels unclear.");
-      setIsCrisisFallback(false);
-      setHasResult(true);
-      setOrbPhase("settled");
-      setIsButtonReady(false);
-      return;
-    }
-
-    await runReflection(trimmed);
-  }
-
   function handleReset() {
     setInput("");
-    setResult("");
-    setHasResult(false);
+    setResponseText("");
+    setError("");
     setIsLoading(false);
     setIsCrisisFallback(false);
     setIsButtonReady(false);
-    setOrbPhase("idle");
 
     requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
   }
 
+  const responseParagraphs = getParagraphs(responseText);
+
   return (
-    <main className="choose-realm">
+    <main className="mind-realm">
       <div className="realm-bg-stage" aria-hidden="true">
         <img
           src="/realms/emerald/emerald-realm-master.png"
@@ -159,21 +143,26 @@ export default function ChoosePage() {
 
       <div className="realm-bg-vignette" aria-hidden="true" />
       <div className="realm-bg-soften" aria-hidden="true" />
+      <div className="realm-mind-wash" aria-hidden="true" />
       <div className="realm-center-halo" aria-hidden="true" />
 
       <section className="realm-content">
         <div className="realm-intro">
-          <h1 className="title">Choose</h1>
+          <p className="realm-label">Mind realm</p>
+
+          <h1 className="title">Clear your mind</h1>
+
           <p className="subtitle">
-            Compare options calmly and move toward a clearer next step.
+            Untangle overthinking, mental loops, and emotional build-up into
+            something a little clearer.
           </p>
         </div>
 
-        <div className="orb-stage">
-          <ReflectionOrb phase={orbPhase} />
+        <div className="anchor-stage" aria-hidden="true">
+          <MindAnchor3D />
         </div>
 
-        <form className="decision-form" onSubmit={handleSubmit}>
+        <form className="mind-form" onSubmit={handleSubmit}>
           <div className="scope-inline">
             <span className="scope-inline-copy">Adults 18+ only</span>
             <span className="scope-separator">·</span>
@@ -186,28 +175,36 @@ export default function ChoosePage() {
             </Link>
           </div>
 
-          <label htmlFor="decision" className="prompt">
-            What decision is in your mind?
+          <label htmlFor="clear-your-mind-input" className="prompt">
+            What feels tangled right now?
           </label>
 
           <textarea
-            id="decision"
+            id="clear-your-mind-input"
             ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Should I..."
-            rows={3}
+            onChange={(event) => setInput(event.target.value)}
+            maxLength={MAX_INPUT_LENGTH}
+            placeholder="Write what feels tangled."
+            className="mind-input"
             disabled={isLoading}
-            className="decision-input"
           />
 
-          {!hasResult && !isLoading && (
+          <div className="form-meta">
+            <p className="character-count">
+              {remainingCharacters} characters remaining
+            </p>
+          </div>
+
+          {!responseText && !error && !isLoading && (
             <div className="actions actions-initial">
               <button
                 type="submit"
-                className={`primary-button ${isButtonReady ? "primary-button-ready" : ""}`}
+                className={`primary-button ${
+                  isButtonReady ? "primary-button-ready" : ""
+                }`}
               >
-                Help me see it clearly
+                Clear your mind
               </button>
             </div>
           )}
@@ -218,7 +215,24 @@ export default function ChoosePage() {
             <div className="loading-zone">
               <p className="loading-copy">{THINKING_COPY}</p>
             </div>
-          ) : !hasResult ? null : (
+          ) : error ? (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">Solace</div>
+                <p className="response-text">{error}</p>
+              </div>
+
+              <div className="actions actions-followup">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="secondary-button"
+                >
+                  Start again
+                </button>
+              </div>
+            </>
+          ) : responseText ? (
             <>
               <div
                 className={`response-card ${
@@ -228,7 +242,14 @@ export default function ChoosePage() {
                 <div className="response-card-label">
                   {isCrisisFallback ? "Important" : "Solace reflection"}
                 </div>
-                <p className="response-text">{result}</p>
+
+                <div className="response-copy">
+                  {responseParagraphs.map((paragraph, index) => (
+                    <p key={`${paragraph}-${index}`} className="response-text">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
 
               <div className="actions actions-followup">
@@ -237,20 +258,20 @@ export default function ChoosePage() {
                   onClick={handleReset}
                   className="secondary-button"
                 >
-                  Explore another decision
+                  Clear another thought
                 </button>
               </div>
             </>
-          )}
+          ) : null}
         </section>
       </section>
 
       <style jsx>{`
-        .choose-realm {
+        .mind-realm {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #020807;
+          background: #05050a;
         }
 
         .realm-bg-stage {
@@ -273,6 +294,8 @@ export default function ChoosePage() {
           max-height: none;
           user-select: none;
           -webkit-user-drag: none;
+          opacity: 0.82;
+          filter: saturate(0.88) hue-rotate(32deg) brightness(0.82);
         }
 
         .realm-bg-vignette {
@@ -280,13 +303,12 @@ export default function ChoosePage() {
           inset: 0;
           z-index: 1;
           pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(0, 0, 0, 0) 38%,
-              rgba(0, 0, 0, 0.18) 72%,
-              rgba(0, 0, 0, 0.38) 100%
-            );
+          background: radial-gradient(
+            ellipse at center,
+            rgba(0, 0, 0, 0) 34%,
+            rgba(0, 0, 0, 0.18) 68%,
+            rgba(0, 0, 0, 0.44) 100%
+          );
         }
 
         .realm-bg-soften {
@@ -294,13 +316,33 @@ export default function ChoosePage() {
           inset: 0;
           z-index: 1;
           pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(10, 9, 16, 0.14) 0%,
+            rgba(10, 9, 16, 0.04) 24%,
+            rgba(10, 9, 16, 0.04) 76%,
+            rgba(10, 9, 16, 0.16) 100%
+          );
+        }
+
+        .realm-mind-wash {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
           background:
-            linear-gradient(
-              180deg,
-              rgba(5, 10, 9, 0.08) 0%,
-              rgba(5, 10, 9, 0) 24%,
-              rgba(5, 10, 9, 0) 78%,
-              rgba(5, 10, 9, 0.1) 100%
+            radial-gradient(
+              ellipse at 50% 24%,
+              rgba(215, 182, 255, 0.16) 0%,
+              rgba(215, 182, 255, 0.09) 16%,
+              rgba(215, 182, 255, 0.03) 34%,
+              rgba(215, 182, 255, 0) 54%
+            ),
+            radial-gradient(
+              ellipse at 82% 28%,
+              rgba(198, 210, 255, 0.06) 0%,
+              rgba(198, 210, 255, 0.02) 28%,
+              rgba(198, 210, 255, 0) 48%
             );
         }
 
@@ -309,14 +351,14 @@ export default function ChoosePage() {
           inset: 0;
           z-index: 1;
           pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(166, 255, 211, 0.07) 0%,
-              rgba(166, 255, 211, 0.03) 18%,
-              rgba(166, 255, 211, 0.012) 32%,
-              rgba(166, 255, 211, 0) 48%
-            );
+          background: radial-gradient(
+            ellipse at center,
+            rgba(224, 196, 255, 0.07) 0%,
+            rgba(224, 196, 255, 0.03) 20%,
+            rgba(224, 196, 255, 0.012) 34%,
+            rgba(224, 196, 255, 0) 50%
+          );
+          filter: blur(12px);
         }
 
         .realm-content {
@@ -325,7 +367,7 @@ export default function ChoosePage() {
           width: 100%;
           max-width: 980px;
           margin: 0 auto;
-          padding: 96px 24px 88px;
+          padding: 92px 24px 88px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -333,7 +375,17 @@ export default function ChoosePage() {
         }
 
         .realm-intro {
-          max-width: 760px;
+          max-width: 820px;
+        }
+
+        .realm-label {
+          margin: 0 0 14px;
+          font-size: 0.78rem;
+          font-weight: 560;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: rgba(236, 226, 246, 0.56);
+          text-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
         }
 
         .title {
@@ -342,32 +394,36 @@ export default function ChoosePage() {
           font-weight: 650;
           line-height: 0.94;
           letter-spacing: -0.06em;
-          color: rgba(246, 251, 248, 0.98);
+          color: rgba(247, 244, 252, 0.99);
           text-shadow:
-            0 8px 26px rgba(0, 0, 0, 0.26),
-            0 0 22px rgba(190, 255, 223, 0.06);
+            0 10px 28px rgba(0, 0, 0, 0.3),
+            0 0 24px rgba(226, 202, 255, 0.08);
         }
 
         .subtitle {
-          margin: 14px 0 0;
+          margin: 16px 0 0;
+          max-width: 760px;
           font-size: 1.02rem;
-          line-height: 1.7;
-          color: rgba(232, 244, 238, 0.88);
+          line-height: 1.72;
+          color: rgba(240, 234, 248, 0.9);
           text-shadow: 0 3px 16px rgba(0, 0, 0, 0.24);
         }
 
-        .orb-stage {
-          margin-top: 18px;
-          min-height: 430px;
+        .anchor-stage {
+          width: 100%;
+          max-width: 760px;
+          margin-top: 8px;
+          margin-bottom: -10px;
           display: flex;
           align-items: center;
           justify-content: center;
+          pointer-events: none;
         }
 
-        .decision-form {
+        .mind-form {
           width: 100%;
           max-width: 760px;
-          margin-top: 12px;
+          margin-top: 0;
         }
 
         .scope-inline {
@@ -379,31 +435,31 @@ export default function ChoosePage() {
           gap: 0;
           font-size: 0.78rem;
           line-height: 1.45;
-          color: rgba(232, 244, 238, 0.48);
+          color: rgba(240, 234, 248, 0.42);
           text-align: center;
           text-wrap: balance;
         }
 
         .scope-inline-copy {
-          color: rgba(232, 244, 238, 0.48);
+          color: rgba(240, 234, 248, 0.42);
         }
 
         .scope-separator {
           padding: 0 0.26rem;
-          color: rgba(232, 244, 238, 0.34);
+          color: rgba(240, 234, 248, 0.28);
         }
 
         .scope-inline-link {
-          color: rgba(246, 251, 248, 0.72);
+          color: rgba(247, 244, 252, 0.72);
           text-decoration: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.14);
           line-height: 1.1;
           transition: color 160ms ease, border-color 160ms ease;
         }
 
         .scope-inline-link:hover {
-          color: rgba(255, 255, 255, 0.9);
-          border-color: rgba(255, 255, 255, 0.3);
+          color: rgba(255, 255, 255, 0.92);
+          border-color: rgba(255, 255, 255, 0.28);
         }
 
         .prompt {
@@ -411,32 +467,32 @@ export default function ChoosePage() {
           margin: 0 0 14px;
           font-size: 1.02rem;
           font-weight: 540;
-          color: rgba(241, 249, 245, 0.96);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          color: rgba(247, 244, 252, 0.96);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
         }
 
-        .decision-input {
+        .mind-input {
           width: 100%;
-          min-height: 88px;
+          min-height: 176px;
           padding: 22px 26px;
           border-radius: 32px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(20, 31, 29, 0.72) 0%,
-              rgba(17, 28, 27, 0.68) 100%
-            );
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: linear-gradient(
+            180deg,
+            rgba(21, 18, 28, 0.66) 0%,
+            rgba(15, 14, 24, 0.74) 100%
+          );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.24),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 20px 44px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.11),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(194, 255, 223, 0.03);
+            0 0 0 1px rgba(228, 204, 255, 0.03),
+            0 0 30px rgba(205, 176, 255, 0.035);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
-          color: rgba(246, 252, 249, 0.96);
+          color: rgba(247, 244, 252, 0.97);
           font-size: 1rem;
-          line-height: 1.55;
+          line-height: 1.65;
           resize: none;
           outline: none;
           transition:
@@ -445,17 +501,29 @@ export default function ChoosePage() {
             background 180ms ease;
         }
 
-        .decision-input:focus {
-          border-color: rgba(197, 255, 223, 0.34);
+        .mind-input:focus {
+          border-color: rgba(226, 202, 255, 0.32);
           box-shadow:
-            0 22px 48px rgba(0, 0, 0, 0.26),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            0 0 0 1px rgba(197, 255, 223, 0.08),
-            0 0 28px rgba(146, 255, 201, 0.09);
+            0 22px 48px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12),
+            0 0 0 1px rgba(226, 202, 255, 0.08),
+            0 0 34px rgba(204, 170, 255, 0.07);
         }
 
-        .decision-input::placeholder {
-          color: rgba(220, 234, 228, 0.58);
+        .mind-input::placeholder {
+          color: rgba(223, 214, 236, 0.5);
+        }
+
+        .form-meta {
+          margin-top: 12px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .character-count {
+          margin: 0;
+          font-size: 0.78rem;
+          color: rgba(240, 234, 248, 0.38);
         }
 
         .actions {
@@ -466,7 +534,7 @@ export default function ChoosePage() {
         }
 
         .actions-initial {
-          margin-top: 18px;
+          margin-top: 20px;
         }
 
         .actions-followup {
@@ -481,7 +549,7 @@ export default function ChoosePage() {
           padding: 0 24px;
           border-radius: 999px;
           border: 1px solid rgba(255, 255, 255, 0.18);
-          color: rgba(246, 252, 249, 0.98);
+          color: rgba(247, 244, 252, 0.98);
           font-size: 0.98rem;
           font-weight: 550;
           cursor: pointer;
@@ -504,56 +572,52 @@ export default function ChoosePage() {
           inset: 1px;
           border-radius: inherit;
           pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.1) 0%,
-              rgba(255, 255, 255, 0.025) 48%,
-              rgba(255, 255, 255, 0.01) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.025) 48%,
+            rgba(255, 255, 255, 0.01) 100%
+          );
         }
 
         .primary-button {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(104, 154, 136, 0.52) 0%,
-              rgba(69, 112, 97, 0.62) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(138, 116, 173, 0.52) 0%,
+            rgba(99, 82, 136, 0.66) 100%
+          );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.28),
+            0 16px 34px rgba(0, 0, 0, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -10px 18px rgba(23, 46, 38, 0.22),
-            0 0 22px rgba(149, 255, 206, 0.05);
+            inset 0 -10px 18px rgba(42, 33, 62, 0.26),
+            0 0 22px rgba(212, 176, 255, 0.06);
         }
 
         .primary-button-ready {
-          border-color: rgba(210, 255, 229, 0.3);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(113, 164, 145, 0.58) 0%,
-              rgba(74, 120, 103, 0.7) 100%
-            );
+          border-color: rgba(236, 216, 255, 0.28);
+          background: linear-gradient(
+            180deg,
+            rgba(149, 126, 188, 0.58) 0%,
+            rgba(108, 89, 149, 0.72) 100%
+          );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.3),
+            0 18px 38px rgba(0, 0, 0, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -10px 18px rgba(23, 46, 38, 0.22),
-            0 0 26px rgba(160, 255, 212, 0.08);
-          filter: brightness(1.02);
+            inset 0 -10px 18px rgba(42, 33, 62, 0.26),
+            0 0 28px rgba(220, 188, 255, 0.08);
+          filter: brightness(1.03);
         }
 
         .secondary-button {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(89, 132, 118, 0.5) 0%,
-              rgba(59, 96, 84, 0.6) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(113, 96, 144, 0.48) 0%,
+            rgba(82, 67, 113, 0.6) 100%
+          );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.26),
+            0 16px 34px rgba(0, 0, 0, 0.28),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -10px 18px rgba(16, 34, 29, 0.22);
+            inset 0 -10px 18px rgba(33, 27, 48, 0.24);
         }
 
         .primary-button:hover,
@@ -563,58 +627,54 @@ export default function ChoosePage() {
         }
 
         .primary-button:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(82, 127, 112, 0.66) 0%,
-              rgba(53, 87, 76, 0.78) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(126, 105, 161, 0.66) 0%,
+            rgba(90, 74, 124, 0.8) 100%
+          );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.3),
+            0 18px 38px rgba(0, 0, 0, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(16, 34, 29, 0.28),
-            0 0 24px rgba(149, 255, 206, 0.04);
+            inset 0 -12px 20px rgba(33, 27, 48, 0.3),
+            0 0 24px rgba(210, 175, 255, 0.05);
         }
 
         .primary-button-ready:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(92, 138, 121, 0.7) 0%,
-              rgba(59, 97, 84, 0.82) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(136, 114, 174, 0.7) 0%,
+            rgba(98, 81, 136, 0.84) 100%
+          );
           box-shadow:
-            0 20px 42px rgba(0, 0, 0, 0.32),
+            0 20px 42px rgba(0, 0, 0, 0.34),
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -12px 20px rgba(16, 34, 29, 0.28),
-            0 0 30px rgba(160, 255, 212, 0.08);
+            inset 0 -12px 20px rgba(33, 27, 48, 0.3),
+            0 0 30px rgba(220, 188, 255, 0.08);
         }
 
         .secondary-button:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(76, 118, 105, 0.64) 0%,
-              rgba(48, 79, 69, 0.76) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(100, 84, 130, 0.64) 0%,
+            rgba(71, 58, 99, 0.76) 100%
+          );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.28),
+            0 18px 38px rgba(0, 0, 0, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(16, 34, 29, 0.28);
+            inset 0 -12px 20px rgba(33, 27, 48, 0.28);
         }
 
         .primary-button:active,
         .secondary-button:active {
           transform: translateY(1px);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(58, 95, 83, 0.74) 0%,
-              rgba(34, 58, 50, 0.84) 100%
-            );
+          background: linear-gradient(
+            180deg,
+            rgba(75, 62, 104, 0.78) 0%,
+            rgba(53, 43, 77, 0.88) 100%
+          );
           box-shadow:
             0 10px 22px rgba(0, 0, 0, 0.26),
-            inset 0 2px 6px rgba(0, 0, 0, 0.18),
+            inset 0 2px 6px rgba(0, 0, 0, 0.2),
             inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
 
@@ -638,15 +698,15 @@ export default function ChoosePage() {
           font-weight: 560;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(241, 249, 245, 0.96);
+          color: rgba(247, 244, 252, 0.96);
           text-shadow:
-            0 4px 16px rgba(0, 0, 0, 0.24),
-            0 0 10px rgba(190, 255, 223, 0.08);
+            0 4px 16px rgba(0, 0, 0, 0.26),
+            0 0 10px rgba(222, 198, 255, 0.08);
           animation: solaceBreathing 3.2s ease-in-out infinite;
         }
 
         .response-zone {
-          margin-top: 6px;
+          margin-top: 18px;
           width: 100%;
           max-width: 760px;
           min-height: 80px;
@@ -662,18 +722,18 @@ export default function ChoosePage() {
           margin-top: 0;
           padding: 22px 26px;
           border-radius: 32px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(20, 31, 29, 0.72) 0%,
-              rgba(17, 28, 27, 0.68) 100%
-            );
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: linear-gradient(
+            180deg,
+            rgba(21, 18, 28, 0.66) 0%,
+            rgba(15, 14, 24, 0.74) 100%
+          );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.24),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 20px 44px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(194, 255, 223, 0.03);
+            0 0 0 1px rgba(228, 204, 255, 0.03),
+            0 0 24px rgba(206, 176, 255, 0.03);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           animation: responseReveal 600ms ease forwards;
@@ -682,10 +742,10 @@ export default function ChoosePage() {
         }
 
         .response-card-crisis {
-          border-color: rgba(255, 255, 255, 0.18);
+          border-color: rgba(255, 255, 255, 0.2);
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.24),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 20px 44px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
             0 0 0 1px rgba(255, 255, 255, 0.03);
         }
@@ -696,14 +756,20 @@ export default function ChoosePage() {
           font-weight: 560;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(226, 240, 233, 0.66);
+          color: rgba(225, 214, 238, 0.66);
+        }
+
+        .response-copy {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
 
         .response-text {
           margin: 0;
-          color: rgba(242, 250, 246, 0.96);
+          color: rgba(247, 244, 252, 0.96);
           line-height: 1.8;
-          text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
+          text-shadow: 0 5px 18px rgba(0, 0, 0, 0.26);
           white-space: pre-line;
         }
 
@@ -735,11 +801,7 @@ export default function ChoosePage() {
 
         @media (max-width: 900px) {
           .realm-content {
-            padding-top: 88px;
-          }
-
-          .orb-stage {
-            min-height: 390px;
+            padding-top: 86px;
           }
         }
 
@@ -750,12 +812,9 @@ export default function ChoosePage() {
             padding-right: 18px;
           }
 
-          .orb-stage {
-            min-height: 330px;
-          }
-
-          .decision-form {
+          .anchor-stage {
             margin-top: 0;
+            margin-bottom: -6px;
           }
 
           .scope-inline {
@@ -766,6 +825,12 @@ export default function ChoosePage() {
 
           .scope-separator {
             padding: 0 0.22rem;
+          }
+
+          .mind-input {
+            min-height: 168px;
+            padding: 20px 20px 22px;
+            border-radius: 24px;
           }
 
           .actions {

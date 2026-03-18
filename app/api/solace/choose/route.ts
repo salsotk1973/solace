@@ -12,10 +12,21 @@ import {
   type ChooseToneMode,
   type ChooseResponsePattern,
 } from "@/lib/solace/prompts";
+import {
+  applySlidingWindowRateLimit,
+  getClientIdentifierFromHeaders,
+} from "@/lib/solace/rate-limit";
+import {
+  isSolaceCrisisInput,
+  SOLACE_CRISIS_FALLBACK,
+} from "@/lib/solace/safety";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const CHOOSE_RATE_LIMIT = 5;
+const CHOOSE_RATE_WINDOW_MS = 60_000;
 
 function extractInputFromUnknown(value: unknown): string {
   if (typeof value === "string") {
@@ -437,6 +448,32 @@ async function rewriteForNaturalness(text: string): Promise<string> {
   return (response.output_text || "").trim();
 }
 
+function buildRateLimitResponse(resetAt: number): NextResponse {
+  const retryAfterSeconds = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+
+  const response = NextResponse.json(
+    {
+      error: "Too many reflections in a short time. Please wait a minute and try again.",
+    },
+    { status: 429 }
+  );
+
+  response.headers.set("Retry-After", String(retryAfterSeconds));
+  response.headers.set("X-RateLimit-Limit", String(CHOOSE_RATE_LIMIT));
+  response.headers.set("X-RateLimit-Remaining", "0");
+  response.headers.set("X-RateLimit-Reset", String(resetAt));
+
+  return response;
+}
+
+function applyRateLimitHeaders(response: NextResponse, remaining: number, resetAt: number) {
+  response.headers.set("X-RateLimit-Limit", String(CHOOSE_RATE_LIMIT));
+  response.headers.set("X-RateLimit-Remaining", String(remaining));
+  response.headers.set("X-RateLimit-Reset", String(resetAt));
+
+  return response;
+}
+
 export async function POST(req: Request) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -444,6 +481,17 @@ export async function POST(req: Request) {
         { error: "OPENAI_API_KEY is missing from .env.local." },
         { status: 500 }
       );
+    }
+
+    const clientKey = getClientIdentifierFromHeaders(req.headers);
+    const rateLimit = applySlidingWindowRateLimit(
+      clientKey,
+      CHOOSE_RATE_LIMIT,
+      CHOOSE_RATE_WINDOW_MS
+    );
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit.resetAt);
     }
 
     const rawBodyText = await req.text();
@@ -459,24 +507,40 @@ export async function POST(req: Request) {
     const input = extractInputFromUnknown(parsedBody);
 
     if (!input) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           error: "No usable input was found in the request body.",
         },
         { status: 400 }
       );
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
+    }
+
+    if (isSolaceCrisisInput(input)) {
+      const response = NextResponse.json({
+        text: SOLACE_CRISIS_FALLBACK,
+        isCrisisFallback: true,
+      });
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
     const validationReflection = getValidationReflection(input);
 
     if (validationReflection) {
-      return NextResponse.json({ text: validationReflection });
+      const response = NextResponse.json({
+        text: validationReflection,
+        isCrisisFallback: false,
+      });
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
     const context = buildDecisionContext(input);
     const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
-    const response = await client.responses.create({
+    const responseFromModel = await client.responses.create({
       model,
       max_output_tokens: 150,
       input: [
@@ -491,7 +555,7 @@ export async function POST(req: Request) {
       ],
     });
 
-    const rawText = (response.output_text || "").trim();
+    const rawText = (responseFromModel.output_text || "").trim();
     let text = formatReflectionText(rawText);
 
     if (needsNaturalnessRewrite(text)) {
@@ -500,13 +564,20 @@ export async function POST(req: Request) {
     }
 
     if (!text) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: "No response text was returned by the model." },
         { status: 500 }
       );
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
-    return NextResponse.json({ text });
+    const response = NextResponse.json({
+      text,
+      isCrisisFallback: false,
+    });
+
+    return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
   } catch (error) {
     console.error("Solace Choose API error:", error);
 
