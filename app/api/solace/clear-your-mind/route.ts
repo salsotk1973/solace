@@ -107,6 +107,10 @@ const CATEGORY_KEYWORDS: Record<
       "disconnect",
       "disconnected",
       "nagging",
+      "mother in law",
+      "mother-in-law",
+      "living at home",
+      "living with us",
       "family oversea",
       "family overseas",
     ],
@@ -136,6 +140,7 @@ const CATEGORY_KEYWORDS: Record<
       "breathing",
       "breath",
       "headache",
+      "need time off",
     ],
   },
   "Environment / External Noise": {
@@ -160,8 +165,10 @@ const CATEGORY_KEYWORDS: Record<
       "neighbours",
       "barking",
       "dog barking",
+      "dogs barking",
       "kids playing",
       "kids playing at night",
+      "barking at night",
     ],
   },
   "Work / Performance": {
@@ -190,6 +197,8 @@ const CATEGORY_KEYWORDS: Record<
       "responsibilities",
       "lost my job",
       "lost job",
+      "work pressure",
+      "workload",
     ],
   },
   "Internal Mental Loops": {
@@ -217,6 +226,8 @@ const CATEGORY_KEYWORDS: Record<
       "obsessive",
       "ruminating",
       "rumination",
+      "loneliness",
+      "lonely",
     ],
   },
   "Logistics / Immediate Problems": {
@@ -249,6 +260,8 @@ const CATEGORY_KEYWORDS: Record<
       "forms",
       "paperwork",
       "call",
+      "needs to be fixed",
+      "fix up",
     ],
   },
 };
@@ -699,19 +712,19 @@ function formatCategoryPhrase(category: SolaceCategory): string {
     case "Money / Stability":
       return "financial pressure";
     case "Relationships / Home Dynamics":
-      return "pressure around home or relationships";
+      return "strain around home and relationships";
     case "Health / Body / Self":
-      return "pressure around your body, energy, or wellbeing";
+      return "pressure on your body, energy, or wellbeing";
     case "Environment / External Noise":
-      return "friction coming from the space around you";
+      return "constant friction from the space around you";
     case "Work / Performance":
-      return "work pressure and responsibility";
+      return "pressure tied to work and responsibility";
     case "Internal Mental Loops":
-      return "a thought pattern that keeps circling";
+      return "an internal loop that keeps circling";
     case "Logistics / Immediate Problems":
-      return "practical things that need handling soon";
+      return "practical problems that keep demanding attention";
     default:
-      return "something still not fully formed";
+      return "something that still has not taken a clear shape";
   }
 }
 
@@ -728,14 +741,14 @@ function buildRecognition(clusters: Cluster[]): string {
     .map((cluster) => formatCategoryPhrase(cluster.category));
 
   if (topCategories.length === 0) {
-    return "There is a pressure here, but it has not separated into a clear shape yet.";
+    return "There is pressure here, but it has not separated into a clean shape yet.";
   }
 
   if (topCategories.length === 1) {
-    return `What seems to be carrying the most weight here is ${topCategories[0]}.`;
+    return `What seems to be weighing on you most is ${topCategories[0]}.`;
   }
 
-  return `What seems to be sitting together here is ${joinPhrases(topCategories)}.`;
+  return `This feels like ${joinPhrases(topCategories)} all pressing at the same time.`;
 }
 
 function buildSeparation(clusters: Cluster[]): string {
@@ -744,65 +757,71 @@ function buildSeparation(clusters: Cluster[]): string {
   const third = clusters[2];
 
   if (!top) {
-    return "The clearest next move is to slow it down and name the heaviest part first.";
+    return "The clearest move is to slow it down and identify the heaviest part first.";
   }
 
   if (!second) {
-    return `Most of the pressure appears to be coming from ${formatCategoryPhrase(top.category)}, rather than from several equal problems at once.`;
+    return `Underneath the noise, one pressure appears to be carrying most of the load.`;
   }
 
   if (!third) {
-    return `The strongest layer looks like ${formatCategoryPhrase(top.category)}, with ${formatCategoryPhrase(
-      second.category,
-    )} adding more weight around it.`;
+    return `One part looks central, while another is feeding into it and making it harder to settle.`;
   }
 
-  return `The strongest layer looks like ${formatCategoryPhrase(top.category)}, with ${formatCategoryPhrase(
-    second.category,
-  )} and ${formatCategoryPhrase(third.category)} adding more weight around it.`;
+  return `There seems to be one central strain, with two other pressures feeding into it from different angles.`;
 }
 
 function buildReframing(clusters: Cluster[]): string {
   const topCluster = clusters[0];
-  const secondCluster = clusters[1];
 
   if (!topCluster) {
-    return "Not everything here needs the same level of attention right now.";
+    return "Not everything here deserves the same level of attention right now.";
   }
 
-  if (!secondCluster) {
-    return "Even if it feels wide, this may be one main pressure showing up in several forms.";
+  switch (topCluster.category) {
+    case "Money / Stability":
+      return "That often happens when money pressure starts colouring everything else around it.";
+    case "Relationships / Home Dynamics":
+      return "When home feels strained, even unrelated things can start landing harder than they normally would.";
+    case "Health / Body / Self":
+      return "When your energy is under pressure, the rest of life often starts to feel louder than it really is.";
+    case "Environment / External Noise":
+      return "When there is no real quiet around you, even manageable problems can begin to feel relentless.";
+    case "Work / Performance":
+      return "When work pressure stays switched on for too long, it can spread into the rest of life and make everything feel tighter.";
+    case "Internal Mental Loops":
+      return "When your mind keeps circling the same ground, separate worries can start to feel like one solid wall.";
+    case "Logistics / Immediate Problems":
+      return "When small practical problems stack up, they can create more pressure than any one of them deserves on its own.";
+    default:
+      return "Not everything here deserves the same level of attention right now.";
   }
-
-  return `Not every thought here needs equal attention. The main pull seems to be ${formatCategoryPhrase(
-    topCluster.category,
-  )}, with the rest gathering around it rather than standing alone.`;
 }
 
 function buildDirection(clusters: Cluster[]): string {
   const topCluster = clusters[0];
 
   if (!topCluster) {
-    return "A gentle next step is to rewrite the heaviest thought in one simple sentence.";
+    return "Start by naming the single thought that feels most exposed, and leave the rest untouched for a moment.";
   }
 
   switch (topCluster.category) {
     case "Money / Stability":
-      return "A gentle next step is to name the single money issue that is most exposed right now, and deal with that one first.";
+      return "Start with the one money issue that feels most exposed right now, and turn that into one concrete action.";
     case "Relationships / Home Dynamics":
-      return "A gentle next step is to separate what needs a conversation from what is simply emotional weight, so both are not carried as one thing.";
+      return "Separate what needs an actual conversation from what is emotional spillover, so you are not carrying both as one thing.";
     case "Health / Body / Self":
-      return "A gentle next step is to choose one immediate act of care for your body or energy today, rather than trying to solve everything at once.";
+      return "Pick one thing today that reduces strain on your body or energy, instead of trying to repair everything at once.";
     case "Environment / External Noise":
-      return "A gentle next step is to reduce one source of friction in your space, so your mind has less to push against.";
+      return "Reduce one source of friction around you first, so your mind has a little less to push against.";
     case "Work / Performance":
-      return "A gentle next step is to identify the work pressure with the biggest consequence and give that one a clean first move.";
+      return "Choose the work pressure with the biggest consequence and make the first move on that, before touching the rest.";
     case "Internal Mental Loops":
-      return "A gentle next step is to pull out the one thought that keeps repeating and ask whether it is a real problem, a fear, or an unfinished decision.";
+      return "Pull out the thought that keeps repeating and ask whether it is a real problem, a fear, or an unfinished decision.";
     case "Logistics / Immediate Problems":
-      return "A gentle next step is to handle the first practical task with a time consequence attached to it, before thinking about the rest.";
+      return "Handle the practical task with the nearest time consequence first, and let the rest wait their turn.";
     default:
-      return "A gentle next step is to rewrite the clearest thought first and work from there.";
+      return "Start with the clearest pressure first and let the rest stay in the background for a moment.";
   }
 }
 
@@ -814,7 +833,7 @@ function generateCrisisFallback(): string {
   return "What you wrote sounds too serious for Solace to hold safely here.\n\nPlease do not stay alone with this right now. Reach out immediately to local emergency services if you may act on these thoughts, or contact a trusted person, a crisis line, or a mental health professional who can be with you in real time.";
 }
 
-function generateReflection(sortedThoughts: ProcessedThought[], clusters: Cluster[]): string {
+function generateReflection(clusters: Cluster[]): string {
   const recognition = buildRecognition(clusters);
   const separation = buildSeparation(clusters);
   const reframing = buildReframing(clusters);
@@ -942,7 +961,7 @@ export async function POST(request: Request) {
 
     const response: ClearYourMindResponse = {
       ok: true,
-      text: generateReflection(sortedMeaningfulThoughts, clusters),
+      text: generateReflection(clusters),
       isCrisisFallback: false,
       clarityFallback: false,
       thoughts: toThoughtResults(sortedAllThoughts),

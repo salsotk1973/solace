@@ -17,11 +17,17 @@ import type { ClearYourMindSuccessResponse } from "@/lib/solace/clear-your-mind/
 
 const MAX_THOUGHTS = 7;
 const MAX_INPUT_LENGTH = 140;
-const BUTTON_READY_DELAY_MS = 900;
 const THINKING_COPY = "SOLACE IS REFLECTING...";
 const STARTER_BUBBLE_ID = "starter-bubble";
 const FIELD_HEIGHT = 320;
 const ORGANIZE_DELAY_MS = 1600;
+const BUTTON_READY_DELAY_MS = 900;
+
+const SCOPE_COPY = "Designed for Adults only";
+const REFLECTIVE_COPY = "Reflective clarity tool";
+const ADVICE_COPY = "Not professional advice";
+const INPUT_PLACEHOLDER =
+  "Write one thought, then press Enter (Max. 7). Click a thought to remove it if needed.";
 
 type BubbleMode = "float" | "organizing" | "aligned";
 
@@ -61,7 +67,7 @@ function getInitialImportance(text: string): number {
     [/\b(health|sick|ill|doctor|hospital|fat|weight|body|smoking)\b/g, 32],
     [/\b(anxiety|stress|fear|panic|overthinking|sad|depressed)\b/g, 34],
     [/\b(moving|move|relocate|selling house|sell house)\b/g, 28],
-    [/\b(dogs|dog|barking|noise)\b/g, 18],
+    [/\b(dogs|dog|barking|noise|neighbour|neighbor|neighbours|neighbors)\b/g, 18],
     [/\b(gaming|addiction)\b/g, 18],
   ];
 
@@ -200,17 +206,21 @@ function getAlignedTargets(
   bubbles: BubbleItem[],
   fieldWidth: number,
 ): Array<{ id: string; targetX: number; targetY: number }> {
-  const sorted = [...bubbles].sort((a, b) => b.importance - a.importance);
+  const sorted = [...bubbles].sort((a, b) => {
+    if (b.diameter !== a.diameter) return b.diameter - a.diameter;
+    return b.importance - a.importance;
+  });
+
   const gap = 18;
   const totalWidth =
     sorted.reduce((sum, bubble) => sum + bubble.diameter, 0) +
     gap * Math.max(0, sorted.length - 1);
 
-  let cursor = Math.max(12, (fieldWidth - totalWidth) / 2);
+  let cursor = Math.max(20, (fieldWidth - totalWidth) / 2);
 
   return sorted.map((bubble) => {
     const targetX = cursor + bubble.diameter / 2;
-    const targetY = FIELD_HEIGHT * 0.52;
+    const targetY = FIELD_HEIGHT * 0.5;
     cursor += bubble.diameter + gap;
 
     return {
@@ -233,16 +243,13 @@ function applyApiResultsToBubbles(
     const existing = currentMap.get(thought.id);
     if (!existing) continue;
 
-    const importance = thought.importance.total;
-    const diameter = getBubbleDiameter(importance);
-
     ordered.push({
       ...existing,
       text: thought.text,
-      importance,
-      diameter,
-      hue: getBubbleHue(importance),
-      fontSize: getBubbleFontSize(thought.text, diameter),
+      importance: thought.importance.total,
+      hue: getBubbleHue(thought.importance.total),
+      fontSize: existing.fontSize,
+      diameter: existing.diameter,
     });
   }
 
@@ -251,6 +258,22 @@ function applyApiResultsToBubbles(
   }
 
   return ordered;
+}
+
+function ScopeInline() {
+  return (
+    <div className="scope-inline">
+      <span className="scope-inline-copy">{SCOPE_COPY}</span>
+      <span className="scope-separator">-</span>
+      <span className="scope-inline-copy">{REFLECTIVE_COPY}</span>
+      <span className="scope-separator">-</span>
+      <span className="scope-inline-copy">{ADVICE_COPY}</span>
+      <span className="scope-separator">-</span>
+      <Link href="/scope" className="scope-inline-link">
+        See Scope
+      </Link>
+    </div>
+  );
 }
 
 export default function ClearYourMindPage() {
@@ -282,11 +305,10 @@ export default function ClearYourMindPage() {
   const canSubmit = hasRealBubbleContent && !isLoading;
   const inputLocked = realBubbles.length >= MAX_THOUGHTS && !isLoading;
   const canRemoveThoughts = !isLoading && !responseText && !error;
-  const showRemovalHint =
-    canRemoveThoughts && realBubbles.length > 0;
+  const showInitialForm = !responseText && !error && !isLoading;
 
   useEffect(() => {
-    const width = bubbleFieldRef.current?.clientWidth ?? 760;
+    const width = bubbleFieldRef.current?.clientWidth ?? 1100;
     setBubbles([createStarterBubble(width)]);
   }, []);
 
@@ -323,7 +345,7 @@ export default function ClearYourMindPage() {
 
   useEffect(() => {
     const interval = window.setInterval(() => {
-      const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 760;
+      const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
       const time = performance.now() * 0.001;
 
       setBubbles((current) => {
@@ -474,7 +496,7 @@ export default function ClearYourMindPage() {
 
     if (!trimmed || inputLocked) return;
 
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 760;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
 
     setBubbles((current) => {
       const withoutStarter = current.filter((bubble) => !bubble.isStarter);
@@ -551,7 +573,7 @@ export default function ClearYourMindPage() {
   }
 
   function handleReset() {
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 760;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
 
     setDraft("");
     setBubbles([createStarterBubble(fieldWidth)]);
@@ -576,7 +598,7 @@ export default function ClearYourMindPage() {
   function removeBubble(id: string) {
     if (id === STARTER_BUBBLE_ID || isLoading || !!responseText) return;
 
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 760;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
 
     setBubbles((current) => {
       const next = current.filter((bubble) => bubble.id !== id);
@@ -665,38 +687,22 @@ export default function ClearYourMindPage() {
           </div>
         </section>
 
-        <form className="mind-form" onSubmit={handleSubmit}>
-          <div className="scope-inline">
-            <span className="scope-inline-copy">Adults 18+ only</span>
-            <span className="scope-separator">·</span>
-            <span className="scope-inline-copy">Reflective clarity tool</span>
-            <span className="scope-separator">·</span>
-            <span className="scope-inline-copy">Not professional advice</span>
-            <span className="scope-separator">·</span>
-            <Link href="/scope" className="scope-inline-link">
-              Scope
-            </Link>
-          </div>
+        {showInitialForm ? (
+          <form className="mind-form" onSubmit={handleSubmit}>
+            <ScopeInline />
 
-          <input
-            id="clear-your-mind-input"
-            ref={inputRef}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={handleInputKeyDown}
-            maxLength={MAX_INPUT_LENGTH}
-            placeholder={`Write one thought, then press Enter. (max ${MAX_THOUGHTS})`}
-            className="mind-input"
-            disabled={isLoading || inputLocked}
-          />
+            <input
+              id="clear-your-mind-input"
+              ref={inputRef}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              maxLength={MAX_INPUT_LENGTH}
+              placeholder={INPUT_PLACEHOLDER}
+              className="mind-input"
+              disabled={isLoading || inputLocked}
+            />
 
-          {showRemovalHint && (
-            <p className="input-helper">
-              Press Enter to add a thought. Click a thought to remove it.
-            </p>
-          )}
-
-          {!responseText && !error && !isLoading && (
             <div className="actions actions-initial">
               <button
                 type="submit"
@@ -708,8 +714,8 @@ export default function ClearYourMindPage() {
                 Clear your mind
               </button>
             </div>
-          )}
-        </form>
+          </form>
+        ) : null}
 
         <section className="response-zone" aria-live="polite">
           {isLoading ? (
@@ -718,6 +724,8 @@ export default function ClearYourMindPage() {
             </div>
           ) : error ? (
             <>
+              <ScopeInline />
+
               <div className="response-card">
                 <div className="response-card-label">Solace</div>
                 <p className="response-text">{error}</p>
@@ -735,6 +743,8 @@ export default function ClearYourMindPage() {
             </>
           ) : responseText ? (
             <>
+              <ScopeInline />
+
               <div
                 className={`response-card ${
                   isCrisisFallback ? "response-card-crisis" : ""
@@ -870,7 +880,7 @@ export default function ClearYourMindPage() {
           position: relative;
           z-index: 2;
           width: 100%;
-          max-width: 980px;
+          max-width: 1400px;
           margin: 0 auto;
           padding: 92px 24px 88px;
           display: flex;
@@ -880,7 +890,7 @@ export default function ClearYourMindPage() {
         }
 
         .realm-intro {
-          max-width: 820px;
+          max-width: 980px;
         }
 
         .realm-label {
@@ -907,7 +917,7 @@ export default function ClearYourMindPage() {
 
         .subtitle {
           margin: 16px 0 0;
-          max-width: 760px;
+          max-width: 980px;
           font-size: 1.02rem;
           line-height: 1.72;
           color: rgba(240, 234, 248, 0.9);
@@ -916,10 +926,11 @@ export default function ClearYourMindPage() {
 
         .bubble-stage {
           width: 100%;
-          max-width: 760px;
+          max-width: 1280px;
           margin-top: 18px;
           margin-bottom: 22px;
           padding: 0 12px;
+          overflow: visible;
         }
 
         .bubble-field {
@@ -989,9 +1000,7 @@ export default function ClearYourMindPage() {
           transition:
             opacity 260ms ease,
             filter 260ms ease,
-            box-shadow 260ms ease,
-            width 420ms ease,
-            height 420ms ease;
+            box-shadow 260ms ease;
           animation: bubbleAppear 620ms cubic-bezier(0.22, 1, 0.36, 1);
           animation-delay: var(--bubble-delay);
           overflow: visible;
@@ -1100,7 +1109,7 @@ export default function ClearYourMindPage() {
 
         .mind-form {
           width: 100%;
-          max-width: 760px;
+          max-width: 1120px;
           margin-top: 0;
         }
 
@@ -1111,33 +1120,33 @@ export default function ClearYourMindPage() {
           align-items: center;
           justify-content: center;
           gap: 0;
-          font-size: 0.78rem;
+          font-size: 0.82rem;
           line-height: 1.45;
-          color: rgba(240, 234, 248, 0.42);
+          color: rgba(240, 234, 248, 0.58);
           text-align: center;
           text-wrap: balance;
         }
 
         .scope-inline-copy {
-          color: rgba(240, 234, 248, 0.42);
+          color: rgba(240, 234, 248, 0.58);
         }
 
         .scope-separator {
-          padding: 0 0.26rem;
-          color: rgba(240, 234, 248, 0.28);
+          padding: 0 0.36rem;
+          color: rgba(240, 234, 248, 0.44);
         }
 
         .scope-inline-link {
           color: rgba(247, 244, 252, 0.72);
           text-decoration: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           line-height: 1.1;
           transition: color 160ms ease, border-color 160ms ease;
         }
 
         .scope-inline-link:hover {
-          color: rgba(255, 255, 255, 0.92);
-          border-color: rgba(255, 255, 255, 0.28);
+          color: rgba(255, 255, 255, 0.9);
+          border-color: rgba(255, 255, 255, 0.22);
         }
 
         .mind-input {
@@ -1178,15 +1187,7 @@ export default function ClearYourMindPage() {
         }
 
         .mind-input::placeholder {
-          color: rgba(223, 214, 236, 0.54);
-        }
-
-        .input-helper {
-          margin: 10px 0 0;
-          font-size: 0.8rem;
-          line-height: 1.5;
-          color: rgba(236, 229, 246, 0.52);
-          text-align: center;
+          color: rgba(236, 229, 246, 0.72);
         }
 
         .actions {
@@ -1371,7 +1372,7 @@ export default function ClearYourMindPage() {
         .response-zone {
           margin-top: 18px;
           width: 100%;
-          max-width: 760px;
+          max-width: 1120px;
           min-height: 80px;
           display: flex;
           flex-direction: column;
@@ -1381,7 +1382,7 @@ export default function ClearYourMindPage() {
 
         .response-card {
           width: 100%;
-          max-width: 760px;
+          max-width: 980px;
           margin-top: 0;
           padding: 22px 26px;
           border-radius: 32px;
@@ -1489,6 +1490,15 @@ export default function ClearYourMindPage() {
           .realm-content {
             padding-top: 86px;
           }
+
+          .bubble-stage {
+            max-width: 100%;
+          }
+
+          .mind-form,
+          .response-zone {
+            max-width: 100%;
+          }
         }
 
         @media (max-width: 640px) {
@@ -1521,12 +1531,6 @@ export default function ClearYourMindPage() {
             height: 54px;
             padding: 0 20px;
             font-size: 0.94rem;
-          }
-
-          .input-helper {
-            font-size: 0.76rem;
-            line-height: 1.45;
-            padding: 0 8px;
           }
 
           .actions {
