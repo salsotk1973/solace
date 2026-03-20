@@ -61,7 +61,14 @@ const helpSteps = [
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#03050b] text-white">
+    <main
+      className="relative min-h-screen overflow-hidden bg-[#03050b] text-white"
+      style={
+        {
+          "--solace-breath-duration": "10s",
+        } as React.CSSProperties
+      }
+    >
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -83,45 +90,37 @@ export default function HomePage() {
 
       <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_16%_26%,rgba(92,142,255,0.24),transparent_34%),radial-gradient(circle_at_84%_24%,rgba(162,120,255,0.18),transparent_34%),radial-gradient(circle_at_50%_16%,rgba(208,220,255,0.18),transparent_22%),radial-gradient(circle_at_50%_82%,rgba(255,230,244,0.14),transparent_18%)]" />
       <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(3,5,11,0.16)_0%,rgba(3,5,11,0.10)_18%,rgba(3,5,11,0.18)_36%,rgba(3,5,11,0.34)_56%,rgba(3,5,11,0.68)_82%,rgba(3,5,11,0.86)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_34%,rgba(6,8,14,0.06)_0%,rgba(6,8,14,0.18)_34%,rgba(6,8,14,0.42)_58%,rgba(0,0,0,0.54)_78%,rgba(0,0,0,0.68)_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[24%] z-10 h-[280px] bg-[radial-gradient(ellipse_at_center,rgba(8,11,19,0.16)_0%,rgba(8,11,19,0.28)_38%,rgba(8,11,19,0.44)_60%,rgba(8,11,19,0)_78%)] blur-3xl" />
-      <div className="pointer-events-none absolute inset-x-0 top-[43%] z-10 h-[220px] bg-[linear-gradient(180deg,rgba(8,11,19,0.34)_0%,rgba(8,11,19,0.14)_18%,rgba(8,11,19,0.14)_82%,rgba(8,11,19,0.34)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_34%,rgba(6,8,14,0.06)_0%,rgba(6,8,14,0.18)_34%,rgba(6,8,14,0.38)_58%,rgba(0,0,0,0.52)_78%,rgba(0,0,0,0.66)_100%)]" />
+
+      <div className="pointer-events-none absolute inset-x-[8%] top-[26%] z-10 h-[340px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(8,11,19,0.18)_0%,rgba(8,11,19,0.24)_28%,rgba(8,11,19,0.16)_52%,rgba(8,11,19,0.04)_70%,rgba(8,11,19,0)_82%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-[10%] top-[44%] z-10 h-[180px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(14,18,30,0.22)_0%,rgba(14,18,30,0.14)_34%,rgba(14,18,30,0.06)_58%,rgba(14,18,30,0)_78%)] blur-2xl" />
 
       <SiteHeader />
 
       <div className="relative z-20">
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-12 pt-[112px] sm:px-8 lg:px-10">
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-4 pt-[118px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
-            <div className="mb-0 scale-[0.92] origin-top sm:scale-[0.96] md:scale-100">
+            <div className="mb-0 origin-top translate-y-0 scale-[0.72] sm:translate-y-1 sm:scale-[0.79] md:translate-y-2 md:scale-[0.85]">
               <HeroPresence />
             </div>
 
-            <div className="-mt-12 mx-auto flex max-w-[980px] flex-col items-center text-center sm:-mt-16 md:-mt-20">
-              <h1 className="text-[44px] font-light tracking-[-0.04em] text-white sm:text-[58px] md:text-[70px]">
+            <div className="-mt-16 mx-auto flex max-w-[980px] flex-col items-center text-center sm:-mt-[4.5rem] md:-mt-[5.25rem]">
+              <h1 className="solace-breathe-word text-[44px] font-light text-white sm:text-[58px] md:text-[70px]">
                 Breathe
               </h1>
-
-              <p className="mt-5 max-w-[760px] text-[16px] leading-7 text-white/76 sm:text-[19px]">
-                A calmer digital space for when your thoughts feel tangled, loud, or hard to sort.
-              </p>
             </div>
           </div>
         </section>
 
         <section
           id="start-from-how-it-feels"
-          className="mx-auto w-full max-w-[1280px] px-6 pb-16 pt-6 sm:px-8 lg:px-10"
+          className="mx-auto w-full max-w-[1280px] px-6 pb-14 pt-3 sm:px-8 lg:px-10"
         >
           <div className="mx-auto max-w-[760px] text-center">
-            <p className="text-[12px] uppercase tracking-[0.28em] text-white/32">
-              Start from how it feels
-            </p>
-            <h2 className="mt-4 text-[28px] font-light tracking-[-0.03em] text-white sm:text-[40px]">
-              You don’t need the perfect words to begin
-            </h2>
+            <p className="solace-section-label">Start from how it feels</p>
           </div>
 
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {emotionalEntryCards.map((card) => (
               <Link
                 key={card.title}
@@ -186,10 +185,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-[980px] px-6 pb-16 pt-8 text-center sm:px-8 lg:px-10">
-          <p className="text-[12px] uppercase tracking-[0.28em] text-white/28">
-            How Solace helps
-          </p>
+        <section className="mx-auto w-full max-w-[980px] px-6 pb-16 pt-2 text-center sm:px-8 lg:px-10">
+          <p className="solace-section-label">How Solace helps</p>
           <h2 className="mt-5 text-[30px] font-light tracking-[-0.03em] text-white sm:text-[42px]">
             A quieter way to move forward
           </h2>
@@ -218,22 +215,36 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-[1160px] px-6 pb-16 pt-6 sm:px-8 lg:px-10">
+        <section className="mx-auto w-full max-w-[1160px] px-6 pb-16 pt-4 sm:px-8 lg:px-10">
           <div
-            className="group relative overflow-hidden rounded-[40px] border px-7 py-10 backdrop-blur-[36px] transition duration-300 sm:px-10 sm:py-12"
+            className="group relative isolate overflow-hidden rounded-[40px] border px-7 py-10 transition duration-300 sm:px-10 sm:py-12"
             style={{
               borderColor: "rgba(215,205,255,0.24)",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04))",
+              background: `
+                linear-gradient(180deg, rgba(38,42,58,0.82) 0%, rgba(24,28,40,0.78) 42%, rgba(14,17,26,0.76) 100%),
+                linear-gradient(135deg, rgba(236,228,255,0.08) 0%, rgba(255,255,255,0.025) 24%, rgba(255,255,255,0.01) 52%, rgba(255,255,255,0) 76%)
+              `,
               boxShadow:
-                "0 48px 124px rgba(0,0,0,0.4), 0 0 150px rgba(145,120,255,0.22), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -24px 48px rgba(255,255,255,0.02)",
+                "0 48px 124px rgba(0,0,0,0.38), 0 0 0 1px rgba(255,255,255,0.03) inset, inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -20px 36px rgba(255,255,255,0.015)",
             }}
           >
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(238,228,255,0.26)_0%,rgba(255,255,255,0.08)_24%,rgba(255,255,255,0)_56%)] opacity-90" />
-            <div className="pointer-events-none absolute -right-14 top-[-48px] h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(150,120,255,0.34),transparent_62%)] blur-3xl" />
-            <div className="pointer-events-none absolute -left-12 bottom-[-46px] h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(96,144,255,0.18),transparent_62%)] blur-3xl" />
-            <div className="pointer-events-none absolute bottom-[-34px] left-1/2 h-32 w-[74%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(150,120,255,0.18),transparent_72%)] blur-3xl opacity-95" />
-            <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-screen bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.12)_18%,transparent_36%,rgba(255,255,255,0.08)_52%,transparent_68%)]" />
+            <div className="pointer-events-none absolute inset-0 opacity-[0.08] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,transparent_36%,rgba(255,255,255,0.04)_52%,transparent_68%)]" />
+            <div className="pointer-events-none absolute inset-x-[18%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.34)_50%,transparent_100%)]" />
+            <div className="pointer-events-none absolute inset-x-[12%] bottom-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(180,170,255,0.18)_50%,transparent_100%)]" />
+            <div
+              className="pointer-events-none absolute right-[8%] top-[16%] h-[180px] w-[180px] rounded-full opacity-[0.16]"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(150,120,255,0.7) 0%, rgba(150,120,255,0.18) 42%, transparent 72%)",
+              }}
+            />
+            <div
+              className="pointer-events-none absolute left-[18%] bottom-[12%] h-[140px] w-[240px] rounded-full opacity-[0.08]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(96,144,255,0.52) 0%, rgba(96,144,255,0.12) 46%, transparent 76%)",
+              }}
+            />
 
             <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
               <div className="max-w-[760px]">
@@ -251,10 +262,13 @@ export default function HomePage() {
               <div className="flex shrink-0 md:self-end">
                 <Link
                   href="/lab"
-                  className="group/button relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.07))] px-6 text-[14px] font-medium text-white/94 backdrop-blur-[26px] shadow-[0_16px_38px_rgba(0,0,0,0.26),0_0_40px_rgba(170,140,255,0.18),inset_0_1px_0_rgba(255,255,255,0.28)] transition duration-300 hover:-translate-y-[2px] hover:scale-[1.01] hover:text-white hover:shadow-[0_20px_44px_rgba(0,0,0,0.3),0_0_52px_rgba(170,140,255,0.26),inset_0_1px_0_rgba(255,255,255,0.32)]"
+                  className="group/button relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full border border-[rgba(255,255,255,0.2)] px-6 text-[14px] font-medium text-white/94 shadow-[0_16px_38px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.28)] transition duration-300 hover:-translate-y-[2px] hover:scale-[1.01] hover:text-white hover:shadow-[0_20px_44px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.32)]"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(210,214,230,0.12) 52%, rgba(120,126,154,0.12) 100%)",
+                  }}
                 >
-                  <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(244,234,255,0.28)_0%,rgba(255,255,255,0.1)_34%,rgba(255,255,255,0)_58%)] opacity-90 transition duration-300 group-hover/button:opacity-100" />
-                  <span className="pointer-events-none absolute -bottom-7 left-1/2 h-14 w-[72%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(170,140,255,0.32),transparent_72%)] blur-2xl opacity-95 transition duration-300 group-hover/button:opacity-100" />
+                  <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(244,234,255,0.22)_0%,rgba(255,255,255,0.08)_34%,rgba(255,255,255,0)_58%)] opacity-90 transition duration-300 group-hover/button:opacity-100" />
                   <span className="relative z-10">Enter the Lab</span>
                 </Link>
               </div>
@@ -312,16 +326,34 @@ export default function HomePage() {
 
         @keyframes solaShimmer {
           0% {
-            opacity: 0.12;
-            transform: translateX(-3%);
+            opacity: 0.08;
+            transform: translateX(-2%);
           }
           50% {
-            opacity: 0.24;
-            transform: translateX(3%);
+            opacity: 0.15;
+            transform: translateX(2%);
           }
           100% {
-            opacity: 0.12;
-            transform: translateX(-3%);
+            opacity: 0.08;
+            transform: translateX(-2%);
+          }
+        }
+
+        @keyframes solaceWordPresenceSync {
+          0% {
+            transform: scale(0.996);
+            opacity: 0.958;
+            text-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+          }
+          50% {
+            transform: scale(1.018);
+            opacity: 1;
+            text-shadow: 0 12px 36px rgba(0, 0, 0, 0.23);
+          }
+          100% {
+            transform: scale(0.996);
+            opacity: 0.958;
+            text-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
           }
         }
 
@@ -384,9 +416,33 @@ export default function HomePage() {
           top: 46%;
           height: 8%;
           pointer-events: none;
-          background: radial-gradient(circle at 50% 50%, rgba(255, 240, 248, 0.08), transparent 58%);
-          filter: blur(22px);
+          background: radial-gradient(circle at 50% 50%, rgba(255, 240, 248, 0.045), transparent 58%);
+          filter: blur(18px);
           animation: solaShimmer 14s ease-in-out infinite;
+        }
+
+        .solace-breathe-word {
+          display: inline-block;
+          transform-origin: 50% 72%;
+          letter-spacing: -0.04em;
+          line-height: 0.94;
+          animation: solaceWordPresenceSync var(--solace-breath-duration, 10s)
+            ease-in-out infinite;
+          will-change: transform, opacity, text-shadow;
+        }
+
+        .solace-section-label {
+          font-size: 14px;
+          line-height: 1;
+          text-transform: uppercase;
+          letter-spacing: 0.32em;
+          color: rgba(255, 255, 255, 0.42);
+        }
+
+        @media (min-width: 640px) {
+          .solace-section-label {
+            font-size: 15px;
+          }
         }
       `}</style>
     </main>

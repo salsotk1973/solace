@@ -119,6 +119,14 @@ const CATEGORY_KEYWORDS: Record<
       "wife nagging",
       "distant to me",
       "too distant",
+      "people don't need me",
+      "people do not need me",
+      "nobody needs me",
+      "no one needs me",
+      "better without me",
+      "burden",
+      "problem for anyone",
+      "problem anymore",
     ],
   },
   "Health / Body / Self": {
@@ -145,6 +153,7 @@ const CATEGORY_KEYWORDS: Record<
       "injured",
       "breathing",
       "breath",
+      "breathe",
       "headache",
       "need time off",
       "worthless",
@@ -153,6 +162,25 @@ const CATEGORY_KEYWORDS: Record<
       "do not want to live",
       "don't want to live anymore",
       "do not want to live anymore",
+      "stop breathing",
+      "stop existing",
+      "not be here",
+      "should not be here",
+      "should have never been born",
+      "should've never been born",
+      "never be born",
+      "never been born",
+      "what's the point of living",
+      "what is the point of living",
+      "why living anyway",
+      "why live anyway",
+      "why am i alive",
+      "i don't matter",
+      "i do not matter",
+      "better off without me",
+      "finish all now",
+      "finish all right now",
+      "end all for good",
     ],
   },
   "Environment / External Noise": {
@@ -247,6 +275,21 @@ const CATEGORY_KEYWORDS: Record<
       "no future",
       "want to leave",
       "hate",
+      "what's the point",
+      "what is the point",
+      "keep going",
+      "why living anyway",
+      "why live anyway",
+      "finish it all",
+      "finish all now",
+      "finish all right now",
+      "done with everything",
+      "nobody needs me",
+      "no one needs me",
+      "problem for anyone anymore",
+      "should i end it",
+      "should i end all",
+      "why me",
     ],
   },
   "Logistics / Immediate Problems": {
@@ -317,6 +360,16 @@ const EMOTIONAL_KEYWORDS = [
   "worthless",
   "no future",
   "hate",
+  "done",
+  "finished",
+  "numb",
+  "empty",
+  "don't matter",
+  "do not matter",
+  "nobody needs me",
+  "no one needs me",
+  "problem for anyone anymore",
+  "better without me",
 ];
 
 const PRACTICAL_KEYWORDS = [
@@ -363,12 +416,20 @@ const URGENCY_KEYWORDS = [
   "before",
 ];
 
-const CRISIS_PATTERNS = [
+const DIRECT_CRISIS_PATTERNS = [
   /\bkill myself\b/i,
   /\bi want to kill myself\b/i,
   /\bi wanna kill myself\b/i,
   /\bwant to kill myself\b/i,
   /\bend my life\b/i,
+  /\bend it all\b/i,
+  /\bfinish it all\b/i,
+  /\bfinish all now\b/i,
+  /\bfinish all right now\b/i,
+  /\bfinish everything now\b/i,
+  /\bshould i end it\b/i,
+  /\bshould i end all\b/i,
+  /\bshould i end all for good\b/i,
   /\bdon'?t want to live\b/i,
   /\bdo not want to live\b/i,
   /\bdon'?t want to live anymore\b/i,
@@ -376,6 +437,7 @@ const CRISIS_PATTERNS = [
   /\bwant to die\b/i,
   /\bi should die\b/i,
   /\bi wish i was dead\b/i,
+  /\bi wish i were dead\b/i,
   /\bsuicide\b/i,
   /\bself harm\b/i,
   /\bhurt myself\b/i,
@@ -386,6 +448,34 @@ const CRISIS_PATTERNS = [
   /\bcannot go on\b/i,
   /\bworthless\b/i,
   /\bno future\b/i,
+  /\bstop breathing\b/i,
+  /\bi want to stop breathing\b/i,
+  /\bi do not want to breathe anymore\b/i,
+  /\bi do not want to breath anymore\b/i,
+  /\bi dont want to breathe anymore\b/i,
+  /\bi dont want to breath anymore\b/i,
+  /\bshould have never been born\b/i,
+  /\bshould've never been born\b/i,
+  /\bshould never have been born\b/i,
+  /\bnever be born\b/i,
+  /\bbetter off dead\b/i,
+  /\bbetter off without me\b/i,
+  /\bthey will be better without me\b/i,
+  /\bpeople don'?t need me\b/i,
+  /\bnobody needs me\b/i,
+  /\bno one needs me\b/i,
+  /\bi won'?t be a problem\b/i,
+  /\bi would not be a problem\b/i,
+  /\bwhat'?s the point of living\b/i,
+  /\bwhat is the point of living\b/i,
+  /\bwhat'?s the point in keep going\b/i,
+  /\bwhat is the point in keep going\b/i,
+  /\bwhat'?s the point of keep going\b/i,
+  /\bwhat is the point of keep going\b/i,
+  /\bwhat'?s the point in going on\b/i,
+  /\bwhy live anyway\b/i,
+  /\bwhy living anyway\b/i,
+  /\bwhy am i alive\b/i,
 ];
 
 const CRISIS_SIGNAL_WORDS = [
@@ -401,7 +491,136 @@ const CRISIS_SIGNAL_WORDS = [
   "end my life",
   "don't want to live",
   "do not want to live",
+  "stop breathing",
+  "never been born",
+  "never be born",
+  "nobody needs me",
+  "no one needs me",
+  "people don't need me",
+  "people do not need me",
+  "better without me",
+  "they will be better without me",
+  "what's the point of living",
+  "what is the point of living",
+  "what's the point in keep going",
+  "what is the point in keep going",
+  "why live anyway",
+  "why living anyway",
+  "finish all now",
+  "finish all right now",
+  "end all for good",
 ];
+
+const RECOGNITION_OPENERS = [
+  "This feels like",
+  "What comes through here is",
+  "There seems to be",
+  "A lot of this feels like",
+];
+
+const SEPARATION_LINES = {
+  single: [
+    "One pressure seems to be carrying most of the weight here.",
+    "Beneath the noise, one issue looks heavier than the rest.",
+    "Underneath everything else, one strain appears to be doing most of the pulling.",
+  ],
+  double: [
+    "One part seems central, while another is feeding into it and making it harder to settle.",
+    "There looks to be one main strain, with a second pressure tightening around it.",
+    "One issue seems to sit in the middle, while another keeps adding force to it.",
+  ],
+  triple: [
+    "There seems to be one central strain, with other pressures feeding into it from different angles.",
+    "One burden looks central, while the others are gathering around it and making it harder to breathe around.",
+    "This does not read like one single issue. It feels like one main pressure with other strains locking onto it.",
+  ],
+};
+
+const REFRAME_BY_CATEGORY: Record<SolaceCategory, string[]> = {
+  "Money / Stability": [
+    "When money pressure stays active for too long, it can start tinting everything else and make unrelated things feel more final than they are.",
+    "Financial strain often spreads beyond the numbers and starts shaping mood, energy, and perspective at the same time.",
+    "Money pressure can make the whole landscape feel smaller, even when the real problem is still only one part of life.",
+  ],
+  "Relationships / Home Dynamics": [
+    "When home or connection feels strained, even small things can land with more force than they normally would.",
+    "Relational strain tends to blur into the rest of life, so everything begins to feel more personal and less workable.",
+    "When the emotional atmosphere around you feels tense, it becomes harder for the mind to sort what is actually happening from what it fears next.",
+  ],
+  "Health / Body / Self": [
+    "When your body or energy is under pressure, the rest of life often starts to feel louder, harsher, and less manageable.",
+    "Low energy and emotional strain can make the whole world feel narrower than it is.",
+    "When wellbeing is under strain, the mind becomes less spacious and more likely to treat pain as proof.",
+  ],
+  "Environment / External Noise": [
+    "When there is no real quiet around you, even manageable problems can begin to feel relentless.",
+    "Constant external friction can make the nervous system act as if everything is urgent.",
+    "When the environment never really lets you settle, the mind stops getting a clean reset.",
+  ],
+  "Work / Performance": [
+    "When work pressure stays switched on too long, it spreads into the rest of life and tightens everything around it.",
+    "Performance pressure often makes the mind read every other problem through the same tense lens.",
+    "When responsibility feels endless, the whole day can start to feel like one long threat signal.",
+  ],
+  "Internal Mental Loops": [
+    "When the mind keeps circling the same ground, separate worries begin to merge into one solid wall.",
+    "Mental looping tends to remove proportion, so everything starts sounding equally loud.",
+    "Once a loop takes hold, the mind often repeats the heaviest interpretation instead of the most accurate one.",
+  ],
+  "Logistics / Immediate Problems": [
+    "When practical problems stack up quickly, they can create more pressure than any one of them deserves on its own.",
+    "Small urgent tasks can crowd the mind until everything starts feeling bigger and more dramatic than it is.",
+    "Practical overload often steals mental space first, then starts distorting perspective.",
+  ],
+  Unclear: [
+    "Not everything here deserves the same weight right now.",
+    "The mind may be blending several different pressures into one single feeling.",
+    "This may be more tangled than unclear — which means it can still be separated.",
+  ],
+};
+
+const DIRECTION_BY_CATEGORY: Record<SolaceCategory, string[]> = {
+  "Money / Stability": [
+    "Start with the one money issue that feels most exposed right now, and turn it into one concrete next move.",
+    "Pick the financial pressure with the nearest consequence and work only on that first.",
+    "Reduce this to one specific money problem, not the whole future at once.",
+  ],
+  "Relationships / Home Dynamics": [
+    "Separate what needs an actual conversation from what is emotional spillover, so you are not carrying both as one thing.",
+    "Name the relationship strain as clearly as you can before trying to solve it.",
+    "Focus first on the part that needs understanding, not the part that wants to react.",
+  ],
+  "Health / Body / Self": [
+    "Choose one step that reduces strain on your body or nervous system today, instead of trying to repair everything at once.",
+    "Treat your energy as part of the problem, not as proof about your life.",
+    "Start with the smallest action that creates a little more steadiness in your body or environment.",
+  ],
+  "Environment / External Noise": [
+    "Reduce one source of friction around you first, so your mind has a little less to push against.",
+    "Create one cleaner pocket of space before trying to think through everything.",
+    "Lower one piece of external noise first, then reassess what still feels heavy.",
+  ],
+  "Work / Performance": [
+    "Choose the work pressure with the biggest consequence and make the first move on that before touching the rest.",
+    "Shrink work pressure into one concrete action, instead of holding the whole burden in your head.",
+    "Handle the task with the clearest consequence first and let the rest wait their turn.",
+  ],
+  "Internal Mental Loops": [
+    "Pull out the thought that keeps repeating and ask whether it is a fact, a fear, or an unfinished decision.",
+    "Name the loop in one sentence, then question whether it is predicting or observing.",
+    "Choose one recurring thought and slow it down enough to see what category it actually belongs to.",
+  ],
+  "Logistics / Immediate Problems": [
+    "Handle the practical task with the nearest time consequence first and let the rest wait their turn.",
+    "Do the next real-world action first, then come back to the emotional noise around it.",
+    "Shrink this to the first task that changes the situation in concrete terms.",
+  ],
+  Unclear: [
+    "Start by naming the single thought that feels most exposed, and leave the rest untouched for a moment.",
+    "Try separating what is practical from what is emotional before doing anything else.",
+    "Give the heaviest thought its own sentence, away from the rest.",
+  ],
+};
 
 function normalizeText(value: string): string {
   return value
@@ -464,14 +683,67 @@ function countCrisisSignals(thoughts: string[]): number {
   return count;
 }
 
+function hasBurdenLanguage(text: string): boolean {
+  return (
+    containsPhrase(text, "problem for anyone") ||
+    containsPhrase(text, "problem for everyone") ||
+    containsPhrase(text, "burden") ||
+    containsPhrase(text, "better without me") ||
+    containsPhrase(text, "they will be better without me") ||
+    containsPhrase(text, "don't need me") ||
+    containsPhrase(text, "do not need me") ||
+    containsPhrase(text, "nobody needs me") ||
+    containsPhrase(text, "no one needs me")
+  );
+}
+
+function hasExistentialCollapseLanguage(text: string): boolean {
+  return (
+    containsPhrase(text, "what's the point") ||
+    containsPhrase(text, "what is the point") ||
+    containsPhrase(text, "why live") ||
+    containsPhrase(text, "why living") ||
+    containsPhrase(text, "keep going") ||
+    containsPhrase(text, "should have never been born") ||
+    containsPhrase(text, "should've never been born") ||
+    containsPhrase(text, "never been born") ||
+    containsPhrase(text, "never be born") ||
+    containsPhrase(text, "stop breathing") ||
+    containsPhrase(text, "end all for good") ||
+    containsPhrase(text, "finish all now") ||
+    containsPhrase(text, "finish all right now") ||
+    containsPhrase(text, "don't want to be here") ||
+    containsPhrase(text, "do not want to be here")
+  );
+}
+
 function detectCrisis(thoughts: string[]): boolean {
   const joined = thoughts.join(" || ");
 
-  if (CRISIS_PATTERNS.some((pattern) => pattern.test(joined))) {
+  if (DIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(joined))) {
     return true;
   }
 
   if (countCrisisSignals(thoughts) >= 1) {
+    return true;
+  }
+
+  const burdenSignals = thoughts.filter(hasBurdenLanguage).length;
+  const collapseSignals = thoughts.filter(hasExistentialCollapseLanguage).length;
+  const hopelessSignals = thoughts.filter(
+    (t) =>
+      containsPhrase(t, "no future") ||
+      containsPhrase(t, "worthless") ||
+      containsPhrase(t, "hopeless") ||
+      containsPhrase(t, "can't go on") ||
+      containsPhrase(t, "cannot go on"),
+  ).length;
+
+  if (burdenSignals >= 1 && collapseSignals >= 1) {
+    return true;
+  }
+
+  if (burdenSignals >= 1 && hopelessSignals >= 1) {
     return true;
   }
 
@@ -482,10 +754,20 @@ function detectCrisis(thoughts: string[]): boolean {
         containsPhrase(t, "kill") ||
         containsPhrase(t, "no future") ||
         containsPhrase(t, "don't want to live") ||
-        containsPhrase(t, "do not want to live"),
+        containsPhrase(t, "do not want to live") ||
+        hasExistentialCollapseLanguage(t),
     );
 
-  return hostilePlusCollapse;
+  if (hostilePlusCollapse) {
+    return true;
+  }
+
+  const multipleIndirectSignals =
+    thoughts.filter(
+      (t) => hasBurdenLanguage(t) || hasExistentialCollapseLanguage(t),
+    ).length >= 2;
+
+  return multipleIndirectSignals;
 }
 
 function tokenHasLikelyMeaning(token: string): boolean {
@@ -626,6 +908,14 @@ function scoreEmotionalWeight(text: string): number {
     score += 4;
   }
 
+  if (hasBurdenLanguage(text)) {
+    score += 8;
+  }
+
+  if (hasExistentialCollapseLanguage(text)) {
+    score += 12;
+  }
+
   return Math.min(score, 40);
 }
 
@@ -658,8 +948,12 @@ function scoreUrgency(text: string): number {
 
   score += Math.min(countKeywordHits(text, URGENCY_KEYWORDS) * 4, 12);
 
-  if (/\b(today|tonight|tomorrow|urgent|asap|immediately|overdue)\b/i.test(text)) {
+  if (/\b(today|tonight|tomorrow|urgent|asap|immediately|overdue|now)\b/i.test(text)) {
     score += 3;
+  }
+
+  if (containsPhrase(text, "all now") || containsPhrase(text, "right now")) {
+    score += 4;
   }
 
   return Math.min(score, 15);
@@ -794,38 +1088,51 @@ function joinPhrases(parts: string[]): string {
   return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
 }
 
+function pickVariant<T>(items: T[], seed: number): T {
+  return items[Math.abs(seed) % items.length];
+}
+
 function buildRecognition(clusters: Cluster[]): string {
-  const topCategories = clusters.slice(0, 3).map((cluster) => formatCategoryPhrase(cluster.category));
+  const topCategories = clusters
+    .slice(0, 3)
+    .map((cluster) => formatCategoryPhrase(cluster.category));
+  const opener = pickVariant(
+    RECOGNITION_OPENERS,
+    clusters.length + Math.round(clusters[0]?.averageImportance || 0),
+  );
 
   if (topCategories.length === 0) {
     return "There is pressure here, but it has not separated into a clean shape yet.";
   }
 
   if (topCategories.length === 1) {
-    return `What seems to be weighing on you most is ${topCategories[0]}.`;
+    return `${opener} ${topCategories[0]} carrying most of the weight right now.`;
   }
 
-  return `This feels like ${joinPhrases(topCategories)} all pressing at the same time.`;
+  return `${opener} ${joinPhrases(topCategories)} all pressing at the same time.`;
 }
 
 function buildSeparation(clusters: Cluster[]): string {
-  const top = clusters[0];
-  const second = clusters[1];
-  const third = clusters[2];
-
-  if (!top) {
-    return "The clearest move is to slow it down and identify the heaviest part first.";
+  if (clusters.length <= 1) {
+    return pickVariant(
+      SEPARATION_LINES.single,
+      Math.round(clusters[0]?.averageImportance || 0),
+    );
   }
 
-  if (!second) {
-    return "Underneath the noise, one pressure appears to be carrying most of the load.";
+  if (clusters.length === 2) {
+    return pickVariant(
+      SEPARATION_LINES.double,
+      Math.round(clusters[1]?.averageImportance || 0),
+    );
   }
 
-  if (!third) {
-    return "One part looks central, while another is feeding into it and making it harder to settle.";
-  }
-
-  return "There seems to be one central strain, with two other pressures feeding into it from different angles.";
+  return pickVariant(
+    SEPARATION_LINES.triple,
+    Math.round(
+      (clusters[0]?.averageImportance || 0) + (clusters[1]?.averageImportance || 0),
+    ),
+  );
 }
 
 function buildReframing(clusters: Cluster[]): string {
@@ -835,24 +1142,10 @@ function buildReframing(clusters: Cluster[]): string {
     return "Not everything here deserves the same level of attention right now.";
   }
 
-  switch (topCluster.category) {
-    case "Money / Stability":
-      return "That often happens when money pressure starts colouring everything else around it.";
-    case "Relationships / Home Dynamics":
-      return "When home feels strained, even unrelated things can start landing harder than they normally would.";
-    case "Health / Body / Self":
-      return "When your energy is under pressure, the rest of life often starts to feel louder than it really is.";
-    case "Environment / External Noise":
-      return "When there is no real quiet around you, even manageable problems can begin to feel relentless.";
-    case "Work / Performance":
-      return "When work pressure stays switched on for too long, it can spread into the rest of life and make everything feel tighter.";
-    case "Internal Mental Loops":
-      return "When your mind keeps circling the same ground, separate worries can start to feel like one solid wall.";
-    case "Logistics / Immediate Problems":
-      return "When small practical problems stack up, they can create more pressure than any one of them deserves on its own.";
-    default:
-      return "Not everything here deserves the same level of attention right now.";
-  }
+  return pickVariant(
+    REFRAME_BY_CATEGORY[topCluster.category],
+    Math.round(topCluster.averageImportance + topCluster.thoughts.length * 3),
+  );
 }
 
 function buildDirection(clusters: Cluster[]): string {
@@ -862,24 +1155,10 @@ function buildDirection(clusters: Cluster[]): string {
     return "Start by naming the single thought that feels most exposed, and leave the rest untouched for a moment.";
   }
 
-  switch (topCluster.category) {
-    case "Money / Stability":
-      return "Start with the one money issue that feels most exposed right now, and turn that into one concrete action.";
-    case "Relationships / Home Dynamics":
-      return "Separate what needs an actual conversation from what is emotional spillover, so you are not carrying both as one thing.";
-    case "Health / Body / Self":
-      return "Pick one thing today that reduces strain on your body or energy, instead of trying to repair everything at once.";
-    case "Environment / External Noise":
-      return "Reduce one source of friction around you first, so your mind has a little less to push against.";
-    case "Work / Performance":
-      return "Choose the work pressure with the biggest consequence and make the first move on that, before touching the rest.";
-    case "Internal Mental Loops":
-      return "Pull out the thought that keeps repeating and ask whether it is a real problem, a fear, or an unfinished decision.";
-    case "Logistics / Immediate Problems":
-      return "Handle the practical task with the nearest time consequence first, and let the rest wait their turn.";
-    default:
-      return "Start with the clearest pressure first and let the rest stay in the background for a moment.";
-  }
+  return pickVariant(
+    DIRECTION_BY_CATEGORY[topCluster.category],
+    Math.round(topCluster.averageImportance + topCluster.thoughts.length * 7),
+  );
 }
 
 function generateClarityFallback(): string {
@@ -892,9 +1171,10 @@ function generateClarityFallback(): string {
 function generateCrisisFallback(): string {
   return [
     "It sounds like things feel very heavy right now.",
-    "You do not need to carry this on your own.",
-    "Please reach out now to someone who can be with you in real time — a trusted person, a crisis line, or a mental health professional.",
-    "If you feel you may act on these thoughts or you are in immediate danger, contact local emergency services now.",
+    "Some of what you wrote suggests you may be close to the edge, and this is a moment to bring in real human support around you.",
+    "Please reach out right now to someone who can be with you in real time — a trusted person nearby, a crisis line, or a mental health professional.",
+    "If you feel you might act on these thoughts, or you are not safe, call local emergency services now.",
+    "For this moment, keep it simple: move closer to another person, or send one short message saying you need help right now.",
   ].join("\n\n");
 }
 
@@ -913,9 +1193,16 @@ function processThoughts(input: ClearYourMindBubbleInput[]): ProcessedThought[] 
   return input.map((item, index) => {
     const normalizedText = normalizedList[index];
     const isGibberish = isLikelyGibberish(normalizedText);
-    const { mainCategory, secondaryCategory, matchedSignals } = detectCategories(normalizedText);
+    const { mainCategory, secondaryCategory, matchedSignals } = detectCategories(
+      normalizedText,
+    );
 
-    const importance = scoreThought(normalizedText, mainCategory, normalizedList, isGibberish);
+    const importance = scoreThought(
+      normalizedText,
+      mainCategory,
+      normalizedList,
+      isGibberish,
+    );
 
     return {
       id: item.id || `thought-${index + 1}`,
@@ -968,12 +1255,17 @@ export async function POST(request: Request) {
     const hasCrisisLanguage = detectCrisis(normalizedTexts);
 
     if (hasCrisisLanguage) {
+      const processedThoughts = processThoughts(thoughts);
+      const sortedThoughts = [...processedThoughts].sort(
+        (a, b) => b.importance.total - a.importance.total,
+      );
+
       const response: ClearYourMindResponse = {
         ok: true,
         text: generateCrisisFallback(),
         isCrisisFallback: true,
         clarityFallback: false,
-        thoughts: [],
+        thoughts: toThoughtResults(sortedThoughts),
         clusters: [],
       };
 

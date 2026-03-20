@@ -260,24 +260,31 @@ function applyApiResultsToBubbles(
 }
 
 function ScopeInline() {
+  const wrapperStyle: CSSProperties = {
+    color: "rgba(231, 225, 241, 0.62)",
+  };
+
   const baseTextStyle: CSSProperties = {
-    color: "rgba(231, 225, 241, 0.60)",
+    color: "rgba(231, 225, 241, 0.62)",
+    WebkitTextFillColor: "rgba(231, 225, 241, 0.62)",
   };
 
   const separatorStyle: CSSProperties = {
     color: "rgba(231, 225, 241, 0.44)",
+    WebkitTextFillColor: "rgba(231, 225, 241, 0.44)",
     whiteSpace: "pre",
   };
 
   const linkStyle: CSSProperties = {
-    color: "rgba(239, 234, 247, 0.72)",
+    color: "rgba(239, 234, 247, 0.74)",
+    WebkitTextFillColor: "rgba(239, 234, 247, 0.74)",
     textDecoration: "none",
     borderBottom: "1px solid rgba(255,255,255,0.14)",
     lineHeight: 1.1,
   };
 
   return (
-    <div className="scope-inline">
+    <div className="scope-inline" style={wrapperStyle}>
       <span className="scope-inline-copy" style={baseTextStyle}>
         {SCOPE_COPY}
       </span>
@@ -335,6 +342,24 @@ export default function ClearYourMindPage() {
   useEffect(() => {
     const width = bubbleFieldRef.current?.clientWidth ?? 1100;
     setBubbles([createStarterBubble(width)]);
+  }, []);
+
+  useEffect(() => {
+    setDraft("");
+
+    const clearRestoredValue = () => {
+      setDraft("");
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    };
+
+    clearRestoredValue();
+    window.addEventListener("pageshow", clearRestoredValue);
+
+    return () => {
+      window.removeEventListener("pageshow", clearRestoredValue);
+    };
   }, []);
 
   useEffect(() => {
@@ -614,7 +639,10 @@ export default function ClearYourMindPage() {
     }
 
     requestAnimationFrame(() => {
-      inputRef.current?.focus();
+      if (inputRef.current) {
+        inputRef.current.value = "";
+        inputRef.current.focus();
+      }
     });
   }
 
@@ -705,7 +733,29 @@ export default function ClearYourMindPage() {
         </section>
 
         {showInitialForm ? (
-          <form className="mind-form" onSubmit={handleSubmit}>
+          <form
+            className="mind-form"
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            data-form-type="other"
+          >
+            <input
+              type="text"
+              name="fake-solace-username"
+              autoComplete="username"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="autofill-trap"
+            />
+            <input
+              type="password"
+              name="fake-solace-password"
+              autoComplete="new-password"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="autofill-trap"
+            />
+
             <ScopeInline />
 
             <div className="input-shell">
@@ -717,6 +767,7 @@ export default function ClearYourMindPage() {
                 <input
                   id="clear-your-mind-input"
                   ref={inputRef}
+                  name="solace-reflection-thought"
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -724,6 +775,14 @@ export default function ClearYourMindPage() {
                   placeholder=""
                   className="mind-input"
                   disabled={isLoading || inputLocked}
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-form-type="other"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
                 />
               </div>
             </div>
@@ -1126,8 +1185,18 @@ export default function ClearYourMindPage() {
           margin-top: 0;
         }
 
+        .autofill-trap {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+          width: 1px;
+          height: 1px;
+          left: -9999px;
+          top: -9999px;
+        }
+
         .scope-inline {
-          margin: 0 0 10px;
+          margin: 0 0 16px;
           display: flex;
           flex-wrap: wrap;
           align-items: center;
@@ -1138,6 +1207,12 @@ export default function ClearYourMindPage() {
           text-align: center;
           text-wrap: balance;
           text-shadow: 0 2px 10px rgba(0, 0, 0, 0.24);
+          transform: translateY(-6px);
+        }
+
+        .scope-inline,
+        .scope-inline * {
+          color: inherit;
         }
 
         .scope-inline-copy {
@@ -1150,14 +1225,23 @@ export default function ClearYourMindPage() {
           line-height: inherit;
         }
 
+        .scope-inline-link,
+        .scope-inline-link:visited,
+        .scope-inline-link:hover,
+        .scope-inline-link:active {
+          color: rgba(239, 234, 247, 0.74) !important;
+          -webkit-text-fill-color: rgba(239, 234, 247, 0.74) !important;
+        }
+
         .scope-inline-link:hover {
           color: rgba(247, 244, 252, 0.88) !important;
+          -webkit-text-fill-color: rgba(247, 244, 252, 0.88) !important;
           border-color: rgba(255, 255, 255, 0.24) !important;
         }
 
         .input-shell {
           width: 100%;
-          max-width: 640px;
+          max-width: 720px;
           margin: 0 auto;
         }
 
@@ -1174,10 +1258,10 @@ export default function ClearYourMindPage() {
           transform: translateY(-50%);
           pointer-events: none;
           text-align: left;
-          font-size: 0.98rem;
+          font-size: 0.93rem;
           line-height: 1.2;
-          color: rgba(232, 226, 242, 0.74);
-          text-shadow: 0 1px 8px rgba(0, 0, 0, 0.22);
+          color: rgba(232, 226, 242, 0.5);
+          text-shadow: 0 1px 8px rgba(0, 0, 0, 0.16);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1531,7 +1615,7 @@ export default function ClearYourMindPage() {
           }
 
           .input-shell {
-            max-width: 600px;
+            max-width: 660px;
           }
         }
 
@@ -1553,8 +1637,9 @@ export default function ClearYourMindPage() {
 
           .scope-inline {
             font-size: 0.66rem;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             line-height: 1.35;
+            transform: translateY(-4px);
           }
 
           .input-shell {
@@ -1570,7 +1655,8 @@ export default function ClearYourMindPage() {
           .mind-input-overlay {
             left: 20px;
             right: 20px;
-            font-size: 0.94rem;
+            font-size: 0.88rem;
+            color: rgba(232, 226, 242, 0.48);
           }
 
           .actions {

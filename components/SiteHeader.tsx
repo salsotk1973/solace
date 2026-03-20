@@ -24,20 +24,23 @@ export default function SiteHeader() {
             <Link
               key={item.label}
               href={item.href}
-              className="group relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full border px-5 text-[14px] font-medium text-white/92 backdrop-blur-[26px] transition duration-200 hover:-translate-y-[2px] hover:scale-[1.02] hover:text-white"
+              className="group relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full border px-5 text-[14px] font-medium text-white/92 transition duration-200 hover:-translate-y-[2px] hover:scale-[1.02] hover:text-white"
               style={{
                 borderColor: "rgba(225,232,255,0.18)",
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.055))",
+                background: `
+                  linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(210,216,232,0.10) 48%, rgba(120,128,150,0.10) 100%),
+                  linear-gradient(135deg, rgba(236,240,255,0.08) 0%, rgba(255,255,255,0.03) 28%, rgba(255,255,255,0.015) 52%, rgba(255,255,255,0) 76%)
+                `,
                 boxShadow:
-                  "0 18px 40px rgba(0,0,0,0.26), 0 0 28px rgba(160,176,255,0.10), inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -12px 24px rgba(255,255,255,0.03)",
+                  "0 18px 40px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -10px 18px rgba(255,255,255,0.025)",
               }}
             >
-              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(205,214,255,0.22)_0%,transparent_74%)] opacity-90 transition duration-200 group-hover:opacity-100" />
-              <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.36)_0%,rgba(255,255,255,0.08)_34%,rgba(255,255,255,0)_58%)] opacity-85 transition duration-200 group-hover:opacity-100" />
-              <span className="pointer-events-none absolute inset-[1px] rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] transition duration-200 group-hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.16)]" />
-              <span className="pointer-events-none absolute -bottom-7 left-1/2 h-14 w-[76%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(178,194,255,0.32)_0%,transparent_72%)] blur-2xl opacity-80 transition duration-200 group-hover:opacity-100" />
-              <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 shadow-[0_0_0_1px_rgba(214,224,255,0.18),0_0_18px_rgba(184,198,255,0.22)] transition duration-200 group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(205,214,255,0.18)_0%,transparent_72%)] opacity-90 transition duration-200 group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.28)_0%,rgba(255,255,255,0.07)_34%,rgba(255,255,255,0)_58%)] opacity-85 transition duration-200 group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-[1px] rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] transition duration-200 group-hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]" />
+              <span className="pointer-events-none absolute inset-x-[18%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.34)_50%,transparent_100%)] opacity-90" />
+              <span className="pointer-events-none absolute inset-x-[22%] bottom-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(188,198,255,0.14)_50%,transparent_100%)] opacity-80" />
+              <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 shadow-[0_0_0_1px_rgba(214,224,255,0.18)] transition duration-200 group-hover:opacity-100" />
               <span className="relative z-10">{item.label}</span>
             </Link>
           ))}

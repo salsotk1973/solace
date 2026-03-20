@@ -35,7 +35,7 @@ export default function HeroPresence() {
             "radial-gradient(circle, rgba(194,178,255,0.14) 0%, rgba(194,178,255,0.08) 30%, rgba(194,178,255,0.035) 52%, rgba(194,178,255,0.012) 64%, rgba(194,178,255,0) 78%)",
           filter: "blur(84px)",
           zIndex: 0,
-          animation: "solaceAuraBreathSync 10s linear infinite",
+          animation: "solaceAuraBreathSync var(--solace-breath-duration, 10s) linear infinite",
         }}
       />
 
@@ -53,7 +53,7 @@ export default function HeroPresence() {
             "radial-gradient(circle, rgba(205,186,255,0.22) 0%, rgba(186,162,255,0.13) 34%, rgba(186,162,255,0.055) 56%, rgba(186,162,255,0) 74%)",
           filter: "blur(50px)",
           zIndex: 1,
-          animation: "solaceCoreAuraSync 10s linear infinite",
+          animation: "solaceCoreAuraSync var(--solace-breath-duration, 10s) linear infinite",
         }}
       />
 
@@ -71,7 +71,7 @@ export default function HeroPresence() {
             "radial-gradient(ellipse at center, rgba(118,84,220,0.16) 0%, rgba(118,84,220,0.07) 44%, rgba(118,84,220,0.02) 70%, rgba(118,84,220,0) 84%)",
           filter: "blur(24px)",
           zIndex: 2,
-          animation: "solaceGroundPulseSync 10s linear infinite",
+          animation: "solaceGroundPulseSync var(--solace-breath-duration, 10s) linear infinite",
         }}
       />
 
@@ -89,7 +89,7 @@ export default function HeroPresence() {
             "radial-gradient(ellipse at center, rgba(102,72,196,0.28) 0%, rgba(102,72,196,0.10) 50%, rgba(102,72,196,0) 84%)",
           filter: "blur(12px)",
           zIndex: 3,
-          animation: "solaceGroundCoreSync 10s linear infinite",
+          animation: "solaceGroundCoreSync var(--solace-breath-duration, 10s) linear infinite",
         }}
       />
 
@@ -151,7 +151,8 @@ export default function HeroPresence() {
 
           filter: blur(80px);
           mix-blend-mode: multiply;
-          animation: solaceFabricBreathSync 10s linear infinite;
+          animation: solaceFabricBreathSync var(--solace-breath-duration, 10s)
+            linear infinite;
         }
 
         .solace-orb-wrap {
@@ -161,7 +162,8 @@ export default function HeroPresence() {
           width: 468px;
           height: 468px;
           transform: translate(-50%, -50%);
-          animation: solaceOrbBreathSync 10s linear infinite;
+          animation: solaceOrbBreathSync var(--solace-breath-duration, 10s)
+            linear infinite;
         }
 
         .solace-orb-backglow {
@@ -176,7 +178,8 @@ export default function HeroPresence() {
             rgba(191, 167, 255, 0) 78%
           );
           filter: blur(34px);
-          animation: solaceOrbGlowSync 10s linear infinite;
+          animation: solaceOrbGlowSync var(--solace-breath-duration, 10s)
+            linear infinite;
         }
 
         .solace-orb-image-frame {
@@ -195,7 +198,9 @@ export default function HeroPresence() {
           object-fit: contain;
           transform: translate(-50%, -50%) scale(2.22);
         }
+      `}</style>
 
+      <style jsx global>{`
         @keyframes solaceFabricBreathSync {
           0% {
             opacity: 0.2;
@@ -235,6 +240,84 @@ export default function HeroPresence() {
           100% {
             transform: scale(0.94);
             opacity: 0.8;
+          }
+        }
+
+        @keyframes solaceAuraBreathSync {
+          0% {
+            transform: translate(-50%, -50%) scale(0.94);
+            opacity: 0.66;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(0.94);
+            opacity: 0.66;
+          }
+        }
+
+        @keyframes solaceCoreAuraSync {
+          0% {
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0.5;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.08);
+            opacity: 0.92;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0.5;
+          }
+        }
+
+        @keyframes solaceGroundPulseSync {
+          0% {
+            transform: translate(-50%, -50%) scaleX(0.9) scaleY(0.92);
+            opacity: 0.38;
+          }
+          50% {
+            transform: translate(-50%, -50%) scaleX(1.08) scaleY(1.12);
+            opacity: 0.72;
+          }
+          100% {
+            transform: translate(-50%, -50%) scaleX(0.9) scaleY(0.92);
+            opacity: 0.38;
+          }
+        }
+
+        @keyframes solaceGroundCoreSync {
+          0% {
+            transform: translate(-50%, -50%) scaleX(0.92) scaleY(0.92);
+            opacity: 0.48;
+          }
+          50% {
+            transform: translate(-50%, -50%) scaleX(1.06) scaleY(1.1);
+            opacity: 0.82;
+          }
+          100% {
+            transform: translate(-50%, -50%) scaleX(0.92) scaleY(0.92);
+            opacity: 0.48;
+          }
+        }
+
+        @keyframes solaceWordBreathSync {
+          0% {
+            transform: scale(0.982);
+            letter-spacing: -0.04em;
+            opacity: 0.94;
+          }
+          50% {
+            transform: scale(1.06);
+            letter-spacing: -0.028em;
+            opacity: 1;
+          }
+          100% {
+            transform: scale(0.982);
+            letter-spacing: -0.04em;
+            opacity: 0.94;
           }
         }
       `}</style>
