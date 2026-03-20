@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import ReflectionOrb from "@/components/solace/ReflectionOrb";
+import SiteHeader from "@/components/SiteHeader";
 
 type OrbPhase = "idle" | "active" | "settled";
 
@@ -160,6 +161,8 @@ export default function ChoosePage() {
       <div className="realm-bg-vignette" aria-hidden="true" />
       <div className="realm-bg-soften" aria-hidden="true" />
       <div className="realm-center-halo" aria-hidden="true" />
+
+      <SiteHeader />
 
       <section className="realm-content">
         <div className="realm-intro">
@@ -325,7 +328,7 @@ export default function ChoosePage() {
           width: 100%;
           max-width: 980px;
           margin: 0 auto;
-          padding: 96px 24px 88px;
+          padding: 138px 24px 88px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -735,7 +738,7 @@ export default function ChoosePage() {
 
         @media (max-width: 900px) {
           .realm-content {
-            padding-top: 88px;
+            padding-top: 130px;
           }
 
           .orb-stage {
@@ -745,7 +748,7 @@ export default function ChoosePage() {
 
         @media (max-width: 640px) {
           .realm-content {
-            padding-top: 78px;
+            padding-top: 122px;
             padding-left: 18px;
             padding-right: 18px;
           }

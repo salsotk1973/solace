@@ -1,31 +1,46 @@
+"use client";
+
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import HeroPresence from "@/components/hero/HeroPresence";
+import { SOLACE_ROUTES } from "@/lib/solace/routes";
 
 const emotionalEntryCards = [
   {
-    title: "I can’t decide",
-    description: "Untangle difficult decisions with a calmer frame.",
-    href: "/tools/i-cant-decide",
-    tone: "rgba(165, 190, 255, 0.14)",
-    border: "rgba(214, 226, 255, 0.18)",
-    glow: "rgba(120, 150, 235, 0.16)",
+    eyebrow: "I CAN’T DECIDE",
+    title: "Choose",
+    description: "Compare options and move forward.",
+    subtext: "For moments of indecision.",
+    href: SOLACE_ROUTES.choose,
+    border: "rgba(176, 204, 255, 0.34)",
+    tintTop: "rgba(162, 190, 255, 0.42)",
+    tintBody: "rgba(174, 198, 255, 0.2)",
+    glow: "rgba(144, 180, 255, 0.3)",
+    glare: "rgba(242, 247, 255, 0.34)",
   },
   {
-    title: "My mind won’t stop",
-    description: "Step out of mental loops and regain perspective.",
-    href: "/tools/clear-your-mind",
-    tone: "rgba(212, 190, 255, 0.14)",
-    border: "rgba(232, 220, 255, 0.18)",
-    glow: "rgba(175, 140, 235, 0.16)",
+    eyebrow: "MY MIND WON’T STOP THINKING",
+    title: "Clear Your Mind",
+    description: "Untangle overthinking and regain perspective.",
+    subtext: "For moments of overthinking.",
+    href: SOLACE_ROUTES.clearYourMind,
+    border: "rgba(196, 214, 198, 0.34)",
+    tintTop: "rgba(212, 222, 214, 0.42)",
+    tintBody: "rgba(198, 210, 202, 0.18)",
+    glow: "rgba(188, 206, 192, 0.22)",
+    glare: "rgba(250, 255, 250, 0.3)",
   },
   {
-    title: "Everything feels noisy",
-    description: "Sort what matters from what is only adding pressure.",
-    href: "/tools/everything-feels-noisy",
-    tone: "rgba(198, 214, 255, 0.12)",
-    border: "rgba(220, 232, 255, 0.16)",
-    glow: "rgba(132, 155, 220, 0.14)",
+    eyebrow: "EVERYTHING FEELS NOISY",
+    title: "Sort",
+    description: "Separate what deserves attention from what doesn’t.",
+    subtext: "For moments of overwhelm.",
+    href: SOLACE_ROUTES.sort,
+    border: "rgba(244, 214, 188, 0.34)",
+    tintTop: "rgba(246, 224, 208, 0.42)",
+    tintBody: "rgba(238, 214, 198, 0.18)",
+    glow: "rgba(236, 206, 182, 0.2)",
+    glare: "rgba(255, 248, 240, 0.28)",
   },
 ];
 
@@ -46,60 +61,54 @@ const helpSteps = [
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#05070d] text-white">
-      {/* Atmospheric background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#0b1422_0%,#07101b_28%,#05070d_60%,#04060b_100%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[#03050b] text-white">
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/solaverse/master-bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
 
-        <div className="absolute inset-x-0 top-[120px] h-[420px] bg-[radial-gradient(circle_at_50%_30%,rgba(160,180,255,0.18),transparent_55%)] blur-3xl" />
-
-        <div className="absolute inset-x-0 top-[420px] h-[500px] bg-[radial-gradient(circle_at_50%_40%,rgba(110,120,190,0.12),transparent_60%)] blur-3xl" />
-
-        <div className="absolute left-[-10%] top-[20%] h-[500px] w-[40%] bg-[radial-gradient(circle,rgba(60,90,170,0.12),transparent_60%)] blur-3xl" />
-
-        <div className="absolute right-[-10%] top-[25%] h-[500px] w-[40%] bg-[radial-gradient(circle,rgba(140,100,180,0.1),transparent_60%)] blur-3xl" />
-
-        <div className="absolute inset-x-0 bottom-[-60px] h-[320px] bg-[radial-gradient(circle_at_50%_100%,rgba(80,60,130,0.12),transparent_60%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+        <div className="sola-haze sola-haze-a" />
+        <div className="sola-haze sola-haze-b" />
+        <div className="sola-haze sola-haze-c" />
+        <div className="sola-light sola-light-left" />
+        <div className="sola-light sola-light-right" />
+        <div className="sola-horizon-shimmer" />
       </div>
+
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_16%_26%,rgba(92,142,255,0.24),transparent_34%),radial-gradient(circle_at_84%_24%,rgba(162,120,255,0.18),transparent_34%),radial-gradient(circle_at_50%_16%,rgba(208,220,255,0.18),transparent_22%),radial-gradient(circle_at_50%_82%,rgba(255,230,244,0.14),transparent_18%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(3,5,11,0.14)_0%,rgba(3,5,11,0.08)_18%,rgba(3,5,11,0.12)_38%,rgba(3,5,11,0.24)_62%,rgba(3,5,11,0.64)_86%,rgba(3,5,11,0.84)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_34%,transparent_0%,transparent_50%,rgba(0,0,0,0.2)_76%,rgba(0,0,0,0.38)_100%)]" />
 
       <SiteHeader />
 
-      <div className="relative z-10">
-        {/* Hero */}
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-10 pt-24 sm:px-8 md:pt-28 lg:px-10">
+      <div className="relative z-20">
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-12 pt-[100px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
-            <div className="pointer-events-none absolute top-[-10px] h-[320px] w-[520px] max-w-full bg-[radial-gradient(circle_at_50%_50%,rgba(165,184,255,0.12),transparent_56%)] blur-3xl" />
-
             <div className="mb-4">
               <HeroPresence />
             </div>
 
-            <div className="mx-auto flex max-w-[760px] flex-col items-center text-center">
+            <div className="mx-auto flex max-w-[1100px] flex-col items-center text-center">
               <h1 className="text-[44px] font-light tracking-[-0.04em] text-white sm:text-[58px] md:text-[70px]">
                 Clear your mind
               </h1>
 
-              <p className="mt-5 max-w-[660px] text-[16px] leading-7 text-white/70 sm:text-[19px]">
-                A calmer digital space for when your thoughts feel tangled,
-                loud, or hard to sort.
+              <p className="mt-5 text-[16px] leading-7 text-white/76 sm:text-[19px]">
+                A calmer digital space for when your thoughts feel tangled, loud, or hard to sort.
               </p>
-
-              <div className="mt-8 flex items-center justify-center">
-                <Link
-                  href="#start-from-how-it-feels"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/14 bg-white/[0.08] px-6 text-[14px] font-medium text-white/92 backdrop-blur-xl transition duration-500 hover:-translate-y-[1px] hover:border-white/24 hover:bg-white/[0.12] hover:shadow-[0_10px_30px_rgba(145,170,255,0.18),0_4px_14px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                >
-                  Start from how it feels
-                </Link>
-              </div>
             </div>
           </div>
         </section>
 
-        {/* Emotional entry cards - clearly interactive */}
         <section
           id="start-from-how-it-feels"
-          className="mx-auto w-full max-w-[1280px] px-6 pb-18 pt-10 sm:px-8 lg:px-10"
+          className="mx-auto w-full max-w-[1280px] px-6 pb-16 pt-6 sm:px-8 lg:px-10"
         >
           <div className="mx-auto max-w-[760px] text-center">
             <p className="text-[12px] uppercase tracking-[0.28em] text-white/32">
@@ -116,34 +125,58 @@ export default function HomePage() {
                 key={card.title}
                 href={card.href}
                 aria-label={`Open ${card.title}`}
-                className="group relative cursor-pointer overflow-hidden rounded-[26px] border bg-white/[0.03] p-0 backdrop-blur-xl transition duration-500 hover:-translate-y-[4px] hover:scale-[1.01]"
+                className="group relative cursor-pointer overflow-hidden rounded-[32px] border p-0 backdrop-blur-[34px] transition duration-300 hover:-translate-y-[6px] hover:scale-[1.015]"
                 style={{
                   borderColor: card.border,
-                  boxShadow: `0 0 0 1px rgba(255,255,255,0.02), 0 24px 70px rgba(0,0,0,0.28), 0 10px 24px rgba(0,0,0,0.2), 0 0 60px ${card.glow}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05))",
+                  boxShadow: `0 30px 88px rgba(0,0,0,0.36), 0 0 120px ${card.glow}, inset 0 1px 0 rgba(255,255,255,0.24), inset 0 -24px 48px rgba(255,255,255,0.025)`,
                 }}
               >
                 <div
-                  className="absolute inset-0 opacity-90"
+                  className="absolute inset-0 opacity-100"
                   style={{
-                    background: `linear-gradient(180deg, ${card.tone} 0%, rgba(255,255,255,0.03) 42%, rgba(8,11,19,0.42) 100%)`,
+                    background: `linear-gradient(180deg, ${card.tintTop} 0%, ${card.tintBody} 34%, rgba(255,255,255,0.03) 54%, rgba(8,11,19,0.44) 100%)`,
                   }}
                 />
-                <div className="pointer-events-none absolute inset-x-8 bottom-0 h-20 rounded-full bg-white/[0.04] blur-2xl transition duration-500 group-hover:bg-white/[0.07]" />
-                <div className="relative flex h-full min-h-[182px] flex-col justify-between px-7 py-7">
+
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-95 transition duration-300 group-hover:opacity-100"
+                  style={{
+                    background: `linear-gradient(135deg, ${card.glare} 0%, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0) 58%)`,
+                  }}
+                />
+
+                <div
+                  className="pointer-events-none absolute inset-x-[8%] top-[-24%] h-[62%] blur-3xl"
+                  style={{
+                    background: `radial-gradient(circle, ${card.glow} 0%, transparent 72%)`,
+                  }}
+                />
+
+                <div
+                  className="pointer-events-none absolute -bottom-10 left-1/2 h-28 w-[82%] -translate-x-1/2 rounded-full blur-3xl opacity-95 transition duration-300 group-hover:opacity-100"
+                  style={{
+                    background: `radial-gradient(circle, ${card.glow} 0%, transparent 72%)`,
+                  }}
+                />
+
+                <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-screen bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.12)_18%,transparent_36%,rgba(255,255,255,0.08)_52%,transparent_68%)]" />
+
+                <div className="relative flex h-full min-h-[214px] flex-col justify-between px-7 py-7">
                   <div>
-                    <h3 className="text-[22px] font-light tracking-[-0.02em] text-white">
+                    <p className="text-[12px] uppercase tracking-[0.22em] text-black/35">
+                      {card.eyebrow}
+                    </p>
+                    <h3 className="mt-5 text-[28px] font-semibold tracking-[-0.04em] text-black/85">
                       {card.title}
                     </h3>
-                    <p className="mt-4 max-w-[30ch] text-[15px] leading-7 text-white/68">
+                    <p className="mt-5 max-w-[30ch] text-[15px] leading-7 text-black/68">
                       {card.description}
                     </p>
-                  </div>
-
-                  <div className="mt-7 inline-flex items-center gap-2 text-[14px] font-medium text-white/84 transition duration-500 group-hover:text-white">
-                    Open tool
-                    <span className="transition duration-500 group-hover:translate-x-1">
-                      →
-                    </span>
+                    <p className="mt-8 text-[14px] text-black/35">
+                      {card.subtext}
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -151,9 +184,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Plain informational text - not cards */}
         <section className="mx-auto w-full max-w-[980px] px-6 pb-16 pt-8 text-center sm:px-8 lg:px-10">
-          <p className="text-[12px] uppercase tracking-[0.28em] text-white/30">
+          <p className="text-[12px] uppercase tracking-[0.28em] text-white/28">
             How Solace helps
           </p>
           <h2 className="mt-5 text-[30px] font-light tracking-[-0.03em] text-white sm:text-[42px]">
@@ -165,9 +197,7 @@ export default function HomePage() {
               <div
                 key={step.title}
                 className={`flex items-start gap-4 py-4 text-left ${
-                  index !== helpSteps.length - 1
-                    ? "border-b border-white/8"
-                    : ""
+                  index !== helpSteps.length - 1 ? "border-b border-white/8" : ""
                 }`}
               >
                 <div className="mt-[2px] w-[42px] shrink-0 text-[12px] tracking-[0.22em] text-white/28">
@@ -186,49 +216,177 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Lab panel - informative panel with single clear CTA */}
         <section className="mx-auto w-full max-w-[1160px] px-6 pb-16 pt-6 sm:px-8 lg:px-10">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] px-7 py-10 backdrop-blur-2xl shadow-[0_30px_80px_rgba(0,0,0,0.28),0_10px_24px_rgba(0,0,0,0.2),0_0_80px_rgba(140,120,200,0.08),inset_0_1px_0_rgba(255,255,255,0.05)] sm:px-10 sm:py-12">
-            <div className="pointer-events-none absolute -right-10 top-[-20px] h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(150,130,210,0.14),transparent_62%)] blur-3xl" />
-            <div className="pointer-events-none absolute -left-8 bottom-[-30px] h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,rgba(90,130,180,0.1),transparent_62%)] blur-3xl" />
+          <div
+            className="group relative overflow-hidden rounded-[40px] border px-7 py-10 backdrop-blur-[36px] transition duration-300 sm:px-10 sm:py-12"
+            style={{
+              borderColor: "rgba(215,205,255,0.24)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04))",
+              boxShadow:
+                "0 48px 124px rgba(0,0,0,0.4), 0 0 150px rgba(145,120,255,0.22), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -24px 48px rgba(255,255,255,0.02)",
+            }}
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(238,228,255,0.26)_0%,rgba(255,255,255,0.08)_24%,rgba(255,255,255,0)_56%)] opacity-90" />
+            <div className="pointer-events-none absolute -right-14 top-[-48px] h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(150,120,255,0.34),transparent_62%)] blur-3xl" />
+            <div className="pointer-events-none absolute -left-12 bottom-[-46px] h-[260px] w-[260px] rounded-full bg-[radial-gradient(circle,rgba(96,144,255,0.18),transparent_62%)] blur-3xl" />
+            <div className="pointer-events-none absolute bottom-[-34px] left-1/2 h-32 w-[74%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(150,120,255,0.18),transparent_72%)] blur-3xl opacity-95" />
+            <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-screen bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.12)_18%,transparent_36%,rgba(255,255,255,0.08)_52%,transparent_68%)]" />
 
             <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
               <div className="max-w-[760px]">
-                <p className="text-[12px] uppercase tracking-[0.28em] text-white/30">
+                <p className="text-[12px] uppercase tracking-[0.28em] text-white/34">
                   Inside the Lab
                 </p>
                 <h2 className="mt-5 max-w-[18ch] text-[34px] font-light tracking-[-0.04em] text-white sm:text-[46px]">
-                  A growing space for studying how people think, feel, decide,
-                  and respond online
+                  A growing space for studying how people think, feel, decide, and respond online
                 </h2>
-                <p className="mt-5 max-w-[58ch] text-[16px] leading-8 text-white/60">
-                  The Digital Human Behaviour Lab sits behind Solace — helping
-                  shape calmer digital experiences through observation, pattern
-                  recognition, and thoughtful design.
+                <p className="mt-5 max-w-[58ch] text-[16px] leading-8 text-white/66">
+                  The Digital Human Behaviour Lab sits behind Solace — helping shape calmer digital experiences through observation, pattern recognition, and thoughtful design.
                 </p>
               </div>
 
               <div className="flex shrink-0 md:self-end">
                 <Link
                   href="/lab"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/12 bg-white/[0.08] px-6 text-[14px] font-medium text-white/90 backdrop-blur-xl transition duration-500 hover:-translate-y-[1px] hover:border-white/22 hover:bg-white/[0.12] hover:shadow-[0_10px_30px_rgba(160,180,255,0.14),0_4px_14px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  className="group/button relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full border border-[rgba(255,255,255,0.2)] bg-[linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.07))] px-6 text-[14px] font-medium text-white/94 backdrop-blur-[26px] shadow-[0_16px_38px_rgba(0,0,0,0.26),0_0_40px_rgba(170,140,255,0.18),inset_0_1px_0_rgba(255,255,255,0.28)] transition duration-300 hover:-translate-y-[2px] hover:scale-[1.01] hover:text-white hover:shadow-[0_20px_44px_rgba(0,0,0,0.3),0_0_52px_rgba(170,140,255,0.26),inset_0_1px_0_rgba(255,255,255,0.32)]"
                 >
-                  Enter the Lab
+                  <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(244,234,255,0.28)_0%,rgba(255,255,255,0.1)_34%,rgba(255,255,255,0)_58%)] opacity-90 transition duration-300 group-hover/button:opacity-100" />
+                  <span className="pointer-events-none absolute -bottom-7 left-1/2 h-14 w-[72%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(170,140,255,0.32),transparent_72%)] blur-2xl opacity-95 transition duration-300 group-hover/button:opacity-100" />
+                  <span className="relative z-10">Enter the Lab</span>
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Quiet footer line */}
         <footer className="mx-auto w-full max-w-[1100px] px-6 pb-10 pt-8 text-center sm:px-8 lg:px-10">
           <p className="text-[12px] leading-6 text-white/38">
-            Solace is for adults 18+ and offers calm reflective support only. It
-            does not provide medical, psychological, legal, financial, or other
-            professional advice.
+            Solace is for adults 18+ and offers calm reflective support only. It does not provide medical, psychological, legal, financial, or other professional advice.
           </p>
         </footer>
       </div>
+
+      <style jsx global>{`
+        @keyframes solaDriftA {
+          0% {
+            transform: translate3d(-2%, 0, 0) scale(1.03);
+            opacity: 0.46;
+          }
+          50% {
+            transform: translate3d(2%, -1%, 0) scale(1.06);
+            opacity: 0.64;
+          }
+          100% {
+            transform: translate3d(-2%, 0, 0) scale(1.03);
+            opacity: 0.46;
+          }
+        }
+
+        @keyframes solaDriftB {
+          0% {
+            transform: translate3d(2%, 0, 0) scale(1.02);
+            opacity: 0.34;
+          }
+          50% {
+            transform: translate3d(-2%, 1%, 0) scale(1.05);
+            opacity: 0.5;
+          }
+          100% {
+            transform: translate3d(2%, 0, 0) scale(1.02);
+            opacity: 0.34;
+          }
+        }
+
+        @keyframes solaBreath {
+          0%,
+          100% {
+            opacity: 0.24;
+          }
+          50% {
+            opacity: 0.4;
+          }
+        }
+
+        @keyframes solaShimmer {
+          0% {
+            opacity: 0.12;
+            transform: translateX(-3%);
+          }
+          50% {
+            opacity: 0.24;
+            transform: translateX(3%);
+          }
+          100% {
+            opacity: 0.12;
+            transform: translateX(-3%);
+          }
+        }
+
+        .sola-haze {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          filter: blur(38px);
+          will-change: transform, opacity;
+        }
+
+        .sola-haze-a {
+          background:
+            radial-gradient(circle at 28% 56%, rgba(92, 142, 255, 0.16), transparent 26%),
+            radial-gradient(circle at 72% 46%, rgba(164, 120, 255, 0.12), transparent 24%),
+            radial-gradient(circle at 50% 80%, rgba(255, 230, 244, 0.08), transparent 18%);
+          animation: solaDriftA 18s ease-in-out infinite;
+        }
+
+        .sola-haze-b {
+          background:
+            radial-gradient(circle at 18% 30%, rgba(80, 120, 220, 0.1), transparent 22%),
+            radial-gradient(circle at 82% 32%, rgba(140, 118, 220, 0.08), transparent 22%);
+          animation: solaDriftB 24s ease-in-out infinite;
+        }
+
+        .sola-haze-c {
+          background:
+            radial-gradient(circle at 50% 18%, rgba(220, 228, 255, 0.1), transparent 18%),
+            radial-gradient(circle at 50% 72%, rgba(120, 100, 180, 0.06), transparent 18%);
+          animation: solaBreath 12s ease-in-out infinite;
+        }
+
+        .sola-light {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 22%;
+          pointer-events: none;
+          filter: blur(42px);
+          will-change: transform, opacity;
+        }
+
+        .sola-light-left {
+          left: 5%;
+          background: radial-gradient(circle at 50% 28%, rgba(100, 132, 222, 0.14), transparent 62%);
+          animation: solaDriftA 22s ease-in-out infinite;
+        }
+
+        .sola-light-right {
+          right: 5%;
+          background: radial-gradient(circle at 50% 26%, rgba(150, 122, 222, 0.12), transparent 62%);
+          animation: solaDriftB 26s ease-in-out infinite;
+        }
+
+        .sola-horizon-shimmer {
+          position: absolute;
+          left: 10%;
+          right: 10%;
+          top: 46%;
+          height: 8%;
+          pointer-events: none;
+          background: radial-gradient(circle at 50% 50%, rgba(255, 240, 248, 0.12), transparent 58%);
+          filter: blur(22px);
+          animation: solaShimmer 14s ease-in-out infinite;
+        }
+      `}</style>
     </main>
   );
 }

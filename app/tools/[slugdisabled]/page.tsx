@@ -12,6 +12,9 @@ type ToolPageProps = {
 
 const TOOL_ALIASES: Record<string, keyof typeof TOOL_REGISTRY> = {
   "overthinking-breaker": "overthinking-reset",
+  "clear-your-mind": "overthinking-reset",
+  "i-cant-decide": "choose",
+  "everything-feels-noisy": "sort",
 };
 
 function resolveToolSlug(slug: string): keyof typeof TOOL_REGISTRY | null {

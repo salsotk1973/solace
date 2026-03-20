@@ -70,6 +70,7 @@ const CATEGORY_KEYWORDS: Record<
       "expensive",
       "broke",
       "not enough money",
+      "need more money",
       "savings",
       "saving",
       "tax",
@@ -113,6 +114,11 @@ const CATEGORY_KEYWORDS: Record<
       "living with us",
       "family oversea",
       "family overseas",
+      "want to leave",
+      "hate my partner",
+      "wife nagging",
+      "distant to me",
+      "too distant",
     ],
   },
   "Health / Body / Self": {
@@ -141,6 +147,12 @@ const CATEGORY_KEYWORDS: Record<
       "breath",
       "headache",
       "need time off",
+      "worthless",
+      "no future",
+      "don't want to live",
+      "do not want to live",
+      "don't want to live anymore",
+      "do not want to live anymore",
     ],
   },
   "Environment / External Noise": {
@@ -169,6 +181,7 @@ const CATEGORY_KEYWORDS: Record<
       "kids playing",
       "kids playing at night",
       "barking at night",
+      "annoying kids",
     ],
   },
   "Work / Performance": {
@@ -197,8 +210,10 @@ const CATEGORY_KEYWORDS: Record<
       "responsibilities",
       "lost my job",
       "lost job",
+      "i lost my job",
       "work pressure",
       "workload",
+      "hate my boss",
     ],
   },
   "Internal Mental Loops": {
@@ -228,6 +243,10 @@ const CATEGORY_KEYWORDS: Record<
       "rumination",
       "loneliness",
       "lonely",
+      "worthless",
+      "no future",
+      "want to leave",
+      "hate",
     ],
   },
   "Logistics / Immediate Problems": {
@@ -262,6 +281,10 @@ const CATEGORY_KEYWORDS: Record<
       "call",
       "needs to be fixed",
       "fix up",
+      "car broken",
+      "my car is broken",
+      "my car is not working",
+      "car not working",
     ],
   },
 };
@@ -291,6 +314,9 @@ const EMOTIONAL_KEYWORDS = [
   "falling apart",
   "can't cope",
   "cannot cope",
+  "worthless",
+  "no future",
+  "hate",
 ];
 
 const PRACTICAL_KEYWORDS = [
@@ -339,6 +365,9 @@ const URGENCY_KEYWORDS = [
 
 const CRISIS_PATTERNS = [
   /\bkill myself\b/i,
+  /\bi want to kill myself\b/i,
+  /\bi wanna kill myself\b/i,
+  /\bwant to kill myself\b/i,
   /\bend my life\b/i,
   /\bdon'?t want to live\b/i,
   /\bdo not want to live\b/i,
@@ -355,6 +384,23 @@ const CRISIS_PATTERNS = [
   /\bno reason to live\b/i,
   /\bcan'?t go on\b/i,
   /\bcannot go on\b/i,
+  /\bworthless\b/i,
+  /\bno future\b/i,
+];
+
+const CRISIS_SIGNAL_WORDS = [
+  "kill",
+  "suicide",
+  "dead",
+  "die",
+  "worthless",
+  "hopeless",
+  "no future",
+  "no reason to live",
+  "end it",
+  "end my life",
+  "don't want to live",
+  "do not want to live",
 ];
 
 function normalizeText(value: string): string {
@@ -403,9 +449,43 @@ function countKeywordHits(text: string, keywords: string[]): number {
   return hits;
 }
 
+function countCrisisSignals(thoughts: string[]): number {
+  let count = 0;
+
+  for (const thought of thoughts) {
+    for (const signal of CRISIS_SIGNAL_WORDS) {
+      if (containsPhrase(thought, signal)) {
+        count += 1;
+        break;
+      }
+    }
+  }
+
+  return count;
+}
+
 function detectCrisis(thoughts: string[]): boolean {
   const joined = thoughts.join(" || ");
-  return CRISIS_PATTERNS.some((pattern) => pattern.test(joined));
+
+  if (CRISIS_PATTERNS.some((pattern) => pattern.test(joined))) {
+    return true;
+  }
+
+  if (countCrisisSignals(thoughts) >= 1) {
+    return true;
+  }
+
+  const hostilePlusCollapse =
+    thoughts.some((t) => containsPhrase(t, "hate")) &&
+    thoughts.some(
+      (t) =>
+        containsPhrase(t, "kill") ||
+        containsPhrase(t, "no future") ||
+        containsPhrase(t, "don't want to live") ||
+        containsPhrase(t, "do not want to live"),
+    );
+
+  return hostilePlusCollapse;
 }
 
 function tokenHasLikelyMeaning(token: string): boolean {
@@ -462,16 +542,6 @@ function isLikelyGibberish(text: string): boolean {
     cleanedWords.every((word) => word.length <= 3) &&
     cleanedWords.every((word) => !tokenHasLikelyMeaning(word));
 
-  const allCapsFragments =
-    words.length >= 2 &&
-    cleanedWords.filter(Boolean).length >= 2 &&
-    cleanedWords.every(
-      (word) =>
-        word.length <= 4 &&
-        word === word.toUpperCase() &&
-        !tokenHasLikelyMeaning(word),
-    );
-
   const repeatedSingleLetters =
     cleanedWords.filter(Boolean).length >= 2 &&
     cleanedWords.every((word) => /^([a-zA-Z])\1*$/.test(word));
@@ -484,7 +554,6 @@ function isLikelyGibberish(text: string): boolean {
 
   return (
     veryShortAndMeaningless ||
-    allCapsFragments ||
     repeatedSingleLetters ||
     longConsonantRun ||
     excessiveSymbols ||
@@ -508,9 +577,7 @@ function detectCategories(text: string): {
     if (category === "Unclear") continue;
 
     const config = CATEGORY_KEYWORDS[category];
-    const matches = config.primary.filter((keyword) =>
-      containsPhrase(text, keyword),
-    );
+    const matches = config.primary.filter((keyword) => containsPhrase(text, keyword));
     const score = matches.length;
 
     if (score > 0) {
@@ -521,8 +588,7 @@ function detectCategories(text: string): {
   scores.sort(
     (a, b) =>
       b.score - a.score ||
-      CATEGORY_PRIORITY.indexOf(a.category) -
-        CATEGORY_PRIORITY.indexOf(b.category),
+      CATEGORY_PRIORITY.indexOf(a.category) - CATEGORY_PRIORITY.indexOf(b.category),
   );
 
   if (scores.length === 0) {
@@ -535,10 +601,7 @@ function detectCategories(text: string): {
   return {
     mainCategory: scores[0].category,
     secondaryCategory: scores[1]?.category,
-    matchedSignals: [...scores[0].matches, ...(scores[1]?.matches || [])].slice(
-      0,
-      6,
-    ),
+    matchedSignals: [...scores[0].matches, ...(scores[1]?.matches || [])].slice(0, 6),
   };
 }
 
@@ -694,15 +757,11 @@ function buildClusters(thoughts: ProcessedThought[]): Cluster[] {
     grouped.set(key, bucket);
   }
 
-  const clusters = Array.from(grouped.entries()).map(
-    ([category, clusterThoughts]) => ({
-      category,
-      thoughts: clusterThoughts.sort(
-        (a, b) => b.importance.total - a.importance.total,
-      ),
-      averageImportance: averageImportance(clusterThoughts),
-    }),
-  );
+  const clusters = Array.from(grouped.entries()).map(([category, clusterThoughts]) => ({
+    category,
+    thoughts: clusterThoughts.sort((a, b) => b.importance.total - a.importance.total),
+    averageImportance: averageImportance(clusterThoughts),
+  }));
 
   return clusters.sort((a, b) => b.averageImportance - a.averageImportance);
 }
@@ -736,9 +795,7 @@ function joinPhrases(parts: string[]): string {
 }
 
 function buildRecognition(clusters: Cluster[]): string {
-  const topCategories = clusters
-    .slice(0, 3)
-    .map((cluster) => formatCategoryPhrase(cluster.category));
+  const topCategories = clusters.slice(0, 3).map((cluster) => formatCategoryPhrase(cluster.category));
 
   if (topCategories.length === 0) {
     return "There is pressure here, but it has not separated into a clean shape yet.";
@@ -761,14 +818,14 @@ function buildSeparation(clusters: Cluster[]): string {
   }
 
   if (!second) {
-    return `Underneath the noise, one pressure appears to be carrying most of the load.`;
+    return "Underneath the noise, one pressure appears to be carrying most of the load.";
   }
 
   if (!third) {
-    return `One part looks central, while another is feeding into it and making it harder to settle.`;
+    return "One part looks central, while another is feeding into it and making it harder to settle.";
   }
 
-  return `There seems to be one central strain, with two other pressures feeding into it from different angles.`;
+  return "There seems to be one central strain, with two other pressures feeding into it from different angles.";
 }
 
 function buildReframing(clusters: Cluster[]): string {
@@ -826,11 +883,19 @@ function buildDirection(clusters: Cluster[]): string {
 }
 
 function generateClarityFallback(): string {
-  return "I’m not getting a clear enough shape yet. Try again with one simple thought per bubble.";
+  return [
+    "I’m not getting a clear enough shape yet.",
+    "Try again with simple, complete thoughts — one thought per bubble.",
+  ].join("\n\n");
 }
 
 function generateCrisisFallback(): string {
-  return "What you wrote sounds too serious for Solace to hold safely here.\n\nPlease do not stay alone with this right now. Reach out immediately to local emergency services if you may act on these thoughts, or contact a trusted person, a crisis line, or a mental health professional who can be with you in real time.";
+  return [
+    "It sounds like things feel very heavy right now.",
+    "You do not need to carry this on your own.",
+    "Please reach out now to someone who can be with you in real time — a trusted person, a crisis line, or a mental health professional.",
+    "If you feel you may act on these thoughts or you are in immediate danger, contact local emergency services now.",
+  ].join("\n\n");
 }
 
 function generateReflection(clusters: Cluster[]): string {
@@ -848,15 +913,9 @@ function processThoughts(input: ClearYourMindBubbleInput[]): ProcessedThought[] 
   return input.map((item, index) => {
     const normalizedText = normalizedList[index];
     const isGibberish = isLikelyGibberish(normalizedText);
-    const { mainCategory, secondaryCategory, matchedSignals } =
-      detectCategories(normalizedText);
+    const { mainCategory, secondaryCategory, matchedSignals } = detectCategories(normalizedText);
 
-    const importance = scoreThought(
-      normalizedText,
-      mainCategory,
-      normalizedList,
-      isGibberish,
-    );
+    const importance = scoreThought(normalizedText, mainCategory, normalizedList, isGibberish);
 
     return {
       id: item.id || `thought-${index + 1}`,
@@ -871,9 +930,7 @@ function processThoughts(input: ClearYourMindBubbleInput[]): ProcessedThought[] 
   });
 }
 
-function toThoughtResults(
-  thoughts: ProcessedThought[],
-): ClearYourMindThoughtResult[] {
+function toThoughtResults(thoughts: ProcessedThought[]): ClearYourMindThoughtResult[] {
   return thoughts.map((thought) => ({
     id: thought.id,
     text: thought.text,
@@ -938,9 +995,7 @@ export async function POST(request: Request) {
         isCrisisFallback: false,
         clarityFallback: true,
         thoughts: toThoughtResults(
-          [...processedThoughts].sort(
-            (a, b) => b.importance.total - a.importance.total,
-          ),
+          [...processedThoughts].sort((a, b) => b.importance.total - a.importance.total),
         ),
         clusters: [],
       };
