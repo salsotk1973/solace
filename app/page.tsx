@@ -82,24 +82,26 @@ export default function HomePage() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_16%_26%,rgba(92,142,255,0.24),transparent_34%),radial-gradient(circle_at_84%_24%,rgba(162,120,255,0.18),transparent_34%),radial-gradient(circle_at_50%_16%,rgba(208,220,255,0.18),transparent_22%),radial-gradient(circle_at_50%_82%,rgba(255,230,244,0.14),transparent_18%)]" />
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(3,5,11,0.14)_0%,rgba(3,5,11,0.08)_18%,rgba(3,5,11,0.12)_38%,rgba(3,5,11,0.24)_62%,rgba(3,5,11,0.64)_86%,rgba(3,5,11,0.84)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_34%,transparent_0%,transparent_50%,rgba(0,0,0,0.2)_76%,rgba(0,0,0,0.38)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(3,5,11,0.16)_0%,rgba(3,5,11,0.10)_18%,rgba(3,5,11,0.18)_36%,rgba(3,5,11,0.34)_56%,rgba(3,5,11,0.68)_82%,rgba(3,5,11,0.86)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_34%,rgba(6,8,14,0.06)_0%,rgba(6,8,14,0.18)_34%,rgba(6,8,14,0.42)_58%,rgba(0,0,0,0.54)_78%,rgba(0,0,0,0.68)_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-[24%] z-10 h-[280px] bg-[radial-gradient(ellipse_at_center,rgba(8,11,19,0.16)_0%,rgba(8,11,19,0.28)_38%,rgba(8,11,19,0.44)_60%,rgba(8,11,19,0)_78%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-[43%] z-10 h-[220px] bg-[linear-gradient(180deg,rgba(8,11,19,0.34)_0%,rgba(8,11,19,0.14)_18%,rgba(8,11,19,0.14)_82%,rgba(8,11,19,0.34)_100%)]" />
 
       <SiteHeader />
 
       <div className="relative z-20">
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-12 pt-[100px] sm:px-8 lg:px-10">
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-12 pt-[112px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
-            <div className="mb-4">
+            <div className="mb-0 scale-[0.92] origin-top sm:scale-[0.96] md:scale-100">
               <HeroPresence />
             </div>
 
-            <div className="mx-auto flex max-w-[1100px] flex-col items-center text-center">
+            <div className="-mt-12 mx-auto flex max-w-[980px] flex-col items-center text-center sm:-mt-16 md:-mt-20">
               <h1 className="text-[44px] font-light tracking-[-0.04em] text-white sm:text-[58px] md:text-[70px]">
-                Clear your mind
+                Breathe
               </h1>
 
-              <p className="mt-5 text-[16px] leading-7 text-white/76 sm:text-[19px]">
+              <p className="mt-5 max-w-[760px] text-[16px] leading-7 text-white/76 sm:text-[19px]">
                 A calmer digital space for when your thoughts feel tangled, loud, or hard to sort.
               </p>
             </div>
@@ -382,7 +384,7 @@ export default function HomePage() {
           top: 46%;
           height: 8%;
           pointer-events: none;
-          background: radial-gradient(circle at 50% 50%, rgba(255, 240, 248, 0.12), transparent 58%);
+          background: radial-gradient(circle at 50% 50%, rgba(255, 240, 248, 0.08), transparent 58%);
           filter: blur(22px);
           animation: solaShimmer 14s ease-in-out infinite;
         }
