@@ -13,6 +13,8 @@ type ProcessedThought = {
   id: string;
   text: string;
   normalizedText: string;
+  normalizedLooseText: string;
+  tokens: string[];
   mainCategory: SolaceCategory;
   secondaryCategory?: SolaceCategory;
   importance: ClearYourMindImportanceBreakdown;
@@ -26,7 +28,16 @@ type Cluster = {
   averageImportance: number;
 };
 
+type ThoughtRiskResult = {
+  thoughtId: string;
+  text: string;
+  shouldTriggerCrisis: boolean;
+  riskScore: number;
+  reasons: string[];
+};
+
 const MAX_THOUGHTS = 7;
+const SINGLE_THOUGHT_CRISIS_SCORE = 6;
 
 const CATEGORY_PRIORITY: SolaceCategory[] = [
   "Money / Stability",
@@ -78,6 +89,8 @@ const CATEGORY_KEYWORDS: Record<
       "car broken",
       "car broke",
       "car too old",
+      "lost my job",
+      "lost job",
     ],
   },
   "Relationships / Home Dynamics": {
@@ -114,10 +127,12 @@ const CATEGORY_KEYWORDS: Record<
       "living with us",
       "family oversea",
       "family overseas",
+      "wife overseas",
+      "partner overseas",
       "want to leave",
       "hate my partner",
       "wife nagging",
-      "distant to me",
+      "mother in law at home",
       "too distant",
       "people don't need me",
       "people do not need me",
@@ -157,13 +172,16 @@ const CATEGORY_KEYWORDS: Record<
       "headache",
       "need time off",
       "worthless",
+      "not worth it",
+      "i am not worth it",
+      "i'm not worth it",
       "no future",
       "don't want to live",
       "do not want to live",
       "don't want to live anymore",
       "do not want to live anymore",
       "stop breathing",
-      "stop existing",
+      "keep breathing",
       "not be here",
       "should not be here",
       "should have never been born",
@@ -175,12 +193,15 @@ const CATEGORY_KEYWORDS: Record<
       "why living anyway",
       "why live anyway",
       "why am i alive",
+      "why breathing anyway",
+      "why breathe anyway",
       "i don't matter",
       "i do not matter",
       "better off without me",
       "finish all now",
       "finish all right now",
       "end all for good",
+      "end it for good",
     ],
   },
   "Environment / External Noise": {
@@ -272,14 +293,21 @@ const CATEGORY_KEYWORDS: Record<
       "loneliness",
       "lonely",
       "worthless",
+      "not worth it",
+      "i am not worth it",
+      "i'm not worth it",
       "no future",
       "want to leave",
       "hate",
       "what's the point",
       "what is the point",
       "keep going",
+      "going on",
+      "keep breathing",
       "why living anyway",
       "why live anyway",
+      "why breathing anyway",
+      "why breathe anyway",
       "finish it all",
       "finish all now",
       "finish all right now",
@@ -290,6 +318,9 @@ const CATEGORY_KEYWORDS: Record<
       "should i end it",
       "should i end all",
       "why me",
+      "drugs",
+      "can't stop thinking about drugs",
+      "cannot stop thinking about drugs",
     ],
   },
   "Logistics / Immediate Problems": {
@@ -358,6 +389,7 @@ const EMOTIONAL_KEYWORDS = [
   "can't cope",
   "cannot cope",
   "worthless",
+  "not worth it",
   "no future",
   "hate",
   "done",
@@ -414,101 +446,7 @@ const URGENCY_KEYWORDS = [
   "overdue",
   "this week",
   "before",
-];
-
-const DIRECT_CRISIS_PATTERNS = [
-  /\bkill myself\b/i,
-  /\bi want to kill myself\b/i,
-  /\bi wanna kill myself\b/i,
-  /\bwant to kill myself\b/i,
-  /\bend my life\b/i,
-  /\bend it all\b/i,
-  /\bfinish it all\b/i,
-  /\bfinish all now\b/i,
-  /\bfinish all right now\b/i,
-  /\bfinish everything now\b/i,
-  /\bshould i end it\b/i,
-  /\bshould i end all\b/i,
-  /\bshould i end all for good\b/i,
-  /\bdon'?t want to live\b/i,
-  /\bdo not want to live\b/i,
-  /\bdon'?t want to live anymore\b/i,
-  /\bdo not want to live anymore\b/i,
-  /\bwant to die\b/i,
-  /\bi should die\b/i,
-  /\bi wish i was dead\b/i,
-  /\bi wish i were dead\b/i,
-  /\bsuicide\b/i,
-  /\bself harm\b/i,
-  /\bhurt myself\b/i,
-  /\bcut myself\b/i,
-  /\boverdose\b/i,
-  /\bno reason to live\b/i,
-  /\bcan'?t go on\b/i,
-  /\bcannot go on\b/i,
-  /\bworthless\b/i,
-  /\bno future\b/i,
-  /\bstop breathing\b/i,
-  /\bi want to stop breathing\b/i,
-  /\bi do not want to breathe anymore\b/i,
-  /\bi do not want to breath anymore\b/i,
-  /\bi dont want to breathe anymore\b/i,
-  /\bi dont want to breath anymore\b/i,
-  /\bshould have never been born\b/i,
-  /\bshould've never been born\b/i,
-  /\bshould never have been born\b/i,
-  /\bnever be born\b/i,
-  /\bbetter off dead\b/i,
-  /\bbetter off without me\b/i,
-  /\bthey will be better without me\b/i,
-  /\bpeople don'?t need me\b/i,
-  /\bnobody needs me\b/i,
-  /\bno one needs me\b/i,
-  /\bi won'?t be a problem\b/i,
-  /\bi would not be a problem\b/i,
-  /\bwhat'?s the point of living\b/i,
-  /\bwhat is the point of living\b/i,
-  /\bwhat'?s the point in keep going\b/i,
-  /\bwhat is the point in keep going\b/i,
-  /\bwhat'?s the point of keep going\b/i,
-  /\bwhat is the point of keep going\b/i,
-  /\bwhat'?s the point in going on\b/i,
-  /\bwhy live anyway\b/i,
-  /\bwhy living anyway\b/i,
-  /\bwhy am i alive\b/i,
-];
-
-const CRISIS_SIGNAL_WORDS = [
-  "kill",
-  "suicide",
-  "dead",
-  "die",
-  "worthless",
-  "hopeless",
-  "no future",
-  "no reason to live",
-  "end it",
-  "end my life",
-  "don't want to live",
-  "do not want to live",
-  "stop breathing",
-  "never been born",
-  "never be born",
-  "nobody needs me",
-  "no one needs me",
-  "people don't need me",
-  "people do not need me",
-  "better without me",
-  "they will be better without me",
-  "what's the point of living",
-  "what is the point of living",
-  "what's the point in keep going",
-  "what is the point in keep going",
-  "why live anyway",
-  "why living anyway",
-  "finish all now",
-  "finish all right now",
-  "end all for good",
+  "right now",
 ];
 
 const RECOGNITION_OPENERS = [
@@ -622,6 +560,71 @@ const DIRECTION_BY_CATEGORY: Record<SolaceCategory, string[]> = {
   ],
 };
 
+const COMMON_SHORT_WORDS = new Set([
+  "i",
+  "a",
+  "am",
+  "an",
+  "to",
+  "do",
+  "go",
+  "no",
+  "my",
+  "me",
+  "we",
+  "he",
+  "she",
+  "it",
+  "us",
+  "up",
+  "on",
+  "in",
+  "at",
+  "if",
+  "of",
+  "or",
+  "is",
+  "be",
+]);
+
+const SEMANTIC_WORDS = new Set([
+  "why",
+  "what",
+  "point",
+  "living",
+  "live",
+  "life",
+  "keep",
+  "going",
+  "worth",
+  "worthless",
+  "future",
+  "bills",
+  "bill",
+  "money",
+  "wife",
+  "job",
+  "lost",
+  "rent",
+  "debt",
+  "work",
+  "pressure",
+  "hate",
+  "nobody",
+  "people",
+  "need",
+  "without",
+  "breath",
+  "breathe",
+  "breathing",
+  "born",
+  "dead",
+  "die",
+  "kill",
+  "pregnant",
+  "drugs",
+]);
+
 function normalizeText(value: string): string {
   return value
     .toLowerCase()
@@ -629,6 +632,23 @@ function normalizeText(value: string): string {
     .replace(/[‘’]/g, "'")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function normalizeLooseText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenizeLooseText(value: string): string[] {
+  return normalizeLooseText(value)
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean);
 }
 
 function splitThoughts(
@@ -656,11 +676,19 @@ function containsPhrase(text: string, phrase: string): boolean {
   return text.includes(phrase);
 }
 
+function containsLoosePhrase(text: string, phrase: string): boolean {
+  return text.includes(normalizeLooseText(phrase));
+}
+
+function hasAnyToken(tokens: string[], candidates: string[]): boolean {
+  return candidates.some((candidate) => tokens.includes(candidate));
+}
+
 function countKeywordHits(text: string, keywords: string[]): number {
   let hits = 0;
 
   for (const keyword of keywords) {
-    if (containsPhrase(text, keyword)) {
+    if (containsPhrase(text, keyword) || containsLoosePhrase(text, keyword)) {
       hits += 1;
     }
   }
@@ -668,183 +696,319 @@ function countKeywordHits(text: string, keywords: string[]): number {
   return hits;
 }
 
-function countCrisisSignals(thoughts: string[]): number {
-  let count = 0;
-
-  for (const thought of thoughts) {
-    for (const signal of CRISIS_SIGNAL_WORDS) {
-      if (containsPhrase(thought, signal)) {
-        count += 1;
-        break;
-      }
-    }
-  }
-
-  return count;
-}
-
-function hasBurdenLanguage(text: string): boolean {
-  return (
-    containsPhrase(text, "problem for anyone") ||
-    containsPhrase(text, "problem for everyone") ||
-    containsPhrase(text, "burden") ||
-    containsPhrase(text, "better without me") ||
-    containsPhrase(text, "they will be better without me") ||
-    containsPhrase(text, "don't need me") ||
-    containsPhrase(text, "do not need me") ||
-    containsPhrase(text, "nobody needs me") ||
-    containsPhrase(text, "no one needs me")
-  );
-}
-
-function hasExistentialCollapseLanguage(text: string): boolean {
-  return (
-    containsPhrase(text, "what's the point") ||
-    containsPhrase(text, "what is the point") ||
-    containsPhrase(text, "why live") ||
-    containsPhrase(text, "why living") ||
-    containsPhrase(text, "keep going") ||
-    containsPhrase(text, "should have never been born") ||
-    containsPhrase(text, "should've never been born") ||
-    containsPhrase(text, "never been born") ||
-    containsPhrase(text, "never be born") ||
-    containsPhrase(text, "stop breathing") ||
-    containsPhrase(text, "end all for good") ||
-    containsPhrase(text, "finish all now") ||
-    containsPhrase(text, "finish all right now") ||
-    containsPhrase(text, "don't want to be here") ||
-    containsPhrase(text, "do not want to be here")
-  );
-}
-
-function detectCrisis(thoughts: string[]): boolean {
-  const joined = thoughts.join(" || ");
-
-  if (DIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(joined))) {
-    return true;
-  }
-
-  if (countCrisisSignals(thoughts) >= 1) {
-    return true;
-  }
-
-  const burdenSignals = thoughts.filter(hasBurdenLanguage).length;
-  const collapseSignals = thoughts.filter(hasExistentialCollapseLanguage).length;
-  const hopelessSignals = thoughts.filter(
-    (t) =>
-      containsPhrase(t, "no future") ||
-      containsPhrase(t, "worthless") ||
-      containsPhrase(t, "hopeless") ||
-      containsPhrase(t, "can't go on") ||
-      containsPhrase(t, "cannot go on"),
-  ).length;
-
-  if (burdenSignals >= 1 && collapseSignals >= 1) {
-    return true;
-  }
-
-  if (burdenSignals >= 1 && hopelessSignals >= 1) {
-    return true;
-  }
-
-  const hostilePlusCollapse =
-    thoughts.some((t) => containsPhrase(t, "hate")) &&
-    thoughts.some(
-      (t) =>
-        containsPhrase(t, "kill") ||
-        containsPhrase(t, "no future") ||
-        containsPhrase(t, "don't want to live") ||
-        containsPhrase(t, "do not want to live") ||
-        hasExistentialCollapseLanguage(t),
-    );
-
-  if (hostilePlusCollapse) {
-    return true;
-  }
-
-  const multipleIndirectSignals =
-    thoughts.filter(
-      (t) => hasBurdenLanguage(t) || hasExistentialCollapseLanguage(t),
-    ).length >= 2;
-
-  return multipleIndirectSignals;
-}
-
 function tokenHasLikelyMeaning(token: string): boolean {
   const cleaned = token.toLowerCase().replace(/[^a-z]/g, "");
   if (!cleaned) return false;
 
-  const commonShortWords = new Set([
-    "i",
-    "a",
-    "am",
-    "an",
-    "to",
-    "do",
-    "go",
-    "no",
-    "my",
-    "me",
-    "we",
-    "he",
-    "she",
-    "it",
-    "us",
-    "up",
-    "on",
-    "in",
-    "at",
-    "if",
-    "of",
-    "or",
-    "is",
-    "be",
-  ]);
-
-  if (commonShortWords.has(cleaned)) return true;
+  if (COMMON_SHORT_WORDS.has(cleaned)) return true;
+  if (SEMANTIC_WORDS.has(cleaned)) return true;
   if (cleaned.length <= 2) return false;
-  if (/[aeiou]/.test(cleaned)) return true;
+  if (/[aeiou]/.test(cleaned) && cleaned.length >= 4) return true;
 
   return false;
 }
 
-function isLikelyGibberish(text: string): boolean {
+function hasDirectSelfEndIntent(text: string): boolean {
+  return (
+    containsLoosePhrase(text, "kill myself") ||
+    containsLoosePhrase(text, "end my life") ||
+    containsLoosePhrase(text, "end it all") ||
+    containsLoosePhrase(text, "finish it all") ||
+    containsLoosePhrase(text, "finish all now") ||
+    containsLoosePhrase(text, "finish all right now") ||
+    containsLoosePhrase(text, "finish everything now") ||
+    containsLoosePhrase(text, "should i end it") ||
+    containsLoosePhrase(text, "should i end all") ||
+    containsLoosePhrase(text, "should i end all for good") ||
+    containsLoosePhrase(text, "end all for good") ||
+    containsLoosePhrase(text, "end it for good") ||
+    containsLoosePhrase(text, "want to die") ||
+    containsLoosePhrase(text, "i should die") ||
+    containsLoosePhrase(text, "wish i was dead") ||
+    containsLoosePhrase(text, "wish i were dead") ||
+    containsLoosePhrase(text, "better off dead")
+  );
+}
+
+function hasLifeRejectionLanguage(text: string): boolean {
+  return (
+    containsLoosePhrase(text, "dont want to live") ||
+    containsLoosePhrase(text, "do not want to live") ||
+    containsLoosePhrase(text, "dont want to live anymore") ||
+    containsLoosePhrase(text, "do not want to live anymore") ||
+    containsLoosePhrase(text, "no reason to live") ||
+    containsLoosePhrase(text, "cant go on") ||
+    containsLoosePhrase(text, "cannot go on")
+  );
+}
+
+function hasBreathingEndLanguage(text: string, tokens: string[]): boolean {
+  return (
+    containsLoosePhrase(text, "stop breathing") ||
+    containsLoosePhrase(text, "want to stop breathing") ||
+    containsLoosePhrase(text, "dont want to breathe anymore") ||
+    containsLoosePhrase(text, "do not want to breathe anymore") ||
+    containsLoosePhrase(text, "dont want to breath anymore") ||
+    containsLoosePhrase(text, "do not want to breath anymore") ||
+    containsLoosePhrase(text, "why breathing anyway") ||
+    containsLoosePhrase(text, "why breathe anyway") ||
+    (tokens.includes("breathing") && tokens.includes("why")) ||
+    (tokens.includes("breathe") && tokens.includes("why")) ||
+    (tokens.includes("breath") && tokens.includes("why")) ||
+    (tokens.includes("keep") && hasAnyToken(tokens, ["breathing", "breathe", "breath"]) && tokens.includes("why")) ||
+    (tokens.includes("should") && hasAnyToken(tokens, ["breathing", "breathe", "breath"]) && tokens.includes("why"))
+  );
+}
+
+function hasNeverBornLanguage(text: string): boolean {
+  return (
+    containsLoosePhrase(text, "should have never been born") ||
+    containsLoosePhrase(text, "shouldve never been born") ||
+    containsLoosePhrase(text, "should never have been born") ||
+    containsLoosePhrase(text, "never been born") ||
+    containsLoosePhrase(text, "never be born")
+  );
+}
+
+function hasBurdenLanguage(text: string): boolean {
+  return (
+    containsLoosePhrase(text, "problem for anyone") ||
+    containsLoosePhrase(text, "problem for everyone") ||
+    containsLoosePhrase(text, "burden") ||
+    containsLoosePhrase(text, "better without me") ||
+    containsLoosePhrase(text, "they will be better without me") ||
+    containsLoosePhrase(text, "dont need me") ||
+    containsLoosePhrase(text, "do not need me") ||
+    containsLoosePhrase(text, "nobody needs me") ||
+    containsLoosePhrase(text, "no one needs me") ||
+    containsLoosePhrase(text, "wont be a problem") ||
+    containsLoosePhrase(text, "would not be a problem")
+  );
+}
+
+function hasExistentialQuestion(text: string, tokens: string[]): boolean {
+  return (
+    containsLoosePhrase(text, "whats the point") ||
+    containsLoosePhrase(text, "what is the point") ||
+    containsLoosePhrase(text, "why live anyway") ||
+    containsLoosePhrase(text, "why living anyway") ||
+    containsLoosePhrase(text, "why keep going") ||
+    containsLoosePhrase(text, "living why should i") ||
+    containsLoosePhrase(text, "why should i") ||
+    (tokens.includes("point") && hasAnyToken(tokens, ["living", "live", "life"])) ||
+    (tokens.includes("why") && hasAnyToken(tokens, ["going", "living", "live", "life"])) ||
+    (tokens.includes("keep") && tokens.includes("going")) ||
+    (tokens.includes("going") && tokens.includes("point")) ||
+    (tokens.includes("living") && tokens.includes("why")) ||
+    (tokens.includes("living") && tokens.includes("should")) ||
+    (tokens.includes("why") && tokens.includes("should") && hasAnyToken(tokens, ["live", "living", "life"]))
+  );
+}
+
+function hasSelfWorthCollapse(text: string, tokens: string[]): boolean {
+  return (
+    containsLoosePhrase(text, "not worth it") ||
+    containsLoosePhrase(text, "im not worth it") ||
+    containsLoosePhrase(text, "i am not worth it") ||
+    containsLoosePhrase(text, "worthless") ||
+    containsLoosePhrase(text, "dont matter") ||
+    containsLoosePhrase(text, "do not matter") ||
+    containsLoosePhrase(text, "im not worth anything") ||
+    containsLoosePhrase(text, "i am not worth anything") ||
+    (tokens.includes("worth") && tokens.includes("it") && tokens.includes("not")) ||
+    tokens.includes("worthless") ||
+    (tokens.includes("worth") && tokens.includes("not"))
+  );
+}
+
+function hasHopelessCollapse(text: string): boolean {
+  return (
+    containsLoosePhrase(text, "no future") ||
+    containsLoosePhrase(text, "hopeless") ||
+    containsLoosePhrase(text, "nothing will change") ||
+    containsLoosePhrase(text, "whats the point") ||
+    containsLoosePhrase(text, "what is the point")
+  );
+}
+
+function looksLikeNonsenseToken(token: string): boolean {
+  if (tokenHasLikelyMeaning(token)) return false;
+  if (token.length <= 2) return true;
+
+  const vowels = (token.match(/[aeiou]/g) || []).length;
+  const consonants = (token.match(/[bcdfghjklmnpqrstvwxyz]/g) || []).length;
+  const hasLongConsonantRun = /[bcdfghjklmnpqrstvwxyz]{4,}/.test(token);
+  const weirdStructure =
+    (vowels === 0 && token.length >= 3) ||
+    hasLongConsonantRun ||
+    (token.length >= 4 && vowels === 1 && consonants >= 3 && !SEMANTIC_WORDS.has(token));
+
+  return weirdStructure;
+}
+
+function isShortGibberishWord(text: string): boolean {
+  const tokens = tokenizeLooseText(text);
+  if (tokens.length === 0) return true;
+  if (tokens.length > 3) return false;
+
+  return tokens.every((token) => looksLikeNonsenseToken(token) || token.length <= 3);
+}
+
+function isLikelyGibberish(text: string, tokens: string[]): boolean {
   const trimmed = text.trim();
 
   if (trimmed.length < 2) return true;
 
-  const words = trimmed.split(/\s+/).filter(Boolean);
+  if (
+    hasDirectSelfEndIntent(trimmed) ||
+    hasLifeRejectionLanguage(trimmed) ||
+    hasBreathingEndLanguage(trimmed, tokens) ||
+    hasNeverBornLanguage(trimmed) ||
+    hasBurdenLanguage(trimmed) ||
+    hasExistentialQuestion(trimmed, tokens) ||
+    hasSelfWorthCollapse(trimmed, tokens) ||
+    hasHopelessCollapse(trimmed)
+  ) {
+    return false;
+  }
+
   const lettersOnly = trimmed.replace(/[^a-zA-Z]/g, "");
-  const cleanedWords = words.map((word) => word.replace(/[^a-zA-Z]/g, ""));
   const vowelCount = (lettersOnly.match(/[aeiou]/gi) || []).length;
   const uniqueChars = new Set(lettersOnly.toLowerCase()).size;
 
-  const veryShortAndMeaningless =
-    words.length <= 2 &&
-    cleanedWords.every((word) => word.length <= 3) &&
-    cleanedWords.every((word) => !tokenHasLikelyMeaning(word));
-
   const repeatedSingleLetters =
-    cleanedWords.filter(Boolean).length >= 2 &&
-    cleanedWords.every((word) => /^([a-zA-Z])\1*$/.test(word));
+    tokens.filter(Boolean).length >= 2 &&
+    tokens.every((word) => /^([a-z])\1*$/.test(word));
 
-  const longConsonantRun = /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(trimmed);
   const excessiveSymbols =
     (trimmed.match(/[^a-zA-Z0-9\s]/g) || []).length > trimmed.length * 0.35;
   const veryLowVowels = lettersOnly.length >= 5 && vowelCount <= 1;
   const lowVariationSpam = lettersOnly.length >= 5 && uniqueChars <= 2;
 
+  const nonsenseTokenCount = tokens.filter(looksLikeNonsenseToken).length;
+  const meaningfulTokenCount = tokens.filter(tokenHasLikelyMeaning).length;
+
+  const mostlyNonsense =
+    tokens.length > 0 &&
+    nonsenseTokenCount >= Math.max(1, Math.ceil(tokens.length * 0.7)) &&
+    meaningfulTokenCount === 0;
+
+  const shortNonsensePhrase =
+    tokens.length <= 3 &&
+    nonsenseTokenCount === tokens.length &&
+    meaningfulTokenCount === 0;
+
   return (
-    veryShortAndMeaningless ||
     repeatedSingleLetters ||
-    longConsonantRun ||
     excessiveSymbols ||
     veryLowVowels ||
-    lowVariationSpam
+    lowVariationSpam ||
+    mostlyNonsense ||
+    shortNonsensePhrase
   );
 }
 
-function detectCategories(text: string): {
+function assessRisk(thoughts: Array<{ text: string; tokens: string[] }>): RiskAssessment {
+  let riskScore = 0;
+  const reasons: string[] = [];
+
+  const directIntentCount = thoughts.filter((t) => hasDirectSelfEndIntent(t.text)).length;
+  const lifeRejectionCount = thoughts.filter((t) => hasLifeRejectionLanguage(t.text)).length;
+  const breathingEndCount = thoughts.filter((t) => hasBreathingEndLanguage(t.text, t.tokens)).length;
+  const neverBornCount = thoughts.filter((t) => hasNeverBornLanguage(t.text)).length;
+  const burdenCount = thoughts.filter((t) => hasBurdenLanguage(t.text)).length;
+  const existentialCount = thoughts.filter((t) =>
+    hasExistentialQuestion(t.text, t.tokens),
+  ).length;
+  const selfWorthCount = thoughts.filter((t) =>
+    hasSelfWorthCollapse(t.text, t.tokens),
+  ).length;
+  const hopelessCount = thoughts.filter((t) => hasHopelessCollapse(t.text)).length;
+
+  if (directIntentCount >= 1) {
+    riskScore += 10;
+    reasons.push("direct-self-end-intent");
+  }
+  if (lifeRejectionCount >= 1) {
+    riskScore += 8;
+    reasons.push("life-rejection-language");
+  }
+  if (breathingEndCount >= 1) {
+    riskScore += 8;
+    reasons.push("breathing-end-language");
+  }
+  if (neverBornCount >= 1) {
+    riskScore += 8;
+    reasons.push("never-born-language");
+  }
+  if (burdenCount >= 1) {
+    riskScore += 3;
+    reasons.push("burden-language");
+  }
+  if (existentialCount >= 1) {
+    riskScore += 3;
+    reasons.push("existential-questioning");
+  }
+  if (selfWorthCount >= 1) {
+    riskScore += 4;
+    reasons.push("self-worth-collapse");
+  }
+  if (hopelessCount >= 1) {
+    riskScore += 4;
+    reasons.push("hopelessness-language");
+  }
+
+  if (burdenCount >= 1 && existentialCount >= 1) {
+    riskScore += 4;
+    reasons.push("burden-plus-existential");
+  }
+  if (burdenCount >= 1 && selfWorthCount >= 1) {
+    riskScore += 4;
+    reasons.push("burden-plus-self-worth-collapse");
+  }
+  if (selfWorthCount >= 1 && existentialCount >= 1) {
+    riskScore += 4;
+    reasons.push("self-worth-plus-existential");
+  }
+  if (hopelessCount >= 1 && selfWorthCount >= 1) {
+    riskScore += 4;
+    reasons.push("hopelessness-plus-self-worth");
+  }
+
+  if (
+    thoughts.some((t) => containsLoosePhrase(t.text, "hate")) &&
+    (directIntentCount >= 1 ||
+      lifeRejectionCount >= 1 ||
+      breathingEndCount >= 1 ||
+      neverBornCount >= 1)
+  ) {
+    riskScore += 3;
+    reasons.push("hate-plus-collapse");
+  }
+
+  const indirectSignals = thoughts.filter(
+    (t) =>
+      hasBurdenLanguage(t.text) ||
+      hasExistentialQuestion(t.text, t.tokens) ||
+      hasSelfWorthCollapse(t.text, t.tokens) ||
+      hasHopelessCollapse(t.text) ||
+      hasNeverBornLanguage(t.text) ||
+      hasBreathingEndLanguage(t.text, t.tokens),
+  ).length;
+
+  if (indirectSignals >= 2) {
+    riskScore += 3;
+    reasons.push("multiple-indirect-signals");
+  }
+
+  return {
+    shouldTriggerCrisis: riskScore >= CRISIS_TRIGGER_SCORE,
+    riskScore,
+    reasons,
+  };
+}
+
+function detectCategories(text: string, tokens: string[]): {
   mainCategory: SolaceCategory;
   secondaryCategory?: SolaceCategory;
   matchedSignals: string[];
@@ -859,7 +1023,10 @@ function detectCategories(text: string): {
     if (category === "Unclear") continue;
 
     const config = CATEGORY_KEYWORDS[category];
-    const matches = config.primary.filter((keyword) => containsPhrase(text, keyword));
+    const matches = config.primary.filter((keyword) => {
+      const loose = normalizeLooseText(keyword);
+      return text.includes(loose) || loose.split(" ").every((part) => tokens.includes(part));
+    });
     const score = matches.length;
 
     if (score > 0) {
@@ -887,7 +1054,7 @@ function detectCategories(text: string): {
   };
 }
 
-function scoreEmotionalWeight(text: string): number {
+function scoreEmotionalWeight(text: string, tokens: string[]): number {
   let score = 0;
 
   score += Math.min(countKeywordHits(text, EMOTIONAL_KEYWORDS) * 10, 28);
@@ -908,11 +1075,15 @@ function scoreEmotionalWeight(text: string): number {
     score += 4;
   }
 
-  if (hasBurdenLanguage(text)) {
-    score += 8;
-  }
+  if (hasBurdenLanguage(text)) score += 8;
 
-  if (hasExistentialCollapseLanguage(text)) {
+  if (
+    hasExistentialQuestion(text, tokens) ||
+    hasNeverBornLanguage(text) ||
+    hasBreathingEndLanguage(text, tokens) ||
+    hasSelfWorthCollapse(text, tokens) ||
+    hasHopelessCollapse(text)
+  ) {
     score += 12;
   }
 
@@ -952,7 +1123,7 @@ function scoreUrgency(text: string): number {
     score += 3;
   }
 
-  if (containsPhrase(text, "all now") || containsPhrase(text, "right now")) {
+  if (containsLoosePhrase(text, "all now") || containsLoosePhrase(text, "right now")) {
     score += 4;
   }
 
@@ -996,6 +1167,7 @@ function computeRepetitionScore(current: string, allThoughts: string[]): number 
 
 function scoreThought(
   text: string,
+  tokens: string[],
   mainCategory: SolaceCategory,
   allThoughts: string[],
   isGibberish: boolean,
@@ -1010,7 +1182,7 @@ function scoreThought(
     };
   }
 
-  let emotionalWeight = scoreEmotionalWeight(text);
+  let emotionalWeight = scoreEmotionalWeight(text, tokens);
   let practicalConsequence = scorePracticalConsequence(text, mainCategory);
   let urgency = scoreUrgency(text);
   let repetition = computeRepetitionScore(text, allThoughts);
@@ -1171,7 +1343,7 @@ function generateClarityFallback(): string {
 function generateCrisisFallback(): string {
   return [
     "It sounds like things feel very heavy right now.",
-    "Some of what you wrote suggests you may be close to the edge, and this is a moment to bring in real human support around you.",
+    "Some of what you wrote suggests this may be more than ordinary overwhelm, and this is a moment to bring real human support around you.",
     "Please reach out right now to someone who can be with you in real time — a trusted person nearby, a crisis line, or a mental health professional.",
     "If you feel you might act on these thoughts, or you are not safe, call local emergency services now.",
     "For this moment, keep it simple: move closer to another person, or send one short message saying you need help right now.",
@@ -1189,18 +1361,24 @@ function generateReflection(clusters: Cluster[]): string {
 
 function processThoughts(input: ClearYourMindBubbleInput[]): ProcessedThought[] {
   const normalizedList = input.map((item) => normalizeText(item.text));
+  const looseList = input.map((item) => normalizeLooseText(item.text));
+  const tokenLists = input.map((item) => tokenizeLooseText(item.text));
 
   return input.map((item, index) => {
     const normalizedText = normalizedList[index];
-    const isGibberish = isLikelyGibberish(normalizedText);
+    const normalizedLooseText = looseList[index];
+    const tokens = tokenLists[index];
+    const isGibberish = isLikelyGibberish(normalizedLooseText, tokens);
     const { mainCategory, secondaryCategory, matchedSignals } = detectCategories(
-      normalizedText,
+      normalizedLooseText,
+      tokens,
     );
 
     const importance = scoreThought(
-      normalizedText,
+      normalizedLooseText,
+      tokens,
       mainCategory,
-      normalizedList,
+      looseList,
       isGibberish,
     );
 
@@ -1208,6 +1386,8 @@ function processThoughts(input: ClearYourMindBubbleInput[]): ProcessedThought[] 
       id: item.id || `thought-${index + 1}`,
       text: item.text,
       normalizedText,
+      normalizedLooseText,
+      tokens,
       mainCategory,
       secondaryCategory,
       importance,
@@ -1251,10 +1431,14 @@ export async function POST(request: Request) {
       return NextResponse.json(response, { status: 400 });
     }
 
-    const normalizedTexts = thoughts.map((item) => normalizeText(item.text));
-    const hasCrisisLanguage = detectCrisis(normalizedTexts);
+    const normalizedBundles = thoughts.map((item) => ({
+      text: normalizeLooseText(item.text),
+      tokens: tokenizeLooseText(item.text),
+    }));
 
-    if (hasCrisisLanguage) {
+    const risk = assessRisk(normalizedBundles);
+
+    if (risk.shouldTriggerCrisis) {
       const processedThoughts = processThoughts(thoughts);
       const sortedThoughts = [...processedThoughts].sort(
         (a, b) => b.importance.total - a.importance.total,
@@ -1277,8 +1461,16 @@ export async function POST(request: Request) {
     const meaningfulThoughts = processedThoughts.filter((item) => !item.isGibberish);
 
     const allGibberish = meaningfulThoughts.length === 0;
+    const tinyGibberishCount = gibberishThoughts.filter((item) =>
+      isShortGibberishWord(item.normalizedLooseText),
+    ).length;
+
+    const meaningfulCount = meaningfulThoughts.length;
     const mostlyGibberish =
-      gibberishThoughts.length >= Math.ceil(processedThoughts.length * 0.5);
+      meaningfulCount === 0 ||
+      (gibberishThoughts.length >= Math.ceil(processedThoughts.length * 0.5) &&
+        meaningfulCount <= 1 &&
+        tinyGibberishCount >= 2);
 
     if (allGibberish || mostlyGibberish) {
       const response: ClearYourMindResponse = {
