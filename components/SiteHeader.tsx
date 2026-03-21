@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Tools", href: "/tools" },
@@ -11,198 +10,95 @@ const navItems = [
 ];
 
 export default function SiteHeader() {
-  const pathname = usePathname();
-
   return (
-    <header className="site-header">
-      <div className="site-header-inner">
-        <Link href="/" className="site-logo" aria-label="Go to Solace home">
-          SOLACE
+    <header className="relative z-40 w-full">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 pt-6 sm:px-8 lg:px-10">
+        <Link href="/" className="group inline-flex" aria-label="Solace home">
+          <span
+            className="
+              text-[48px] font-medium tracking-[-0.06em] sm:text-[58px] md:text-[64px]
+              text-[rgba(136,166,255,0.98)]
+              drop-shadow-[0_0_18px_rgba(116,146,255,0.20)]
+              transition-all duration-300
+              group-hover:-translate-y-[1px]
+              group-hover:text-[rgba(168,194,255,1)]
+              group-hover:drop-shadow-[0_0_30px_rgba(132,166,255,0.36)]
+            "
+          >
+            SOLACE
+          </span>
         </Link>
 
-        <nav className="site-nav" aria-label="Primary">
-          {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname?.startsWith(item.href));
-
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`site-nav-pill ${isActive ? "site-nav-pill-active" : ""}`}
-              >
-                <span className="site-nav-pill-sheen" />
-                <span className="site-nav-pill-tint" />
-                <span className="site-nav-pill-label">{item.label}</span>
-              </Link>
-            );
-          })}
+        <nav className="flex items-center gap-3 sm:gap-4">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              aria-label={item.label}
+              className="
+                group relative inline-flex min-h-[52px] items-center justify-center overflow-hidden rounded-full
+                px-5 text-[14px] font-medium text-white/94
+                transition duration-200
+                hover:-translate-y-[2px] hover:scale-[1.02] hover:text-white
+              "
+              style={{
+                border: "1px solid rgba(190,210,255,0.16)",
+                background: `
+                  linear-gradient(180deg,
+                    rgba(232,238,255,0.16) 0%,
+                    rgba(156,176,232,0.10) 36%,
+                    rgba(74,82,124,0.20) 100%
+                  ),
+                  radial-gradient(circle at 22% 18%,
+                    rgba(126,162,255,0.22) 0%,
+                    transparent 34%
+                  ),
+                  radial-gradient(circle at 80% 84%,
+                    rgba(124,108,248,0.16) 0%,
+                    transparent 36%
+                  ),
+                  linear-gradient(180deg,
+                    rgba(116,148,255,0.08) 0%,
+                    rgba(116,148,255,0.04) 46%,
+                    rgba(108,94,206,0.07) 100%
+                  )
+                `,
+                boxShadow:
+                  "0 14px 30px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -10px 20px rgba(255,255,255,0.012)",
+              }}
+            >
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full opacity-90 transition duration-200 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 24%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0) 62%)",
+                }}
+              />
+              <span
+                className="pointer-events-none absolute left-[16%] right-[16%] top-0 h-px opacity-90 transition duration-200 group-hover:opacity-100"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.26) 50%, transparent 100%)",
+                }}
+              />
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full transition duration-200"
+                style={{
+                  boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.035)",
+                }}
+              />
+              <span
+                className="pointer-events-none absolute left-1/2 bottom-[-14px] h-6 w-[74%] -translate-x-1/2 rounded-full opacity-90 blur-[14px] transition duration-200 group-hover:opacity-100 group-hover:scale-[1.03]"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(136,166,255,0.26) 0%, rgba(136,166,255,0.08) 42%, transparent 74%)",
+                }}
+              />
+              <span className="relative z-10">{item.label}</span>
+            </Link>
+          ))}
         </nav>
       </div>
-
-      <style jsx>{`
-        .site-header {
-          position: relative;
-          width: 100%;
-          padding: 0 28px;
-        }
-
-        .site-header-inner {
-          max-width: 1320px;
-          margin: 0 auto;
-          min-height: 64px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-        }
-
-        .site-logo {
-          position: relative;
-          z-index: 2;
-          display: inline-flex;
-          align-items: center;
-          text-decoration: none;
-          font-size: clamp(3.4rem, 4.35vw, 4.9rem);
-          font-weight: 560;
-          line-height: 0.86;
-          letter-spacing: -0.078em;
-          color: rgba(147, 173, 255, 0.98);
-          text-shadow:
-            0 0 16px rgba(104, 136, 255, 0.16),
-            0 0 40px rgba(104, 136, 255, 0.06);
-          transition:
-            color 180ms ease,
-            text-shadow 180ms ease,
-            transform 180ms ease;
-        }
-
-        .site-logo:hover {
-          color: rgba(172, 194, 255, 1);
-          text-shadow:
-            0 0 20px rgba(124, 152, 255, 0.2),
-            0 0 52px rgba(124, 152, 255, 0.08);
-          transform: translateY(-0.5px);
-        }
-
-        .site-nav {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 14px;
-          flex-wrap: wrap;
-        }
-
-        .site-nav-pill {
-          position: relative;
-          min-height: 52px;
-          padding: 0 21px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          border-radius: 999px;
-          text-decoration: none;
-          border: 1px solid rgba(198, 212, 255, 0.22);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.16) 0%,
-              rgba(170, 188, 255, 0.1) 40%,
-              rgba(48, 66, 128, 0.16) 100%
-            );
-          box-shadow:
-            0 16px 36px rgba(0, 0, 0, 0.18),
-            0 0 22px rgba(116, 144, 255, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.26),
-            inset 0 -12px 18px rgba(18, 28, 62, 0.22);
-          backdrop-filter: blur(16px) saturate(128%);
-          -webkit-backdrop-filter: blur(16px) saturate(128%);
-          transition:
-            transform 180ms ease,
-            border-color 180ms ease,
-            box-shadow 180ms ease,
-            background 180ms ease;
-        }
-
-        .site-nav-pill:hover {
-          transform: translateY(-1px);
-          border-color: rgba(220, 230, 255, 0.3);
-          box-shadow:
-            0 18px 40px rgba(0, 0, 0, 0.2),
-            0 0 32px rgba(132, 158, 255, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.32),
-            inset 0 -12px 18px rgba(18, 28, 62, 0.24);
-        }
-
-        .site-nav-pill-active {
-          border-color: rgba(228, 236, 255, 0.32);
-        }
-
-        .site-nav-pill-sheen,
-        .site-nav-pill-tint {
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          pointer-events: none;
-        }
-
-        .site-nav-pill-sheen {
-          background:
-            linear-gradient(
-              135deg,
-              rgba(255, 255, 255, 0.26) 0%,
-              rgba(255, 255, 255, 0.12) 24%,
-              rgba(255, 255, 255, 0.03) 44%,
-              rgba(255, 255, 255, 0) 64%
-            );
-          opacity: 0.94;
-        }
-
-        .site-nav-pill-tint {
-          background:
-            radial-gradient(
-              ellipse at 50% 118%,
-              rgba(118, 146, 255, 0.18) 0%,
-              rgba(118, 146, 255, 0.05) 42%,
-              rgba(118, 146, 255, 0) 74%
-            );
-          opacity: 0.84;
-        }
-
-        .site-nav-pill-label {
-          position: relative;
-          z-index: 2;
-          font-size: 14px;
-          font-weight: 560;
-          letter-spacing: -0.01em;
-          color: rgba(246, 248, 255, 0.96);
-          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.16);
-        }
-
-        @media (max-width: 900px) {
-          .site-header {
-            padding: 0 18px;
-          }
-
-          .site-header-inner {
-            min-height: auto;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 14px;
-          }
-
-          .site-nav {
-            width: 100%;
-            justify-content: flex-start;
-          }
-
-          .site-logo {
-            font-size: clamp(2.45rem, 10vw, 3.8rem);
-          }
-        }
-      `}</style>
     </header>
   );
 }

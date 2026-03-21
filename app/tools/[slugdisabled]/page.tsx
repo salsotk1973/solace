@@ -13,8 +13,8 @@ type ToolPageProps = {
 const TOOL_ALIASES: Record<string, keyof typeof TOOL_REGISTRY> = {
   "overthinking-breaker": "overthinking-reset",
   "clear-your-mind": "overthinking-reset",
-  "i-cant-decide": "choose",
-  "everything-feels-noisy": "sort",
+  "i-cant-decide": "clarity",
+  "everything-feels-noisy": "decision-filter",
 };
 
 function resolveToolSlug(slug: string): keyof typeof TOOL_REGISTRY | null {
@@ -30,7 +30,7 @@ function resolveToolSlug(slug: string): keyof typeof TOOL_REGISTRY | null {
 }
 
 function getToolAccentClasses(
-  colorToken: "clarity" | "overthinking" | "decision"
+  colorToken: "clarity" | "overthinking" | "decision",
 ) {
   switch (colorToken) {
     case "clarity":
