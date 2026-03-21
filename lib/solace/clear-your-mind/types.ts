@@ -1,59 +1,59 @@
-export type SolaceCategory =
-  | "Money / Stability"
-  | "Relationships / Home Dynamics"
-  | "Health / Body / Self"
-  | "Environment / External Noise"
-  | "Work / Performance"
-  | "Internal Mental Loops"
-  | "Logistics / Immediate Problems"
-  | "Unclear";
-
-export type ClearYourMindBubbleInput = {
-  id?: string;
+export type ClearYourMindThought = {
   text: string;
 };
 
-export type ClearYourMindImportanceBreakdown = {
-  emotionalWeight: number;
-  practicalConsequence: number;
-  repetition: number;
-  urgency: number;
-  total: number;
+export type ClearYourMindInput = {
+  thoughts: ClearYourMindThought[];
 };
 
-export type ClearYourMindThoughtResult = {
-  id: string;
-  text: string;
-  mainCategory: SolaceCategory;
-  secondaryCategory?: SolaceCategory;
-  importance: ClearYourMindImportanceBreakdown;
-  isGibberish: boolean;
+export type SafetySignals = {
+  directIntent: boolean;
+  indirectIntent: boolean;
+  existentialLanguage: boolean;
+  burdenLanguage: boolean;
+  selfWorthCollapse: boolean;
+  gibberish: boolean;
 };
 
-export type ClearYourMindClusterResult = {
-  category: SolaceCategory;
-  averageImportance: number;
-  thoughtIds: string[];
-};
-
-export type ClearYourMindRequest = {
-  thoughts: Array<string | ClearYourMindBubbleInput>;
-};
-
-export type ClearYourMindSuccessResponse = {
-  ok: true;
-  text: string;
-  isCrisisFallback: boolean;
+export type SafetyAssessment = {
+  riskScore: number;
+  isCrisis: boolean;
   clarityFallback: boolean;
-  thoughts: ClearYourMindThoughtResult[];
-  clusters: ClearYourMindClusterResult[];
-};
-
-export type ClearYourMindErrorResponse = {
-  ok: false;
-  error: string;
+  signals: SafetySignals;
+  matchedRules: string[];
 };
 
 export type ClearYourMindResponse =
-  | ClearYourMindSuccessResponse
-  | ClearYourMindErrorResponse;
+  | {
+      ok: true;
+      isCrisisFallback: true;
+      clarityFallback: false;
+      title: string;
+      message: string;
+      safetyAssessment: SafetyAssessment;
+    }
+  | {
+      ok: true;
+      isCrisisFallback: false;
+      clarityFallback: true;
+      title: string;
+      message: string;
+      safetyAssessment: SafetyAssessment;
+    }
+  | {
+      ok: true;
+      isCrisisFallback: false;
+      clarityFallback: false;
+      reflection: {
+        title: string;
+        summary: string;
+        structure: {
+          recognition: string;
+          untangling: string;
+          gentleFrame: string;
+        };
+      };
+      safetyAssessment: SafetyAssessment;
+    };
+
+export const CRISIS_TRIGGER_SCORE = 3;

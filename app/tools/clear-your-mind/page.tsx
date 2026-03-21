@@ -14,7 +14,6 @@ import {
   useState,
 } from "react";
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
-import type { ClearYourMindSuccessResponse } from "@/lib/solace/clear-your-mind/types";
 
 const MAX_THOUGHTS = 7;
 const MAX_INPUT_LENGTH = 140;
@@ -47,6 +46,214 @@ type BubbleItem = {
   fontSize: number;
   isStarter?: boolean;
 };
+
+type StructuredEngineResponse =
+  | {
+      ok: true;
+      isCrisisFallback: true;
+      clarityFallback: false;
+      title: string;
+      message: string;
+    }
+  | {
+      ok: true;
+      isCrisisFallback: false;
+      clarityFallback: true;
+      title: string;
+      message: string;
+    }
+  | {
+      ok: true;
+      isCrisisFallback: false;
+      clarityFallback: false;
+      reflection: {
+        title: string;
+        summary: string;
+        structure: {
+          recognition: string;
+          untangling: string;
+          gentleFrame: string;
+        };
+      };
+    };
+
+type LegacyThoughtResult = {
+  id: string;
+  text: string;
+  importance: {
+    total: number;
+  };
+};
+
+type LegacySuccessResponse = {
+  ok: true;
+  text: string;
+  isCrisisFallback?: boolean;
+  clarityFallback?: boolean;
+  thoughts?: LegacyThoughtResult[];
+};
+
+type ErrorResponse = {
+  ok: false;
+  error?: string;
+};
+
+type NormalizedUiResponse =
+  | {
+      ok: true;
+      text: string;
+      isCrisisFallback: boolean;
+      clarityFallback: boolean;
+      thoughts?: LegacyThoughtResult[];
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isLegacyThoughtResultArray(value: unknown): value is LegacyThoughtResult[] {
+  if (!Array.isArray(value)) return false;
+
+  return value.every((item) => {
+    if (!isRecord(item)) return false;
+    if (typeof item.id !== "string") return false;
+    if (typeof item.text !== "string") return false;
+    if (!isRecord(item.importance)) return false;
+    return typeof item.importance.total === "number";
+  });
+}
+
+function normalizeApiResult(raw: unknown): NormalizedUiResponse {
+  if (!isRecord(raw)) {
+    return {
+      ok: false,
+      error: "Invalid response from Solace.",
+    };
+  }
+
+  if (raw.ok === false) {
+    return {
+      ok: false,
+      error:
+        typeof raw.error === "string" && raw.error.trim().length > 0
+          ? raw.error
+          : "Something went wrong. Please try again.",
+    };
+  }
+
+  if (raw.ok !== true) {
+    return {
+      ok: false,
+      error: "Invalid response from Solace.",
+    };
+  }
+
+  const legacyText = typeof raw.text === "string" ? raw.text.trim() : "";
+  const legacyIsCrisisFallback = Boolean(raw.isCrisisFallback);
+  const legacyClarityFallback = Boolean(raw.clarityFallback);
+  const legacyThoughts = isLegacyThoughtResultArray(raw.thoughts) ? raw.thoughts : undefined;
+
+  if (legacyText.length > 0) {
+    return {
+      ok: true,
+      text: legacyText,
+      isCrisisFallback: legacyIsCrisisFallback,
+      clarityFallback: legacyClarityFallback,
+      thoughts: legacyThoughts,
+    };
+  }
+
+  if (raw.isCrisisFallback === true) {
+    const title = typeof raw.title === "string" ? raw.title.trim() : "";
+    const message = typeof raw.message === "string" ? raw.message.trim() : "";
+
+    if (!message) {
+      return {
+        ok: false,
+        error: "The crisis response was not in the expected format.",
+      };
+    }
+
+    return {
+      ok: true,
+      text: [title, message].filter(Boolean).join("\n\n"),
+      isCrisisFallback: true,
+      clarityFallback: false,
+    };
+  }
+
+  if (raw.clarityFallback === true) {
+    const title = typeof raw.title === "string" ? raw.title.trim() : "";
+    const message = typeof raw.message === "string" ? raw.message.trim() : "";
+
+    if (!message) {
+      return {
+        ok: false,
+        error: "The clarity response was not in the expected format.",
+      };
+    }
+
+    return {
+      ok: true,
+      text: [title, message].filter(Boolean).join("\n\n"),
+      isCrisisFallback: false,
+      clarityFallback: true,
+    };
+  }
+
+  if (isRecord(raw.reflection)) {
+    const reflection = raw.reflection;
+
+    const title = typeof reflection.title === "string" ? reflection.title.trim() : "";
+    const summary = typeof reflection.summary === "string" ? reflection.summary.trim() : "";
+
+    let recognition = "";
+    let untangling = "";
+    let gentleFrame = "";
+
+    if (isRecord(reflection.structure)) {
+      recognition =
+        typeof reflection.structure.recognition === "string"
+          ? reflection.structure.recognition.trim()
+          : "";
+      untangling =
+        typeof reflection.structure.untangling === "string"
+          ? reflection.structure.untangling.trim()
+          : "";
+      gentleFrame =
+        typeof reflection.structure.gentleFrame === "string"
+          ? reflection.structure.gentleFrame.trim()
+          : "";
+    }
+
+    const parts = [title, summary, recognition, untangling, gentleFrame].filter(
+      (part) => part.length > 0,
+    );
+
+    if (parts.length === 0) {
+      return {
+        ok: false,
+        error: "The reflection response was not in the expected format.",
+      };
+    }
+
+    return {
+      ok: true,
+      text: parts.join("\n\n"),
+      isCrisisFallback: false,
+      clarityFallback: false,
+    };
+  }
+
+  return {
+    ok: false,
+    error: "The reflection response was not in the expected format.",
+  };
+}
 
 function getParagraphs(text: string): string[] {
   return text
@@ -228,35 +435,6 @@ function getAlignedTargets(
       targetY,
     };
   });
-}
-
-function applyApiResultsToBubbles(
-  currentBubbles: BubbleItem[],
-  response: ClearYourMindSuccessResponse,
-): BubbleItem[] {
-  const realBubbles = currentBubbles.filter((bubble) => !bubble.isStarter);
-  const currentMap = new Map(realBubbles.map((bubble) => [bubble.id, bubble]));
-  const ordered: BubbleItem[] = [];
-
-  for (const thought of response.thoughts) {
-    const existing = currentMap.get(thought.id);
-    if (!existing) continue;
-
-    ordered.push({
-      ...existing,
-      text: thought.text,
-      importance: thought.importance.total,
-      hue: getBubbleHue(thought.importance.total),
-      fontSize: existing.fontSize,
-      diameter: existing.diameter,
-    });
-  }
-
-  if (ordered.length === 0) {
-    return realBubbles;
-  }
-
-  return ordered;
 }
 
 function ScopeInline() {
@@ -597,22 +775,23 @@ export default function ClearYourMindPage() {
     }, ORGANIZE_DELAY_MS);
 
     try {
-      const result = await submitClearYourMindThoughts(
+      const rawResult = await submitClearYourMindThoughts(
         [...realBubbles].map((bubble) => ({
           id: bubble.id,
           text: bubble.text,
         })),
       );
 
+      const result = normalizeApiResult(rawResult);
+
       if (!result.ok) {
-        setError(result.error || "Something went wrong. Please try again.");
+        setError(result.error);
         return;
       }
 
-      setBubbles((current) => applyApiResultsToBubbles(current, result));
       setResponseText(result.text.trim());
-      setIsCrisisFallback(Boolean(result.isCrisisFallback));
-      setIsClarityFallback(Boolean(result.clarityFallback));
+      setIsCrisisFallback(result.isCrisisFallback);
+      setIsClarityFallback(result.clarityFallback);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
