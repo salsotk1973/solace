@@ -111,10 +111,17 @@ export default function HomePage() {
       <div className="pointer-events-none absolute inset-x-[8%] top-[26%] z-10 h-[340px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(8,11,19,0.18)_0%,rgba(8,11,19,0.24)_28%,rgba(8,11,19,0.16)_52%,rgba(8,11,19,0.04)_70%,rgba(8,11,19,0)_82%)] blur-3xl" />
       <div className="pointer-events-none absolute inset-x-[10%] top-[44%] z-10 h-[180px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(14,18,30,0.22)_0%,rgba(14,18,30,0.14)_34%,rgba(14,18,30,0.06)_58%,rgba(14,18,30,0)_78%)] blur-2xl" />
 
-      <SiteHeader />
+      <div className="fixed inset-x-0 top-0 z-40 header-shell">
+        <div className="pointer-events-none absolute inset-0 header-backdrop" />
+        <div className="pointer-events-none absolute inset-0 header-glow" />
+        <div className="pointer-events-none absolute inset-0 header-falloff" />
+        <div className="relative header-inner">
+          <SiteHeader />
+        </div>
+      </div>
 
       <div className="relative z-20">
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-4 pt-[118px] sm:px-8 lg:px-10">
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-4 pt-[122px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
             <div className="mb-0 origin-top translate-y-0 scale-[0.72] sm:translate-y-1 sm:scale-[0.79] md:translate-y-2 md:scale-[0.85]">
               <HeroPresence />
@@ -324,6 +331,8 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <SiteFooter />
       </div>
 
       <style jsx global>{`
@@ -409,6 +418,63 @@ export default function HomePage() {
             transform: translateX(7px);
             opacity: 1;
           }
+        }
+
+        .header-shell {
+          height: 86px;
+        }
+
+        .header-inner {
+          transform: translateY(-16px);
+        }
+
+        .header-backdrop {
+          background:
+            linear-gradient(
+              180deg,
+              rgba(16, 18, 28, 0.84) 0%,
+              rgba(16, 18, 28, 0.8) 36%,
+              rgba(14, 17, 28, 0.72) 68%,
+              rgba(14, 17, 28, 0.28) 100%
+            ),
+            linear-gradient(
+              135deg,
+              rgba(236, 228, 255, 0.06) 0%,
+              rgba(255, 255, 255, 0.015) 24%,
+              rgba(255, 255, 255, 0.006) 52%,
+              rgba(255, 255, 255, 0) 76%
+            );
+          backdrop-filter: blur(34px) saturate(148%) contrast(1.08);
+          -webkit-backdrop-filter: blur(34px) saturate(148%) contrast(1.08);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 8px 18px rgba(0, 0, 0, 0.1);
+          opacity: 0.98;
+        }
+
+        .header-glow {
+          background:
+            radial-gradient(
+              circle at 50% 100%,
+              rgba(164, 170, 255, 0.12) 0%,
+              rgba(164, 170, 255, 0.04) 34%,
+              rgba(164, 170, 255, 0) 72%
+            );
+          filter: blur(24px);
+          opacity: 0.72;
+        }
+
+        .header-falloff {
+          background:
+            linear-gradient(
+              180deg,
+              rgba(12, 14, 24, 0) 0%,
+              rgba(12, 14, 24, 0) 54%,
+              rgba(12, 14, 24, 0.1) 76%,
+              rgba(12, 14, 24, 0.24) 100%
+            );
+          mask-image: linear-gradient(180deg, transparent 0%, black 70%, black 100%);
+          -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 70%, black 100%);
         }
 
         .sola-haze {
@@ -509,8 +575,6 @@ export default function HomePage() {
           }
         }
       `}</style>
-
-      <SiteFooter />
     </main>
   );
 }

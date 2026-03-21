@@ -36,6 +36,7 @@ type BubbleItem = {
   text: string;
   diameter: number;
   importance: number;
+  rawImportance: number;
   x: number;
   y: number;
   vx: number;
@@ -47,55 +48,12 @@ type BubbleItem = {
   isStarter?: boolean;
 };
 
-type StructuredEngineResponse =
-  | {
-      ok: true;
-      isCrisisFallback: true;
-      clarityFallback: false;
-      title: string;
-      message: string;
-    }
-  | {
-      ok: true;
-      isCrisisFallback: false;
-      clarityFallback: true;
-      title: string;
-      message: string;
-    }
-  | {
-      ok: true;
-      isCrisisFallback: false;
-      clarityFallback: false;
-      reflection: {
-        title: string;
-        summary: string;
-        structure: {
-          recognition: string;
-          untangling: string;
-          gentleFrame: string;
-        };
-      };
-    };
-
 type LegacyThoughtResult = {
   id: string;
   text: string;
   importance: {
     total: number;
   };
-};
-
-type LegacySuccessResponse = {
-  ok: true;
-  text: string;
-  isCrisisFallback?: boolean;
-  clarityFallback?: boolean;
-  thoughts?: LegacyThoughtResult[];
-};
-
-type ErrorResponse = {
-  ok: false;
-  error?: string;
 };
 
 type NormalizedUiResponse =
@@ -262,56 +220,41 @@ function getParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-function getInitialImportance(text: string): number {
+function getRawImportance(text: string): number {
   const trimmed = text.trim().toLowerCase();
 
   let score = 0;
-  score += Math.min(trimmed.length * 1.2, 70);
+  score += Math.min(trimmed.length * 1.15, 60);
 
   const weightedTerms: Array<[RegExp, number]> = [
-    // Money / bills
     [
       /\b(bills|bill|rent|mortgage|debt|loan|money|cash|broke|financial|finance|expenses|expense|cost|costs|afford|affording|not enough money)\b/g,
-      44,
-    ],
-
-    // Job loss / employment instability
-    [
-      /\b(lost my job|lose my job|i lost my job|no job|jobless|unemployed|laid off|got fired|lost work)\b/g,
-      62,
-    ],
-
-    // Work pressure
-    [
-      /\b(work|job|career|office|boss|income|workload|deadline|deadlines|too much work|lots to do at work)\b/g,
-      30,
-    ],
-
-    // Family / relationship / responsibility
-    [
-      /\b(wife|husband|partner|marriage|family|kids|children|mother in law|mother-in-law|mother|mom|mum|father|dad|parents|pregnant|baby)\b/g,
       34,
     ],
-
-    // Health / body / strain
     [
-      /\b(health|sick|ill|doctor|hospital|fat|weight|body|smoking|panic|stress|stressed|tired|exhausted)\b/g,
-      28,
+      /\b(lost my job|lose my job|i lost my job|no job|jobless|unemployed|laid off|got fired|lost work|not working|not working at the moment|out of work|currently not working)\b/g,
+      58,
     ],
-
-    // Home / practical breakdown
     [
-      /\b(car|broken|house|home|dirty|mess|messy|laundry|cleaning|repair|repairs)\b/g,
+      /\b(work|career|office|boss|income|workload|deadline|deadlines|too much work|lots to do at work|too much at work)\b/g,
+      24,
+    ],
+    [
+      /\b(wife|husband|partner|marriage|family|kids|children|mother in law|mother-in-law|mother|mom|mum|father|dad|parents|pregnant|baby)\b/g,
+      26,
+    ],
+    [
+      /\b(health|sick|ill|doctor|hospital|fat|weight|body|panic|stress|stressed|tired|exhausted|anxiety)\b/g,
       20,
     ],
-
-    // Emotion / self-worth language
+    [
+      /\b(car|broken|house|home|dirty|mess|messy|laundry|cleaning|repair|repairs|neighbour|neighbours|neighbor|neighbors|noise|noisy)\b/g,
+      16,
+    ],
     [
       /\b(anxiety|fear|overthinking|sad|depressed|worthless|no future|lost|stuck|ugly|not good enough)\b/g,
-      30,
+      22,
     ],
-
-    // Distance / separation
     [/\b(overseas|abroad|far away|away from family)\b/g, 18],
   ];
 
@@ -322,17 +265,24 @@ function getInitialImportance(text: string): number {
     }
   }
 
-  // High-importance phrase boosts
   const phraseBoosts: Array<[RegExp, number]> = [
-    [/\blost my job\b/i, 55],
+    [/\blost my job\b/i, 60],
+    [/\bnot working at the moment\b/i, 52],
+    [/\bcurrently not working\b/i, 48],
+    [/\bout of work\b/i, 46],
     [/\bno job\b/i, 42],
-    [/\bwife pregnant\b/i, 42],
-    [/\bmother in law living at home\b/i, 38],
-    [/\bfamily overseas\b/i, 24],
-    [/\bcar broken\b/i, 24],
-    [/\bfeel fat\b/i, 20],
-    [/\blots of bills to pay\b/i, 34],
-    [/\btoo much work\b/i, 26],
+    [/\bwife pregnant\b/i, 38],
+    [/\bpartner pregnant\b/i, 38],
+    [/\bmother in law living at home\b/i, 34],
+    [/\bfamily overseas\b/i, 30],
+    [/\bwife is overseas\b/i, 30],
+    [/\bcar broken\b/i, 22],
+    [/\bfeel fat\b/i, 18],
+    [/\blots of bills to pay\b/i, 36],
+    [/\bbills piling up\b/i, 36],
+    [/\btoo much work\b/i, 24],
+    [/\bnoisy neighbours\b/i, 16],
+    [/\bnoisy neighbors\b/i, 16],
   ];
 
   for (const [pattern, weight] of phraseBoosts) {
@@ -341,50 +291,71 @@ function getInitialImportance(text: string): number {
     }
   }
 
-  if (trimmed.includes("not enough")) score += 18;
-  if (trimmed.includes("can't")) score += 12;
-  if (trimmed.includes("cannot")) score += 12;
-  if (trimmed.includes("never")) score += 10;
-  if (trimmed.includes("always")) score += 10;
-  if (trimmed.split(" ").length >= 4) score += 12;
+  if (trimmed.includes("not enough")) score += 16;
+  if (trimmed.includes("can't")) score += 10;
+  if (trimmed.includes("cannot")) score += 10;
+  if (trimmed.includes("never")) score += 8;
+  if (trimmed.includes("always")) score += 8;
+  if (trimmed.split(" ").length >= 4) score += 10;
   if (trimmed.split(" ").length >= 7) score += 10;
 
-  return Math.max(10, Math.min(score, 220));
+  return Math.max(10, Math.min(score, 320));
+}
+
+function getVisualImportance(rawImportance: number): number {
+  const raw = Math.max(10, Math.min(rawImportance, 320));
+
+  if (raw <= 35) return 14 + (raw - 10) * 0.45;
+  if (raw <= 70) return 25 + (raw - 35) * 0.58;
+  if (raw <= 110) return 45 + (raw - 70) * 0.7;
+  if (raw <= 160) return 73 + (raw - 110) * 0.44;
+  if (raw <= 220) return 95 + (raw - 160) * 0.16;
+
+  return 104;
 }
 
 function getBubbleDiameter(importance: number): number {
-  if (importance <= 8) return 74;
-  if (importance <= 18) return 84;
-  if (importance <= 30) return 98;
-  if (importance <= 45) return 116;
-  if (importance <= 60) return 138;
-  if (importance <= 75) return 164;
-  if (importance <= 88) return 186;
-  return 208;
+  if (importance <= 16) return 74;
+  if (importance <= 24) return 84;
+  if (importance <= 34) return 98;
+  if (importance <= 46) return 116;
+  if (importance <= 58) return 136;
+  if (importance <= 70) return 156;
+  if (importance <= 82) return 178;
+  if (importance <= 92) return 202;
+  if (importance <= 100) return 224;
+  return 242;
 }
 
 function getBubbleFontSize(text: string, diameter: number): number {
   const length = text.trim().length;
 
+  if (diameter >= 220) {
+    if (length <= 14) return 21;
+    if (length <= 24) return 18.6;
+    if (length <= 36) return 16;
+    return 14;
+  }
+
   if (diameter >= 196) {
-    if (length <= 14) return 20;
-    if (length <= 24) return 18;
-    if (length <= 36) return 15.5;
-    return 13.6;
+    if (length <= 14) return 19;
+    if (length <= 24) return 17;
+    if (length <= 36) return 15;
+    return 13.4;
   }
 
-  if (diameter >= 164) {
-    if (length <= 14) return 18;
-    if (length <= 24) return 16;
-    if (length <= 34) return 14.2;
-    return 12.9;
+  if (diameter >= 170) {
+    if (length <= 14) return 17;
+    if (length <= 24) return 15.4;
+    if (length <= 34) return 13.8;
+    return 12.6;
   }
 
-  if (diameter >= 132) {
-    if (length <= 12) return 15.8;
+  if (diameter >= 140) {
+    if (length <= 12) return 15.6;
     if (length <= 20) return 14.2;
     if (length <= 30) return 12.9;
-    return 11.9;
+    return 11.8;
   }
 
   if (length <= 10) return 14;
@@ -393,11 +364,11 @@ function getBubbleFontSize(text: string, diameter: number): number {
 }
 
 function getBubbleHue(importance: number): number {
-  if (importance >= 85) return 220;
-  if (importance >= 70) return 226;
-  if (importance >= 55) return 232;
-  if (importance >= 40) return 238;
-  if (importance >= 20) return 244;
+  if (importance >= 90) return 220;
+  if (importance >= 78) return 226;
+  if (importance >= 62) return 232;
+  if (importance >= 44) return 238;
+  if (importance >= 26) return 244;
   return 252;
 }
 
@@ -409,6 +380,7 @@ function createStarterBubble(fieldWidth: number): BubbleItem {
     text: "",
     diameter,
     importance: 999,
+    rawImportance: 999,
     x: fieldWidth / 2,
     y: FIELD_HEIGHT / 2,
     vx: 0,
@@ -422,7 +394,8 @@ function createStarterBubble(fieldWidth: number): BubbleItem {
 }
 
 function buildBubble(text: string, index: number, fieldWidth: number): BubbleItem {
-  const importance = Math.min(getInitialImportance(text), 100);
+  const rawImportance = getRawImportance(text);
+  const importance = getVisualImportance(rawImportance);
   const diameter = getBubbleDiameter(importance);
 
   const positions = [
@@ -453,6 +426,7 @@ function buildBubble(text: string, index: number, fieldWidth: number): BubbleIte
     text,
     diameter,
     importance,
+    rawImportance,
     x: fieldWidth * position.x,
     y: FIELD_HEIGHT * position.y,
     vx: drift.vx,
@@ -510,20 +484,22 @@ function applyApiResultsToBubbles(
     const existing = currentMap.get(thought.id);
     if (!existing) continue;
 
-    const nextImportance = Math.max(
-      Math.min(thought.importance.total || getInitialImportance(thought.text), 100),
+    const rawImportance = Math.max(
       10,
+      Math.min(thought.importance.total || getRawImportance(thought.text), 320),
     );
-    const nextDiameter = getBubbleDiameter(nextImportance);
-    const nextFontSize = getBubbleFontSize(thought.text, nextDiameter);
+    const importance = getVisualImportance(rawImportance);
+    const diameter = getBubbleDiameter(importance);
+    const fontSize = getBubbleFontSize(thought.text, diameter);
 
     ordered.push({
       ...existing,
       text: thought.text,
-      importance: nextImportance,
-      hue: getBubbleHue(nextImportance),
-      diameter: nextDiameter,
-      fontSize: nextFontSize,
+      importance,
+      rawImportance,
+      hue: getBubbleHue(importance),
+      diameter,
+      fontSize,
     });
   }
 
