@@ -33,7 +33,7 @@ export default function SiteHeader() {
                 className={`site-nav-pill ${isActive ? "site-nav-pill-active" : ""}`}
               >
                 <span className="site-nav-pill-sheen" />
-                <span className="site-nav-pill-glow" />
+                <span className="site-nav-pill-tint" />
                 <span className="site-nav-pill-label">{item.label}</span>
               </Link>
             );
@@ -51,7 +51,7 @@ export default function SiteHeader() {
         .site-header-inner {
           max-width: 1320px;
           margin: 0 auto;
-          min-height: 72px;
+          min-height: 64px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -64,11 +64,11 @@ export default function SiteHeader() {
           display: inline-flex;
           align-items: center;
           text-decoration: none;
-          font-size: clamp(3rem, 4.25vw, 4.5rem);
+          font-size: clamp(3.4rem, 4.35vw, 4.9rem);
           font-weight: 560;
-          line-height: 0.88;
-          letter-spacing: -0.075em;
-          color: rgba(150, 175, 255, 0.98);
+          line-height: 0.86;
+          letter-spacing: -0.078em;
+          color: rgba(147, 173, 255, 0.98);
           text-shadow:
             0 0 16px rgba(104, 136, 255, 0.16),
             0 0 40px rgba(104, 136, 255, 0.06);
@@ -79,7 +79,7 @@ export default function SiteHeader() {
         }
 
         .site-logo:hover {
-          color: rgba(174, 196, 255, 1);
+          color: rgba(172, 194, 255, 1);
           text-shadow:
             0 0 20px rgba(124, 152, 255, 0.2),
             0 0 52px rgba(124, 152, 255, 0.08);
@@ -96,29 +96,29 @@ export default function SiteHeader() {
 
         .site-nav-pill {
           position: relative;
-          min-height: 50px;
-          padding: 0 20px;
+          min-height: 52px;
+          padding: 0 21px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
           border-radius: 999px;
           text-decoration: none;
-          border: 1px solid rgba(202, 214, 255, 0.2);
+          border: 1px solid rgba(198, 212, 255, 0.22);
           background:
             linear-gradient(
               180deg,
               rgba(255, 255, 255, 0.16) 0%,
-              rgba(160, 178, 255, 0.12) 38%,
-              rgba(64, 80, 132, 0.16) 100%
+              rgba(170, 188, 255, 0.1) 40%,
+              rgba(48, 66, 128, 0.16) 100%
             );
           box-shadow:
             0 16px 36px rgba(0, 0, 0, 0.18),
-            0 0 24px rgba(114, 142, 255, 0.08),
+            0 0 22px rgba(116, 144, 255, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.26),
-            inset 0 -12px 20px rgba(18, 28, 62, 0.22);
-          backdrop-filter: blur(18px) saturate(132%);
-          -webkit-backdrop-filter: blur(18px) saturate(132%);
+            inset 0 -12px 18px rgba(18, 28, 62, 0.22);
+          backdrop-filter: blur(16px) saturate(128%);
+          -webkit-backdrop-filter: blur(16px) saturate(128%);
           transition:
             transform 180ms ease,
             border-color 180ms ease,
@@ -128,25 +128,20 @@ export default function SiteHeader() {
 
         .site-nav-pill:hover {
           transform: translateY(-1px);
-          border-color: rgba(224, 232, 255, 0.28);
+          border-color: rgba(220, 230, 255, 0.3);
           box-shadow:
             0 18px 40px rgba(0, 0, 0, 0.2),
-            0 0 34px rgba(132, 158, 255, 0.12),
+            0 0 32px rgba(132, 158, 255, 0.12),
             inset 0 1px 0 rgba(255, 255, 255, 0.32),
-            inset 0 -12px 20px rgba(18, 28, 62, 0.24);
+            inset 0 -12px 18px rgba(18, 28, 62, 0.24);
         }
 
         .site-nav-pill-active {
           border-color: rgba(228, 236, 255, 0.32);
-          box-shadow:
-            0 18px 40px rgba(0, 0, 0, 0.2),
-            0 0 40px rgba(136, 162, 255, 0.14),
-            inset 0 1px 0 rgba(255, 255, 255, 0.34),
-            inset 0 -12px 20px rgba(18, 28, 62, 0.26);
         }
 
         .site-nav-pill-sheen,
-        .site-nav-pill-glow {
+        .site-nav-pill-tint {
           position: absolute;
           inset: 0;
           border-radius: inherit;
@@ -165,15 +160,15 @@ export default function SiteHeader() {
           opacity: 0.94;
         }
 
-        .site-nav-pill-glow {
+        .site-nav-pill-tint {
           background:
             radial-gradient(
               ellipse at 50% 118%,
-              rgba(118, 146, 255, 0.22) 0%,
-              rgba(118, 146, 255, 0.06) 42%,
+              rgba(118, 146, 255, 0.18) 0%,
+              rgba(118, 146, 255, 0.05) 42%,
               rgba(118, 146, 255, 0) 74%
             );
-          opacity: 0.82;
+          opacity: 0.84;
         }
 
         .site-nav-pill-label {
