@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import ReflectionOrb from "@/components/solace/ReflectionOrb";
 import SiteHeader from "@/components/SiteHeader";
 
 type OrbPhase = "idle" | "active" | "settled";
@@ -161,6 +160,8 @@ export default function ChoosePage() {
       <div className="realm-bg-vignette" aria-hidden="true" />
       <div className="realm-bg-soften" aria-hidden="true" />
       <div className="realm-bg-deepen" aria-hidden="true" />
+      <div className="realm-bg-bottom-weight" aria-hidden="true" />
+      <div className="realm-bg-top-weight" aria-hidden="true" />
       <div className="realm-center-halo" aria-hidden="true" />
       <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
       <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
@@ -178,28 +179,59 @@ export default function ChoosePage() {
         </div>
 
         <div className="orb-stage">
-          <div className="azure-orb-shell" aria-hidden="true">
-            <div className="azure-orb-shell-aura azure-orb-shell-aura-back" />
-            <div className="azure-orb-shell-aura azure-orb-shell-aura-mid" />
-            <div className="azure-orb-shell-core-glow" />
-            <div className="azure-orb-shell-floor-glow" />
-          </div>
+          <div className={`azure-hero azure-hero-${orbPhase}`} aria-hidden="true">
+            <div className="azure-hero-field azure-hero-field-back" />
+            <div className="azure-hero-field azure-hero-field-mid" />
+            <div className="azure-hero-field azure-hero-field-front" />
+            <div className="azure-hero-floor-glow" />
+            <div className="azure-hero-floor-core" />
 
-          <div className="azure-orb-content">
-            <ReflectionOrb phase={orbPhase} />
+            <div className="azure-core-shadow" />
+            <div className="azure-core-tilt">
+              <div className="azure-core">
+                <div className="azure-core-parallax azure-core-parallax-back">
+                  <div className="azure-core-atmosphere azure-core-atmosphere-a" />
+                  <div className="azure-core-atmosphere azure-core-atmosphere-b" />
+                  <div className="azure-core-atmosphere azure-core-atmosphere-c" />
+                  <div className="azure-core-swirl azure-core-swirl-a" />
+                  <div className="azure-core-swirl azure-core-swirl-b" />
+                  <div className="azure-core-swirl azure-core-swirl-c" />
+                </div>
+
+                <div className="azure-core-parallax azure-core-parallax-mid">
+                  <div className="azure-core-mineral azure-core-mineral-a" />
+                  <div className="azure-core-mineral azure-core-mineral-b" />
+                  <div className="azure-core-mineral azure-core-mineral-c" />
+                  <div className="azure-core-mineral azure-core-mineral-d" />
+                  <div className="azure-core-line azure-core-line-a" />
+                  <div className="azure-core-line azure-core-line-b" />
+                  <div className="azure-core-line azure-core-line-c" />
+                </div>
+
+                <div className="azure-core-parallax azure-core-parallax-front">
+                  <div className="azure-core-inner-glow" />
+                  <div className="azure-core-hotspot" />
+                  <div className="azure-core-sheen azure-core-sheen-a" />
+                  <div className="azure-core-sheen azure-core-sheen-b" />
+                </div>
+
+                <div className="azure-core-glass" />
+                <div className="azure-core-rim" />
+              </div>
+            </div>
           </div>
         </div>
 
         <form className="decision-form" onSubmit={handleSubmit}>
           <div className="scope-inline">
-            <span className="scope-inline-copy">Adults 18+ only</span>
+            <span className="scope-inline-copy">Designed for Adults only</span>
             <span className="scope-separator">·</span>
             <span className="scope-inline-copy">Reflective clarity tool</span>
             <span className="scope-separator">·</span>
             <span className="scope-inline-copy">Not professional advice</span>
             <span className="scope-separator">·</span>
             <Link href="/scope" className="scope-inline-link">
-              Scope
+              See Scope
             </Link>
           </div>
 
@@ -212,8 +244,8 @@ export default function ChoosePage() {
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="I’m choosing between..."
-            rows={3}
+            placeholder="Should I..."
+            rows={2}
             disabled={isLoading}
             className="decision-input"
           />
@@ -267,7 +299,7 @@ export default function ChoosePage() {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #02040a;
+          background: #010309;
         }
 
         .realm-bg-stage {
@@ -298,9 +330,9 @@ export default function ChoosePage() {
           background:
             radial-gradient(
               ellipse at center,
-              rgba(0, 0, 0, 0.06) 18%,
-              rgba(0, 0, 0, 0.22) 56%,
-              rgba(0, 0, 0, 0.52) 100%
+              rgba(0, 0, 0, 0.12) 10%,
+              rgba(0, 0, 0, 0.34) 56%,
+              rgba(0, 0, 0, 0.68) 100%
             );
         }
 
@@ -312,11 +344,11 @@ export default function ChoosePage() {
           background:
             linear-gradient(
               180deg,
-              rgba(4, 7, 14, 0.38) 0%,
-              rgba(4, 7, 14, 0.18) 20%,
-              rgba(4, 7, 14, 0.08) 42%,
-              rgba(4, 7, 14, 0.18) 72%,
-              rgba(4, 7, 14, 0.42) 100%
+              rgba(3, 7, 15, 0.46) 0%,
+              rgba(3, 7, 15, 0.22) 18%,
+              rgba(3, 7, 15, 0.12) 42%,
+              rgba(3, 7, 15, 0.22) 72%,
+              rgba(3, 7, 15, 0.48) 100%
             );
         }
 
@@ -328,10 +360,40 @@ export default function ChoosePage() {
           background:
             radial-gradient(
               circle at 50% 44%,
-              rgba(10, 16, 30, 0.06) 0%,
-              rgba(10, 16, 30, 0.18) 26%,
-              rgba(10, 16, 30, 0.34) 58%,
-              rgba(2, 4, 10, 0.52) 100%
+              rgba(8, 14, 28, 0.12) 0%,
+              rgba(8, 14, 28, 0.28) 26%,
+              rgba(8, 14, 28, 0.46) 58%,
+              rgba(1, 3, 9, 0.64) 100%
+            );
+        }
+
+        .realm-bg-bottom-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0) 0%,
+              rgba(1, 3, 9, 0.04) 52%,
+              rgba(1, 3, 9, 0.24) 72%,
+              rgba(1, 3, 9, 0.58) 100%
+            );
+        }
+
+        .realm-bg-top-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(1, 3, 9, 0.48) 0%,
+              rgba(1, 3, 9, 0.18) 16%,
+              rgba(1, 3, 9, 0) 34%,
+              rgba(1, 3, 9, 0) 100%
             );
         }
 
@@ -343,10 +405,10 @@ export default function ChoosePage() {
           background:
             radial-gradient(
               ellipse at center,
-              rgba(170, 196, 255, 0.05) 0%,
-              rgba(170, 196, 255, 0.02) 18%,
-              rgba(170, 196, 255, 0.008) 34%,
-              rgba(170, 196, 255, 0) 48%
+              rgba(154, 184, 255, 0.036) 0%,
+              rgba(154, 184, 255, 0.014) 18%,
+              rgba(154, 184, 255, 0.006) 32%,
+              rgba(154, 184, 255, 0) 48%
             );
         }
 
@@ -357,25 +419,25 @@ export default function ChoosePage() {
           width: 24%;
           z-index: 1;
           pointer-events: none;
-          filter: blur(52px);
-          opacity: 0.72;
+          filter: blur(56px);
+          opacity: 0.56;
         }
 
         .realm-side-light-left {
-          left: 1%;
+          left: 0;
           background: radial-gradient(
-            circle at 38% 28%,
-            rgba(88, 128, 245, 0.12) 0%,
-            transparent 64%
+            circle at 34% 26%,
+            rgba(76, 118, 240, 0.12) 0%,
+            transparent 66%
           );
         }
 
         .realm-side-light-right {
-          right: 1%;
+          right: 0;
           background: radial-gradient(
-            circle at 62% 24%,
-            rgba(116, 104, 255, 0.1) 0%,
-            transparent 64%
+            circle at 66% 24%,
+            rgba(104, 96, 255, 0.1) 0%,
+            transparent 66%
           );
         }
 
@@ -389,12 +451,12 @@ export default function ChoosePage() {
           pointer-events: none;
           background: radial-gradient(
             circle at 50% 50%,
-            rgba(226, 236, 255, 0.07) 0%,
-            rgba(226, 236, 255, 0.03) 28%,
+            rgba(226, 236, 255, 0.05) 0%,
+            rgba(226, 236, 255, 0.02) 28%,
             transparent 60%
           );
-          filter: blur(22px);
-          opacity: 0.72;
+          filter: blur(24px);
+          opacity: 0.52;
         }
 
         .realm-content {
@@ -421,7 +483,7 @@ export default function ChoosePage() {
           letter-spacing: 0.28em;
           text-transform: uppercase;
           color: rgba(206, 220, 255, 0.54);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
         }
 
         .title {
@@ -432,117 +494,657 @@ export default function ChoosePage() {
           letter-spacing: -0.06em;
           color: rgba(247, 250, 255, 0.98);
           text-shadow:
-            0 10px 28px rgba(0, 0, 0, 0.34),
-            0 0 24px rgba(160, 188, 255, 0.08);
+            0 10px 28px rgba(0, 0, 0, 0.4),
+            0 0 24px rgba(160, 188, 255, 0.07);
         }
 
         .subtitle {
           margin: 14px 0 0;
           font-size: 1.02rem;
           line-height: 1.7;
-          color: rgba(232, 239, 250, 0.88);
-          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.34);
+          color: rgba(232, 239, 250, 0.86);
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.38);
         }
 
         .orb-stage {
           position: relative;
-          margin-top: 8px;
-          min-height: 440px;
+          margin-top: 4px;
+          min-height: 446px;
           width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
-        .azure-orb-shell {
-          position: absolute;
-          left: 50%;
-          top: 50%;
+        .azure-hero {
+          position: relative;
           width: min(92vw, 900px);
-          height: min(78vw, 540px);
-          transform: translate(-50%, -50%);
+          height: min(80vw, 540px);
           pointer-events: none;
-          z-index: 0;
+          transform-origin: center;
         }
 
-        .azure-orb-shell-aura,
-        .azure-orb-shell-core-glow,
-        .azure-orb-shell-floor-glow {
+        .azure-hero-field,
+        .azure-hero-floor-glow,
+        .azure-hero-floor-core,
+        .azure-core-shadow,
+        .azure-core-tilt {
           position: absolute;
           left: 50%;
-          border-radius: 999px;
           transform: translateX(-50%);
           pointer-events: none;
         }
 
-        .azure-orb-shell-aura-back {
-          top: 10%;
-          width: 640px;
-          height: 420px;
+        .azure-hero-field-back {
+          top: 13%;
+          width: 700px;
+          height: 410px;
+          border-radius: 999px;
           background: radial-gradient(
             ellipse at center,
-            rgba(118, 154, 255, 0.22) 0%,
-            rgba(118, 154, 255, 0.12) 28%,
-            rgba(118, 154, 255, 0.05) 48%,
-            rgba(118, 154, 255, 0) 72%
+            rgba(82, 126, 255, 0.18) 0%,
+            rgba(82, 126, 255, 0.1) 26%,
+            rgba(82, 126, 255, 0.04) 48%,
+            rgba(82, 126, 255, 0) 72%
           );
-          filter: blur(46px);
-          opacity: 0.88;
-        }
-
-        .azure-orb-shell-aura-mid {
-          top: 16%;
-          width: 470px;
-          height: 300px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(168, 196, 255, 0.16) 0%,
-            rgba(168, 196, 255, 0.08) 36%,
-            rgba(168, 196, 255, 0) 72%
-          );
-          filter: blur(30px);
-          opacity: 0.9;
-        }
-
-        .azure-orb-shell-core-glow {
-          top: 26%;
-          width: 330px;
-          height: 170px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(188, 216, 255, 0.12) 0%,
-            rgba(188, 216, 255, 0.045) 46%,
-            rgba(188, 216, 255, 0) 76%
-          );
-          filter: blur(24px);
+          filter: blur(54px);
           opacity: 0.82;
         }
 
-        .azure-orb-shell-floor-glow {
-          bottom: 12%;
-          width: 560px;
-          height: 90px;
+        .azure-hero-field-mid {
+          top: 20%;
+          width: 520px;
+          height: 280px;
+          border-radius: 999px;
           background: radial-gradient(
             ellipse at center,
-            rgba(122, 158, 255, 0.16) 0%,
-            rgba(122, 158, 255, 0.06) 44%,
-            rgba(122, 158, 255, 0) 76%
+            rgba(162, 194, 255, 0.12) 0%,
+            rgba(162, 194, 255, 0.06) 34%,
+            rgba(162, 194, 255, 0.02) 54%,
+            rgba(162, 194, 255, 0) 74%
           );
-          filter: blur(24px);
+          filter: blur(34px);
+          opacity: 0.82;
+        }
+
+        .azure-hero-field-front {
+          top: 25%;
+          width: 360px;
+          height: 180px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(216, 232, 255, 0.11) 0%,
+            rgba(216, 232, 255, 0.04) 40%,
+            rgba(216, 232, 255, 0) 74%
+          );
+          filter: blur(20px);
+          opacity: 0.72;
+        }
+
+        .azure-hero-floor-glow {
+          bottom: 11%;
+          width: 520px;
+          height: 82px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(86, 128, 255, 0.18) 0%,
+            rgba(86, 128, 255, 0.06) 44%,
+            rgba(86, 128, 255, 0) 76%
+          );
+          filter: blur(26px);
+          opacity: 0.72;
+        }
+
+        .azure-hero-floor-core {
+          bottom: 13.5%;
+          width: 260px;
+          height: 34px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(132, 172, 255, 0.24) 0%,
+            rgba(132, 172, 255, 0.08) 48%,
+            rgba(132, 172, 255, 0) 78%
+          );
+          filter: blur(14px);
+          opacity: 0.7;
+        }
+
+        .azure-core-shadow {
+          top: 31%;
+          width: 322px;
+          height: 322px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at 50% 58%,
+            rgba(8, 16, 34, 0.4) 0%,
+            rgba(8, 16, 34, 0.18) 42%,
+            rgba(8, 16, 34, 0) 72%
+          );
+          filter: blur(30px);
+          opacity: 0.74;
+        }
+
+        .azure-core-tilt {
+          top: 22%;
+          width: 276px;
+          height: 276px;
+          transform-style: preserve-3d;
+          perspective: 1200px;
+        }
+
+        .azure-core {
+          position: relative;
+          width: 276px;
+          height: 276px;
+          border-radius: 50%;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 50% 42%,
+              rgba(244, 249, 255, 0.98) 0%,
+              rgba(212, 230, 255, 0.92) 16%,
+              rgba(148, 190, 255, 0.8) 38%,
+              rgba(72, 120, 228, 0.92) 72%,
+              rgba(22, 46, 112, 0.98) 100%
+            );
+          box-shadow:
+            0 28px 58px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(138, 174, 255, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -18px 32px rgba(0, 0, 0, 0.16);
+          transform-style: preserve-3d;
+        }
+
+        .azure-core-rim {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+            inset 0 0 0 16px rgba(255, 255, 255, 0.014);
+        }
+
+        .azure-core-glass {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.14) 0%,
+              rgba(255, 255, 255, 0.04) 26%,
+              rgba(255, 255, 255, 0) 48%
+            ),
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.1) 0%,
+              rgba(255, 255, 255, 0) 36%,
+              rgba(0, 0, 0, 0.06) 100%
+            );
+          mix-blend-mode: screen;
+          pointer-events: none;
+        }
+
+        .azure-core-parallax {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          transform-style: preserve-3d;
+        }
+
+        .azure-core-parallax-back {
+          transform: translateZ(-10px);
+        }
+
+        .azure-core-parallax-mid {
+          transform: translateZ(0);
+        }
+
+        .azure-core-parallax-front {
+          transform: translateZ(12px);
+        }
+
+        .azure-core-inner-glow {
+          position: absolute;
+          left: 50%;
+          top: 44%;
+          width: 62%;
+          height: 62%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(244, 250, 255, 0.44) 0%,
+            rgba(244, 250, 255, 0.16) 34%,
+            rgba(244, 250, 255, 0) 72%
+          );
+          filter: blur(11px);
+          opacity: 0.9;
+        }
+
+        .azure-core-hotspot {
+          position: absolute;
+          left: 58%;
+          top: 26%;
+          width: 34%;
+          height: 34%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0.08) 42%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          filter: blur(10px);
           opacity: 0.78;
         }
 
-        .azure-orb-content {
-          position: relative;
-          z-index: 1;
-          transform: scale(0.96);
-          transform-origin: center;
+        .azure-core-atmosphere,
+        .azure-core-sheen,
+        .azure-core-mineral,
+        .azure-core-swirl,
+        .azure-core-line {
+          position: absolute;
+          pointer-events: none;
+        }
+
+        .azure-core-atmosphere-a {
+          left: 10%;
+          top: 18%;
+          width: 80%;
+          height: 52%;
+          border-radius: 50%;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(236, 245, 255, 0.16) 0%,
+            rgba(236, 245, 255, 0.05) 44%,
+            rgba(236, 245, 255, 0) 80%
+          );
+          filter: blur(18px);
+          opacity: 0.72;
+        }
+
+        .azure-core-atmosphere-b {
+          left: 16%;
+          top: 42%;
+          width: 58%;
+          height: 24%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(174, 206, 255, 0.18) 0%,
+            rgba(174, 206, 255, 0.05) 42%,
+            rgba(174, 206, 255, 0) 80%
+          );
+          filter: blur(12px);
+          opacity: 0.68;
+        }
+
+        .azure-core-atmosphere-c {
+          right: 12%;
+          bottom: 18%;
+          width: 34%;
+          height: 20%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(130, 168, 255, 0.22) 0%,
+            rgba(130, 168, 255, 0.06) 42%,
+            rgba(130, 168, 255, 0) 80%
+          );
+          filter: blur(10px);
+          opacity: 0.52;
+        }
+
+        .azure-core-sheen-a {
+          inset: 7% 12% auto 12%;
+          height: 46%;
+          border-radius: 50%;
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.06) 34%,
+            rgba(255, 255, 255, 0) 82%
+          );
+          filter: blur(12px);
+          transform: rotate(-10deg);
+          opacity: 0.84;
+        }
+
+        .azure-core-sheen-b {
+          left: 14%;
+          top: 12%;
+          width: 42%;
+          height: 56%;
+          border-radius: 50%;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.04) 42%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          filter: blur(14px);
+          opacity: 0.72;
+        }
+
+        .azure-core-swirl {
+          border-radius: 999px;
+          border: 1px solid rgba(220, 235, 255, 0.12);
+          filter: blur(0.3px);
+          opacity: 0.48;
+        }
+
+        .azure-core-swirl-a {
+          left: 16%;
+          top: 28%;
+          width: 66%;
+          height: 28%;
+          transform: rotate(-10deg);
+        }
+
+        .azure-core-swirl-b {
+          left: 20%;
+          top: 44%;
+          width: 54%;
+          height: 22%;
+          transform: rotate(7deg);
+          opacity: 0.34;
+        }
+
+        .azure-core-swirl-c {
+          left: 26%;
+          top: 58%;
+          width: 40%;
+          height: 14%;
+          transform: rotate(-4deg);
+          opacity: 0.24;
+        }
+
+        .azure-core-mineral-a {
+          left: 18%;
+          top: 28%;
+          width: 62%;
+          height: 24%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(208, 228, 255, 0.18) 0%,
+            rgba(208, 228, 255, 0.06) 38%,
+            rgba(208, 228, 255, 0) 74%
+          );
+          filter: blur(10px);
+          transform: rotate(-12deg);
+          opacity: 0.64;
+        }
+
+        .azure-core-mineral-b {
+          left: 22%;
+          top: 54%;
+          width: 46%;
+          height: 20%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(188, 216, 255, 0.16) 0%,
+            rgba(188, 216, 255, 0.05) 38%,
+            rgba(188, 216, 255, 0) 74%
+          );
+          filter: blur(10px);
+          transform: rotate(10deg);
+          opacity: 0.5;
+        }
+
+        .azure-core-mineral-c {
+          right: 16%;
+          top: 22%;
+          width: 26%;
+          height: 26%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.04) 44%,
+            rgba(255, 255, 255, 0) 78%
+          );
+          filter: blur(12px);
+          opacity: 0.54;
+        }
+
+        .azure-core-mineral-d {
+          left: 28%;
+          bottom: 14%;
+          width: 28%;
+          height: 16%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(126, 166, 255, 0.22) 0%,
+            rgba(126, 166, 255, 0.06) 40%,
+            rgba(126, 166, 255, 0) 78%
+          );
+          filter: blur(9px);
+          transform: rotate(-12deg);
+          opacity: 0.46;
+        }
+
+        .azure-core-line {
+          left: 50%;
+          border-radius: 999px;
+          transform: translateX(-50%);
+          background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(222, 236, 255, 0.22) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          filter: blur(1px);
+          opacity: 0.62;
+        }
+
+        .azure-core-line-a {
+          top: 39%;
+          width: 68%;
+          height: 1px;
+        }
+
+        .azure-core-line-b {
+          top: 51%;
+          width: 54%;
+          height: 1px;
+          opacity: 0.38;
+        }
+
+        .azure-core-line-c {
+          top: 63%;
+          width: 46%;
+          height: 1px;
+          opacity: 0.22;
+        }
+
+        .azure-hero-idle .azure-core-tilt {
+          animation: azureTiltIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-core {
+          animation: azureCoreIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-hero-field-back {
+          animation: azureAuraIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-hero-field-mid {
+          animation: azureAuraMidIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-hero-field-front {
+          animation: azureAuraFrontIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-hero-floor-glow {
+          animation: azureFloorIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-hero-floor-core {
+          animation: azureFloorCoreIdle 6.6s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-core-parallax-back {
+          animation: azureParallaxBackIdle 7.2s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-core-parallax-mid {
+          animation: azureParallaxMidIdle 6.8s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-core-parallax-front {
+          animation: azureParallaxFrontIdle 6.2s ease-in-out infinite;
+        }
+
+        .azure-hero-idle .azure-core-atmosphere-a,
+        .azure-hero-idle .azure-core-atmosphere-b,
+        .azure-hero-idle .azure-core-atmosphere-c,
+        .azure-hero-idle .azure-core-sheen-a,
+        .azure-hero-idle .azure-core-sheen-b,
+        .azure-hero-idle .azure-core-mineral-a,
+        .azure-hero-idle .azure-core-mineral-b,
+        .azure-hero-idle .azure-core-mineral-c,
+        .azure-hero-idle .azure-core-mineral-d,
+        .azure-hero-idle .azure-core-swirl-a,
+        .azure-hero-idle .azure-core-swirl-b,
+        .azure-hero-idle .azure-core-swirl-c,
+        .azure-hero-idle .azure-core-line-a,
+        .azure-hero-idle .azure-core-line-b,
+        .azure-hero-idle .azure-core-line-c,
+        .azure-hero-idle .azure-core-hotspot {
+          animation: azureInteriorIdle 7.8s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core-tilt {
+          animation: azureTiltActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core {
+          animation: azureCoreActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-hero-field-back {
+          animation: azureAuraActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-hero-field-mid {
+          animation: azureAuraMidActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-hero-field-front {
+          animation: azureAuraFrontActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-hero-floor-glow {
+          animation: azureFloorActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-hero-floor-core {
+          animation: azureFloorCoreActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core-parallax-back {
+          animation: azureParallaxBackActive 3.1s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core-parallax-mid {
+          animation: azureParallaxMidActive 2.8s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core-parallax-front {
+          animation: azureParallaxFrontActive 2.5s ease-in-out infinite;
+        }
+
+        .azure-hero-active .azure-core-atmosphere-a,
+        .azure-hero-active .azure-core-atmosphere-b,
+        .azure-hero-active .azure-core-atmosphere-c,
+        .azure-hero-active .azure-core-sheen-a,
+        .azure-hero-active .azure-core-sheen-b,
+        .azure-hero-active .azure-core-mineral-a,
+        .azure-hero-active .azure-core-mineral-b,
+        .azure-hero-active .azure-core-mineral-c,
+        .azure-hero-active .azure-core-mineral-d,
+        .azure-hero-active .azure-core-swirl-a,
+        .azure-hero-active .azure-core-swirl-b,
+        .azure-hero-active .azure-core-swirl-c,
+        .azure-hero-active .azure-core-line-a,
+        .azure-hero-active .azure-core-line-b,
+        .azure-hero-active .azure-core-line-c,
+        .azure-hero-active .azure-core-hotspot {
+          animation: azureInteriorActive 3.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core-tilt {
+          animation: azureTiltSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core {
+          animation: azureCoreSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-hero-field-back {
+          animation: azureAuraSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-hero-field-mid {
+          animation: azureAuraMidSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-hero-field-front {
+          animation: azureAuraFrontSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-hero-floor-glow {
+          animation: azureFloorSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-hero-floor-core {
+          animation: azureFloorCoreSettled 5.2s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core-parallax-back {
+          animation: azureParallaxBackSettled 5.8s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core-parallax-mid {
+          animation: azureParallaxMidSettled 5.4s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core-parallax-front {
+          animation: azureParallaxFrontSettled 5.1s ease-in-out infinite;
+        }
+
+        .azure-hero-settled .azure-core-atmosphere-a,
+        .azure-hero-settled .azure-core-atmosphere-b,
+        .azure-hero-settled .azure-core-atmosphere-c,
+        .azure-hero-settled .azure-core-sheen-a,
+        .azure-hero-settled .azure-core-sheen-b,
+        .azure-hero-settled .azure-core-mineral-a,
+        .azure-hero-settled .azure-core-mineral-b,
+        .azure-hero-settled .azure-core-mineral-c,
+        .azure-hero-settled .azure-core-mineral-d,
+        .azure-hero-settled .azure-core-swirl-a,
+        .azure-hero-settled .azure-core-swirl-b,
+        .azure-hero-settled .azure-core-swirl-c,
+        .azure-hero-settled .azure-core-line-a,
+        .azure-hero-settled .azure-core-line-b,
+        .azure-hero-settled .azure-core-line-c,
+        .azure-hero-settled .azure-core-hotspot {
+          animation: azureInteriorSettled 5.8s ease-in-out infinite;
         }
 
         .decision-form {
           width: 100%;
           max-width: 760px;
-          margin-top: 4px;
+          margin-top: 2px;
         }
 
         .scope-inline {
@@ -587,23 +1189,23 @@ export default function ChoosePage() {
           font-size: 1.02rem;
           font-weight: 540;
           color: rgba(241, 246, 255, 0.96);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
         }
 
         .decision-input {
           width: 100%;
-          min-height: 88px;
-          padding: 22px 26px;
-          border-radius: 32px;
+          min-height: 74px;
+          padding: 18px 24px;
+          border-radius: 30px;
           border: 1px solid rgba(214, 226, 255, 0.18);
           background:
             linear-gradient(
               180deg,
-              rgba(14, 20, 34, 0.82) 0%,
-              rgba(10, 16, 30, 0.76) 100%
+              rgba(12, 18, 34, 0.84) 0%,
+              rgba(8, 14, 28, 0.8) 100%
             );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.32),
+            0 20px 44px rgba(0, 0, 0, 0.36),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
             0 0 0 1px rgba(170, 194, 255, 0.03);
@@ -611,7 +1213,7 @@ export default function ChoosePage() {
           -webkit-backdrop-filter: blur(18px);
           color: rgba(246, 250, 255, 0.96);
           font-size: 1rem;
-          line-height: 1.55;
+          line-height: 1.45;
           resize: none;
           outline: none;
           transition:
@@ -623,7 +1225,7 @@ export default function ChoosePage() {
         .decision-input:focus {
           border-color: rgba(188, 208, 255, 0.34);
           box-shadow:
-            0 22px 48px rgba(0, 0, 0, 0.34),
+            0 22px 48px rgba(0, 0, 0, 0.38),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
             0 0 0 1px rgba(188, 208, 255, 0.08),
             0 0 28px rgba(148, 176, 255, 0.12);
@@ -696,7 +1298,7 @@ export default function ChoosePage() {
               rgba(68, 96, 160, 0.62) 100%
             );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.3),
+            0 16px 34px rgba(0, 0, 0, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
             inset 0 -10px 18px rgba(24, 38, 72, 0.22),
             0 0 22px rgba(160, 188, 255, 0.05);
@@ -711,7 +1313,7 @@ export default function ChoosePage() {
               rgba(76, 104, 172, 0.7) 100%
             );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
+            0 18px 38px rgba(0, 0, 0, 0.34),
             inset 0 1px 0 rgba(255, 255, 255, 0.12),
             inset 0 -10px 18px rgba(24, 38, 72, 0.22),
             0 0 26px rgba(174, 200, 255, 0.08);
@@ -726,7 +1328,7 @@ export default function ChoosePage() {
               rgba(56, 80, 134, 0.6) 100%
             );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.28),
+            0 16px 34px rgba(0, 0, 0, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
             inset 0 -10px 18px rgba(20, 30, 56, 0.22);
         }
@@ -745,7 +1347,7 @@ export default function ChoosePage() {
               rgba(56, 82, 146, 0.78) 100%
             );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
+            0 18px 38px rgba(0, 0, 0, 0.34),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
             inset 0 -12px 20px rgba(20, 30, 56, 0.28),
             0 0 24px rgba(160, 188, 255, 0.04);
@@ -759,7 +1361,7 @@ export default function ChoosePage() {
               rgba(62, 90, 156, 0.82) 100%
             );
           box-shadow:
-            0 20px 42px rgba(0, 0, 0, 0.34),
+            0 20px 42px rgba(0, 0, 0, 0.36),
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
             inset 0 -12px 20px rgba(20, 30, 56, 0.28),
             0 0 30px rgba(174, 200, 255, 0.08);
@@ -773,7 +1375,7 @@ export default function ChoosePage() {
               rgba(48, 70, 122, 0.76) 100%
             );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.3),
+            0 18px 38px rgba(0, 0, 0, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
             inset 0 -12px 20px rgba(20, 30, 56, 0.28);
         }
@@ -788,7 +1390,7 @@ export default function ChoosePage() {
               rgba(30, 46, 86, 0.84) 100%
             );
           box-shadow:
-            0 10px 22px rgba(0, 0, 0, 0.28),
+            0 10px 22px rgba(0, 0, 0, 0.3),
             inset 0 2px 6px rgba(0, 0, 0, 0.18),
             inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
@@ -815,7 +1417,7 @@ export default function ChoosePage() {
           text-transform: uppercase;
           color: rgba(241, 246, 255, 0.96);
           text-shadow:
-            0 4px 16px rgba(0, 0, 0, 0.24),
+            0 4px 16px rgba(0, 0, 0, 0.26),
             0 0 10px rgba(188, 208, 255, 0.08);
           animation: solaceBreathing 3.2s ease-in-out infinite;
         }
@@ -841,11 +1443,11 @@ export default function ChoosePage() {
           background:
             linear-gradient(
               180deg,
-              rgba(14, 20, 34, 0.82) 0%,
-              rgba(10, 16, 30, 0.76) 100%
+              rgba(12, 18, 34, 0.84) 0%,
+              rgba(8, 14, 28, 0.8) 100%
             );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.32),
+            0 20px 44px rgba(0, 0, 0, 0.36),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
             0 0 0 1px rgba(170, 194, 255, 0.03);
@@ -859,7 +1461,7 @@ export default function ChoosePage() {
         .response-card-crisis {
           border-color: rgba(255, 255, 255, 0.18);
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.32),
+            0 20px 44px rgba(0, 0, 0, 0.36),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
             0 0 0 1px rgba(255, 255, 255, 0.03);
@@ -880,6 +1482,382 @@ export default function ChoosePage() {
           line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
           white-space: pre-line;
+        }
+
+        @keyframes azureTiltIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-1deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(1.1deg) rotateY(1.8deg);
+          }
+        }
+
+        @keyframes azureTiltActive {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-1.5deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(1.8deg) rotateY(3.8deg);
+          }
+        }
+
+        @keyframes azureTiltSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-0.8deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(0.9deg) rotateY(1.6deg);
+          }
+        }
+
+        @keyframes azureParallaxBackIdle {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-5px) scale(0.99);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(6px) scale(1.02);
+          }
+        }
+
+        @keyframes azureParallaxMidIdle {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-2px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(3px) scale(1.02);
+          }
+        }
+
+        @keyframes azureParallaxFrontIdle {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(4px) scale(1.01);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-5px) scale(1.04);
+          }
+        }
+
+        @keyframes azureParallaxBackActive {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-8px) scale(0.99);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(10px) scale(1.04);
+          }
+        }
+
+        @keyframes azureParallaxMidActive {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-4px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(6px) scale(1.04);
+          }
+        }
+
+        @keyframes azureParallaxFrontActive {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(6px) scale(1.02);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-8px) scale(1.06);
+          }
+        }
+
+        @keyframes azureParallaxBackSettled {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-4px) scale(1);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(4px) scale(1.02);
+          }
+        }
+
+        @keyframes azureParallaxMidSettled {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-1px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(2px) scale(1.02);
+          }
+        }
+
+        @keyframes azureParallaxFrontSettled {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(3px) scale(1.01);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-3px) scale(1.03);
+          }
+        }
+
+        @keyframes azureCoreIdle {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.982);
+            box-shadow:
+              0 28px 58px rgba(0, 0, 0, 0.34),
+              0 0 44px rgba(138, 174, 255, 0.16),
+              inset 0 1px 0 rgba(255, 255, 255, 0.28),
+              inset 0 -18px 32px rgba(0, 0, 0, 0.16);
+          }
+          50% {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow:
+              0 38px 70px rgba(0, 0, 0, 0.4),
+              0 0 68px rgba(148, 186, 255, 0.28),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3),
+              inset 0 -18px 32px rgba(0, 0, 0, 0.14);
+          }
+        }
+
+        @keyframes azureCoreActive {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.982);
+          }
+          50% {
+            transform: translateY(-12px) scale(1.082);
+          }
+        }
+
+        @keyframes azureCoreSettled {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.994);
+          }
+          50% {
+            transform: translateY(-4px) scale(1.03);
+          }
+        }
+
+        @keyframes azureAuraIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.95);
+            opacity: 0.68;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.14);
+            opacity: 0.98;
+          }
+        }
+
+        @keyframes azureAuraMidIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.96);
+            opacity: 0.66;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes azureAuraFrontIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.965);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.1);
+            opacity: 0.82;
+          }
+        }
+
+        @keyframes azureFloorIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92) scaleY(0.9);
+            opacity: 0.56;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.1) scaleY(1.16);
+            opacity: 0.86;
+          }
+        }
+
+        @keyframes azureFloorCoreIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.9);
+            opacity: 0.48;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.12);
+            opacity: 0.78;
+          }
+        }
+
+        @keyframes azureAuraActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.95);
+            opacity: 0.72;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.22);
+            opacity: 1;
+          }
+        }
+
+        @keyframes azureAuraMidActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.96);
+            opacity: 0.7;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.18);
+            opacity: 1;
+          }
+        }
+
+        @keyframes azureAuraFrontActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.16);
+            opacity: 0.96;
+          }
+        }
+
+        @keyframes azureFloorActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92) scaleY(0.9);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.18) scaleY(1.22);
+            opacity: 0.98;
+          }
+        }
+
+        @keyframes azureFloorCoreActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92);
+            opacity: 0.52;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.18);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes azureAuraSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.72;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes azureAuraMidSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.68;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.09);
+            opacity: 0.84;
+          }
+        }
+
+        @keyframes azureAuraFrontSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.98);
+            opacity: 0.56;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.06);
+            opacity: 0.72;
+          }
+        }
+
+        @keyframes azureFloorSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.93) scaleY(0.92);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.12) scaleY(1.14);
+            opacity: 0.82;
+          }
+        }
+
+        @keyframes azureFloorCoreSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.94);
+            opacity: 0.5;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.1);
+            opacity: 0.72;
+          }
+        }
+
+        @keyframes azureInteriorIdle {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.72;
+          }
+          50% {
+            transform: rotate(2.4deg) translateX(4px) translateY(-4px) scale(1.03);
+            opacity: 0.96;
+          }
+        }
+
+        @keyframes azureInteriorActive {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.72;
+          }
+          50% {
+            transform: rotate(5deg) translateX(8px) translateY(-7px) scale(1.05);
+            opacity: 1;
+          }
+        }
+
+        @keyframes azureInteriorSettled {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.76;
+          }
+          50% {
+            transform: rotate(1.5deg) translateX(3px) translateY(-2px) scale(1.02);
+            opacity: 0.88;
+          }
         }
 
         @keyframes responseReveal {
@@ -917,7 +1895,7 @@ export default function ChoosePage() {
             min-height: 400px;
           }
 
-          .azure-orb-content {
+          .azure-hero {
             transform: scale(0.88);
           }
         }
@@ -933,7 +1911,7 @@ export default function ChoosePage() {
             min-height: 340px;
           }
 
-          .azure-orb-content {
+          .azure-hero {
             transform: scale(0.72);
           }
 

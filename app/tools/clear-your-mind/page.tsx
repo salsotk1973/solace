@@ -266,17 +266,53 @@ function getInitialImportance(text: string): number {
   const trimmed = text.trim().toLowerCase();
 
   let score = 0;
-  score += Math.min(trimmed.length * 1.35, 90);
+  score += Math.min(trimmed.length * 1.2, 70);
 
   const weightedTerms: Array<[RegExp, number]> = [
-    [/\b(bills|bill|rent|mortgage|debt|loan|money|broke|not enough money|need more money)\b/g, 48],
-    [/\b(wife|husband|partner|marriage|family|kids|children|mother in law|mother-in-law|mother|parents)\b/g, 38],
-    [/\b(work|job|career|office|boss|income)\b/g, 30],
-    [/\b(health|sick|ill|doctor|hospital|fat|weight|body|smoking)\b/g, 32],
-    [/\b(anxiety|stress|fear|panic|overthinking|sad|depressed|worthless|no future)\b/g, 34],
-    [/\b(moving|move|relocate|selling house|sell house)\b/g, 28],
-    [/\b(dogs|dog|barking|noise|neighbour|neighbor|neighbours|neighbors)\b/g, 18],
-    [/\b(gaming|addiction)\b/g, 18],
+    // Money / bills
+    [
+      /\b(bills|bill|rent|mortgage|debt|loan|money|cash|broke|financial|finance|expenses|expense|cost|costs|afford|affording|not enough money)\b/g,
+      44,
+    ],
+
+    // Job loss / employment instability
+    [
+      /\b(lost my job|lose my job|i lost my job|no job|jobless|unemployed|laid off|got fired|lost work)\b/g,
+      62,
+    ],
+
+    // Work pressure
+    [
+      /\b(work|job|career|office|boss|income|workload|deadline|deadlines|too much work|lots to do at work)\b/g,
+      30,
+    ],
+
+    // Family / relationship / responsibility
+    [
+      /\b(wife|husband|partner|marriage|family|kids|children|mother in law|mother-in-law|mother|mom|mum|father|dad|parents|pregnant|baby)\b/g,
+      34,
+    ],
+
+    // Health / body / strain
+    [
+      /\b(health|sick|ill|doctor|hospital|fat|weight|body|smoking|panic|stress|stressed|tired|exhausted)\b/g,
+      28,
+    ],
+
+    // Home / practical breakdown
+    [
+      /\b(car|broken|house|home|dirty|mess|messy|laundry|cleaning|repair|repairs)\b/g,
+      20,
+    ],
+
+    // Emotion / self-worth language
+    [
+      /\b(anxiety|fear|overthinking|sad|depressed|worthless|no future|lost|stuck|ugly|not good enough)\b/g,
+      30,
+    ],
+
+    // Distance / separation
+    [/\b(overseas|abroad|far away|away from family)\b/g, 18],
   ];
 
   for (const [pattern, weight] of weightedTerms) {
@@ -286,12 +322,32 @@ function getInitialImportance(text: string): number {
     }
   }
 
-  if (trimmed.includes("not enough")) score += 26;
-  if (trimmed.includes("can't")) score += 14;
-  if (trimmed.includes("cannot")) score += 14;
+  // High-importance phrase boosts
+  const phraseBoosts: Array<[RegExp, number]> = [
+    [/\blost my job\b/i, 55],
+    [/\bno job\b/i, 42],
+    [/\bwife pregnant\b/i, 42],
+    [/\bmother in law living at home\b/i, 38],
+    [/\bfamily overseas\b/i, 24],
+    [/\bcar broken\b/i, 24],
+    [/\bfeel fat\b/i, 20],
+    [/\blots of bills to pay\b/i, 34],
+    [/\btoo much work\b/i, 26],
+  ];
+
+  for (const [pattern, weight] of phraseBoosts) {
+    if (pattern.test(trimmed)) {
+      score += weight;
+    }
+  }
+
+  if (trimmed.includes("not enough")) score += 18;
+  if (trimmed.includes("can't")) score += 12;
+  if (trimmed.includes("cannot")) score += 12;
   if (trimmed.includes("never")) score += 10;
   if (trimmed.includes("always")) score += 10;
   if (trimmed.split(" ").length >= 4) score += 12;
+  if (trimmed.split(" ").length >= 7) score += 10;
 
   return Math.max(10, Math.min(score, 220));
 }
@@ -435,6 +491,43 @@ function getAlignedTargets(
       targetY,
     };
   });
+}
+
+function applyApiResultsToBubbles(
+  currentBubbles: BubbleItem[],
+  response: NormalizedUiResponse,
+): BubbleItem[] {
+  const realBubbles = currentBubbles.filter((bubble) => !bubble.isStarter);
+
+  if (!response.ok || !response.thoughts || response.thoughts.length === 0) {
+    return realBubbles;
+  }
+
+  const currentMap = new Map(realBubbles.map((bubble) => [bubble.id, bubble]));
+  const ordered: BubbleItem[] = [];
+
+  for (const thought of response.thoughts) {
+    const existing = currentMap.get(thought.id);
+    if (!existing) continue;
+
+    const nextImportance = Math.max(
+      Math.min(thought.importance.total || getInitialImportance(thought.text), 100),
+      10,
+    );
+    const nextDiameter = getBubbleDiameter(nextImportance);
+    const nextFontSize = getBubbleFontSize(thought.text, nextDiameter);
+
+    ordered.push({
+      ...existing,
+      text: thought.text,
+      importance: nextImportance,
+      hue: getBubbleHue(nextImportance),
+      diameter: nextDiameter,
+      fontSize: nextFontSize,
+    });
+  }
+
+  return ordered.length > 0 ? ordered : realBubbles;
 }
 
 function ScopeInline() {
@@ -789,6 +882,7 @@ export default function ClearYourMindPage() {
         return;
       }
 
+      setBubbles((current) => applyApiResultsToBubbles(current, result));
       setResponseText(result.text.trim());
       setIsCrisisFallback(result.isCrisisFallback);
       setIsClarityFallback(result.clarityFallback);
