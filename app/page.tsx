@@ -1,8 +1,8 @@
 "use client";
 
+import SiteHeaderShell from "@/components/SiteHeaderShell";
 import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
-import SiteHeader from "@/components/SiteHeader";
 import HeroPresence from "@/components/hero/HeroPresence";
 import { SOLACE_ROUTES } from "@/lib/solace/routes";
 
@@ -115,7 +115,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 header-backdrop" />
         <div className="pointer-events-none absolute inset-0 header-soften" />
         <div className="relative header-inner">
-          <SiteHeader />
+          <SiteHeaderShell />
         </div>
       </div>
 

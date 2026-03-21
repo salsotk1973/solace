@@ -1,0 +1,84 @@
+"use client";
+
+import SiteHeader from "@/components/SiteHeader";
+
+export default function SiteHeaderShell() {
+  return (
+    <div className="site-header-shell">
+      <div className="site-header-shell__glass" aria-hidden="true" />
+      <div className="site-header-shell__fade" aria-hidden="true" />
+
+      <div className="site-header-shell__inner">
+        <SiteHeader />
+      </div>
+
+      <style jsx>{`
+        .site-header-shell {
+          position: fixed;
+          inset: 0 auto auto 0;
+          width: 100%;
+          z-index: 60;
+          pointer-events: none;
+        }
+
+        .site-header-shell__glass {
+          position: absolute;
+          inset: 0;
+          height: 88px;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(20, 24, 38, 0.58) 0%,
+              rgba(18, 22, 34, 0.5) 34%,
+              rgba(16, 19, 30, 0.34) 68%,
+              rgba(14, 17, 28, 0.08) 100%
+            ),
+            linear-gradient(
+              90deg,
+              rgba(118, 144, 255, 0.06) 0%,
+              rgba(255, 255, 255, 0.02) 50%,
+              rgba(158, 128, 255, 0.06) 100%
+            );
+          backdrop-filter: blur(26px) saturate(135%) brightness(0.72);
+          -webkit-backdrop-filter: blur(26px) saturate(135%) brightness(0.72);
+          mask-image: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 1) 72%,
+            rgba(0, 0, 0, 0.42) 90%,
+            rgba(0, 0, 0, 0) 100%
+          );
+          -webkit-mask-image: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 1) 72%,
+            rgba(0, 0, 0, 0.42) 90%,
+            rgba(0, 0, 0, 0) 100%
+          );
+        }
+
+        .site-header-shell__fade {
+          position: absolute;
+          inset: 0;
+          height: 88px;
+          pointer-events: none;
+          background: radial-gradient(
+            ellipse at 50% 0%,
+            rgba(220, 228, 255, 0.08) 0%,
+            rgba(220, 228, 255, 0.03) 32%,
+            rgba(220, 228, 255, 0) 72%
+          );
+          opacity: 0.78;
+          mix-blend-mode: screen;
+        }
+
+        .site-header-shell__inner {
+          position: relative;
+          z-index: 2;
+          pointer-events: auto;
+        }
+      `}</style>
+    </div>
+  );
+}

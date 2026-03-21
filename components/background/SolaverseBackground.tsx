@@ -288,12 +288,12 @@ function AtmosphericSheets() {
       const cfg = sheets[i];
       if (!sprite) return;
 
+      const material = sprite.material as THREE.SpriteMaterial;
+
       sprite.position.x = cfg.x + Math.sin(t * cfg.speed + cfg.offset) * cfg.driftX;
       sprite.position.y = cfg.y + Math.cos(t * cfg.speed * 1.15 + cfg.offset) * cfg.driftY;
-      sprite.material.opacity =
-        cfg.opacity + Math.sin(t * (cfg.speed * 1.8) + cfg.offset) * 0.012;
-      sprite.material.rotation =
-        cfg.rotation + Math.sin(t * cfg.speed * 0.6 + cfg.offset) * 0.02;
+      material.opacity = cfg.opacity + Math.sin(t * (cfg.speed * 1.8) + cfg.offset) * 0.012;
+      material.rotation = cfg.rotation + Math.sin(t * cfg.speed * 0.6 + cfg.offset) * 0.02;
     });
   });
 
@@ -350,9 +350,10 @@ function ReflectionLayer() {
     const t = state.clock.elapsedTime;
     refs.current.forEach((sprite, i) => {
       if (!sprite) return;
+      const material = sprite.material as THREE.SpriteMaterial;
       const base = i === 0 ? 0.14 : i === 1 ? 0.06 : 0.04;
       const speed = i === 0 ? 0.18 : i === 1 ? 0.1 : 0.14;
-      sprite.material.opacity = base + Math.sin(t * speed + i) * 0.01;
+      material.opacity = base + Math.sin(t * speed + i) * 0.01;
     });
   });
 
@@ -451,12 +452,7 @@ function SparseStars() {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
         map={texture}
@@ -505,7 +501,8 @@ function ForegroundMists() {
     refs.current.forEach((sprite, i) => {
       const c = cfg[i];
       if (!sprite) return;
-      sprite.material.opacity = c.o + Math.sin(t * c.s + c.off) * 0.008;
+      const material = sprite.material as THREE.SpriteMaterial;
+      material.opacity = c.o + Math.sin(t * c.s + c.off) * 0.008;
       sprite.position.x = c.x + Math.sin(t * c.s + c.off) * 0.08;
     });
   });
@@ -594,12 +591,7 @@ function DustVeil() {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
         map={texture}
@@ -650,7 +642,6 @@ export default function SolaverseBackground() {
         <SolaverseScene />
       </Canvas>
 
-      {/* Cinematic atmosphere overlays */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(192,205,255,0.18),transparent_20%),radial-gradient(circle_at_50%_42%,rgba(112,126,205,0.12),transparent_36%),radial-gradient(circle_at_50%_78%,rgba(120,92,170,0.08),transparent_28%)]" />
 
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,11,0.06)_0%,rgba(4,6,11,0.02)_18%,rgba(4,6,11,0.06)_38%,rgba(4,6,11,0.2)_66%,rgba(4,6,11,0.5)_100%)]" />
