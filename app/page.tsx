@@ -1,5 +1,6 @@
 "use client";
 
+import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import HeroPresence from "@/components/hero/HeroPresence";
@@ -297,10 +298,13 @@ export default function HomePage() {
                   Inside the Lab
                 </p>
                 <h2 className="mt-5 max-w-[18ch] text-[34px] font-light tracking-[-0.04em] text-white sm:text-[46px]">
-                  A growing space for studying how people think, feel, decide, and respond online
+                  A growing space for studying how people think, feel, decide, and
+                  respond online
                 </h2>
                 <p className="mt-5 max-w-[58ch] text-[16px] leading-8 text-white/66">
-                  The Digital Human Behaviour Lab sits behind Solace — helping shape calmer digital experiences through observation, pattern recognition, and thoughtful design.
+                  The Digital Human Behaviour Lab sits behind Solace — helping
+                  shape calmer digital experiences through observation, pattern
+                  recognition, and thoughtful design.
                 </p>
               </div>
 
@@ -320,12 +324,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        <footer className="mx-auto w-full max-w-[1100px] px-6 pb-10 pt-8 text-center sm:px-8 lg:px-10">
-          <p className="text-[12px] leading-6 text-white/38">
-            Solace is for adults 18+ and offers calm reflective support only. It does not provide medical, psychological, legal, financial, or other professional advice.
-          </p>
-        </footer>
       </div>
 
       <style jsx global>{`
@@ -511,6 +509,8 @@ export default function HomePage() {
           }
         }
       `}</style>
+
+      <SiteFooter />
     </main>
   );
 }

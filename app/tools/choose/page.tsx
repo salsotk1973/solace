@@ -1,5 +1,6 @@
 "use client";
 
+import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
@@ -256,7 +257,9 @@ export default function ChoosePage() {
                 type="submit"
                 className={`primary-button ${isButtonReady ? "primary-button-ready" : ""}`}
               >
-                Help me see it clearly
+                <span className="button-glass-sheen" />
+                <span className="button-glass-tint" />
+                <span className="button-label">Help me see it clearly</span>
               </button>
             </div>
           )}
@@ -281,18 +284,18 @@ export default function ChoosePage() {
               </div>
 
               <div className="actions actions-followup">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="secondary-button"
-                >
-                  Explore another decision
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Explore another decision</span>
                 </button>
               </div>
             </>
           )}
         </section>
       </section>
+
+ import SiteFooter from "@/components/SiteFooter";
 
       <style jsx>{`
         .choose-realm {
@@ -465,7 +468,7 @@ export default function ChoosePage() {
           width: 100%;
           max-width: 980px;
           margin: 0 auto;
-          padding: 138px 24px 88px;
+          padding: 138px 24px 60px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1253,17 +1256,29 @@ export default function ChoosePage() {
         .primary-button,
         .secondary-button {
           position: relative;
-          min-width: 186px;
-          min-height: 56px;
-          padding: 0 24px;
+          min-width: 204px;
+          min-height: 58px;
+          padding: 0 28px;
           border-radius: 999px;
-          border: 1px solid rgba(214, 226, 255, 0.18);
+          border: 1px solid rgba(186, 206, 255, 0.24);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(150, 178, 255, 0.18) 0%,
+              rgba(96, 126, 214, 0.16) 46%,
+              rgba(48, 72, 142, 0.2) 100%
+            );
+          box-shadow:
+            0 18px 42px rgba(0, 0, 0, 0.32),
+            0 0 34px rgba(126, 162, 255, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -14px 24px rgba(12, 24, 56, 0.24);
           color: rgba(246, 250, 255, 0.98);
           font-size: 0.98rem;
-          font-weight: 550;
+          font-weight: 560;
           cursor: pointer;
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
           transition:
             transform 220ms ease,
             box-shadow 220ms ease,
@@ -1274,125 +1289,70 @@ export default function ChoosePage() {
           overflow: hidden;
         }
 
-        .primary-button::before,
-        .secondary-button::before {
-          content: "";
+        .button-glass-sheen,
+        .button-glass-tint {
           position: absolute;
-          inset: 1px;
-          border-radius: inherit;
+          inset: 0;
           pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.1) 0%,
-              rgba(255, 255, 255, 0.025) 48%,
-              rgba(255, 255, 255, 0.01) 100%
-            );
+          border-radius: inherit;
         }
 
-        .primary-button {
+        .button-glass-sheen {
           background:
             linear-gradient(
-              180deg,
-              rgba(102, 132, 198, 0.52) 0%,
-              rgba(68, 96, 160, 0.62) 100%
+              135deg,
+              rgba(255, 255, 255, 0.26) 0%,
+              rgba(255, 255, 255, 0.12) 22%,
+              rgba(255, 255, 255, 0.03) 42%,
+              rgba(255, 255, 255, 0) 62%
             );
-          box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -10px 18px rgba(24, 38, 72, 0.22),
-            0 0 22px rgba(160, 188, 255, 0.05);
+          opacity: 0.9;
+        }
+
+        .button-glass-tint {
+          background:
+            radial-gradient(
+              ellipse at 50% 118%,
+              rgba(118, 154, 255, 0.24) 0%,
+              rgba(118, 154, 255, 0.06) 42%,
+              rgba(118, 154, 255, 0) 74%
+            );
+          opacity: 0.86;
+        }
+
+        .button-label {
+          position: relative;
+          z-index: 2;
         }
 
         .primary-button-ready {
-          border-color: rgba(220, 230, 255, 0.3);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(112, 142, 210, 0.58) 0%,
-              rgba(76, 104, 172, 0.7) 100%
-            );
+          border-color: rgba(208, 222, 255, 0.34);
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.34),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -10px 18px rgba(24, 38, 72, 0.22),
-            0 0 26px rgba(174, 200, 255, 0.08);
-          filter: brightness(1.02);
-        }
-
-        .secondary-button {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(82, 108, 166, 0.5) 0%,
-              rgba(56, 80, 134, 0.6) 100%
-            );
-          box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -10px 18px rgba(20, 30, 56, 0.22);
+            0 20px 46px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(144, 176, 255, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            inset 0 -14px 24px rgba(12, 24, 56, 0.26);
+          filter: brightness(1.03);
         }
 
         .primary-button:hover,
         .secondary-button:hover {
           transform: translateY(-1px);
-          border-color: rgba(255, 255, 255, 0.22);
-        }
-
-        .primary-button:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(84, 114, 182, 0.66) 0%,
-              rgba(56, 82, 146, 0.78) 100%
-            );
+          border-color: rgba(225, 235, 255, 0.34);
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.34),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(20, 30, 56, 0.28),
-            0 0 24px rgba(160, 188, 255, 0.04);
-        }
-
-        .primary-button-ready:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(94, 126, 194, 0.7) 0%,
-              rgba(62, 90, 156, 0.82) 100%
-            );
-          box-shadow:
-            0 20px 42px rgba(0, 0, 0, 0.36),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -12px 20px rgba(20, 30, 56, 0.28),
-            0 0 30px rgba(174, 200, 255, 0.08);
-        }
-
-        .secondary-button:hover {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(72, 100, 156, 0.64) 0%,
-              rgba(48, 70, 122, 0.76) 100%
-            );
-          box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(20, 30, 56, 0.28);
+            0 22px 50px rgba(0, 0, 0, 0.34),
+            0 0 50px rgba(150, 180, 255, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.34),
+            inset 0 -14px 24px rgba(12, 24, 56, 0.28);
         }
 
         .primary-button:active,
         .secondary-button:active {
           transform: translateY(1px);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(52, 76, 128, 0.74) 0%,
-              rgba(30, 46, 86, 0.84) 100%
-            );
           box-shadow:
-            0 10px 22px rgba(0, 0, 0, 0.3),
+            0 12px 28px rgba(0, 0, 0, 0.32),
             inset 0 2px 6px rgba(0, 0, 0, 0.18),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
         }
 
         .primary-button:disabled,
@@ -1482,6 +1442,47 @@ export default function ChoosePage() {
           line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
           white-space: pre-line;
+        }
+
+        .realm-footer {
+          position: relative;
+          z-index: 2;
+          padding: 0 24px 26px;
+        }
+
+        .realm-footer-inner {
+          max-width: 980px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(184, 206, 255, 0.12);
+        }
+
+        .realm-footer-copy {
+          margin: 0;
+          max-width: 72ch;
+          font-size: 12px;
+          line-height: 1.7;
+          color: rgba(220, 232, 255, 0.4);
+        }
+
+        .realm-footer-link {
+          flex-shrink: 0;
+          font-size: 12px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          text-decoration: none;
+          color: rgba(236, 244, 255, 0.72);
+          border-bottom: 1px solid rgba(236, 244, 255, 0.18);
+          transition: color 160ms ease, border-color 160ms ease;
+        }
+
+        .realm-footer-link:hover {
+          color: rgba(255, 255, 255, 0.92);
+          border-color: rgba(255, 255, 255, 0.34);
         }
 
         @keyframes azureTiltIdle {
@@ -1898,6 +1899,11 @@ export default function ChoosePage() {
           .azure-hero {
             transform: scale(0.88);
           }
+
+          .realm-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+          }
         }
 
         @media (max-width: 640px) {
@@ -1942,8 +1948,15 @@ export default function ChoosePage() {
             padding: 20px 20px 22px;
             border-radius: 24px;
           }
+
+          .realm-footer {
+            padding-left: 18px;
+            padding-right: 18px;
+          }
         }
-      `}</style>
+       `}</style>
+
+      <SiteFooter />
     </main>
   );
 }
