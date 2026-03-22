@@ -14,18 +14,19 @@ export async function reflect({
   toolSlug,
   question,
 }: ReflectArgs): Promise<ReflectionResponse> {
+  // Keep these calls because they are part of the engine pipeline,
+  // even if composeResponse currently derives most output from question/tension.
   const intent = detectIntent(question);
   const tension = detectTension(question);
   const strategy = chooseStrategy(toolSlug, intent);
 
-  const reflection = composeResponse({
-    toolSlug,
-    question,
-    intent,
-    tension,
-    strategy,
-  });
+  // Prevent unused-variable build failures while preserving the current pipeline.
+  void tension;
+  void strategy;
 
+  const composed = composeResponse(question);
+
+  const reflection = composed.reflection.join("\n\n");
   const quality = qualityFilter(question, reflection);
 
   const finalReflection = quality.passed
@@ -39,11 +40,20 @@ You may ask yourself: what feels most important about this decision right now?`;
   return {
     reflection: finalReflection,
     relatedToolSuggestion:
-      toolSlug === "clarity" ? "decision-filter" : null,
-    recoveryOptions: [
-      "Focus more on the emotional side",
-      "Focus more on the practical side",
-      "That’s not the real tension",
-    ],
+      composed.relatedToolSlug === "clarity" ||
+      composed.relatedToolSlug === "overthinking-reset" ||
+      composed.relatedToolSlug === "decision-filter"
+        ? composed.relatedToolSlug
+        : toolSlug === "clarity"
+          ? "decision-filter"
+          : null,
+    recoveryOptions:
+      composed.followUpPrompts.length > 0
+        ? composed.followUpPrompts
+        : [
+            "Focus more on the emotional side",
+            "Focus more on the practical side",
+            "That’s not the real tension",
+          ],
   };
 }
