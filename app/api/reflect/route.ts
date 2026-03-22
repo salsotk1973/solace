@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import {
+  isSolaceCrisisInput,
+  SOLACE_CRISIS_FALLBACK,
+} from "@/lib/solace/safety";
 
 type ReflectRequestBody = {
   question?: string;
@@ -27,6 +31,13 @@ export async function POST(request: Request) {
         { error: "Question is required." },
         { status: 400 },
       );
+    }
+
+    if (isSolaceCrisisInput(question)) {
+      return NextResponse.json({
+        text: SOLACE_CRISIS_FALLBACK,
+        isCrisisFallback: true,
+      });
     }
 
     const client = getOpenAIClient();
@@ -150,6 +161,7 @@ Stay grounded and simple.
       state: "ready_for_next_question",
       needsClarification: false,
       previousResponseId: response.id,
+      isCrisisFallback: false,
     });
   } catch (error: unknown) {
     const err =
@@ -168,7 +180,7 @@ Stay grounded and simple.
           : "OpenAI request failed.",
         details: err.message,
       },
-      { status: isMissingKey ? 500 : 500 },
+      { status: 500 },
     );
   }
 }

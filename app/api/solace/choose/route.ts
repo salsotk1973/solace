@@ -1,5 +1,3 @@
-// app/api/solace/choose/route.ts
-
 import { NextResponse } from "next/server";
 import {
   CHOOSE_SYSTEM_PROMPT,
@@ -356,10 +354,7 @@ function buildDecisionContext(input: string): ChooseDecisionContext {
 }
 
 function cleanupSentenceText(text: string): string {
-  return text
-    .replace(/\s+/g, " ")
-    .replace(/\s+([,.!?;:])/g, "$1")
-    .trim();
+  return text.replace(/\s+/g, " ").replace(/\s+([,.!?;:])/g, "$1").trim();
 }
 
 function splitIntoSentences(text: string): string[] {

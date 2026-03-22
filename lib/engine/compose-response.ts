@@ -40,9 +40,9 @@ function buildCareerResponse(q: string): ComposeResponseResult {
   ) {
     return {
       reflection: [
-        "It sounds like this decision sits between financial safety and the cost of staying in work that no longer feels right.",
-        "Good pay can make a role look safe from the outside, but it does not remove the weight of doing something that drains you.",
-        "Before trying to solve it all at once, it may help to clarify what matters more right now.",
+        "This feels like a pull between financial safety and the cost of staying in work that no longer feels right.",
+        "Good pay can keep a role looking sensible on paper, even while it keeps taking energy from you.",
+        "The clearer question may be what matters more right now: protecting stability or protecting yourself.",
       ],
       followUpPrompts: [
         "Money matters more right now",
@@ -58,9 +58,9 @@ function buildCareerResponse(q: string): ComposeResponseResult {
 
   return {
     reflection: [
-      "It sounds like this question may be less about work alone, and more about what this role is costing you over time.",
-      "Sometimes a job becomes hard not because it is objectively bad, but because it no longer fits the person you are becoming.",
-      "Before trying to solve it all at once, it may help to clarify what matters more right now.",
+      "This feels less like a job question and more like a question about what this role is quietly costing you.",
+      "Sometimes work becomes heavy not because it is objectively wrong, but because it no longer fits the person you are now.",
+      "The next useful step may be to name what matters most here: stability, energy, or direction.",
     ],
     followUpPrompts: [
       "Stability matters more right now",
@@ -77,9 +77,9 @@ function buildCareerResponse(q: string): ComposeResponseResult {
 function buildPlaceResponse(): ComposeResponseResult {
   return {
     reflection: [
-      "It sounds like this decision may be carrying more than geography.",
-      "Place choices often feel heavy because they quietly shape belonging, identity, and the direction of life.",
-      "Before going further, it may help to clarify what matters most in this decision.",
+      "This feels bigger than geography alone.",
+      "Place decisions often carry belonging, identity, and future direction all at once, which is why they can feel so heavy.",
+      "The next useful step may be to name what matters most here: belonging, practicality, or the life you want next.",
     ],
     followUpPrompts: [
       "Belonging matters more",
@@ -96,9 +96,9 @@ function buildPlaceResponse(): ComposeResponseResult {
 function buildRelationshipResponse(): ComposeResponseResult {
   return {
     reflection: [
-      "It sounds like this question may be less about one surface choice and more about what each option means emotionally.",
-      "Relationship questions often feel heavy because they carry attachment, identity, and future at the same time.",
-      "Before going further, it may help to clarify what feels most important right now.",
+      "This feels like more than a surface choice.",
+      "Relationship decisions usually feel heavy because attachment, identity, and future all start pressing at once.",
+      "The next useful step may be to name what matters most here: emotion, practicality, or where this leads.",
     ],
     followUpPrompts: [
       "The emotional side matters more",
@@ -115,9 +115,9 @@ function buildRelationshipResponse(): ComposeResponseResult {
 function buildOverthinkingResponse(): ComposeResponseResult {
   return {
     reflection: [
-      "It sounds like the mind may still be circling because something important does not yet feel settled.",
-      "When a question keeps repeating, it is often because the real tension has not been named clearly enough yet.",
-      "Before going further, it may help to name what kind of pressure this is.",
+      "This feels like a question your mind has not been able to settle yet.",
+      "When something keeps circling, it is often because the real tension underneath it still has not been named clearly enough.",
+      "The next useful step may be to name what kind of pressure this really is: emotional, practical, or both.",
     ],
     followUpPrompts: [
       "It feels emotional",
@@ -134,9 +134,9 @@ function buildOverthinkingResponse(): ComposeResponseResult {
 function buildNoiseResponse(): ComposeResponseResult {
   return {
     reflection: [
-      "It sounds like several pressures may be arriving at the same time, making it harder to see what matters most.",
-      "When everything feels equally loud, the mind often struggles to decide where to begin.",
-      "Before going further, it may help to identify the kind of pressure you are under.",
+      "This feels like several pressures arriving at once.",
+      "When everything gets loud at the same time, the mind often loses its sense of where to begin.",
+      "The next useful step may be to name the main kind of pressure here: options, emotions, or weight from too many things at once.",
     ],
     followUpPrompts: [
       "Too many options",
@@ -153,9 +153,9 @@ function buildNoiseResponse(): ComposeResponseResult {
 function buildGeneralResponse(question: string): ComposeResponseResult {
   return {
     reflection: [
-      `It sounds like this question may be carrying more than one layer: ${cleanQuestion(question)}`,
-      "Sometimes the weight of a decision comes from what each option represents underneath.",
-      "Before going further, it may help to clarify what matters most right now.",
+      `This feels like more than a simple decision: ${cleanQuestion(question)}`,
+      "The weight here may be coming less from the options themselves and more from what each one represents underneath.",
+      "The next useful step may be to name what matters most here: the emotional side, the practical side, or something you have not fully named yet.",
     ],
     followUpPrompts: [
       "The emotional side matters more",
@@ -172,7 +172,7 @@ function buildGeneralResponse(question: string): ComposeResponseResult {
 function buildClarificationResponse(
   originalQuestion: string,
   clarification: string,
-  context: string
+  context: string,
 ): ComposeResponseResult {
   const answer = lower(clarification);
 
@@ -180,9 +180,9 @@ function buildClarificationResponse(
     if (hasAny(answer, ["money", "pay", "salary", "stability"])) {
       return {
         reflection: [
-          "That makes sense. Financial stability clearly matters in this decision.",
-          "So the real question may not be whether the job is ideal, but how much dissatisfaction is sustainable while protecting the stability you still need.",
-          "A useful next step may be to ask what level of dissatisfaction feels temporary, and what level would cost too much of you over time.",
+          "That makes sense. Financial stability feels central here.",
+          "So the real question may be less about whether the job is ideal, and more about how much dissatisfaction is sustainable while you still need that stability.",
+          "The next useful step may be to ask what feels temporary here, and what is starting to cost too much of you.",
         ],
         followUpPrompts: [],
         relatedToolSlug: "decision-filter",
@@ -195,9 +195,9 @@ function buildClarificationResponse(
     if (hasAny(answer, ["meaning", "energy", "direction"])) {
       return {
         reflection: [
-          "That helps. It sounds like the deeper issue is not salary alone, but whether your work still feels aligned with the life you want.",
-          "When meaning matters more, staying in the wrong role can become expensive in ways that do not appear on paper.",
-          "A useful next step may be to ask whether you need to leave immediately, or whether you need a clear transition path out.",
+          "That helps. The deeper weight here seems to be whether your work still fits the life you want.",
+          "When meaning matters more, staying in the wrong role can become expensive in ways that do not show up on paper.",
+          "The next useful step may be to ask whether you need a full exit now, or a clearer path out over time.",
         ],
         followUpPrompts: [],
         relatedToolSlug: "decision-filter",
@@ -209,9 +209,9 @@ function buildClarificationResponse(
 
     return {
       reflection: [
-        "That makes sense. It sounds like you are trying to balance financial safety with personal fit, rather than choosing one blindly.",
-        "That usually means the question is not simply whether to stay or leave, but how to reduce the cost of staying while preparing for a better direction.",
-        "A useful next step may be to ask what would make leaving feel realistic rather than impulsive.",
+        "That makes sense. This feels like a real balance between financial safety and personal fit.",
+        "So the question may be less about staying or leaving blindly, and more about how to reduce the cost of staying while preparing a better direction.",
+        "The next useful step may be to ask what would make change feel grounded rather than reactive.",
       ],
       followUpPrompts: [],
       relatedToolSlug: "decision-filter",
@@ -223,9 +223,9 @@ function buildClarificationResponse(
 
   return {
     reflection: [
-      "That helps narrow the question.",
-      "Now the real tension feels a little clearer, which usually makes the next step easier to see.",
-      "A useful next step may be to keep following the part that feels most alive, true, or costly to ignore.",
+      "That helps narrow it.",
+      "Now the real tension feels easier to see, which usually makes the next step feel less foggy.",
+      "The next useful step may be to keep following the part that feels most true, most alive, or hardest to ignore.",
     ],
     followUpPrompts: [],
     relatedToolSlug: "clarity",
@@ -241,7 +241,7 @@ export function composeResponse(
     previousQuestion?: string;
     previousContext?: string;
     isClarification?: boolean;
-  }
+  },
 ): ComposeResponseResult {
   const clean = cleanQuestion(question);
 
@@ -249,7 +249,7 @@ export function composeResponse(
     return buildClarificationResponse(
       options.previousQuestion,
       clean,
-      options.previousContext ?? "general"
+      options.previousContext ?? "general",
     );
   }
 

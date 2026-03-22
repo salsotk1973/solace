@@ -15,13 +15,62 @@ type ThreadItem = {
     slug: string;
     title: string;
   } | null;
+  isCrisisFallback?: boolean;
 };
 
-function getRelatedToolTitle(slug: string): string {
+function getRelatedToolTitle(slug: string) {
   if (slug === "clarity") return "Clarity Tool";
   if (slug === "overthinking-reset") return "Overthinking Reset";
   if (slug === "decision-filter") return "Decision Filter";
   return "Related Tool";
+}
+
+function getToolEndpoint(toolSlug: string) {
+  if (toolSlug === "clarity") {
+    return "/api/solace/choose";
+  }
+
+  if (toolSlug === "overthinking-reset") {
+    return "/api/solace/slow-down";
+  }
+
+  if (toolSlug === "decision-filter") {
+    return "/api/reflect";
+  }
+
+  return "/api/reflect";
+}
+
+function buildRequestBody(toolSlug: string, question: string) {
+  if (toolSlug === "clarity") {
+    return { input: question };
+  }
+
+  if (toolSlug === "overthinking-reset") {
+    return { thoughts: [question] };
+  }
+
+  return { toolSlug, question };
+}
+
+function normalizeReflection(data: any): string {
+  if (typeof data?.text === "string" && data.text.trim()) {
+    return data.text.trim();
+  }
+
+  if (typeof data?.reflection === "string" && data.reflection.trim()) {
+    return data.reflection.trim();
+  }
+
+  if (Array.isArray(data?.reflection)) {
+    return data.reflection.filter(Boolean).join("\n\n").trim();
+  }
+
+  if (typeof data?.error === "string" && data.error.trim()) {
+    return data.error.trim();
+  }
+
+  return "Something interrupted the reflection for a moment. Please try again.";
 }
 
 export default function ThreadContainer({
@@ -38,40 +87,71 @@ export default function ThreadContainer({
       reflection: null,
       recoveryOptions: [],
       relatedToolSuggestion: null,
+      isCrisisFallback: false,
     };
 
     setThread((prev) => [...prev, newItem]);
     setThinking(true);
 
-    const response = await fetch("/api/reflect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ toolSlug, question }),
-    });
+    const endpoint = getToolEndpoint(toolSlug);
+    const body = buildRequestBody(toolSlug, question);
 
-    const data = await response.json();
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    setThread((prev) =>
-      prev.map((item, index) =>
-        index === prev.length - 1
-          ? {
-              ...item,
-              reflection: data.reflection,
-              recoveryOptions: data.recoveryOptions ?? [],
-              relatedToolSuggestion: data.relatedToolSuggestion
-                ? {
-                    slug: data.relatedToolSuggestion,
-                    title: getRelatedToolTitle(data.relatedToolSuggestion),
-                  }
-                : null,
-            }
-          : item,
-      ),
-    );
+      const data = await response.json().catch(() => null);
 
-    setThinking(false);
+      const reflection = normalizeReflection(data);
+
+      setThread((prev) =>
+        prev.map((item, index) =>
+          index === prev.length - 1
+            ? {
+                ...item,
+                reflection,
+                recoveryOptions: Array.isArray(data?.recoveryOptions)
+                  ? data.recoveryOptions
+                  : [],
+                relatedToolSuggestion: data?.relatedToolSuggestion
+                  ? {
+                      slug: data.relatedToolSuggestion,
+                      title: getRelatedToolTitle(data.relatedToolSuggestion),
+                    }
+                  : data?.relatedToolSlug
+                    ? {
+                        slug: data.relatedToolSlug,
+                        title: getRelatedToolTitle(data.relatedToolSlug),
+                      }
+                    : null,
+                isCrisisFallback: Boolean(data?.isCrisisFallback),
+              }
+            : item,
+        ),
+      );
+    } catch {
+      setThread((prev) =>
+        prev.map((item, index) =>
+          index === prev.length - 1
+            ? {
+                ...item,
+                reflection:
+                  "Something interrupted the reflection for a moment. Please try again.",
+                recoveryOptions: [],
+                relatedToolSuggestion: null,
+                isCrisisFallback: false,
+              }
+            : item,
+        ),
+      );
+    } finally {
+      setThinking(false);
+    }
   }
 
   return (
@@ -85,6 +165,7 @@ export default function ThreadContainer({
               reflection={item.reflection}
               recoveryOptions={item.recoveryOptions}
               relatedToolSuggestion={item.relatedToolSuggestion}
+              isCrisisFallback={item.isCrisisFallback}
             />
           ) : (
             <ThinkingState toolSlug={toolSlug} />

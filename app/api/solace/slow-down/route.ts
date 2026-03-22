@@ -17,9 +17,6 @@ const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
 const MAX_THOUGHTS = 12;
 
-/**
- * ✅ SAFE CLIENT CREATION (lazy)
- */
 function getOpenAIClient() {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is missing");
@@ -97,7 +94,7 @@ function buildRateLimitResponse(resetAt: number) {
       ok: false,
       message: "Too many reflections in a short time. Please wait a minute and try again.",
     },
-    { status: 429 }
+    { status: 429 },
   );
 
   response.headers.set("Retry-After", String(retryAfterSeconds));
@@ -115,9 +112,6 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
   return response;
 }
 
-/**
- * ✅ SAFE MODEL CALL
- */
 async function getModelResponse(input: string): Promise<string> {
   const client = getOpenAIClient();
 
@@ -152,7 +146,7 @@ export async function POST(request: Request) {
           ok: false,
           message: "OPENAI_API_KEY is missing from .env.local.",
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -174,7 +168,7 @@ export async function POST(request: Request) {
           message:
             "I’m not quite seeing what’s running through your mind yet. Try dropping one thought at a time.",
         },
-        { status: 400 }
+        { status: 400 },
       );
 
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
@@ -182,8 +176,7 @@ export async function POST(request: Request) {
 
     if (isSolaceCrisisInput(input)) {
       const response = NextResponse.json({
-        ok: true,
-        message: SOLACE_CRISIS_FALLBACK,
+        text: SOLACE_CRISIS_FALLBACK,
         isCrisisFallback: true,
       });
 
@@ -195,7 +188,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({
       ok: true,
-      message,
+      text: message,
       isCrisisFallback: false,
     });
 
@@ -208,7 +201,7 @@ export async function POST(request: Request) {
         ok: false,
         message: "Something interrupted the reflection for a moment. Please try again.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

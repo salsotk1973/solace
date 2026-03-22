@@ -1,4 +1,4 @@
-// /lib/solace/safety.ts
+// lib/solace/safety.ts
 
 export const SOLACE_AGE_REQUIREMENT = "Adults only (18+).";
 
@@ -19,17 +19,21 @@ export const SOLACE_SCOPE_FULL = [
   "If you are dealing with severe distress or a crisis situation, Solace is not the right tool for that moment.",
 ];
 
+/**
+ * 🔒 LOCKED CRISIS MESSAGE
+ * Keep this short, calm, and consistent across all tools.
+ */
 export const SOLACE_CRISIS_FALLBACK =
   "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.";
 
 /**
- * These patterns are intentionally broad for v1.
- * We can refine them later, but they give us a safe foundation before launch.
+ * Direct / explicit self-harm or suicide language.
+ * These should trigger immediately.
  */
-export const SOLACE_CRISIS_PATTERNS: RegExp[] = [
+export const SOLACE_DIRECT_CRISIS_PATTERNS: RegExp[] = [
   /\bkill myself\b/i,
-  /\bwant to die\b/i,
   /\bi want to die\b/i,
+  /\bwant to die\b/i,
   /\bend my life\b/i,
   /\bend it all\b/i,
   /\bsuicide\b/i,
@@ -40,28 +44,116 @@ export const SOLACE_CRISIS_PATTERNS: RegExp[] = [
   /\boverdose\b/i,
   /\bno reason to live\b/i,
   /\bi cannot go on\b/i,
-  /\bcan’t go on\b/i,
-  /\bcant go on\b/i,
+  /\bi can['’]t go on\b/i,
   /\bdo not want to live\b/i,
-  /\bdon't want to live\b/i,
+  /\bdon['’]t want to live\b/i,
+  /\bi(?:'|’)m going to kill myself\b/i,
   /\bim going to kill myself\b/i,
-  /\bi'm going to kill myself\b/i,
   /\bthinking about killing myself\b/i,
   /\bthinking of killing myself\b/i,
   /\bthinking about suicide\b/i,
   /\bsevere crisis\b/i,
 ];
 
+/**
+ * High-risk indirect language.
+ * These should also trigger Solace's crisis fallback.
+ */
+export const SOLACE_INDIRECT_CRISIS_PATTERNS: RegExp[] = [
+  /\bi do not see the point anymore\b/i,
+  /\bi don['’]t see the point anymore\b/i,
+  /\bdo not see the point anymore\b/i,
+  /\bdon['’]t see the point anymore\b/i,
+  /\bwhat['’]s the point anymore\b/i,
+  /\bwhat is the point anymore\b/i,
+  /\bwhat['’]s the point of anything\b/i,
+  /\bwhat is the point of anything\b/i,
+  /\bnothing matters anymore\b/i,
+  /\bi can['’]t handle it\b/i,
+  /\bi cannot handle it\b/i,
+  /\bi can['’]t do this anymore\b/i,
+  /\bi cannot do this anymore\b/i,
+  /\beverything feels too much\b/i,
+  /\bit all feels too much\b/i,
+  /\btoo much to handle\b/i,
+  /\bi am at my limit\b/i,
+  /\bi'm at my limit\b/i,
+  /\bi am done\b/i,
+  /\bi'm done\b/i,
+  /\bi am broken\b/i,
+  /\bi'm broken\b/i,
+  /\bi feel trapped and hopeless\b/i,
+  /\bi feel hopeless\b/i,
+  /\bi can['’]t keep going\b/i,
+  /\bi cannot keep going\b/i,
+];
+
+/**
+ * Mild stress / overwhelm patterns that should NOT on their own trigger crisis.
+ */
+export const SOLACE_NON_CRISIS_STRESS_PATTERNS: RegExp[] = [
+  /\ba bit stressed\b/i,
+  /\bstressed about work\b/i,
+  /\bstressed with work\b/i,
+  /\boverwhelmed at work\b/i,
+  /\btired\b/i,
+  /\bexhausted\b/i,
+  /\bburnt out\b/i,
+  /\bburned out\b/i,
+  /\bi need a break\b/i,
+  /\bi need rest\b/i,
+];
+
+function normalizeCrisisInput(input: string): string {
+  return input
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[’]/g, "'")
+    .toLowerCase();
+}
+
 export function isSolaceCrisisInput(input: string): boolean {
   if (!input || typeof input !== "string") {
     return false;
   }
 
-  const normalized = input.trim();
+  const normalized = normalizeCrisisInput(input);
 
   if (!normalized) {
     return false;
   }
 
-  return SOLACE_CRISIS_PATTERNS.some((pattern) => pattern.test(normalized));
+  if (SOLACE_DIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return true;
+  }
+
+  if (SOLACE_INDIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return true;
+  }
+
+  if (
+    /\beverything feels too much\b/i.test(normalized) &&
+    /\bi can(?:not|'t) handle it\b/i.test(normalized)
+  ) {
+    return true;
+  }
+
+  if (
+    /\bwhat(?:'s| is) the point\b/i.test(normalized) &&
+    /\banymore\b/i.test(normalized)
+  ) {
+    return true;
+  }
+
+  if (
+    /\bi can(?:not|'t) (?:go on|keep going|do this anymore|handle it)\b/i.test(normalized)
+  ) {
+    return true;
+  }
+
+  if (SOLACE_NON_CRISIS_STRESS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return false;
+  }
+
+  return false;
 }
