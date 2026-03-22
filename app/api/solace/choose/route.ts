@@ -1,7 +1,6 @@
 // app/api/solace/choose/route.ts
 
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
 import {
   CHOOSE_SYSTEM_PROMPT,
   NATURALNESS_REWRITE_SYSTEM_PROMPT,
@@ -20,10 +19,7 @@ import {
   isSolaceCrisisInput,
   SOLACE_CRISIS_FALLBACK,
 } from "@/lib/solace/safety";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { getOpenAIClient } from "@/lib/server/openai";
 
 const CHOOSE_RATE_LIMIT = 5;
 const CHOOSE_RATE_WINDOW_MS = 60_000;
@@ -244,7 +240,7 @@ function classifyDecisionType(input: string): ChooseDecisionType {
 
   if (
     /\bpartner|wife|husband|boyfriend|girlfriend|marry|marriage|relationship|love|feel about her|feel about him|text my ex|ex\b/.test(
-      text
+      text,
     )
   ) {
     return "relationship";
@@ -256,7 +252,7 @@ function classifyDecisionType(input: string): ChooseDecisionType {
 
   if (
     /\bchild|baby|have a child|have a baby|move to another city|move city|move overseas|another city|marry\b/.test(
-      text
+      text,
     )
   ) {
     return "major-life";
@@ -264,7 +260,7 @@ function classifyDecisionType(input: string): ChooseDecisionType {
 
   if (
     /\bdog|cat|pet|wake up earlier|routine|cook|eat out|holiday|apartment|buy a home|buy a place\b/.test(
-      text
+      text,
     )
   ) {
     return "lifestyle";
@@ -279,14 +275,14 @@ function classifyDecisionType(input: string): ChooseDecisionType {
 
 function classifyEmotionalWeight(
   input: string,
-  decisionType: ChooseDecisionType
+  decisionType: ChooseDecisionType,
 ): ChooseEmotionalWeight {
   const text = normalizeText(input);
 
   if (
     decisionType === "forgiveness" ||
     /\bhurt|trust|betray|leave my partner|break up|marry|child|baby|forgive|love|wife|husband\b/.test(
-      text
+      text,
     )
   ) {
     return "heavy";
@@ -305,7 +301,7 @@ function classifyEmotionalWeight(
 
 function classifyToneMode(
   decisionType: ChooseDecisionType,
-  emotionalWeight: ChooseEmotionalWeight
+  emotionalWeight: ChooseEmotionalWeight,
 ): ChooseToneMode {
   if (emotionalWeight === "heavy") return "careful";
   if (
@@ -331,7 +327,7 @@ function hashString(value: string): number {
 function selectResponsePattern(
   input: string,
   decisionType: ChooseDecisionType,
-  emotionalWeight: ChooseEmotionalWeight
+  emotionalWeight: ChooseEmotionalWeight,
 ): ChooseResponsePattern {
   const patterns: ChooseResponsePattern[] = [
     "anchor-tension-observation",
@@ -423,6 +419,7 @@ function needsNaturalnessRewrite(text: string): boolean {
 }
 
 async function rewriteForNaturalness(text: string): Promise<string> {
+  const client = getOpenAIClient();
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
   const response = await client.responses.create({
@@ -455,7 +452,7 @@ function buildRateLimitResponse(resetAt: number): NextResponse {
     {
       error: "Too many reflections in a short time. Please wait a minute and try again.",
     },
-    { status: 429 }
+    { status: 429 },
   );
 
   response.headers.set("Retry-After", String(retryAfterSeconds));
@@ -476,18 +473,11 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
 
 export async function POST(req: Request) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: "OPENAI_API_KEY is missing from .env.local." },
-        { status: 500 }
-      );
-    }
-
     const clientKey = getClientIdentifierFromHeaders(req.headers);
     const rateLimit = applySlidingWindowRateLimit(
       clientKey,
       CHOOSE_RATE_LIMIT,
-      CHOOSE_RATE_WINDOW_MS
+      CHOOSE_RATE_WINDOW_MS,
     );
 
     if (!rateLimit.allowed) {
@@ -511,7 +501,7 @@ export async function POST(req: Request) {
         {
           error: "No usable input was found in the request body.",
         },
-        { status: 400 }
+        { status: 400 },
       );
 
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
@@ -537,6 +527,7 @@ export async function POST(req: Request) {
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
+    const client = getOpenAIClient();
     const context = buildDecisionContext(input);
     const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
@@ -566,7 +557,7 @@ export async function POST(req: Request) {
     if (!text) {
       const response = NextResponse.json(
         { error: "No response text was returned by the model." },
-        { status: 500 }
+        { status: 500 },
       );
 
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
