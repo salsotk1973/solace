@@ -1,6 +1,7 @@
 "use client";
 
-import SiteHeaderShell from "@/components/SiteHeaderShell";
+import SiteHeader from "@/components/SiteHeader";
+import GlobalHeader from "@/components/GlobalHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
 import HeroPresence from "@/components/hero/HeroPresence";
@@ -111,14 +112,8 @@ export default function HomePage() {
       <div className="pointer-events-none absolute inset-x-[8%] top-[26%] z-10 h-[340px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(8,11,19,0.18)_0%,rgba(8,11,19,0.24)_28%,rgba(8,11,19,0.16)_52%,rgba(8,11,19,0.04)_70%,rgba(8,11,19,0)_82%)] blur-3xl" />
       <div className="pointer-events-none absolute inset-x-[10%] top-[44%] z-10 h-[180px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(14,18,30,0.22)_0%,rgba(14,18,30,0.14)_34%,rgba(14,18,30,0.06)_58%,rgba(14,18,30,0)_78%)] blur-2xl" />
 
-      <div className="fixed inset-x-0 top-0 z-40 header-shell">
-        <div className="pointer-events-none absolute inset-0 header-backdrop" />
-        <div className="pointer-events-none absolute inset-0 header-soften" />
-        <div className="relative header-inner">
-          <SiteHeaderShell />
-        </div>
-      </div>
-
+      
+      <SiteHeader />
       <div className="relative z-20">
         <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-4 pt-[112px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
@@ -417,47 +412,6 @@ export default function HomePage() {
             transform: translateX(7px);
             opacity: 1;
           }
-        }
-
-        .header-shell {
-          height: 82px;
-          overflow: hidden;
-        }
-
-        .header-inner {
-          transform: translateY(-22px);
-        }
-
-        .header-backdrop {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(28, 32, 48, 0.56) 0%,
-              rgba(26, 30, 46, 0.52) 38%,
-              rgba(24, 28, 42, 0.44) 72%,
-              rgba(24, 28, 42, 0.16) 100%
-            ),
-            linear-gradient(
-              135deg,
-              rgba(236, 228, 255, 0.06) 0%,
-              rgba(255, 255, 255, 0.012) 24%,
-              rgba(255, 255, 255, 0.004) 52%,
-              rgba(255, 255, 255, 0) 76%
-            );
-          backdrop-filter: blur(34px) saturate(150%) brightness(0.82);
-          -webkit-backdrop-filter: blur(34px) saturate(150%) brightness(0.82);
-          opacity: 1;
-        }
-
-        .header-soften {
-          background:
-            linear-gradient(
-              180deg,
-              rgba(16, 20, 32, 0.18) 0%,
-              rgba(16, 20, 32, 0.12) 54%,
-              rgba(16, 20, 32, 0.04) 76%,
-              rgba(16, 20, 32, 0) 100%
-            );
         }
 
         .sola-haze {
