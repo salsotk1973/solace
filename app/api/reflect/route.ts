@@ -1,24 +1,23 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 type ReflectRequestBody = {
   question?: string;
   toolSlug?: string;
 };
 
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  return new OpenAI({ apiKey });
+}
+
 export async function POST(request: Request) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: "OPENAI_API_KEY is missing from .env.local" },
-        { status: 500 }
-      );
-    }
-
     const body = (await request.json()) as ReflectRequestBody;
     const question = body.question?.trim() ?? "";
     const toolSlug = body.toolSlug ?? "clarity";
@@ -26,9 +25,11 @@ export async function POST(request: Request) {
     if (!question) {
       return NextResponse.json(
         { error: "Question is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
+
+    const client = getOpenAIClient();
 
     const systemPrompt = `
 You are Solace.
@@ -150,18 +151,24 @@ Stay grounded and simple.
       needsClarification: false,
       previousResponseId: response.id,
     });
-  } catch (error: any) {
-    console.error("Reflect route failed:", error);
+  } catch (error: unknown) {
+    const err =
+      error instanceof Error
+        ? error
+        : new Error(typeof error === "string" ? error : "Unknown error");
+
+    console.error("Reflect route failed:", err);
+
+    const isMissingKey = err.message.includes("OPENAI_API_KEY is missing");
 
     return NextResponse.json(
       {
-        error: "OpenAI request failed.",
-        details: error?.message ?? "Unknown error",
-        status: error?.status ?? null,
-        code: error?.code ?? null,
-        type: error?.type ?? null,
+        error: isMissingKey
+          ? "OPENAI_API_KEY is missing from the server environment."
+          : "OpenAI request failed.",
+        details: err.message,
       },
-      { status: 500 }
+      { status: isMissingKey ? 500 : 500 },
     );
   }
 }
