@@ -14,40 +14,40 @@ const emotionalEntryCards = [
     href: SOLACE_ROUTES.choose,
     border: "rgba(162, 196, 255, 0.28)",
     borderHover: "rgba(182, 212, 255, 0.42)",
-    glassTop: "rgba(202, 222, 255, 0.24)",
-    glassMid: "rgba(125, 165, 245, 0.15)",
-    glassBottom: "rgba(40, 62, 118, 0.26)",
-    glassTopHover: "rgba(214, 230, 255, 0.34)",
-    glassMidHover: "rgba(138, 176, 250, 0.22)",
-    glassBottomHover: "rgba(48, 72, 132, 0.34)",
+    glassTop: "rgba(202, 222, 255, 0.26)",
+    glassMid: "rgba(125, 165, 245, 0.18)",
+    glassBottom: "rgba(56, 82, 148, 0.34)",
+    glassTopHover: "rgba(214, 230, 255, 0.36)",
+    glassMidHover: "rgba(138, 176, 250, 0.24)",
+    glassBottomHover: "rgba(66, 96, 166, 0.40)",
     glow: "rgba(118, 165, 255, 0.22)",
-    glowSoft: "rgba(160, 196, 255, 0.10)",
+    glowSoft: "rgba(160, 196, 255, 0.12)",
     glare: "rgba(248, 251, 255, 0.22)",
-    text: "rgba(248, 251, 255, 0.96)",
-    eyebrowText: "rgba(226, 235, 250, 0.52)",
-    subtextColor: "rgba(208, 221, 248, 0.64)",
-    arrow: "rgba(228, 238, 255, 0.82)",
+    text: "rgba(250, 252, 255, 0.96)",
+    eyebrowText: "rgba(250, 252, 255, 0.96)",
+    subtextColor: "rgba(250, 252, 255, 0.96)",
+    arrow: "rgba(250, 252, 255, 0.96)",
   },
   {
     eyebrow: "MY MIND FEELS STUCK",
-    title: "Quiet the mental noise.",
+    title: "Quiet your thoughts.",
     subtext: "Enter Clear Your Mind",
     href: SOLACE_ROUTES.clearYourMind,
     border: "rgba(168, 214, 184, 0.28)",
     borderHover: "rgba(186, 226, 199, 0.40)",
-    glassTop: "rgba(221, 242, 228, 0.22)",
-    glassMid: "rgba(137, 187, 154, 0.14)",
-    glassBottom: "rgba(38, 82, 60, 0.26)",
-    glassTopHover: "rgba(228, 246, 234, 0.32)",
-    glassMidHover: "rgba(148, 198, 165, 0.22)",
-    glassBottomHover: "rgba(48, 92, 68, 0.34)",
+    glassTop: "rgba(221, 242, 228, 0.24)",
+    glassMid: "rgba(137, 187, 154, 0.17)",
+    glassBottom: "rgba(54, 108, 80, 0.34)",
+    glassTopHover: "rgba(228, 246, 234, 0.34)",
+    glassMidHover: "rgba(148, 198, 165, 0.24)",
+    glassBottomHover: "rgba(62, 120, 88, 0.40)",
     glow: "rgba(132, 202, 156, 0.20)",
-    glowSoft: "rgba(192, 235, 204, 0.10)",
+    glowSoft: "rgba(192, 235, 204, 0.12)",
     glare: "rgba(247, 255, 249, 0.20)",
-    text: "rgba(245, 251, 246, 0.96)",
-    eyebrowText: "rgba(221, 238, 226, 0.50)",
-    subtextColor: "rgba(203, 227, 210, 0.64)",
-    arrow: "rgba(224, 243, 228, 0.82)",
+    text: "rgba(248, 252, 249, 0.96)",
+    eyebrowText: "rgba(248, 252, 249, 0.96)",
+    subtextColor: "rgba(248, 252, 249, 0.96)",
+    arrow: "rgba(248, 252, 249, 0.96)",
   },
   {
     eyebrow: "EVERYTHING FEELS NOISY",
@@ -56,19 +56,19 @@ const emotionalEntryCards = [
     href: SOLACE_ROUTES.sort,
     border: "rgba(245, 204, 162, 0.28)",
     borderHover: "rgba(250, 216, 180, 0.40)",
-    glassTop: "rgba(255, 235, 220, 0.22)",
-    glassMid: "rgba(212, 164, 118, 0.14)",
-    glassBottom: "rgba(92, 58, 28, 0.26)",
-    glassTopHover: "rgba(255, 239, 226, 0.32)",
-    glassMidHover: "rgba(222, 175, 128, 0.20)",
-    glassBottomHover: "rgba(104, 66, 34, 0.34)",
+    glassTop: "rgba(255, 235, 220, 0.24)",
+    glassMid: "rgba(212, 164, 118, 0.16)",
+    glassBottom: "rgba(120, 78, 42, 0.34)",
+    glassTopHover: "rgba(255, 239, 226, 0.34)",
+    glassMidHover: "rgba(222, 175, 128, 0.22)",
+    glassBottomHover: "rgba(136, 88, 46, 0.40)",
     glow: "rgba(236, 178, 120, 0.20)",
-    glowSoft: "rgba(255, 224, 190, 0.10)",
+    glowSoft: "rgba(255, 224, 190, 0.12)",
     glare: "rgba(255, 248, 240, 0.18)",
-    text: "rgba(255, 248, 242, 0.96)",
-    eyebrowText: "rgba(243, 227, 212, 0.50)",
-    subtextColor: "rgba(236, 215, 196, 0.64)",
-    arrow: "rgba(255, 235, 214, 0.82)",
+    text: "rgba(255, 250, 246, 0.96)",
+    eyebrowText: "rgba(255, 250, 246, 0.96)",
+    subtextColor: "rgba(255, 250, 246, 0.96)",
+    arrow: "rgba(255, 250, 246, 0.96)",
   },
 ];
 
@@ -154,56 +154,90 @@ export default function HomePage() {
                 key={card.eyebrow}
                 href={card.href}
                 aria-label={`Open ${card.subtext}`}
-                className="group relative cursor-pointer overflow-hidden rounded-[32px] border p-0 transition duration-300 hover:-translate-y-[4px] hover:scale-[1.008]"
+                className="group relative cursor-pointer overflow-hidden rounded-[32px] border transition-all duration-300 hover:-translate-y-[2px] hover:scale-[1.006]"
                 style={{
                   borderColor: card.border,
-                  background: `linear-gradient(180deg, ${card.glassTop} 0%, ${card.glassMid} 34%, rgba(255,255,255,0.018) 56%, ${card.glassBottom} 100%)`,
+                  background: `
+                    linear-gradient(
+                      180deg,
+                      ${card.glassTop} 0%,
+                      ${card.glassMid} 38%,
+                      ${card.glassMid} 64%,
+                      ${card.glassBottom} 100%
+                    )
+                  `,
                   boxShadow: `
-                    0 24px 64px rgba(0,0,0,0.28),
-                    0 0 54px ${card.glowSoft},
+                    0 18px 44px rgba(0,0,0,0.28),
+                    0 2px 6px rgba(0,0,0,0.18),
                     inset 0 1px 0 rgba(255,255,255,0.18),
-                    inset 0 -18px 34px rgba(255,255,255,0.012)
+                    inset 0 -14px 28px rgba(255,255,255,0.012)
                   `,
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget;
                   el.style.borderColor = card.borderHover;
-                  el.style.background = `linear-gradient(180deg, ${card.glassTopHover} 0%, ${card.glassMidHover} 34%, rgba(255,255,255,0.03) 56%, ${card.glassBottomHover} 100%)`;
+                  el.style.background = `
+                    linear-gradient(
+                      180deg,
+                      ${card.glassTopHover} 0%,
+                      ${card.glassMidHover} 38%,
+                      ${card.glassMidHover} 64%,
+                      ${card.glassBottomHover} 100%
+                    )
+                  `;
                   el.style.boxShadow = `
-                    0 30px 78px rgba(0,0,0,0.34),
-                    0 0 82px ${card.glowSoft},
+                    0 22px 50px rgba(0,0,0,0.30),
+                    0 3px 8px rgba(0,0,0,0.18),
                     inset 0 1px 0 rgba(255,255,255,0.24),
-                    inset 0 -20px 38px rgba(255,255,255,0.016)
+                    inset 0 -16px 30px rgba(255,255,255,0.016)
                   `;
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget;
                   el.style.borderColor = card.border;
-                  el.style.background = `linear-gradient(180deg, ${card.glassTop} 0%, ${card.glassMid} 34%, rgba(255,255,255,0.018) 56%, ${card.glassBottom} 100%)`;
+                  el.style.background = `
+                    linear-gradient(
+                      180deg,
+                      ${card.glassTop} 0%,
+                      ${card.glassMid} 38%,
+                      ${card.glassMid} 64%,
+                      ${card.glassBottom} 100%
+                    )
+                  `;
                   el.style.boxShadow = `
-                    0 24px 64px rgba(0,0,0,0.28),
-                    0 0 54px ${card.glowSoft},
+                    0 18px 44px rgba(0,0,0,0.28),
+                    0 2px 6px rgba(0,0,0,0.18),
                     inset 0 1px 0 rgba(255,255,255,0.18),
-                    inset 0 -18px 34px rgba(255,255,255,0.012)
+                    inset 0 -14px 28px rgba(255,255,255,0.012)
                   `;
                 }}
               >
                 <div
-                  className="pointer-events-none absolute inset-0 opacity-[0.72] transition duration-300 group-hover:opacity-100"
+                  className="pointer-events-none absolute inset-0 opacity-[0.62] transition duration-300 group-hover:opacity-[0.92]"
                   style={{
-                    background: `linear-gradient(135deg, ${card.glare} 0%, rgba(255,255,255,0.08) 22%, rgba(255,255,255,0.018) 42%, rgba(255,255,255,0) 66%)`,
+                    background: `linear-gradient(
+                      135deg,
+                      ${card.glare} 0%,
+                      rgba(255,255,255,0.07) 20%,
+                      rgba(255,255,255,0.03) 42%,
+                      rgba(255,255,255,0.012) 68%,
+                      rgba(255,255,255,0) 100%
+                    )`,
                   }}
                 />
 
                 <div
-                  className="pointer-events-none absolute inset-0 opacity-[0.46] transition duration-300 group-hover:opacity-[0.82]"
+                  className="pointer-events-none absolute inset-0 opacity-[0.44] transition duration-300 group-hover:opacity-[0.76]"
                   style={{
-                    background: `radial-gradient(circle at 18% 14%, ${card.glowSoft} 0%, transparent 36%), radial-gradient(circle at 84% 84%, ${card.glowSoft} 0%, transparent 34%)`,
+                    background: `
+                      radial-gradient(circle at 18% 14%, ${card.glowSoft} 0%, transparent 40%),
+                      radial-gradient(circle at 82% 86%, ${card.glowSoft} 0%, transparent 38%)
+                    `,
                   }}
                 />
 
                 <div
-                  className="pointer-events-none absolute inset-x-[10%] top-[-18%] h-[50%] opacity-[0.24] transition duration-300 group-hover:opacity-[0.78]"
+                  className="pointer-events-none absolute inset-x-[12%] top-[-18%] h-[50%] opacity-[0.18] transition duration-300 group-hover:opacity-[0.6]"
                   style={{
                     background: `radial-gradient(circle, ${card.glow} 0%, transparent 72%)`,
                     filter: "blur(26px)",
@@ -211,32 +245,32 @@ export default function HomePage() {
                 />
 
                 <div
-                  className="pointer-events-none absolute -bottom-10 left-1/2 h-24 w-[76%] -translate-x-1/2 rounded-full opacity-[0.16] transition duration-300 group-hover:opacity-[0.72]"
+                  className="pointer-events-none absolute -bottom-10 left-1/2 h-20 w-[72%] -translate-x-1/2 rounded-full opacity-[0.14] transition duration-300 group-hover:opacity-[0.5]"
                   style={{
                     background: `radial-gradient(circle, ${card.glow} 0%, transparent 72%)`,
-                    filter: "blur(24px)",
+                    filter: "blur(22px)",
                   }}
                 />
 
-                <div className="pointer-events-none absolute inset-x-[14%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.24)_50%,transparent_100%)] opacity-75 transition duration-300 group-hover:opacity-100" />
-                <div className="pointer-events-none absolute inset-x-[18%] bottom-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.10)_50%,transparent_100%)] opacity-70 transition duration-300 group-hover:opacity-90" />
+                <div className="pointer-events-none absolute inset-x-[16%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.26)_50%,transparent_100%)] opacity-70 transition duration-300 group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-x-[20%] bottom-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.08)_50%,transparent_100%)] opacity-60 transition duration-300 group-hover:opacity-90" />
                 <div className="pointer-events-none absolute inset-0 rounded-[32px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] transition duration-300 group-hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]" />
 
-                <div className="relative flex h-full min-h-[214px] flex-col justify-between px-7 py-7">
+                <div className="relative flex h-full min-h-[214px] flex-col justify-between px-7 py-7 transition-transform duration-300 group-hover:-translate-y-[1px]">
                   <div>
                     <p
-                      className="text-[11px] uppercase tracking-[0.19em] transition duration-300 group-hover:opacity-100"
-                      style={{ color: card.eyebrowText }}
+                      className="text-[11px] uppercase tracking-[0.18em] opacity-[0.62] transition duration-300 group-hover:opacity-[0.78]"
+                      style={{ color: card.text }}
                     >
                       {card.eyebrow}
                     </p>
 
                     <h3
-                      className="mt-6 max-w-[14ch] text-[30px] font-normal leading-[1.18] tracking-[-0.04em] [text-wrap:balance] transition duration-300 group-hover:translate-y-[-1px]"
+                      className="mt-6 max-w-[14ch] text-[30px] font-normal leading-[1.18] tracking-[-0.04em] transition"
                       style={{
                         color: card.text,
                         textShadow:
-                          "0 1px 0 rgba(255,255,255,0.03), 0 8px 22px rgba(0,0,0,0.16)",
+                          "0 1px 0 rgba(255,255,255,0.03), 0 6px 18px rgba(0,0,0,0.16)",
                       }}
                     >
                       {card.title}
@@ -245,15 +279,15 @@ export default function HomePage() {
 
                   <div className="mt-10 flex items-center gap-3">
                     <p
-                      className="text-[14px] transition duration-300 group-hover:opacity-100"
-                      style={{ color: card.subtextColor }}
+                      className="text-[14px] opacity-[0.76] transition duration-300 group-hover:opacity-[0.94]"
+                      style={{ color: card.text }}
                     >
                       {card.subtext}
                     </p>
 
                     <span
-                      className="solace-card-arrow shrink-0"
-                      style={{ color: card.arrow }}
+                      className="solace-card-arrow shrink-0 opacity-[0.82]"
+                      style={{ color: card.text }}
                       aria-hidden="true"
                     >
                       →
