@@ -67,8 +67,8 @@ export default function ThreadContainer({
                   }
                 : null,
             }
-          : item
-      )
+          : item,
+      ),
     );
 
     setThinking(false);
@@ -87,7 +87,7 @@ export default function ThreadContainer({
               relatedToolSuggestion={item.relatedToolSuggestion}
             />
           ) : (
-            <ThinkingState />
+            <ThinkingState toolSlug={toolSlug} />
           )}
         </div>
       ))}
