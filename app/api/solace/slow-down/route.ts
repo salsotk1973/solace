@@ -13,23 +13,30 @@ import {
   SOLACE_CRISIS_FALLBACK,
 } from "@/lib/solace/safety";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
 const MAX_THOUGHTS = 12;
 
-function cleanThoughts(thoughts: unknown): string[] {
-  if (!Array.isArray(thoughts)) {
-    return [];
+/**
+ * ✅ SAFE CLIENT CREATION (lazy)
+ */
+function getOpenAIClient() {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is missing");
   }
 
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
+
+function cleanThoughts(thoughts: unknown): string[] {
+  if (!Array.isArray(thoughts)) return [];
+
   return thoughts
-    .filter((value): value is string => typeof value === "string")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0)
+    .filter((v): v is string => typeof v === "string")
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0)
     .slice(0, MAX_THOUGHTS);
 }
 
@@ -45,7 +52,7 @@ function splitIntoSentences(text: string): string[] {
   return text
     .replace(/\n+/g, " ")
     .split(/(?<=[.!?])\s+/)
-    .map((part) => part.trim())
+    .map((p) => p.trim())
     .filter(Boolean);
 }
 
@@ -62,17 +69,17 @@ function formatThreeParagraphs(rawText: string): string {
 
   const paragraphParts = cleaned
     .split(/\n\s*\n/)
-    .map((part) => part.trim())
+    .map((p) => p.trim())
     .filter(Boolean);
 
   if (paragraphParts.length >= 3) {
     return paragraphParts.slice(0, 3).join("\n\n");
   }
 
-  const sentenceParts = splitIntoSentences(cleaned);
+  const sentences = splitIntoSentences(cleaned);
 
-  if (sentenceParts.length >= 3) {
-    return sentenceParts.slice(0, 3).join("\n\n");
+  if (sentences.length >= 3) {
+    return sentences.slice(0, 3).join("\n\n");
   }
 
   return [
@@ -105,12 +112,19 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
   response.headers.set("X-RateLimit-Limit", String(RATE_LIMIT));
   response.headers.set("X-RateLimit-Remaining", String(remaining));
   response.headers.set("X-RateLimit-Reset", String(resetAt));
-
   return response;
 }
 
+/**
+ * ✅ SAFE MODEL CALL
+ */
 async function getModelResponse(input: string): Promise<string> {
-  const model = process.env.SOLACE_OPENAI_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const client = getOpenAIClient();
+
+  const model =
+    process.env.SOLACE_OPENAI_MODEL ||
+    process.env.OPENAI_MODEL ||
+    "gpt-4.1-mini";
 
   const response = await client.responses.create({
     model,
@@ -187,16 +201,14 @@ export async function POST(request: Request) {
 
     return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
   } catch (error) {
-    console.error("Legacy slow-down compatibility route error:", error);
+    console.error("Slow-down route error:", error);
 
-    const response = NextResponse.json(
+    return NextResponse.json(
       {
         ok: false,
         message: "Something interrupted the reflection for a moment. Please try again.",
       },
       { status: 500 }
     );
-
-    return response;
   }
 }
