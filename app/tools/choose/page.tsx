@@ -1,9 +1,9 @@
 "use client";
 
 import SiteFooter from "@/components/SiteFooter";
-import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
+import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
 type OrbPhase = "idle" | "active" | "settled";
 
@@ -57,6 +57,20 @@ export default function ChoosePage() {
     };
   }, [input, isLoading, hasResult]);
 
+  function getDisplayResponse(text: string, crisis: boolean) {
+    if (crisis) {
+      return SOLACE_CRISIS_FALLBACK;
+    }
+
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+      return "Something interrupted the reflection for a moment. Please try again.";
+    }
+
+    return trimmed;
+  }
+
   async function runReflection(trimmed: string) {
     setIsLoading(true);
     setHasResult(false);
@@ -82,25 +96,25 @@ export default function ChoosePage() {
       const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
       await new Promise((resolve) => setTimeout(resolve, remaining));
 
+      const crisisFallback = Boolean(data?.isCrisisFallback);
+
       if (!res.ok) {
         const errorText =
           typeof data?.error === "string"
             ? data.error
             : "Something interrupted the reflection for a moment. Please try again.";
 
-        setResult(errorText);
+        setResult(getDisplayResponse(errorText, false));
         setIsCrisisFallback(false);
         setHasResult(true);
         setOrbPhase("settled");
         return;
       }
 
-      const text = typeof data?.text === "string" ? data.text.trim() : "";
+      const text = typeof data?.text === "string" ? data.text : "";
 
-      setResult(
-        text || "Something interrupted the reflection for a moment. Please try again."
-      );
-      setIsCrisisFallback(Boolean(data?.isCrisisFallback));
+      setResult(getDisplayResponse(text, crisisFallback));
+      setIsCrisisFallback(crisisFallback);
       setHasResult(true);
       setOrbPhase("settled");
     } catch {
@@ -224,18 +238,6 @@ export default function ChoosePage() {
         </div>
 
         <form className="decision-form" onSubmit={handleSubmit}>
-          <div className="scope-inline">
-            <span className="scope-inline-copy">Designed for Adults only</span>
-            <span className="scope-separator">·</span>
-            <span className="scope-inline-copy">Reflective clarity tool</span>
-            <span className="scope-separator">·</span>
-            <span className="scope-inline-copy">Not professional advice</span>
-            <span className="scope-separator">·</span>
-            <Link href="/scope" className="scope-inline-link">
-              See Scope
-            </Link>
-          </div>
-
           <label htmlFor="decision" className="prompt">
             What decision is in front of you?
           </label>
@@ -278,24 +280,35 @@ export default function ChoosePage() {
                 }`}
               >
                 <div className="response-card-label">
-                  {isCrisisFallback ? "Important" : "Solace reflection"}
+                  {isCrisisFallback ? "Take a moment" : "Solace reflection"}
                 </div>
-                <p className="response-text">{result}</p>
+
+                <div className="response-copy">
+                  {result
+                    .split(/\n\s*\n/)
+                    .map((paragraph) => paragraph.trim())
+                    .filter(Boolean)
+                    .map((paragraph, index) => (
+                      <p key={`${paragraph}-${index}`} className="response-text">
+                        {paragraph}
+                      </p>
+                    ))}
+                </div>
               </div>
 
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
                   <span className="button-glass-sheen" />
                   <span className="button-glass-tint" />
-                  <span className="button-label">Explore another decision</span>
+                  <span className="button-label">
+                    {isCrisisFallback ? "Clear another thought" : "Explore another decision"}
+                  </span>
                 </button>
               </div>
             </>
           )}
         </section>
       </section>
-
- import SiteFooter from "@/components/SiteFooter";
 
       <style jsx>{`
         .choose-realm {
@@ -1150,42 +1163,6 @@ export default function ChoosePage() {
           margin-top: 2px;
         }
 
-        .scope-inline {
-          margin: 0 0 10px;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: center;
-          gap: 0;
-          font-size: 0.78rem;
-          line-height: 1.45;
-          color: rgba(228, 236, 250, 0.46);
-          text-align: center;
-          text-wrap: balance;
-        }
-
-        .scope-inline-copy {
-          color: rgba(228, 236, 250, 0.46);
-        }
-
-        .scope-separator {
-          padding: 0 0.26rem;
-          color: rgba(228, 236, 250, 0.3);
-        }
-
-        .scope-inline-link {
-          color: rgba(240, 246, 255, 0.74);
-          text-decoration: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-          line-height: 1.1;
-          transition: color 160ms ease, border-color 160ms ease;
-        }
-
-        .scope-inline-link:hover {
-          color: rgba(255, 255, 255, 0.9);
-          border-color: rgba(255, 255, 255, 0.3);
-        }
-
         .prompt {
           display: block;
           margin: 0 0 14px;
@@ -1419,12 +1396,20 @@ export default function ChoosePage() {
         }
 
         .response-card-crisis {
-          border-color: rgba(255, 255, 255, 0.18);
+          border-color: rgba(255, 255, 255, 0.12);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(10, 14, 24, 0.72) 0%,
+              rgba(6, 10, 18, 0.78) 100%
+            );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.36),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(255, 255, 255, 0.03);
+            0 18px 38px rgba(0, 0, 0, 0.32),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+            0 0 0 1px rgba(255, 255, 255, 0.02);
+          backdrop-filter: blur(22px);
+          -webkit-backdrop-filter: blur(22px);
         }
 
         .response-card-label {
@@ -1434,6 +1419,12 @@ export default function ChoosePage() {
           letter-spacing: 0.12em;
           text-transform: uppercase;
           color: rgba(226, 234, 248, 0.66);
+        }
+
+        .response-copy {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
         }
 
         .response-text {
@@ -1925,16 +1916,6 @@ export default function ChoosePage() {
             margin-top: 0;
           }
 
-          .scope-inline {
-            font-size: 0.74rem;
-            margin-bottom: 9px;
-            line-height: 1.4;
-          }
-
-          .scope-separator {
-            padding: 0 0.22rem;
-          }
-
           .actions {
             flex-direction: column;
           }
@@ -1954,7 +1935,7 @@ export default function ChoosePage() {
             padding-right: 18px;
           }
         }
-       `}</style>
+      `}</style>
 
       <SiteFooter />
     </main>

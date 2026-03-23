@@ -21,7 +21,8 @@ export const SOLACE_SCOPE_FULL = [
 
 /**
  * 🔒 LOCKED CRISIS MESSAGE
- * Keep this short, calm, and consistent across all tools.
+ * Single shared fallback for all current and future Solace tools.
+ * Keep this short, gentle, calm, and non-alarmist.
  */
 export const SOLACE_CRISIS_FALLBACK =
   "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.";

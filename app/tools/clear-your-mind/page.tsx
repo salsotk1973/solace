@@ -2,7 +2,6 @@
 
 // /app/tools/clear-your-mind/page.tsx
 
-import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import {
   type CSSProperties,
@@ -14,6 +13,7 @@ import {
   useState,
 } from "react";
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
+import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
 const MAX_THOUGHTS = 7;
 const MAX_INPUT_LENGTH = 140;
@@ -23,9 +23,6 @@ const FIELD_HEIGHT = 320;
 const ORGANIZE_DELAY_MS = 1600;
 const BUTTON_READY_DELAY_MS = 900;
 
-const SCOPE_COPY = "Designed for Adults only";
-const REFLECTIVE_COPY = "Reflective clarity tool";
-const ADVICE_COPY = "Not professional advice";
 const INPUT_HELPER_COPY =
   "Write one thought, then press Enter (Max. 7). Click a thought to remove it if needed.";
 
@@ -211,6 +208,20 @@ function normalizeApiResult(raw: unknown): NormalizedUiResponse {
     ok: false,
     error: "The reflection response was not in the expected format.",
   };
+}
+
+function getDisplayResponse(text: string, crisis: boolean) {
+  if (crisis) {
+    return SOLACE_CRISIS_FALLBACK;
+  }
+
+  const trimmed = text.trim();
+
+  if (!trimmed) {
+    return "Something went wrong. Please try again.";
+  }
+
+  return trimmed;
 }
 
 function getParagraphs(text: string): string[] {
@@ -504,57 +515,6 @@ function applyApiResultsToBubbles(
   }
 
   return ordered.length > 0 ? ordered : realBubbles;
-}
-
-function ScopeInline() {
-  const wrapperStyle: CSSProperties = {
-    color: "rgba(231, 225, 241, 0.62)",
-  };
-
-  const baseTextStyle: CSSProperties = {
-    color: "rgba(231, 225, 241, 0.62)",
-    WebkitTextFillColor: "rgba(231, 225, 241, 0.62)",
-  };
-
-  const separatorStyle: CSSProperties = {
-    color: "rgba(231, 225, 241, 0.44)",
-    WebkitTextFillColor: "rgba(231, 225, 241, 0.44)",
-    whiteSpace: "pre",
-  };
-
-  const linkStyle: CSSProperties = {
-    color: "rgba(239, 234, 247, 0.74)",
-    WebkitTextFillColor: "rgba(239, 234, 247, 0.74)",
-    textDecoration: "none",
-    borderBottom: "1px solid rgba(255,255,255,0.14)",
-    lineHeight: 1.1,
-  };
-
-  return (
-    <div className="scope-inline" style={wrapperStyle}>
-      <span className="scope-inline-copy" style={baseTextStyle}>
-        {SCOPE_COPY}
-      </span>
-      <span className="scope-separator" style={separatorStyle}>
-        {" · "}
-      </span>
-      <span className="scope-inline-copy" style={baseTextStyle}>
-        {REFLECTIVE_COPY}
-      </span>
-      <span className="scope-separator" style={separatorStyle}>
-        {" · "}
-      </span>
-      <span className="scope-inline-copy" style={baseTextStyle}>
-        {ADVICE_COPY}
-      </span>
-      <span className="scope-separator" style={separatorStyle}>
-        {" · "}
-      </span>
-      <Link href="/scope" className="scope-inline-link" style={linkStyle}>
-        See Scope
-      </Link>
-    </div>
-  );
 }
 
 export default function ClearYourMindPage() {
@@ -859,9 +819,9 @@ export default function ClearYourMindPage() {
       }
 
       setBubbles((current) => applyApiResultsToBubbles(current, result));
-      setResponseText(result.text.trim());
+      setResponseText(getDisplayResponse(result.text, result.isCrisisFallback));
       setIsCrisisFallback(result.isCrisisFallback);
-      setIsClarityFallback(result.clarityFallback);
+      setIsClarityFallback(result.isCrisisFallback ? false : result.clarityFallback);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -1005,8 +965,6 @@ export default function ClearYourMindPage() {
               className="autofill-trap"
             />
 
-            <ScopeInline />
-
             <div className="input-shell">
               <div className="mind-input-wrap">
                 {showHelperOverlay ? (
@@ -1055,8 +1013,6 @@ export default function ClearYourMindPage() {
             </div>
           ) : error ? (
             <>
-              <ScopeInline />
-
               <div className="response-card">
                 <div className="response-card-label">Solace</div>
                 <p className="response-text">{error}</p>
@@ -1070,14 +1026,12 @@ export default function ClearYourMindPage() {
             </>
           ) : responseText ? (
             <>
-              <ScopeInline />
-
               <div
                 className={`response-card ${isCrisisFallback ? "response-card-crisis" : ""}`}
               >
                 <div className="response-card-label">
                   {isCrisisFallback
-                    ? "Important"
+                    ? "Take a moment"
                     : isClarityFallback
                       ? "Need a little more clarity"
                       : "Solace reflection"}
@@ -1444,50 +1398,6 @@ export default function ClearYourMindPage() {
           top: -9999px;
         }
 
-        .scope-inline {
-          margin: 0 0 16px;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: center;
-          gap: 0;
-          font-size: 0.7rem;
-          line-height: 1.35;
-          text-align: center;
-          text-wrap: balance;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.24);
-          transform: translateY(-6px);
-        }
-
-        .scope-inline,
-        .scope-inline * {
-          color: inherit;
-        }
-
-        .scope-inline-copy {
-          font-size: inherit;
-          line-height: inherit;
-        }
-
-        .scope-separator {
-          font-size: inherit;
-          line-height: inherit;
-        }
-
-        .scope-inline-link,
-        .scope-inline-link:visited,
-        .scope-inline-link:hover,
-        .scope-inline-link:active {
-          color: rgba(239, 234, 247, 0.74) !important;
-          -webkit-text-fill-color: rgba(239, 234, 247, 0.74) !important;
-        }
-
-        .scope-inline-link:hover {
-          color: rgba(247, 244, 252, 0.88) !important;
-          -webkit-text-fill-color: rgba(247, 244, 252, 0.88) !important;
-          border-color: rgba(255, 255, 255, 0.24) !important;
-        }
-
         .input-shell {
           width: 100%;
           max-width: 720px;
@@ -1769,12 +1679,19 @@ export default function ClearYourMindPage() {
         }
 
         .response-card-crisis {
-          border-color: rgba(255, 255, 255, 0.2);
+          border-color: rgba(255, 255, 255, 0.12);
+          background: linear-gradient(
+            180deg,
+            rgba(10, 14, 24, 0.72) 0%,
+            rgba(6, 10, 18, 0.78) 100%
+          );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.28),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(255, 255, 255, 0.03);
+            0 18px 38px rgba(0, 0, 0, 0.32),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+            0 0 0 1px rgba(255, 255, 255, 0.02);
+          backdrop-filter: blur(22px);
+          -webkit-backdrop-filter: blur(22px);
         }
 
         .response-card-label {
@@ -1882,13 +1799,6 @@ export default function ClearYourMindPage() {
 
           .bubble-field {
             height: 280px;
-          }
-
-          .scope-inline {
-            font-size: 0.66rem;
-            margin-bottom: 12px;
-            line-height: 1.35;
-            transform: translateY(-4px);
           }
 
           .input-shell {
