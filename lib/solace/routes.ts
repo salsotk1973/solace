@@ -1,5 +1,6 @@
 export const SOLACE_ROUTES = {
+  home: "/",
   choose: "/tools/choose",
   clearYourMind: "/tools/clear-your-mind",
-  sort: "/tools/sort",
-} as const;
+  breakItDown: "/tools/break-it-down",
+};

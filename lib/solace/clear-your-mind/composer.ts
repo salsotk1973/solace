@@ -9,6 +9,8 @@ type Anchor =
   | "self_image"
   | "practical_breakdown"
   | "health_strain"
+  | "escape_desire"
+  | "calm_desire"
   | "general_pressure";
 
 type Reflection = {
@@ -153,6 +155,20 @@ function extractAnchorDescriptors(thoughts: string[]): AnchorDescriptor[] {
     ) {
       pushDescriptor(found, "health_strain", 85, "your system already sounds stretched");
     }
+
+    if (
+      hasAny(text, [/\b(vacation|holiday|travel|get away|escape|time away|break away)\b/i])
+    ) {
+      pushDescriptor(found, "escape_desire", 62, "part of you wants to step away for a while");
+    }
+
+    if (
+      hasAny(text, [
+        /\b(calm|peace|quiet|rest|stillness|breathe|breathing room|slow down|relax)\b/i,
+      ])
+    ) {
+      pushDescriptor(found, "calm_desire", 58, "there is a need for calm underneath all of this");
+    }
   }
 
   if (found.size === 0) {
@@ -182,12 +198,28 @@ function capitalize(text: string): string {
 function joinWithFlow(fragments: string[]): string {
   if (fragments.length === 0) return "";
   if (fragments.length === 1) return fragments[0];
-  if (fragments.length === 2) return `${fragments[0]}, and ${fragments[1]}`;
+  if (fragments.length === 2) return `${fragments[0]} and ${fragments[1]}`;
   return `${fragments[0]}, ${fragments[1]}, and ${fragments.slice(2).join(", ")}`;
 }
 
 function buildTitle(descriptors: AnchorDescriptor[]): string {
   const ids = descriptors.map((item) => item.id);
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("work_pressure") &&
+    ids.includes("family_responsibility")
+  ) {
+    return "A lot is landing at once";
+  }
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("escape_desire") &&
+    ids.includes("calm_desire")
+  ) {
+    return "Part of you wants relief";
+  }
 
   if (ids.includes("job_loss") && ids.includes("money_pressure") && ids.length >= 3) {
     return "Too much is leaning on the same point";
@@ -221,6 +253,10 @@ function buildTitle(descriptors: AnchorDescriptor[]): string {
     return "Part of you is somewhere else";
   }
 
+  if (ids.includes("escape_desire") && ids.includes("calm_desire")) {
+    return "Part of you wants breathing room";
+  }
+
   return "This is carrying more weight than it should";
 }
 
@@ -229,10 +265,26 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
 
   if (
     ids.includes("money_pressure") &&
+    ids.includes("work_pressure") &&
+    ids.includes("family_responsibility")
+  ) {
+    return "Providing, keeping up, and preparing for what is coming are all pressing on you together.";
+  }
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("escape_desire") &&
+    ids.includes("calm_desire")
+  ) {
+    return "Part of you is carrying pressure, and another part is looking for space, relief, and a little quiet.";
+  }
+
+  if (
+    ids.includes("money_pressure") &&
     ids.includes("job_loss") &&
     ids.includes("family_distance")
   ) {
-    return "Bills are piling up, you've lost your job, and part of your mind is still with your family overseas.";
+    return "Practical pressure, uncertainty, and distance from the people you care about are all landing together.";
   }
 
   if (
@@ -240,7 +292,7 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
     ids.includes("money_pressure") &&
     ids.includes("family_responsibility")
   ) {
-    return "Home already feels full, money pressure is there, and a baby is on the way too.";
+    return "Pressure at home, practical strain, and responsibility for what is ahead are all sitting in the same place.";
   }
 
   if (
@@ -248,11 +300,11 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
     ids.includes("job_loss") &&
     ids.includes("family_responsibility")
   ) {
-    return "Bills are there, you've lost your job, and family responsibility is sitting on top of it all.";
+    return "Security, responsibility, and uncertainty are all pulling on the same part of you.";
   }
 
   if (ids.includes("money_pressure") && ids.includes("work_pressure")) {
-    return "Money feels tight, and work is piling up at the same time.";
+    return "Trying to stay on top of daily demands while also feeling stretched can wear you down quickly.";
   }
 
   const fragments = pickTopFragments(descriptors, 4);
@@ -261,6 +313,22 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
 
 function buildLineTwo(descriptors: AnchorDescriptor[]): string {
   const ids = descriptors.map((item) => item.id);
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("work_pressure") &&
+    ids.includes("family_responsibility")
+  ) {
+    return "That can make the future feel heavy before anything has even happened yet.";
+  }
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("escape_desire") &&
+    ids.includes("calm_desire")
+  ) {
+    return "That usually means the pressure is no longer just practical — your system is asking for breathing room too.";
+  }
 
   if (ids.includes("money_pressure") && ids.includes("job_loss")) {
     return "That kind of mix can make everything feel urgent, even before the day has properly begun.";
@@ -286,11 +354,31 @@ function buildLineTwo(descriptors: AnchorDescriptor[]): string {
     return "That kind of weight often gets worse when it starts turning inward as well.";
   }
 
+  if (ids.includes("escape_desire") && ids.includes("calm_desire")) {
+    return "Wanting calm can be your mind's way of saying it has been carrying more than it wants to admit.";
+  }
+
   return "That can make the whole situation feel heavier than any one part of it on its own.";
 }
 
 function buildLineThree(descriptors: AnchorDescriptor[]): string {
   const ids = descriptors.map((item) => item.id);
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("work_pressure") &&
+    ids.includes("family_responsibility")
+  ) {
+    return "Start with the part that would give you the most breathing room today.";
+  }
+
+  if (
+    ids.includes("money_pressure") &&
+    ids.includes("escape_desire") &&
+    ids.includes("calm_desire")
+  ) {
+    return "Give your attention to the smallest thing that would make today feel a little lighter.";
+  }
 
   if (ids.includes("job_loss") && ids.includes("money_pressure")) {
     return "Start with the one thing that gives you the most breathing room first, not the whole stack.";
@@ -310,6 +398,10 @@ function buildLineThree(descriptors: AnchorDescriptor[]): string {
 
   if (ids.includes("family_distance")) {
     return "It may help to focus on what is actually in front of you today, rather than everything your mind is carrying at once.";
+  }
+
+  if (ids.includes("escape_desire") && ids.includes("calm_desire")) {
+    return "Try to give your attention to the smallest thing that would make the day feel a little calmer, not perfect.";
   }
 
   return "Try to give your attention to the part that most needs it first, and leave the rest for later.";

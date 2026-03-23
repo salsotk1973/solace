@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import QuestionCard from "./QuestionCard";
 import ReflectionCard from "./ReflectionCard";
@@ -58,6 +58,10 @@ function normalizeReflection(data: any): string {
     return data.text.trim();
   }
 
+  if (typeof data?.message === "string" && data.message.trim()) {
+    return data.message.trim();
+  }
+
   if (typeof data?.reflection === "string" && data.reflection.trim()) {
     return data.reflection.trim();
   }
@@ -80,6 +84,13 @@ export default function ThreadContainer({
 }) {
   const [thread, setThread] = useState<ThreadItem[]>([]);
   const [thinking, setThinking] = useState(false);
+
+  const latestItem = useMemo(
+    () => (thread.length > 0 ? thread[thread.length - 1] : null),
+    [thread],
+  );
+
+  const hideComposer = Boolean(latestItem?.isCrisisFallback);
 
   async function handleSubmit(question: string) {
     const newItem: ThreadItem = {
@@ -106,7 +117,6 @@ export default function ThreadContainer({
       });
 
       const data = await response.json().catch(() => null);
-
       const reflection = normalizeReflection(data);
 
       setThread((prev) =>
@@ -173,7 +183,7 @@ export default function ThreadContainer({
         </div>
       ))}
 
-      <Composer onSubmit={handleSubmit} disabled={thinking} />
+      {!hideComposer && <Composer onSubmit={handleSubmit} disabled={thinking} />}
     </div>
   );
 }

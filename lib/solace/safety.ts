@@ -21,15 +21,12 @@ export const SOLACE_SCOPE_FULL = [
 
 /**
  * 🔒 LOCKED CRISIS MESSAGE
- * Single shared fallback for all current and future Solace tools.
- * Keep this short, gentle, calm, and non-alarmist.
  */
 export const SOLACE_CRISIS_FALLBACK =
   "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.";
 
 /**
  * Direct / explicit self-harm or suicide language.
- * These should trigger immediately.
  */
 export const SOLACE_DIRECT_CRISIS_PATTERNS: RegExp[] = [
   /\bkill myself\b/i,
@@ -58,7 +55,6 @@ export const SOLACE_DIRECT_CRISIS_PATTERNS: RegExp[] = [
 
 /**
  * High-risk indirect language.
- * These should also trigger Solace's crisis fallback.
  */
 export const SOLACE_INDIRECT_CRISIS_PATTERNS: RegExp[] = [
   /\bi do not see the point anymore\b/i,
@@ -90,7 +86,18 @@ export const SOLACE_INDIRECT_CRISIS_PATTERNS: RegExp[] = [
 ];
 
 /**
- * Mild stress / overwhelm patterns that should NOT on their own trigger crisis.
+ * NEW: Ambiguous death-as-option language
+ * (This fixes your exact bug)
+ */
+export const SOLACE_AMBIGUOUS_DEATH_PATTERNS: RegExp[] = [
+  /\bor (die|dead)\b/i,
+  /\bmaybe (die|dead)\b/i,
+  /\bbetter to (die|be dead)\b/i,
+  /\bjust (die|be dead)\b/i,
+];
+
+/**
+ * Mild stress patterns (do NOT trigger crisis)
  */
 export const SOLACE_NON_CRISIS_STRESS_PATTERNS: RegExp[] = [
   /\ba bit stressed\b/i,
@@ -124,14 +131,22 @@ export function isSolaceCrisisInput(input: string): boolean {
     return false;
   }
 
-  if (SOLACE_DIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+  // 🔴 Direct
+  if (SOLACE_DIRECT_CRISIS_PATTERNS.some((p) => p.test(normalized))) {
     return true;
   }
 
-  if (SOLACE_INDIRECT_CRISIS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+  // 🟠 Indirect
+  if (SOLACE_INDIRECT_CRISIS_PATTERNS.some((p) => p.test(normalized))) {
     return true;
   }
 
+  // 🟡 NEW ambiguous (your bug fix)
+  if (SOLACE_AMBIGUOUS_DEATH_PATTERNS.some((p) => p.test(normalized))) {
+    return true;
+  }
+
+  // Combined signals
   if (
     /\beverything feels too much\b/i.test(normalized) &&
     /\bi can(?:not|'t) handle it\b/i.test(normalized)
@@ -152,7 +167,8 @@ export function isSolaceCrisisInput(input: string): boolean {
     return true;
   }
 
-  if (SOLACE_NON_CRISIS_STRESS_PATTERNS.some((pattern) => pattern.test(normalized))) {
+  // 🟢 Explicitly NOT crisis
+  if (SOLACE_NON_CRISIS_STRESS_PATTERNS.some((p) => p.test(normalized))) {
     return false;
   }
 

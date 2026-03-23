@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
@@ -50,25 +51,25 @@ const emotionalEntryCards = [
     arrow: "rgba(248, 252, 249, 0.96)",
   },
   {
-    eyebrow: "EVERYTHING FEELS NOISY",
-    title: "Find what matters first.",
-    subtext: "Enter Sort",
-    href: SOLACE_ROUTES.sort,
-    border: "rgba(245, 204, 162, 0.28)",
-    borderHover: "rgba(250, 216, 180, 0.40)",
-    glassTop: "rgba(255, 235, 220, 0.24)",
-    glassMid: "rgba(212, 164, 118, 0.16)",
-    glassBottom: "rgba(120, 78, 42, 0.34)",
-    glassTopHover: "rgba(255, 239, 226, 0.34)",
-    glassMidHover: "rgba(222, 175, 128, 0.22)",
-    glassBottomHover: "rgba(136, 88, 46, 0.40)",
-    glow: "rgba(236, 178, 120, 0.20)",
-    glowSoft: "rgba(255, 224, 190, 0.12)",
-    glare: "rgba(255, 248, 240, 0.18)",
-    text: "rgba(255, 250, 246, 0.96)",
-    eyebrowText: "rgba(255, 250, 246, 0.96)",
-    subtextColor: "rgba(255, 250, 246, 0.96)",
-    arrow: "rgba(255, 250, 246, 0.96)",
+    eyebrow: "I FEEL OVERWHELMED",
+    title: "Break it into simple parts.",
+    subtext: "Enter Break It Down",
+    href: SOLACE_ROUTES.breakItDown,
+    border: "rgba(255, 190, 120, 0.28)",
+    borderHover: "rgba(255, 210, 150, 0.42)",
+    glassTop: "rgba(255, 220, 170, 0.20)",
+    glassMid: "rgba(255, 170, 110, 0.16)",
+    glassBottom: "rgba(160, 90, 40, 0.28)",
+    glassTopHover: "rgba(255, 235, 190, 0.28)",
+    glassMidHover: "rgba(255, 190, 130, 0.22)",
+    glassBottomHover: "rgba(180, 100, 50, 0.36)",
+    glow: "rgba(255, 180, 110, 0.22)",
+    glowSoft: "rgba(255, 200, 140, 0.12)",
+    glare: "rgba(255, 235, 200, 0.18)",
+    text: "rgba(255, 248, 240, 0.96)",
+    eyebrowText: "rgba(255, 248, 240, 0.96)",
+    subtextColor: "rgba(255, 248, 240, 0.96)",
+    arrow: "rgba(255, 248, 240, 0.96)",
   },
 ];
 
@@ -94,7 +95,7 @@ export default function HomePage() {
       style={
         {
           "--solace-breath-duration": "10s",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <div
@@ -126,14 +127,14 @@ export default function HomePage() {
       <SiteHeader />
 
       <div className="relative z-20">
-        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-4 pt-[112px] sm:px-8 lg:px-10">
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pb-14 pt-[112px] sm:px-8 lg:px-10">
           <div className="relative flex w-full flex-col items-center">
             <div className="mb-0 origin-top translate-y-0 scale-[0.72] sm:translate-y-1 sm:scale-[0.79] md:translate-y-2 md:scale-[0.85]">
               <HeroPresence />
             </div>
 
             <div className="-mt-16 mx-auto flex max-w-[980px] flex-col items-center text-center sm:-mt-[4.5rem] md:-mt-[5.25rem]">
-              <h1 className="solace-breathe-word text-[44px] font-light text-white sm:text-[58px] md:text-[70px]">
+              <h1 className="solace-breathe-word translate-y-6 text-[44px] font-light text-white sm:translate-y-8 sm:text-[58px] md:translate-y-10 md:text-[70px]">
                 Breathe
               </h1>
             </div>
@@ -142,7 +143,7 @@ export default function HomePage() {
 
         <section
           id="start-from-how-it-feels"
-          className="mx-auto w-full max-w-[1280px] px-6 pb-14 pt-3 sm:px-8 lg:px-10"
+          className="mx-auto w-full max-w-[1280px] px-6 pb-14 pt-2 sm:px-8 lg:px-10"
         >
           <div className="mx-auto max-w-[760px] text-center">
             <p className="solace-section-label">Start from how it feels</p>
@@ -454,17 +455,14 @@ export default function HomePage() {
 
         @keyframes solaceWordPresenceSync {
           0% {
-            transform: scale(0.996);
             opacity: 0.958;
             text-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
           }
           50% {
-            transform: scale(1.018);
             opacity: 1;
             text-shadow: 0 12px 36px rgba(0, 0, 0, 0.23);
           }
           100% {
-            transform: scale(0.996);
             opacity: 0.958;
             text-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
           }
@@ -552,7 +550,7 @@ export default function HomePage() {
           line-height: 0.94;
           animation: solaceWordPresenceSync var(--solace-breath-duration, 10s)
             ease-in-out infinite;
-          will-change: transform, opacity, text-shadow;
+          will-change: opacity, text-shadow;
         }
 
         .solace-section-label {
