@@ -19,53 +19,42 @@ export default function SiteFooter() {
       <style jsx>{`
         .site-footer {
           position: relative;
-          z-index: 30;
+          z-index: 80;
           width: 100%;
-          padding: 12px 24px 30px;
+          padding: 8px 24px 28px;
         }
 
         .site-footer-inner {
-          max-width: 1100px;
+          max-width: 980px;
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 20px;
           padding-top: 18px;
-
-          /* FIX: clearer divider */
-          border-top: 1px solid rgba(255, 255, 255, 0.14);
+          border-top: 1px solid rgba(184, 206, 255, 0.12);
         }
 
         .site-footer-copy {
           margin: 0;
           font-size: 12px;
           line-height: 1.6;
-
-          /* FIX: readable white */
-          color: rgba(255, 255, 255, 0.78);
-
+          color: rgba(255, 255, 255, 0.92);
           letter-spacing: 0.01em;
         }
 
         .site-footer-link {
           flex-shrink: 0;
           font-size: 12px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+          letter-spacing: 0.01em;
+          text-transform: none;
           text-decoration: none;
-
-          /* FIX: visible white */
-          color: rgba(255, 255, 255, 0.92);
-
-          border-bottom: 1px solid rgba(255, 255, 255, 0.28);
-
-          transition: all 160ms ease;
+          color: rgba(255, 255, 255, 0.96);
+          transition: color 160ms ease, opacity 160ms ease;
         }
 
         .site-footer-link:hover {
           color: rgba(255, 255, 255, 1);
-          border-color: rgba(255, 255, 255, 0.5);
         }
 
         @media (max-width: 640px) {

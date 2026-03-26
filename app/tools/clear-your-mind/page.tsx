@@ -1225,9 +1225,7 @@ export default function ClearYourMindPage() {
         </section>
       </section>
 
-      <div className="page-footer">
-        <SiteFooter />
-      </div>
+      <SiteFooter />
 
       <style jsx>{`
         .mind-realm {
@@ -1392,11 +1390,11 @@ export default function ClearYourMindPage() {
 
         .realm-content {
           position: relative;
-          z-index: 20;
+          z-index: 2;
           width: 100%;
           max-width: 980px;
           margin: 0 auto;
-          padding: 138px 24px 28px;
+          padding: 138px 24px 60px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1444,22 +1442,22 @@ export default function ClearYourMindPage() {
         }
 
         .bubble-stage {
-          position: relative;
-          margin-top: 4px;
           width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          max-width: 1280px;
+          margin-top: 18px;
+          margin-bottom: 22px;
+          padding: 0 12px;
           overflow: visible;
         }
 
         .bubble-field {
           position: relative;
-          width: min(92vw, 900px);
+          width: 100%;
           height: var(--bubble-field-height);
           min-height: var(--bubble-field-height);
-          overflow: hidden;
+          overflow: visible;
           pointer-events: auto;
+          --bubble-y-offset: 58px;
         }
 
         .bubble-field-organizing {
@@ -1473,7 +1471,7 @@ export default function ClearYourMindPage() {
         .thought-bubble {
           position: absolute;
           left: var(--bubble-x);
-          top: var(--bubble-y);
+          top: calc(var(--bubble-y) + var(--bubble-y-offset));
           width: var(--bubble-diameter);
           height: var(--bubble-diameter);
           transform: translate(-50%, -50%);
@@ -1632,7 +1630,7 @@ export default function ClearYourMindPage() {
         .mind-form {
           width: 100%;
           max-width: 760px;
-          margin-top: 2px;
+          margin-top: 205px;
         }
 
         .autofill-trap {
@@ -1684,8 +1682,9 @@ export default function ClearYourMindPage() {
 
         .mind-input {
           width: 100%;
-          min-height: 74px;
-          padding: 18px 24px;
+          min-height: 88px;
+          height: 88px;
+          padding: 0 24px;
           border-radius: 30px;
           border: 1px solid rgba(198, 238, 216, 0.18);
           background:
@@ -1862,7 +1861,7 @@ export default function ClearYourMindPage() {
         }
 
         .loading-zone {
-          margin-top: 12px;
+          margin-top: 172px;
           width: 100%;
           display: flex;
           justify-content: center;
@@ -1895,7 +1894,7 @@ export default function ClearYourMindPage() {
         .response-card {
           width: 100%;
           max-width: 760px;
-          margin-top: 0;
+          margin-top: 172;
           padding: 22px 26px;
           border-radius: 32px;
           border: 1px solid rgba(198, 238, 216, 0.18);
@@ -1955,14 +1954,6 @@ export default function ClearYourMindPage() {
           line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.26);
           white-space: pre-line;
-        }
-
-        .page-footer {
-          position: relative;
-          z-index: 220;
-          width: 100%;
-          isolation: isolate;
-          pointer-events: auto;
         }
 
         @keyframes bubbleAppear {
@@ -2051,6 +2042,16 @@ export default function ClearYourMindPage() {
 
           .realm-intro {
             min-height: 150px;
+          }
+
+          .bubble-stage {
+            margin-top: 14px;
+            margin-bottom: 18px;
+            padding: 0 6px;
+          }
+
+          .bubble-field {
+            --bubble-y-offset: 42px;
           }
 
           .input-shell {
