@@ -1,147 +1,2042 @@
 "use client";
 
-import { useState } from "react";
-import SiteHeader from "@/components/SiteHeader";
+import Link from "next/link";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
+
+type OrbPhase = "idle" | "active" | "settled";
+
+type BreakItDownApiResponse =
+  | {
+      type: "normal";
+      lead: string;
+      steps: string[];
+    }
+  | {
+      type: "gibberish";
+      lead: string;
+      steps: string[];
+    }
+  | {
+      type: "redirect";
+      lead: string;
+      steps: string[];
+      redirectTarget?: "choose" | "clear-your-mind" | "break-it-down";
+      redirectTitle?: string;
+    }
+  | {
+      type: "support";
+      lead: string;
+      message: string;
+    }
+  | {
+      error?: string;
+    };
+
+const THINKING_DELAY_MS = 2800;
+const THINKING_COPY = "SOLACE IS BREAKING IT DOWN...";
+const BUTTON_READY_DELAY_MS = 1400;
 
 export default function BreakItDownPage() {
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState<string[] | null>(null);
+  const [resultLead, setResultLead] = useState("");
+  const [resultSteps, setResultSteps] = useState<string[]>([]);
+  const [resultMessage, setResultMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [orbPhase, setOrbPhase] = useState<OrbPhase>("idle");
+  const [hasResult, setHasResult] = useState(false);
+  const [isSupport, setIsSupport] = useState(false);
+  const [isToolRedirect, setIsToolRedirect] = useState(false);
+  const [redirectTarget, setRedirectTarget] = useState<
+    "clear-your-mind" | "break-it-down" | "choose" | null
+  >(null);
+  const [redirectTitle, setRedirectTitle] = useState("");
+  const [isButtonReady, setIsButtonReady] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const handleSubmit = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    if (!isLoading && !hasResult) {
+      setOrbPhase("idle");
+    }
+  }, [isLoading, hasResult]);
 
-    setResponse([
-      "This is not one big problem. It’s a few smaller parts.",
-      "Understand what this really involves",
-      "Identify the main pressure point",
-      "Break it into simple steps",
-      "Start with one small action",
-    ]);
-  };
+  useEffect(() => {
+    if (hasResult && !isLoading) {
+      inputRef.current?.focus();
+    }
+  }, [hasResult, isLoading]);
+
+  useEffect(() => {
+    if (isLoading || hasResult) {
+      setIsButtonReady(false);
+      return;
+    }
+
+    const trimmed = input.trim();
+
+    if (!trimmed) {
+      setIsButtonReady(false);
+      return;
+    }
+
+    setIsButtonReady(false);
+
+    const timer = window.setTimeout(() => {
+      setIsButtonReady(true);
+    }, BUTTON_READY_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [input, isLoading, hasResult]);
+
+  const redirectHref = useMemo(() => {
+    if (!isToolRedirect || !redirectTarget) return null;
+    return `/tools/${redirectTarget}`;
+  }, [isToolRedirect, redirectTarget]);
+
+  const redirectButtonLabel = useMemo(() => {
+    if (redirectTarget === "choose") return "Go to Choose";
+    if (redirectTarget === "clear-your-mind") return "Go to Clear Your Mind";
+    if (redirectTarget === "break-it-down") return "Go to Break It Down";
+    return "Open suggested tool";
+  }, [redirectTarget]);
+
+  function getResponseLabel() {
+    if (isSupport) return "Take a moment";
+    if (isToolRedirect) return redirectTitle || "A better fit";
+    return "Solace";
+  }
+
+  function getFollowupLabel() {
+    if (isSupport) return "Break down something else";
+    if (isToolRedirect) return "Try something else";
+    return "Break down something else";
+  }
+
+  function clearResultState() {
+    setResultLead("");
+    setResultSteps([]);
+    setResultMessage("");
+    setIsSupport(false);
+    setIsToolRedirect(false);
+    setRedirectTarget(null);
+    setRedirectTitle("");
+  }
+
+  async function runReflection(trimmed: string) {
+    setIsLoading(true);
+    setHasResult(false);
+    clearResultState();
+    setIsButtonReady(false);
+    setOrbPhase("active");
+
+    const startedAt = Date.now();
+
+    try {
+      const res = await fetch("/api/solace/break-it-down", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input: trimmed }),
+      });
+
+      const data: BreakItDownApiResponse | null = await res.json().catch(() => null);
+
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
+      await new Promise((resolve) => setTimeout(resolve, remaining));
+
+      if (!res.ok) {
+        setResultLead("Something interrupted the reflection for a moment.");
+        setResultMessage(
+          typeof data?.error === "string"
+            ? data.error
+            : "Please try again.",
+        );
+        setIsSupport(true);
+        setHasResult(true);
+        setOrbPhase("settled");
+        return;
+      }
+
+      if (!data || typeof data !== "object" || !("type" in data)) {
+        setResultLead("Something interrupted the reflection for a moment.");
+        setResultMessage("Please try again.");
+        setIsSupport(true);
+        setHasResult(true);
+        setOrbPhase("settled");
+        return;
+      }
+
+      if (data.type === "support") {
+        setResultLead(data.lead || "Take a moment");
+        setResultMessage(data.message || "");
+        setIsSupport(true);
+        setHasResult(true);
+        setOrbPhase("settled");
+        return;
+      }
+
+      if (data.type === "redirect") {
+        setResultLead(data.lead || "");
+        setResultSteps([]);
+        setResultMessage("");
+        setIsSupport(false);
+        setIsToolRedirect(true);
+        setRedirectTarget(
+          data.redirectTarget === "clear-your-mind" ||
+            data.redirectTarget === "break-it-down" ||
+            data.redirectTarget === "choose"
+            ? data.redirectTarget
+            : null,
+        );
+        setRedirectTitle(
+          typeof data.redirectTitle === "string" ? data.redirectTitle : "",
+        );
+        setHasResult(true);
+        setOrbPhase("settled");
+        return;
+      }
+
+      setResultLead(data.lead || "");
+      setResultSteps(
+        Array.isArray(data.steps) ? data.steps.filter(Boolean).slice(0, 3) : [],
+      );
+      setResultMessage("");
+      setIsSupport(false);
+      setIsToolRedirect(false);
+      setRedirectTarget(null);
+      setRedirectTitle("");
+      setHasResult(true);
+      setOrbPhase("settled");
+    } catch {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
+      await new Promise((resolve) => setTimeout(resolve, remaining));
+
+      setResultLead("Something interrupted the reflection for a moment.");
+      setResultMessage("Please try again.");
+      setIsSupport(true);
+      setHasResult(true);
+      setOrbPhase("settled");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const trimmed = input.trim();
+
+    if (!trimmed) {
+      setResultLead("Tell me one thing you want to deal with right now.");
+      setResultMessage("");
+      setResultSteps([]);
+      setIsSupport(false);
+      setIsToolRedirect(false);
+      setRedirectTarget(null);
+      setRedirectTitle("");
+      setHasResult(true);
+      setOrbPhase("settled");
+      setIsButtonReady(false);
+      return;
+    }
+
+    await runReflection(trimmed);
+  }
+
+  function handleReset() {
+    setInput("");
+    clearResultState();
+    setHasResult(false);
+    setIsLoading(false);
+    setIsButtonReady(false);
+    setOrbPhase("idle");
+
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }
+
+  const displayedSteps = resultSteps.slice(0, 3);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#03050b] text-white">
-      {/* Amber Realm background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 58% 34%, rgba(255, 224, 186, 0.10), transparent 42%),
-            url('/realms/amber/break-it-down-bg.jpg')
-          `,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
+    <main className="breakdown-realm">
+      <div className="realm-bg-stage" aria-hidden="true">
+        <img
+          src="/realms/amber/break-it-down-bg.jpg"
+          alt=""
+          className="realm-bg-image"
+        />
+      </div>
 
-      {/* Global atmospheric overlays */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_55%_38%,rgba(255,210,140,0.10),transparent_42%)]" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_24%,rgba(255,244,224,0.06),transparent_20%),radial-gradient(circle_at_18%_74%,rgba(255,190,120,0.04),transparent_18%),radial-gradient(circle_at_84%_30%,rgba(255,210,160,0.03),transparent_16%)]" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(6,6,10,0.38)_0%,rgba(6,6,10,0.32)_18%,rgba(6,6,10,0.40)_38%,rgba(6,6,10,0.52)_58%,rgba(6,6,10,0.68)_78%,rgba(6,6,10,0.82)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_44%,rgba(8,8,14,0.14)_0%,rgba(8,8,14,0.28)_40%,rgba(8,8,14,0.48)_74%,rgba(8,8,14,0.66)_100%)]" />
-
-      {/* Realm-specific amber glass light */}
-      <div className="pointer-events-none absolute inset-x-[8%] top-[18%] z-[1] h-[260px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,214,150,0.14)_0%,rgba(255,214,150,0.08)_30%,rgba(255,214,150,0.03)_54%,rgba(255,214,150,0)_74%)] blur-3xl" />
-      <div className="pointer-events-none absolute inset-x-[16%] top-[46%] z-[1] h-[180px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,236,208,0.06)_0%,rgba(255,236,208,0.03)_38%,rgba(255,236,208,0)_72%)] blur-2xl" />
+      <div className="realm-bg-vignette" aria-hidden="true" />
+      <div className="realm-bg-soften" aria-hidden="true" />
+      <div className="realm-bg-deepen" aria-hidden="true" />
+      <div className="realm-bg-bottom-weight" aria-hidden="true" />
+      <div className="realm-bg-top-weight" aria-hidden="true" />
+      <div className="realm-center-halo" aria-hidden="true" />
+      <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
+      <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
+      <div className="realm-horizon-shimmer" aria-hidden="true" />
 
       <SiteHeader />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[900px] flex-col px-6 pb-20 pt-[130px]">
-        <div className="flex flex-col items-center text-center">
-          <h1 className="text-[42px] font-light tracking-[-0.04em] text-white sm:text-[56px]">
-            Break It Down
-          </h1>
-
-          <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-white/72 sm:text-[17px]">
-            Write one thing you need to deal with. We’ll break it into simple,
-            manageable parts.
+      <section className="realm-content">
+        <div className="realm-intro">
+          <p className="realm-label">Amber Realm</p>
+          <h1 className="title">Break It Down</h1>
+          <p className="subtitle">
+            Bring one thing here. Solace will turn it into simple, useful steps.
           </p>
         </div>
 
-        <div className="mt-10 w-full">
-          <div
-            className="relative overflow-hidden rounded-[20px] border border-[rgba(255,235,214,0.12)]"
-            style={{
-              background: `
-                linear-gradient(
-                  180deg,
-                  rgba(255,235,214,0.08) 0%,
-                  rgba(180,128,76,0.06) 38%,
-                  rgba(34,24,18,0.44) 100%
-                )
-              `,
-              boxShadow:
-                "0 24px 52px rgba(0,0,0,0.30), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.12)",
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-            }}
-          >
-            <div className="pointer-events-none absolute inset-0 opacity-70 bg-[linear-gradient(135deg,rgba(255,245,232,0.12)_0%,rgba(255,255,255,0.04)_26%,rgba(255,255,255,0.02)_48%,rgba(255,255,255,0)_72%)]" />
-            <div className="pointer-events-none absolute inset-x-[14%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.26)_50%,transparent_100%)]" />
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Write one thing you need to deal with..."
-              className="relative h-[120px] w-full resize-none bg-transparent px-5 py-4 text-[16px] text-white outline-none placeholder:text-white/40"
-            />
-          </div>
+        <div className="orb-stage">
+          <div className={`amber-hero amber-hero-${orbPhase}`} aria-hidden="true">
+            <div className="amber-hero-field amber-hero-field-back" />
+            <div className="amber-hero-field amber-hero-field-mid" />
+            <div className="amber-hero-field amber-hero-field-front" />
+            <div className="amber-hero-floor-glow" />
+            <div className="amber-hero-floor-core" />
 
-          <button
-            onClick={handleSubmit}
-            className="mt-5 w-full rounded-full border border-[rgba(255,255,255,0.16)] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.10))] py-4 text-[15px] text-white shadow-[0_12px_30px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] transition hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.14))]"
-          >
-            Break it down
-          </button>
-        </div>
-
-        {response && (
-          <div className="mt-16">
-            <p className="mb-5 text-[12px] uppercase tracking-[0.26em] text-white/44">
-              Solace
-            </p>
-
-            <div className="space-y-4">
-              {response.map((item, index) => (
-                <div
-                  key={index}
-                  className="relative overflow-hidden rounded-[18px] border border-[rgba(255,235,214,0.10)] px-5 py-5 text-[15px] leading-7 text-white/92"
-                  style={{
-                    background: `
-                      linear-gradient(
-                        180deg,
-                        rgba(255,235,214,0.06) 0%,
-                        rgba(176,126,76,0.04) 36%,
-                        rgba(12,12,16,0.62) 100%
-                      )
-                    `,
-                    boxShadow:
-                      "0 16px 36px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)",
-                    backdropFilter: "blur(14px)",
-                    WebkitBackdropFilter: "blur(14px)",
-                  }}
-                >
-                  <div className="pointer-events-none absolute inset-0 opacity-[0.58] bg-[linear-gradient(135deg,rgba(255,245,232,0.08)_0%,rgba(255,255,255,0.025)_28%,rgba(255,255,255,0.012)_50%,rgba(255,255,255,0)_76%)]" />
-                  <div className="pointer-events-none absolute inset-x-[16%] top-0 h-[1px] bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.18)_50%,transparent_100%)]" />
-                  <div className="relative">
-                    {index === 0 ? (
-                      <p>{item}</p>
-                    ) : (
-                      <p>
-                        <span className="mr-2 text-white/38">
-                          {String(index).padStart(2, "0")}
-                        </span>
-                        {item}
-                      </p>
-                    )}
-                  </div>
+            <div className="amber-core-shadow" />
+            <div className="amber-core-tilt">
+              <div className="amber-core">
+                <div className="amber-core-parallax amber-core-parallax-back">
+                  <div className="amber-core-atmosphere amber-core-atmosphere-a" />
+                  <div className="amber-core-atmosphere amber-core-atmosphere-b" />
+                  <div className="amber-core-atmosphere amber-core-atmosphere-c" />
+                  <div className="amber-core-swirl amber-core-swirl-a" />
+                  <div className="amber-core-swirl amber-core-swirl-b" />
+                  <div className="amber-core-swirl amber-core-swirl-c" />
                 </div>
-              ))}
+
+                <div className="amber-core-parallax amber-core-parallax-mid">
+                  <div className="amber-core-mineral amber-core-mineral-a" />
+                  <div className="amber-core-mineral amber-core-mineral-b" />
+                  <div className="amber-core-mineral amber-core-mineral-c" />
+                  <div className="amber-core-mineral amber-core-mineral-d" />
+                  <div className="amber-core-line amber-core-line-a" />
+                  <div className="amber-core-line amber-core-line-b" />
+                  <div className="amber-core-line amber-core-line-c" />
+                </div>
+
+                <div className="amber-core-parallax amber-core-parallax-front">
+                  <div className="amber-core-inner-glow" />
+                  <div className="amber-core-hotspot" />
+                  <div className="amber-core-sheen amber-core-sheen-a" />
+                  <div className="amber-core-sheen amber-core-sheen-b" />
+                </div>
+
+                <div className="amber-core-glass" />
+                <div className="amber-core-rim" />
+              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+
+        <form className="decision-form" onSubmit={handleSubmit}>
+          <label htmlFor="breakdown-input" className="prompt">
+            What do you want to deal with right now?
+          </label>
+
+          <textarea
+            id="breakdown-input"
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Tell me one thing you want to deal with right now"
+            rows={2}
+            disabled={isLoading}
+            className="decision-input"
+          />
+
+          {!hasResult && !isLoading && (
+            <div className="actions actions-initial">
+              <button
+                type="submit"
+                className={`primary-button ${isButtonReady ? "primary-button-ready" : ""}`}
+              >
+                <span className="button-glass-sheen" />
+                <span className="button-glass-tint" />
+                <span className="button-label">Break it down for me</span>
+              </button>
+            </div>
+          )}
+        </form>
+
+        <section className="response-zone" aria-live="polite">
+          {isLoading ? (
+            <div className="loading-zone">
+              <p className="loading-copy">{THINKING_COPY}</p>
+            </div>
+          ) : !hasResult ? null : (
+            <>
+              <div
+                className={`response-card ${
+                  isSupport ? "response-card-crisis" : ""
+                } ${isToolRedirect ? "response-card-redirect" : ""}`}
+              >
+                <div className="response-card-label">{getResponseLabel()}</div>
+
+                <div className="response-copy">
+                  {resultLead ? <p className="response-text">{resultLead}</p> : null}
+
+                  {isSupport && resultMessage ? (
+                    <p className="response-text">{resultMessage}</p>
+                  ) : null}
+
+                  {isToolRedirect ? (
+                    <>
+                      <p className="response-text response-text-soft">
+                        Another Solace tool may fit this better.
+                      </p>
+
+                      {redirectHref ? (
+                        <div className="redirect-button-wrap">
+                          <Link href={redirectHref} className="secondary-button redirect-button">
+                            <span className="button-glass-sheen" />
+                            <span className="button-glass-tint" />
+                            <span className="button-label">{redirectButtonLabel}</span>
+                          </Link>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {!isSupport && !isToolRedirect && displayedSteps.length > 0 ? (
+                    <div className="steps-block">
+                      {displayedSteps.map((step, index) => (
+                        <p key={`${step}-${index}`} className="response-text">
+                          {index + 1}. {step}
+                        </p>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="actions actions-followup">
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">{getFollowupLabel()}</span>
+                </button>
+              </div>
+            </>
+          )}
+        </section>
+      </section>
+
+      <style jsx>{`
+        .breakdown-realm {
+          position: relative;
+          min-height: 100vh;
+          overflow: hidden;
+          background: #080503;
+        }
+
+        .realm-bg-stage {
+          position: fixed;
+          inset: 0;
+          overflow: hidden;
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        .realm-bg-image {
+          position: absolute;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+
+        .realm-bg-vignette {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            radial-gradient(
+              ellipse at center,
+              rgba(0, 0, 0, 0.12) 10%,
+              rgba(0, 0, 0, 0.34) 56%,
+              rgba(0, 0, 0, 0.7) 100%
+            );
+        }
+
+        .realm-bg-soften {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(22, 12, 5, 0.48) 0%,
+              rgba(22, 12, 5, 0.22) 18%,
+              rgba(22, 12, 5, 0.12) 42%,
+              rgba(22, 12, 5, 0.22) 72%,
+              rgba(22, 12, 5, 0.5) 100%
+            );
+        }
+
+        .realm-bg-deepen {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            radial-gradient(
+              circle at 50% 44%,
+              rgba(26, 14, 6, 0.12) 0%,
+              rgba(26, 14, 6, 0.28) 26%,
+              rgba(26, 14, 6, 0.46) 58%,
+              rgba(8, 5, 3, 0.66) 100%
+            );
+        }
+
+        .realm-bg-bottom-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(0, 0, 0, 0) 0%,
+              rgba(8, 5, 3, 0.04) 52%,
+              rgba(8, 5, 3, 0.24) 72%,
+              rgba(8, 5, 3, 0.58) 100%
+            );
+        }
+
+        .realm-bg-top-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(8, 5, 3, 0.5) 0%,
+              rgba(8, 5, 3, 0.18) 16%,
+              rgba(8, 5, 3, 0) 34%,
+              rgba(8, 5, 3, 0) 100%
+            );
+        }
+
+        .realm-center-halo {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            radial-gradient(
+              ellipse at center,
+              rgba(255, 192, 116, 0.04) 0%,
+              rgba(255, 192, 116, 0.015) 18%,
+              rgba(255, 192, 116, 0.006) 32%,
+              rgba(255, 192, 116, 0) 48%
+            );
+        }
+
+        .realm-side-light {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          width: 24%;
+          z-index: 1;
+          pointer-events: none;
+          filter: blur(56px);
+          opacity: 0.56;
+        }
+
+        .realm-side-light-left {
+          left: 0;
+          background: radial-gradient(
+            circle at 34% 26%,
+            rgba(255, 146, 58, 0.12) 0%,
+            transparent 66%
+          );
+        }
+
+        .realm-side-light-right {
+          right: 0;
+          background: radial-gradient(
+            circle at 66% 24%,
+            rgba(255, 196, 120, 0.1) 0%,
+            transparent 66%
+          );
+        }
+
+        .realm-horizon-shimmer {
+          position: fixed;
+          left: 10%;
+          right: 10%;
+          top: 48%;
+          height: 7%;
+          z-index: 1;
+          pointer-events: none;
+          background: radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 232, 208, 0.05) 0%,
+            rgba(255, 232, 208, 0.02) 28%,
+            transparent 60%
+          );
+          filter: blur(24px);
+          opacity: 0.52;
+        }
+
+        .realm-content {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 980px;
+          margin: 0 auto;
+          padding: 138px 24px 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .realm-intro {
+          max-width: 760px;
+        }
+
+        .realm-label {
+          margin: 0 0 14px;
+          font-size: 0.82rem;
+          font-weight: 560;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: rgba(255, 220, 184, 0.54);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .title {
+          margin: 0;
+          font-size: clamp(3.5rem, 7vw, 6rem);
+          font-weight: 650;
+          line-height: 0.94;
+          letter-spacing: -0.06em;
+          color: rgba(255, 248, 242, 0.98);
+          text-shadow:
+            0 10px 28px rgba(0, 0, 0, 0.4),
+            0 0 24px rgba(255, 198, 140, 0.07);
+        }
+
+        .subtitle {
+          margin: 14px 0 0;
+          font-size: 1.02rem;
+          line-height: 1.7;
+          color: rgba(250, 239, 228, 0.86);
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.38);
+        }
+
+        .orb-stage {
+          position: relative;
+          margin-top: 4px;
+          min-height: 446px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .amber-hero {
+          position: relative;
+          width: min(92vw, 900px);
+          height: min(80vw, 540px);
+          pointer-events: none;
+          transform-origin: center;
+        }
+
+        .amber-hero-field,
+        .amber-hero-floor-glow,
+        .amber-hero-floor-core,
+        .amber-core-shadow,
+        .amber-core-tilt {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          pointer-events: none;
+        }
+
+        .amber-hero-field-back {
+          top: 13%;
+          width: 700px;
+          height: 410px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 154, 84, 0.18) 0%,
+            rgba(255, 154, 84, 0.1) 26%,
+            rgba(255, 154, 84, 0.04) 48%,
+            rgba(255, 154, 84, 0) 72%
+          );
+          filter: blur(54px);
+          opacity: 0.82;
+        }
+
+        .amber-hero-field-mid {
+          top: 20%;
+          width: 520px;
+          height: 280px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 214, 166, 0.12) 0%,
+            rgba(255, 214, 166, 0.06) 34%,
+            rgba(255, 214, 166, 0.02) 54%,
+            rgba(255, 214, 166, 0) 74%
+          );
+          filter: blur(34px);
+          opacity: 0.82;
+        }
+
+        .amber-hero-field-front {
+          top: 25%;
+          width: 360px;
+          height: 180px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 238, 214, 0.11) 0%,
+            rgba(255, 238, 214, 0.04) 40%,
+            rgba(255, 238, 214, 0) 74%
+          );
+          filter: blur(20px);
+          opacity: 0.72;
+        }
+
+        .amber-hero-floor-glow {
+          bottom: 11%;
+          width: 520px;
+          height: 82px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 146, 58, 0.18) 0%,
+            rgba(255, 146, 58, 0.06) 44%,
+            rgba(255, 146, 58, 0) 76%
+          );
+          filter: blur(26px);
+          opacity: 0.72;
+        }
+
+        .amber-hero-floor-core {
+          bottom: 13.5%;
+          width: 260px;
+          height: 34px;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 190, 120, 0.24) 0%,
+            rgba(255, 190, 120, 0.08) 48%,
+            rgba(255, 190, 120, 0) 78%
+          );
+          filter: blur(14px);
+          opacity: 0.7;
+        }
+
+        .amber-core-shadow {
+          top: 31%;
+          width: 322px;
+          height: 322px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at 50% 58%,
+            rgba(34, 16, 8, 0.4) 0%,
+            rgba(34, 16, 8, 0.18) 42%,
+            rgba(34, 16, 8, 0) 72%
+          );
+          filter: blur(30px);
+          opacity: 0.74;
+        }
+
+        .amber-core-tilt {
+          top: 22%;
+          width: 276px;
+          height: 276px;
+          transform-style: preserve-3d;
+          perspective: 1200px;
+        }
+
+        .amber-core {
+          position: relative;
+          width: 276px;
+          height: 276px;
+          border-radius: 50%;
+          overflow: hidden;
+          background:
+            radial-gradient(
+              circle at 50% 42%,
+              rgba(255, 249, 242, 0.98) 0%,
+              rgba(255, 226, 192, 0.92) 16%,
+              rgba(255, 178, 112, 0.8) 38%,
+              rgba(208, 112, 44, 0.92) 72%,
+              rgba(102, 42, 14, 0.98) 100%
+            );
+          box-shadow:
+            0 28px 58px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(255, 170, 102, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -18px 32px rgba(0, 0, 0, 0.16);
+          transform-style: preserve-3d;
+        }
+
+        .amber-core-rim {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+            inset 0 0 0 16px rgba(255, 255, 255, 0.014);
+        }
+
+        .amber-core-glass {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.14) 0%,
+              rgba(255, 255, 255, 0.04) 26%,
+              rgba(255, 255, 255, 0) 48%
+            ),
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.1) 0%,
+              rgba(255, 255, 255, 0) 36%,
+              rgba(0, 0, 0, 0.06) 100%
+            );
+          mix-blend-mode: screen;
+          pointer-events: none;
+        }
+
+        .amber-core-parallax {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          transform-style: preserve-3d;
+        }
+
+        .amber-core-parallax-back {
+          transform: translateZ(-10px);
+        }
+
+        .amber-core-parallax-mid {
+          transform: translateZ(0);
+        }
+
+        .amber-core-parallax-front {
+          transform: translateZ(12px);
+        }
+
+        .amber-core-inner-glow {
+          position: absolute;
+          left: 50%;
+          top: 44%;
+          width: 62%;
+          height: 62%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 248, 240, 0.44) 0%,
+            rgba(255, 248, 240, 0.16) 34%,
+            rgba(255, 248, 240, 0) 72%
+          );
+          filter: blur(11px);
+          opacity: 0.9;
+        }
+
+        .amber-core-hotspot {
+          position: absolute;
+          left: 58%;
+          top: 26%;
+          width: 34%;
+          height: 34%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0.08) 42%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          filter: blur(10px);
+          opacity: 0.78;
+        }
+
+        .amber-core-atmosphere,
+        .amber-core-sheen,
+        .amber-core-mineral,
+        .amber-core-swirl,
+        .amber-core-line {
+          position: absolute;
+          pointer-events: none;
+        }
+
+        .amber-core-atmosphere-a {
+          left: 10%;
+          top: 18%;
+          width: 80%;
+          height: 52%;
+          border-radius: 50%;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 242, 224, 0.16) 0%,
+            rgba(255, 242, 224, 0.05) 44%,
+            rgba(255, 242, 224, 0) 80%
+          );
+          filter: blur(18px);
+          opacity: 0.72;
+        }
+
+        .amber-core-atmosphere-b {
+          left: 16%;
+          top: 42%;
+          width: 58%;
+          height: 24%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 212, 162, 0.18) 0%,
+            rgba(255, 212, 162, 0.05) 42%,
+            rgba(255, 212, 162, 0) 80%
+          );
+          filter: blur(12px);
+          opacity: 0.68;
+        }
+
+        .amber-core-atmosphere-c {
+          right: 12%;
+          bottom: 18%;
+          width: 34%;
+          height: 20%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 170, 102, 0.22) 0%,
+            rgba(255, 170, 102, 0.06) 42%,
+            rgba(255, 170, 102, 0) 80%
+          );
+          filter: blur(10px);
+          opacity: 0.52;
+        }
+
+        .amber-core-sheen-a {
+          inset: 7% 12% auto 12%;
+          height: 46%;
+          border-radius: 50%;
+          background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.06) 34%,
+            rgba(255, 255, 255, 0) 82%
+          );
+          filter: blur(12px);
+          transform: rotate(-10deg);
+          opacity: 0.84;
+        }
+
+        .amber-core-sheen-b {
+          left: 14%;
+          top: 12%;
+          width: 42%;
+          height: 56%;
+          border-radius: 50%;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.04) 42%,
+            rgba(255, 255, 255, 0) 76%
+          );
+          filter: blur(14px);
+          opacity: 0.72;
+        }
+
+        .amber-core-swirl {
+          border-radius: 999px;
+          border: 1px solid rgba(255, 236, 214, 0.12);
+          filter: blur(0.3px);
+          opacity: 0.48;
+        }
+
+        .amber-core-swirl-a {
+          left: 16%;
+          top: 28%;
+          width: 66%;
+          height: 28%;
+          transform: rotate(-10deg);
+        }
+
+        .amber-core-swirl-b {
+          left: 20%;
+          top: 44%;
+          width: 54%;
+          height: 22%;
+          transform: rotate(7deg);
+          opacity: 0.34;
+        }
+
+        .amber-core-swirl-c {
+          left: 26%;
+          top: 58%;
+          width: 40%;
+          height: 14%;
+          transform: rotate(-4deg);
+          opacity: 0.24;
+        }
+
+        .amber-core-mineral-a {
+          left: 18%;
+          top: 28%;
+          width: 62%;
+          height: 24%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 228, 198, 0.18) 0%,
+            rgba(255, 228, 198, 0.06) 38%,
+            rgba(255, 228, 198, 0) 74%
+          );
+          filter: blur(10px);
+          transform: rotate(-12deg);
+          opacity: 0.64;
+        }
+
+        .amber-core-mineral-b {
+          left: 22%;
+          top: 54%;
+          width: 46%;
+          height: 20%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 214, 170, 0.16) 0%,
+            rgba(255, 214, 170, 0.05) 38%,
+            rgba(255, 214, 170, 0) 74%
+          );
+          filter: blur(10px);
+          transform: rotate(10deg);
+          opacity: 0.5;
+        }
+
+        .amber-core-mineral-c {
+          right: 16%;
+          top: 22%;
+          width: 26%;
+          height: 26%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.14) 0%,
+            rgba(255, 255, 255, 0.04) 44%,
+            rgba(255, 255, 255, 0) 78%
+          );
+          filter: blur(12px);
+          opacity: 0.54;
+        }
+
+        .amber-core-mineral-d {
+          left: 28%;
+          bottom: 14%;
+          width: 28%;
+          height: 16%;
+          border-radius: 999px;
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 160, 84, 0.22) 0%,
+            rgba(255, 160, 84, 0.06) 40%,
+            rgba(255, 160, 84, 0) 78%
+          );
+          filter: blur(9px);
+          transform: rotate(-12deg);
+          opacity: 0.46;
+        }
+
+        .amber-core-line {
+          left: 50%;
+          border-radius: 999px;
+          transform: translateX(-50%);
+          background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 236, 214, 0.22) 50%,
+            rgba(255, 255, 255, 0) 100%
+          );
+          filter: blur(1px);
+          opacity: 0.62;
+        }
+
+        .amber-core-line-a {
+          top: 39%;
+          width: 68%;
+          height: 1px;
+        }
+
+        .amber-core-line-b {
+          top: 51%;
+          width: 54%;
+          height: 1px;
+          opacity: 0.38;
+        }
+
+        .amber-core-line-c {
+          top: 63%;
+          width: 46%;
+          height: 1px;
+          opacity: 0.22;
+        }
+
+        .amber-hero-idle .amber-core-tilt {
+          animation: amberTiltIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-core {
+          animation: amberCoreIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-hero-field-back {
+          animation: amberAuraIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-hero-field-mid {
+          animation: amberAuraMidIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-hero-field-front {
+          animation: amberAuraFrontIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-hero-floor-glow {
+          animation: amberFloorIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-hero-floor-core {
+          animation: amberFloorCoreIdle 6.6s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-core-parallax-back {
+          animation: amberParallaxBackIdle 7.2s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-core-parallax-mid {
+          animation: amberParallaxMidIdle 6.8s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-core-parallax-front {
+          animation: amberParallaxFrontIdle 6.2s ease-in-out infinite;
+        }
+
+        .amber-hero-idle .amber-core-atmosphere-a,
+        .amber-hero-idle .amber-core-atmosphere-b,
+        .amber-hero-idle .amber-core-atmosphere-c,
+        .amber-hero-idle .amber-core-sheen-a,
+        .amber-hero-idle .amber-core-sheen-b,
+        .amber-hero-idle .amber-core-mineral-a,
+        .amber-hero-idle .amber-core-mineral-b,
+        .amber-hero-idle .amber-core-mineral-c,
+        .amber-hero-idle .amber-core-mineral-d,
+        .amber-hero-idle .amber-core-swirl-a,
+        .amber-hero-idle .amber-core-swirl-b,
+        .amber-hero-idle .amber-core-swirl-c,
+        .amber-hero-idle .amber-core-line-a,
+        .amber-hero-idle .amber-core-line-b,
+        .amber-hero-idle .amber-core-line-c,
+        .amber-hero-idle .amber-core-hotspot {
+          animation: amberInteriorIdle 7.8s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core-tilt {
+          animation: amberTiltActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core {
+          animation: amberCoreActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-hero-field-back {
+          animation: amberAuraActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-hero-field-mid {
+          animation: amberAuraMidActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-hero-field-front {
+          animation: amberAuraFrontActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-hero-floor-glow {
+          animation: amberFloorActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-hero-floor-core {
+          animation: amberFloorCoreActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core-parallax-back {
+          animation: amberParallaxBackActive 3.1s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core-parallax-mid {
+          animation: amberParallaxMidActive 2.8s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core-parallax-front {
+          animation: amberParallaxFrontActive 2.5s ease-in-out infinite;
+        }
+
+        .amber-hero-active .amber-core-atmosphere-a,
+        .amber-hero-active .amber-core-atmosphere-b,
+        .amber-hero-active .amber-core-atmosphere-c,
+        .amber-hero-active .amber-core-sheen-a,
+        .amber-hero-active .amber-core-sheen-b,
+        .amber-hero-active .amber-core-mineral-a,
+        .amber-hero-active .amber-core-mineral-b,
+        .amber-hero-active .amber-core-mineral-c,
+        .amber-hero-active .amber-core-mineral-d,
+        .amber-hero-active .amber-core-swirl-a,
+        .amber-hero-active .amber-core-swirl-b,
+        .amber-hero-active .amber-core-swirl-c,
+        .amber-hero-active .amber-core-line-a,
+        .amber-hero-active .amber-core-line-b,
+        .amber-hero-active .amber-core-line-c,
+        .amber-hero-active .amber-core-hotspot {
+          animation: amberInteriorActive 3.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core-tilt {
+          animation: amberTiltSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core {
+          animation: amberCoreSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-hero-field-back {
+          animation: amberAuraSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-hero-field-mid {
+          animation: amberAuraMidSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-hero-field-front {
+          animation: amberAuraFrontSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-hero-floor-glow {
+          animation: amberFloorSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-hero-floor-core {
+          animation: amberFloorCoreSettled 5.2s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core-parallax-back {
+          animation: amberParallaxBackSettled 5.8s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core-parallax-mid {
+          animation: amberParallaxMidSettled 5.4s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core-parallax-front {
+          animation: amberParallaxFrontSettled 5.1s ease-in-out infinite;
+        }
+
+        .amber-hero-settled .amber-core-atmosphere-a,
+        .amber-hero-settled .amber-core-atmosphere-b,
+        .amber-hero-settled .amber-core-atmosphere-c,
+        .amber-hero-settled .amber-core-sheen-a,
+        .amber-hero-settled .amber-core-sheen-b,
+        .amber-hero-settled .amber-core-mineral-a,
+        .amber-hero-settled .amber-core-mineral-b,
+        .amber-hero-settled .amber-core-mineral-c,
+        .amber-hero-settled .amber-core-mineral-d,
+        .amber-hero-settled .amber-core-swirl-a,
+        .amber-hero-settled .amber-core-swirl-b,
+        .amber-hero-settled .amber-core-swirl-c,
+        .amber-hero-settled .amber-core-line-a,
+        .amber-hero-settled .amber-core-line-b,
+        .amber-hero-settled .amber-core-line-c,
+        .amber-hero-settled .amber-core-hotspot {
+          animation: amberInteriorSettled 5.8s ease-in-out infinite;
+        }
+
+        .decision-form {
+          width: 100%;
+          max-width: 760px;
+          margin-top: 2px;
+        }
+
+        .prompt {
+          display: block;
+          margin: 0 0 14px;
+          font-size: 1.02rem;
+          font-weight: 540;
+          color: rgba(255, 244, 232, 0.96);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
+        }
+
+        .decision-input {
+          width: 100%;
+          min-height: 74px;
+          padding: 18px 24px;
+          border-radius: 30px;
+          border: 1px solid rgba(255, 224, 196, 0.18);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(26, 16, 10, 0.84) 0%,
+              rgba(18, 10, 6, 0.8) 100%
+            );
+          box-shadow:
+            0 20px 44px rgba(0, 0, 0, 0.36),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+            0 0 0 1px rgba(255, 198, 140, 0.03);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          color: rgba(255, 248, 242, 0.96);
+          font-size: 1rem;
+          line-height: 1.45;
+          resize: none;
+          outline: none;
+          transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            background 180ms ease;
+        }
+
+        .decision-input:focus {
+          border-color: rgba(255, 214, 170, 0.34);
+          box-shadow:
+            0 22px 48px rgba(0, 0, 0, 0.38),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 0 0 1px rgba(255, 214, 170, 0.08),
+            0 0 28px rgba(255, 176, 108, 0.12);
+        }
+
+        .decision-input::placeholder {
+          color: rgba(244, 224, 204, 0.58);
+        }
+
+        .actions {
+          display: flex;
+          gap: 14px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .actions-initial {
+          margin-top: 18px;
+        }
+
+        .actions-followup {
+          margin-top: 16px;
+        }
+
+        .primary-button,
+        .secondary-button {
+          position: relative;
+          min-width: 204px;
+          min-height: 58px;
+          padding: 0 28px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 220, 188, 0.24);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(255, 194, 140, 0.18) 0%,
+              rgba(214, 138, 76, 0.16) 46%,
+              rgba(142, 72, 32, 0.2) 100%
+            );
+          box-shadow:
+            0 18px 42px rgba(0, 0, 0, 0.32),
+            0 0 34px rgba(255, 172, 102, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -14px 24px rgba(56, 24, 10, 0.24);
+          color: rgba(255, 248, 242, 0.98);
+          font-size: 0.98rem;
+          font-weight: 560;
+          cursor: pointer;
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          transition:
+            transform 220ms ease,
+            box-shadow 220ms ease,
+            border-color 220ms ease,
+            background 220ms ease,
+            opacity 220ms ease,
+            filter 220ms ease;
+          overflow: hidden;
+          text-decoration: none;
+        }
+
+        .button-glass-sheen,
+        .button-glass-tint {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          border-radius: inherit;
+        }
+
+        .button-glass-sheen {
+          background:
+            linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.26) 0%,
+              rgba(255, 255, 255, 0.12) 22%,
+              rgba(255, 255, 255, 0.03) 42%,
+              rgba(255, 255, 255, 0) 62%
+            );
+          opacity: 0.9;
+        }
+
+        .button-glass-tint {
+          background:
+            radial-gradient(
+              ellipse at 50% 118%,
+              rgba(255, 166, 90, 0.24) 0%,
+              rgba(255, 166, 90, 0.06) 42%,
+              rgba(255, 166, 90, 0) 74%
+            );
+          opacity: 0.86;
+        }
+
+        .button-label {
+          position: relative;
+          z-index: 2;
+        }
+
+        .primary-button-ready {
+          border-color: rgba(255, 234, 214, 0.34);
+          box-shadow:
+            0 20px 46px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(255, 182, 122, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            inset 0 -14px 24px rgba(56, 24, 10, 0.26);
+          filter: brightness(1.03);
+        }
+
+        .primary-button:hover,
+        .secondary-button:hover {
+          transform: translateY(-1px);
+          border-color: rgba(255, 240, 225, 0.34);
+          box-shadow:
+            0 22px 50px rgba(0, 0, 0, 0.34),
+            0 0 50px rgba(255, 186, 126, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.34),
+            inset 0 -14px 24px rgba(56, 24, 10, 0.28);
+        }
+
+        .primary-button:active,
+        .secondary-button:active {
+          transform: translateY(1px);
+          box-shadow:
+            0 12px 28px rgba(0, 0, 0, 0.32),
+            inset 0 2px 6px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+
+        .primary-button:disabled,
+        .secondary-button:disabled {
+          opacity: 0.65;
+          cursor: default;
+          transform: none;
+        }
+
+        .loading-zone {
+          margin-top: 12px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+
+        .loading-copy {
+          margin: 0;
+          font-size: 0.75rem;
+          font-weight: 560;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255, 244, 232, 0.96);
+          text-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.26),
+            0 0 10px rgba(255, 198, 140, 0.08);
+          animation: solaceBreathing 3.2s ease-in-out infinite;
+        }
+
+        .response-zone {
+          margin-top: 6px;
+          width: 100%;
+          max-width: 760px;
+          min-height: 80px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .response-card {
+          width: 100%;
+          max-width: 760px;
+          margin-top: 0;
+          padding: 22px 26px;
+          border-radius: 32px;
+          border: 1px solid rgba(255, 224, 196, 0.18);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(26, 16, 10, 0.84) 0%,
+              rgba(18, 10, 6, 0.8) 100%
+            );
+          box-shadow:
+            0 20px 44px rgba(0, 0, 0, 0.36),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+            0 0 0 1px rgba(255, 198, 140, 0.03);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          animation: responseReveal 600ms ease forwards;
+          opacity: 0;
+          transform: translateY(12px);
+        }
+
+        .response-card-crisis {
+          border-color: rgba(255, 255, 255, 0.12);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(18, 12, 10, 0.72) 0%,
+              rgba(14, 10, 8, 0.78) 100%
+            );
+          box-shadow:
+            0 18px 38px rgba(0, 0, 0, 0.32),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+            0 0 0 1px rgba(255, 255, 255, 0.02);
+          backdrop-filter: blur(22px);
+          -webkit-backdrop-filter: blur(22px);
+        }
+
+        .response-card-redirect {
+          border-color: rgba(255, 224, 196, 0.14);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(22, 14, 10, 0.78) 0%,
+              rgba(16, 10, 8, 0.82) 100%
+            );
+        }
+
+        .response-card-label {
+          margin-bottom: 12px;
+          font-size: 0.75rem;
+          font-weight: 560;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(248, 234, 220, 0.66);
+        }
+
+        .response-copy {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .response-text {
+          margin: 0;
+          color: rgba(255, 248, 242, 0.96);
+          line-height: 1.8;
+          text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
+          white-space: pre-line;
+        }
+
+        .response-text-soft {
+          color: rgba(248, 234, 220, 0.78);
+        }
+
+        .steps-block {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .redirect-button-wrap {
+          display: flex;
+          justify-content: flex-start;
+        }
+
+        .redirect-button {
+          min-width: 0;
+        }
+
+        @keyframes amberTiltIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-1deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(1.1deg) rotateY(1.8deg);
+          }
+        }
+
+        @keyframes amberTiltActive {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-1.5deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(1.8deg) rotateY(3.8deg);
+          }
+        }
+
+        @keyframes amberTiltSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) rotateX(0deg) rotateY(-0.8deg);
+          }
+          50% {
+            transform: translateX(-50%) rotateX(0.9deg) rotateY(1.6deg);
+          }
+        }
+
+        @keyframes amberParallaxBackIdle {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-5px) scale(0.99);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(6px) scale(1.02);
+          }
+        }
+
+        @keyframes amberParallaxMidIdle {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-2px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(3px) scale(1.02);
+          }
+        }
+
+        @keyframes amberParallaxFrontIdle {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(4px) scale(1.01);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-5px) scale(1.04);
+          }
+        }
+
+        @keyframes amberParallaxBackActive {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-8px) scale(0.99);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(10px) scale(1.04);
+          }
+        }
+
+        @keyframes amberParallaxMidActive {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-4px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(6px) scale(1.04);
+          }
+        }
+
+        @keyframes amberParallaxFrontActive {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(6px) scale(1.02);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-8px) scale(1.06);
+          }
+        }
+
+        @keyframes amberParallaxBackSettled {
+          0%,
+          100% {
+            transform: translateZ(-10px) translateX(-4px) scale(1);
+          }
+          50% {
+            transform: translateZ(-10px) translateX(4px) scale(1.02);
+          }
+        }
+
+        @keyframes amberParallaxMidSettled {
+          0%,
+          100% {
+            transform: translateZ(0) translateX(-1px) scale(1);
+          }
+          50% {
+            transform: translateZ(0) translateX(2px) scale(1.02);
+          }
+        }
+
+        @keyframes amberParallaxFrontSettled {
+          0%,
+          100% {
+            transform: translateZ(12px) translateX(3px) scale(1.01);
+          }
+          50% {
+            transform: translateZ(12px) translateX(-3px) scale(1.03);
+          }
+        }
+
+        @keyframes amberCoreIdle {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.982);
+            box-shadow:
+              0 28px 58px rgba(0, 0, 0, 0.34),
+              0 0 44px rgba(255, 170, 102, 0.16),
+              inset 0 1px 0 rgba(255, 255, 255, 0.28),
+              inset 0 -18px 32px rgba(0, 0, 0, 0.16);
+          }
+          50% {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow:
+              0 38px 70px rgba(0, 0, 0, 0.4),
+              0 0 68px rgba(255, 188, 132, 0.28),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3),
+              inset 0 -18px 32px rgba(0, 0, 0, 0.14);
+          }
+        }
+
+        @keyframes amberCoreActive {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.982);
+          }
+          50% {
+            transform: translateY(-12px) scale(1.082);
+          }
+        }
+
+        @keyframes amberCoreSettled {
+          0%,
+          100% {
+            transform: translateY(0) scale(0.994);
+          }
+          50% {
+            transform: translateY(-4px) scale(1.03);
+          }
+        }
+
+        @keyframes amberAuraIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.95);
+            opacity: 0.68;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.14);
+            opacity: 0.98;
+          }
+        }
+
+        @keyframes amberAuraMidIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.96);
+            opacity: 0.66;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes amberAuraFrontIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.965);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.1);
+            opacity: 0.82;
+          }
+        }
+
+        @keyframes amberFloorIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92) scaleY(0.9);
+            opacity: 0.56;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.1) scaleY(1.16);
+            opacity: 0.86;
+          }
+        }
+
+        @keyframes amberFloorCoreIdle {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.9);
+            opacity: 0.48;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.12);
+            opacity: 0.78;
+          }
+        }
+
+        @keyframes amberAuraActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.95);
+            opacity: 0.72;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.22);
+            opacity: 1;
+          }
+        }
+
+        @keyframes amberAuraMidActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.96);
+            opacity: 0.7;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.18);
+            opacity: 1;
+          }
+        }
+
+        @keyframes amberAuraFrontActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.16);
+            opacity: 0.96;
+          }
+        }
+
+        @keyframes amberFloorActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92) scaleY(0.9);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.18) scaleY(1.22);
+            opacity: 0.98;
+          }
+        }
+
+        @keyframes amberFloorCoreActive {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.92);
+            opacity: 0.52;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.18);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes amberAuraSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.72;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes amberAuraMidSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.97);
+            opacity: 0.68;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.09);
+            opacity: 0.84;
+          }
+        }
+
+        @keyframes amberAuraFrontSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scale(0.98);
+            opacity: 0.56;
+          }
+          50% {
+            transform: translateX(-50%) scale(1.06);
+            opacity: 0.72;
+          }
+        }
+
+        @keyframes amberFloorSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.93) scaleY(0.92);
+            opacity: 0.58;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.12) scaleY(1.14);
+            opacity: 0.82;
+          }
+        }
+
+        @keyframes amberFloorCoreSettled {
+          0%,
+          100% {
+            transform: translateX(-50%) scaleX(0.94);
+            opacity: 0.5;
+          }
+          50% {
+            transform: translateX(-50%) scaleX(1.1);
+            opacity: 0.72;
+          }
+        }
+
+        @keyframes amberInteriorIdle {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.72;
+          }
+          50% {
+            transform: rotate(2.4deg) translateX(4px) translateY(-4px) scale(1.03);
+            opacity: 0.96;
+          }
+        }
+
+        @keyframes amberInteriorActive {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.72;
+          }
+          50% {
+            transform: rotate(5deg) translateX(8px) translateY(-7px) scale(1.05);
+            opacity: 1;
+          }
+        }
+
+        @keyframes amberInteriorSettled {
+          0%,
+          100% {
+            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
+            opacity: 0.76;
+          }
+          50% {
+            transform: rotate(1.5deg) translateX(3px) translateY(-2px) scale(1.02);
+            opacity: 0.88;
+          }
+        }
+
+        @keyframes responseReveal {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes solaceBreathing {
+          0% {
+            transform: scale(0.98);
+            opacity: 0.85;
+          }
+          50% {
+            transform: scale(1.04);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(0.98);
+            opacity: 0.85;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .realm-content {
+            padding-top: 130px;
+          }
+
+          .orb-stage {
+            min-height: 400px;
+          }
+
+          .amber-hero {
+            transform: scale(0.88);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .realm-content {
+            padding-top: 122px;
+            padding-left: 18px;
+            padding-right: 18px;
+          }
+
+          .orb-stage {
+            min-height: 340px;
+          }
+
+          .amber-hero {
+            transform: scale(0.72);
+          }
+
+          .decision-form {
+            margin-top: 0;
+          }
+
+          .actions {
+            flex-direction: column;
+          }
+
+          .primary-button,
+          .secondary-button {
+            width: 100%;
+          }
+
+          .response-card {
+            padding: 20px 20px 22px;
+            border-radius: 24px;
+          }
+        }
+      `}</style>
 
       <SiteFooter />
     </main>

@@ -7,6 +7,15 @@ import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
 type OrbPhase = "idle" | "active" | "settled";
 
+type ChooseApiResponse = {
+  text?: string;
+  error?: string;
+  isCrisisFallback?: boolean;
+  isToolRedirect?: boolean;
+  redirectTarget?: "clear-your-mind" | "break-it-down" | "choose";
+  redirectTitle?: string;
+};
+
 const THINKING_DELAY_MS = 2800;
 const THINKING_COPY = "SOLACE IS REFLECTING...";
 const BUTTON_READY_DELAY_MS = 1400;
@@ -18,6 +27,11 @@ export default function ChoosePage() {
   const [orbPhase, setOrbPhase] = useState<OrbPhase>("idle");
   const [hasResult, setHasResult] = useState(false);
   const [isCrisisFallback, setIsCrisisFallback] = useState(false);
+  const [isToolRedirect, setIsToolRedirect] = useState(false);
+  const [redirectTarget, setRedirectTarget] = useState<
+    "clear-your-mind" | "break-it-down" | "choose" | null
+  >(null);
+  const [redirectTitle, setRedirectTitle] = useState("");
   const [isButtonReady, setIsButtonReady] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -71,11 +85,26 @@ export default function ChoosePage() {
     return trimmed;
   }
 
+  function getResponseLabel() {
+    if (isCrisisFallback) return "Take a moment";
+    if (isToolRedirect) return redirectTitle || "A better fit";
+    return "Solace reflection";
+  }
+
+  function getFollowupLabel() {
+    if (isCrisisFallback) return "Clear another thought";
+    if (isToolRedirect) return "Try another decision";
+    return "Explore another decision";
+  }
+
   async function runReflection(trimmed: string) {
     setIsLoading(true);
     setHasResult(false);
     setResult("");
     setIsCrisisFallback(false);
+    setIsToolRedirect(false);
+    setRedirectTarget(null);
+    setRedirectTitle("");
     setIsButtonReady(false);
     setOrbPhase("active");
 
@@ -90,13 +119,14 @@ export default function ChoosePage() {
         body: JSON.stringify({ input: trimmed }),
       });
 
-      const data = await res.json().catch(() => null);
+      const data: ChooseApiResponse | null = await res.json().catch(() => null);
 
       const elapsed = Date.now() - startedAt;
       const remaining = Math.max(0, THINKING_DELAY_MS - elapsed);
       await new Promise((resolve) => setTimeout(resolve, remaining));
 
       const crisisFallback = Boolean(data?.isCrisisFallback);
+      const toolRedirect = Boolean(data?.isToolRedirect);
 
       if (!res.ok) {
         const errorText =
@@ -106,6 +136,9 @@ export default function ChoosePage() {
 
         setResult(getDisplayResponse(errorText, false));
         setIsCrisisFallback(false);
+        setIsToolRedirect(false);
+        setRedirectTarget(null);
+        setRedirectTitle("");
         setHasResult(true);
         setOrbPhase("settled");
         return;
@@ -115,6 +148,13 @@ export default function ChoosePage() {
 
       setResult(getDisplayResponse(text, crisisFallback));
       setIsCrisisFallback(crisisFallback);
+      setIsToolRedirect(toolRedirect && !crisisFallback);
+      setRedirectTarget(
+        data?.redirectTarget === "clear-your-mind" || data?.redirectTarget === "break-it-down"
+          ? data.redirectTarget
+          : null,
+      );
+      setRedirectTitle(typeof data?.redirectTitle === "string" ? data.redirectTitle : "");
       setHasResult(true);
       setOrbPhase("settled");
     } catch {
@@ -124,6 +164,9 @@ export default function ChoosePage() {
 
       setResult("Something interrupted the reflection for a moment. Please try again.");
       setIsCrisisFallback(false);
+      setIsToolRedirect(false);
+      setRedirectTarget(null);
+      setRedirectTitle("");
       setHasResult(true);
       setOrbPhase("settled");
     } finally {
@@ -139,6 +182,9 @@ export default function ChoosePage() {
     if (!trimmed) {
       setResult("Describe what feels unclear.");
       setIsCrisisFallback(false);
+      setIsToolRedirect(false);
+      setRedirectTarget(null);
+      setRedirectTitle("");
       setHasResult(true);
       setOrbPhase("settled");
       setIsButtonReady(false);
@@ -154,6 +200,9 @@ export default function ChoosePage() {
     setHasResult(false);
     setIsLoading(false);
     setIsCrisisFallback(false);
+    setIsToolRedirect(false);
+    setRedirectTarget(null);
+    setRedirectTitle("");
     setIsButtonReady(false);
     setOrbPhase("idle");
 
@@ -189,7 +238,7 @@ export default function ChoosePage() {
           <p className="realm-label">Azure Realm</p>
           <h1 className="title">Choose</h1>
           <p className="subtitle">
-            Compare what’s in front of you calmly and move toward a clearer next step.
+            Bring one decision here. Solace will help you see the choice more clearly.
           </p>
         </div>
 
@@ -277,11 +326,9 @@ export default function ChoosePage() {
               <div
                 className={`response-card ${
                   isCrisisFallback ? "response-card-crisis" : ""
-                }`}
+                } ${isToolRedirect ? "response-card-redirect" : ""}`}
               >
-                <div className="response-card-label">
-                  {isCrisisFallback ? "Take a moment" : "Solace reflection"}
-                </div>
+                <div className="response-card-label">{getResponseLabel()}</div>
 
                 <div className="response-copy">
                   {result
@@ -294,15 +341,20 @@ export default function ChoosePage() {
                       </p>
                     ))}
                 </div>
+
+                {isToolRedirect && redirectTarget ? (
+                  <div className="redirect-chip">
+                    Better fit:{" "}
+                    {redirectTarget === "clear-your-mind" ? "Clear Your Mind" : "Break It Down"}
+                  </div>
+                ) : null}
               </div>
 
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
                   <span className="button-glass-sheen" />
                   <span className="button-glass-tint" />
-                  <span className="button-label">
-                    {isCrisisFallback ? "Clear another thought" : "Explore another decision"}
-                  </span>
+                  <span className="button-label">{getFollowupLabel()}</span>
                 </button>
               </div>
             </>
@@ -1412,6 +1464,16 @@ export default function ChoosePage() {
           -webkit-backdrop-filter: blur(22px);
         }
 
+        .response-card-redirect {
+          border-color: rgba(214, 226, 255, 0.14);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(10, 16, 30, 0.78) 0%,
+              rgba(7, 12, 24, 0.82) 100%
+            );
+        }
+
         .response-card-label {
           margin-bottom: 12px;
           font-size: 0.75rem;
@@ -1433,6 +1495,19 @@ export default function ChoosePage() {
           line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
           white-space: pre-line;
+        }
+
+        .redirect-chip {
+          margin-top: 16px;
+          display: inline-flex;
+          align-self: flex-start;
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(214, 226, 255, 0.14);
+          background: rgba(255, 255, 255, 0.04);
+          color: rgba(236, 244, 255, 0.78);
+          font-size: 0.74rem;
+          letter-spacing: 0.04em;
         }
 
         .realm-footer {

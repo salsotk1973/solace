@@ -21,7 +21,7 @@ export default function SiteFooter() {
           position: relative;
           z-index: 30;
           width: 100%;
-          padding: 8px 24px 28px;
+          padding: 12px 24px 30px;
         }
 
         .site-footer-inner {
@@ -32,14 +32,19 @@ export default function SiteFooter() {
           justify-content: space-between;
           gap: 20px;
           padding-top: 18px;
-          border-top: 1px solid rgba(184, 206, 255, 0.12);
+
+          /* FIX: clearer divider */
+          border-top: 1px solid rgba(255, 255, 255, 0.14);
         }
 
         .site-footer-copy {
           margin: 0;
           font-size: 12px;
           line-height: 1.6;
-          color: rgba(220, 232, 255, 0.42);
+
+          /* FIX: readable white */
+          color: rgba(255, 255, 255, 0.78);
+
           letter-spacing: 0.01em;
         }
 
@@ -49,14 +54,18 @@ export default function SiteFooter() {
           letter-spacing: 0.08em;
           text-transform: uppercase;
           text-decoration: none;
-          color: rgba(236, 244, 255, 0.72);
-          border-bottom: 1px solid rgba(236, 244, 255, 0.18);
-          transition: color 160ms ease, border-color 160ms ease;
+
+          /* FIX: visible white */
+          color: rgba(255, 255, 255, 0.92);
+
+          border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+
+          transition: all 160ms ease;
         }
 
         .site-footer-link:hover {
-          color: rgba(255, 255, 255, 0.92);
-          border-color: rgba(255, 255, 255, 0.34);
+          color: rgba(255, 255, 255, 1);
+          border-color: rgba(255, 255, 255, 0.5);
         }
 
         @media (max-width: 640px) {

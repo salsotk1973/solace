@@ -14,9 +14,10 @@ import {
   getClientIdentifierFromHeaders,
 } from "@/lib/solace/rate-limit";
 import {
-  isSolaceCrisisInput,
-  SOLACE_CRISIS_FALLBACK,
-} from "@/lib/solace/safety";
+  buildSharedCrisisTextPayload,
+  isSharedSolaceRedFlagText,
+} from "@/lib/solace/safety/shared";
+import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
 import { getOpenAIClient } from "@/lib/server/openai";
 
 const CHOOSE_RATE_LIMIT = 5;
@@ -466,64 +467,6 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
   return response;
 }
 
-function isChooseViolenceOrHomicideInput(input: string): boolean {
-  const text = normalizeText(input);
-
-  if (!text) return false;
-
-  const violentIntentPatterns = [
-    /\bkill\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bmurder\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bstab\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bshoot\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bstrangle\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bpoison\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bhurt\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\battack\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bbeat\s+up\s+(him|her|them|someone|somebody|my\s+\w+|our\s+\w+|a\s+\w+|that\s+\w+)\b/i,
-    /\bset\s+fire\s+to\b/i,
-  ];
-
-  const firstPersonViolentDecisionPatterns = [
-    /\bshould\s+i\s+kill\b/i,
-    /\bdo\s+i\s+kill\b/i,
-    /\bcan\s+i\s+kill\b/i,
-    /\bshould\s+i\s+murder\b/i,
-    /\bdo\s+i\s+murder\b/i,
-    /\bcan\s+i\s+murder\b/i,
-    /\bshould\s+i\s+stab\b/i,
-    /\bshould\s+i\s+shoot\b/i,
-    /\bshould\s+i\s+strangle\b/i,
-    /\bshould\s+i\s+poison\b/i,
-    /\bshould\s+i\s+hurt\b/i,
-    /\bshould\s+i\s+attack\b/i,
-    /\bshould\s+i\s+beat\s+up\b/i,
-    /\bi\s+want\s+to\s+kill\b/i,
-    /\bi\s+want\s+to\s+murder\b/i,
-    /\bi\s+feel\s+like\s+killing\b/i,
-    /\bi\s+feel\s+like\s+hurting\b/i,
-    /\bi\s+am\s+going\s+to\s+kill\b/i,
-    /\bi\s+am\s+going\s+to\s+hurt\b/i,
-    /\bi'm\s+going\s+to\s+kill\b/i,
-    /\bi'm\s+going\s+to\s+hurt\b/i,
-  ];
-
-  const threatPatterns = [
-    /\bhe\s+deserves\s+to\s+die\b/i,
-    /\bshe\s+deserves\s+to\s+die\b/i,
-    /\bthey\s+deserve\s+to\s+die\b/i,
-    /\bmake\s+him\s+pay\b/i,
-    /\bmake\s+her\s+pay\b/i,
-    /\bmake\s+them\s+pay\b/i,
-  ];
-
-  return (
-    violentIntentPatterns.some((pattern) => pattern.test(text)) ||
-    firstPersonViolentDecisionPatterns.some((pattern) => pattern.test(text)) ||
-    threatPatterns.some((pattern) => pattern.test(text))
-  );
-}
-
 export async function POST(req: Request) {
   try {
     const clientKey = getClientIdentifierFromHeaders(req.headers);
@@ -560,10 +503,29 @@ export async function POST(req: Request) {
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
-    if (isChooseViolenceOrHomicideInput(input) || isSolaceCrisisInput(input)) {
+    if (isSharedSolaceRedFlagText(input)) {
+      const response = NextResponse.json(buildSharedCrisisTextPayload());
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
+    }
+
+    const routing = classifySolaceToolIntent({
+      currentTool: "choose",
+      text: input,
+    });
+
+    if (
+      routing.shouldRedirect &&
+      routing.redirectTarget &&
+      routing.title &&
+      routing.message &&
+      routing.ctaLabel
+    ) {
       const response = NextResponse.json({
-        text: SOLACE_CRISIS_FALLBACK,
-        isCrisisFallback: true,
+        text: `${routing.message}\n\n${routing.ctaLabel}`,
+        isCrisisFallback: false,
+        isToolRedirect: true,
+        redirectTarget: routing.redirectTarget,
+        redirectTitle: routing.title,
       });
 
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);

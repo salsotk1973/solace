@@ -3,6 +3,7 @@
 // /app/tools/clear-your-mind/page.tsx
 
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import {
   type CSSProperties,
   FormEvent,
@@ -15,16 +16,18 @@ import {
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
 import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
-const MAX_THOUGHTS = 7;
+const MAX_THOUGHTS = 3;
+const MAX_LAYOUT_CAPACITY = 7;
 const MAX_INPUT_LENGTH = 140;
 const THINKING_COPY = "SOLACE IS REFLECTING...";
 const STARTER_BUBBLE_ID = "starter-bubble";
-const FIELD_HEIGHT = 320;
+const DEFAULT_FIELD_HEIGHT = 280;
 const ORGANIZE_DELAY_MS = 1600;
 const BUTTON_READY_DELAY_MS = 900;
 
+const PROMPT_COPY = "What is bothering you?";
 const INPUT_HELPER_COPY =
-  "Write one thought, then press Enter (Max. 7). Click a thought to remove it if needed.";
+  "Write a thought, press Enter (max. 3). To remove it, just click it.";
 
 type BubbleMode = "float" | "organizing" | "aligned";
 
@@ -163,7 +166,6 @@ function normalizeApiResult(raw: unknown): NormalizedUiResponse {
   if (isRecord(raw.reflection)) {
     const reflection = raw.reflection;
 
-    const title = typeof reflection.title === "string" ? reflection.title.trim() : "";
     const summary = typeof reflection.summary === "string" ? reflection.summary.trim() : "";
 
     let recognition = "";
@@ -185,7 +187,7 @@ function normalizeApiResult(raw: unknown): NormalizedUiResponse {
           : "";
     }
 
-    const parts = [title, summary, recognition, untangling, gentleFrame].filter(
+    const parts = [summary, recognition, untangling, gentleFrame].filter(
       (part) => part.length > 0,
     );
 
@@ -375,16 +377,50 @@ function getBubbleFontSize(text: string, diameter: number): number {
 }
 
 function getBubbleHue(importance: number): number {
-  if (importance >= 90) return 220;
-  if (importance >= 78) return 226;
-  if (importance >= 62) return 232;
-  if (importance >= 44) return 238;
-  if (importance >= 26) return 244;
-  return 252;
+  if (importance >= 90) return 144;
+  if (importance >= 78) return 150;
+  if (importance >= 62) return 156;
+  if (importance >= 44) return 162;
+  if (importance >= 26) return 168;
+  return 174;
 }
 
-function createStarterBubble(fieldWidth: number): BubbleItem {
-  const diameter = Math.min(180, Math.max(156, fieldWidth * 0.23));
+function getResponsiveFieldHeight(
+  viewportWidth: number,
+  bubbleCount: number,
+  isOrganized: boolean,
+): number {
+  const extraBubbles = Math.max(0, bubbleCount - 3);
+
+  if (viewportWidth <= 420) {
+    return (isOrganized ? 540 : 420) + extraBubbles * 54;
+  }
+
+  if (viewportWidth <= 520) {
+    return (isOrganized ? 490 : 390) + extraBubbles * 48;
+  }
+
+  if (viewportWidth <= 640) {
+    return (isOrganized ? 430 : 340) + extraBubbles * 42;
+  }
+
+  if (viewportWidth <= 768) {
+    return (isOrganized ? 390 : 310) + extraBubbles * 34;
+  }
+
+  if (viewportWidth <= 900) {
+    return (isOrganized ? 360 : 290) + extraBubbles * 28;
+  }
+
+  if (viewportWidth <= 1200) {
+    return (isOrganized ? 340 : 276) + extraBubbles * 24;
+  }
+
+  return (isOrganized ? 320 : DEFAULT_FIELD_HEIGHT) + extraBubbles * 22;
+}
+
+function createStarterBubble(fieldWidth: number, fieldHeight: number): BubbleItem {
+  const diameter = Math.min(172, Math.max(148, fieldWidth * 0.19));
 
   return {
     id: STARTER_BUBBLE_ID,
@@ -393,10 +429,10 @@ function createStarterBubble(fieldWidth: number): BubbleItem {
     importance: 999,
     rawImportance: 999,
     x: fieldWidth / 2,
-    y: FIELD_HEIGHT / 2,
+    y: fieldHeight / 2,
     vx: 0,
     vy: 0,
-    hue: 264,
+    hue: 164,
     delay: 0,
     seed: 0.5,
     fontSize: 16,
@@ -404,7 +440,12 @@ function createStarterBubble(fieldWidth: number): BubbleItem {
   };
 }
 
-function buildBubble(text: string, index: number, fieldWidth: number): BubbleItem {
+function buildBubble(
+  text: string,
+  index: number,
+  fieldWidth: number,
+  fieldHeight: number,
+): BubbleItem {
   const rawImportance = getRawImportance(text);
   const importance = getVisualImportance(rawImportance);
   const diameter = getBubbleDiameter(importance);
@@ -439,7 +480,7 @@ function buildBubble(text: string, index: number, fieldWidth: number): BubbleIte
     importance,
     rawImportance,
     x: fieldWidth * position.x,
-    y: FIELD_HEIGHT * position.y,
+    y: fieldHeight * position.y,
     vx: drift.vx,
     vy: drift.vy,
     hue: getBubbleHue(importance),
@@ -452,29 +493,92 @@ function buildBubble(text: string, index: number, fieldWidth: number): BubbleIte
 function getAlignedTargets(
   bubbles: BubbleItem[],
   fieldWidth: number,
+  fieldHeight: number,
 ): Array<{ id: string; targetX: number; targetY: number }> {
   const sorted = [...bubbles].sort((a, b) => {
     if (b.diameter !== a.diameter) return b.diameter - a.diameter;
     return b.importance - a.importance;
   });
 
-  const gap = 18;
-  const totalWidth =
+  if (sorted.length === 0) return [];
+
+  const horizontalPadding = fieldWidth <= 640 ? 14 : 20;
+  const gap = fieldWidth <= 640 ? 12 : 18;
+  const rowGap = fieldWidth <= 640 ? 20 : 26;
+  const availableWidth = Math.max(220, fieldWidth - horizontalPadding * 2);
+
+  const singleRowWidth =
     sorted.reduce((sum, bubble) => sum + bubble.diameter, 0) +
     gap * Math.max(0, sorted.length - 1);
 
-  let cursor = Math.max(20, (fieldWidth - totalWidth) / 2);
+  if (singleRowWidth <= availableWidth) {
+    let cursorX = (fieldWidth - singleRowWidth) / 2;
+    const targetY = fieldHeight * 0.5;
 
-  return sorted.map((bubble) => {
-    const targetX = cursor + bubble.diameter / 2;
-    const targetY = FIELD_HEIGHT * 0.5;
-    cursor += bubble.diameter + gap;
+    return sorted.map((bubble) => {
+      const targetX = cursorX + bubble.diameter / 2;
+      cursorX += bubble.diameter + gap;
 
-    return {
-      id: bubble.id,
-      targetX,
-      targetY,
-    };
+      return {
+        id: bubble.id,
+        targetX,
+        targetY,
+      };
+    });
+  }
+
+  const rows: BubbleItem[][] = [];
+  let currentRow: BubbleItem[] = [];
+  let currentRowWidth = 0;
+
+  for (const bubble of sorted) {
+    const nextWidth = currentRow.length
+      ? currentRowWidth + gap + bubble.diameter
+      : bubble.diameter;
+
+    if (currentRow.length > 0 && nextWidth > availableWidth) {
+      rows.push(currentRow);
+      currentRow = [bubble];
+      currentRowWidth = bubble.diameter;
+    } else {
+      currentRow.push(bubble);
+      currentRowWidth = nextWidth;
+    }
+  }
+
+  if (currentRow.length > 0) {
+    rows.push(currentRow);
+  }
+
+  const rowHeights = rows.map((row) => Math.max(...row.map((bubble) => bubble.diameter)));
+  const totalClusterHeight =
+    rowHeights.reduce((sum, rowHeight) => sum + rowHeight, 0) +
+    rowGap * Math.max(0, rows.length - 1);
+
+  let cursorY = Math.max((fieldHeight - totalClusterHeight) / 2, 20);
+
+  return rows.flatMap((row, rowIndex) => {
+    const rowWidth =
+      row.reduce((sum, bubble) => sum + bubble.diameter, 0) +
+      gap * Math.max(0, row.length - 1);
+
+    let cursorX = Math.max((fieldWidth - rowWidth) / 2, horizontalPadding);
+    const rowHeight = rowHeights[rowIndex];
+    const targetY = cursorY + rowHeight / 2;
+
+    const rowTargets = row.map((bubble) => {
+      const targetX = cursorX + bubble.diameter / 2;
+      cursorX += bubble.diameter + gap;
+
+      return {
+        id: bubble.id,
+        targetX,
+        targetY,
+      };
+    });
+
+    cursorY += rowHeight + rowGap;
+    return rowTargets;
   });
 }
 
@@ -527,6 +631,7 @@ export default function ClearYourMindPage() {
   const [isClarityFallback, setIsClarityFallback] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [bubbleMode, setBubbleMode] = useState<BubbleMode>("float");
+  const [fieldHeight, setFieldHeight] = useState(DEFAULT_FIELD_HEIGHT);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const bubbleFieldRef = useRef<HTMLDivElement | null>(null);
@@ -547,9 +652,48 @@ export default function ClearYourMindPage() {
   const showHelperOverlay = draft.length === 0;
 
   useEffect(() => {
-    const width = bubbleFieldRef.current?.clientWidth ?? 1100;
-    setBubbles([createStarterBubble(width)]);
-  }, []);
+    const updateFieldHeight = () => {
+      setFieldHeight(
+        getResponsiveFieldHeight(
+          window.innerWidth,
+          realBubbles.length,
+          bubbleMode !== "float" || Boolean(responseText),
+        ),
+      );
+    };
+
+    updateFieldHeight();
+    window.addEventListener("resize", updateFieldHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateFieldHeight);
+    };
+  }, [realBubbles.length, bubbleMode, responseText]);
+
+  useEffect(() => {
+    const width = bubbleFieldRef.current?.clientWidth ?? 900;
+
+    setBubbles((current) => {
+      const real = current.filter((bubble) => !bubble.isStarter);
+
+      if (real.length === 0) {
+        return [createStarterBubble(width, fieldHeight)];
+      }
+
+      return real.map((bubble, index) => ({
+        ...bubble,
+        x: Math.min(
+          Math.max(bubble.diameter / 2 + 8, bubble.x),
+          width - bubble.diameter / 2 - 8,
+        ),
+        y: Math.min(
+          Math.max(bubble.diameter / 2 + 8, bubble.y),
+          fieldHeight - bubble.diameter / 2 - 8,
+        ),
+        delay: index * 120,
+      }));
+    });
+  }, [fieldHeight]);
 
   useEffect(() => {
     setDraft("");
@@ -602,12 +746,14 @@ export default function ClearYourMindPage() {
 
   useEffect(() => {
     const interval = window.setInterval(() => {
-      const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
+      const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 900;
       const time = performance.now() * 0.001;
 
       setBubbles((current) => {
         if (current.length === 0) return current;
-        if (current.length === 1 && current[0].isStarter) return current;
+        if (current.length === 1 && current[0].isStarter) {
+          return [createStarterBubble(fieldWidth, fieldHeight)];
+        }
 
         const next = current.map((bubble) => ({ ...bubble }));
 
@@ -617,7 +763,7 @@ export default function ClearYourMindPage() {
             const minX = radius + 6;
             const maxX = fieldWidth - radius - 6;
             const minY = radius + 6;
-            const maxY = FIELD_HEIGHT - radius - 6;
+            const maxY = fieldHeight - radius - 6;
 
             const wanderX = Math.sin(time * 1.1 + bubble.seed * 1.7) * 0.03;
             const wanderY = Math.cos(time * 0.92 + bubble.seed * 1.3) * 0.026;
@@ -723,7 +869,11 @@ export default function ClearYourMindPage() {
           return next;
         }
 
-        const targets = getAlignedTargets(next, fieldWidth);
+        const targets = getAlignedTargets(
+          next.slice(0, MAX_LAYOUT_CAPACITY),
+          fieldWidth,
+          fieldHeight,
+        );
 
         for (const bubble of next) {
           const target = targets.find((item) => item.id === bubble.id);
@@ -744,19 +894,24 @@ export default function ClearYourMindPage() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [bubbleMode]);
+  }, [bubbleMode, fieldHeight]);
 
   function addBubbleFromDraft() {
     const trimmed = draft.trim();
 
     if (!trimmed || inputLocked) return;
 
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 900;
 
     setBubbles((current) => {
       const withoutStarter = current.filter((bubble) => !bubble.isStarter);
       if (withoutStarter.length >= MAX_THOUGHTS) return withoutStarter;
-      const next = [...withoutStarter, buildBubble(trimmed, withoutStarter.length, fieldWidth)];
+
+      const next = [
+        ...withoutStarter,
+        buildBubble(trimmed, withoutStarter.length, fieldWidth, fieldHeight),
+      ];
+
       return next.slice(-MAX_THOUGHTS);
     });
 
@@ -830,10 +985,10 @@ export default function ClearYourMindPage() {
   }
 
   function handleReset() {
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 900;
 
     setDraft("");
-    setBubbles([createStarterBubble(fieldWidth)]);
+    setBubbles([createStarterBubble(fieldWidth, fieldHeight)]);
     setResponseText("");
     setError("");
     setIsLoading(false);
@@ -858,11 +1013,11 @@ export default function ClearYourMindPage() {
   function removeBubble(id: string) {
     if (id === STARTER_BUBBLE_ID || isLoading || !!responseText) return;
 
-    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 1100;
+    const fieldWidth = bubbleFieldRef.current?.clientWidth ?? 900;
 
     setBubbles((current) => {
       const next = current.filter((bubble) => bubble.id !== id);
-      return next.length ? next : [createStarterBubble(fieldWidth)];
+      return next.length ? next : [createStarterBubble(fieldWidth, fieldHeight)];
     });
 
     setResponseText("");
@@ -884,29 +1039,33 @@ export default function ClearYourMindPage() {
 
       <div className="realm-bg-vignette" aria-hidden="true" />
       <div className="realm-bg-soften" aria-hidden="true" />
-      <div className="realm-mind-wash" aria-hidden="true" />
+      <div className="realm-bg-deepen" aria-hidden="true" />
+      <div className="realm-bg-bottom-weight" aria-hidden="true" />
+      <div className="realm-bg-top-weight" aria-hidden="true" />
       <div className="realm-center-halo" aria-hidden="true" />
+      <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
+      <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
+      <div className="realm-horizon-shimmer" aria-hidden="true" />
 
       <SiteHeader />
 
       <section className="realm-content">
         <div className="realm-intro">
-          <p className="realm-label">Mind realm</p>
-
+          <p className="realm-label">Emerald Realm</p>
           <h1 className="title">Clear your mind</h1>
-
           <p className="subtitle">
             Untangle overthinking, mental loops, and emotional build-up into something a little
             clearer.
           </p>
         </div>
 
-        <section className="bubble-stage" aria-label="Thoughts">
+        <div className="bubble-stage">
           <div
             ref={bubbleFieldRef}
             className={`bubble-field ${
               bubbleMode !== "float" ? "bubble-field-organizing" : ""
             } ${responseText ? "bubble-field-softened" : ""}`}
+            style={{ "--bubble-field-height": `${fieldHeight}px` } as CSSProperties}
           >
             {bubbles.map((bubble) => (
               <button
@@ -939,7 +1098,7 @@ export default function ClearYourMindPage() {
               </button>
             ))}
           </div>
-        </section>
+        </div>
 
         {showInitialForm ? (
           <form
@@ -964,6 +1123,10 @@ export default function ClearYourMindPage() {
               aria-hidden="true"
               className="autofill-trap"
             />
+
+            <label htmlFor="clear-your-mind-input" className="prompt">
+              {PROMPT_COPY}
+            </label>
 
             <div className="input-shell">
               <div className="mind-input-wrap">
@@ -1000,7 +1163,9 @@ export default function ClearYourMindPage() {
                 className={`primary-button ${isButtonReady ? "primary-button-ready" : ""}`}
                 disabled={!canSubmit}
               >
-                Clear your mind
+                <span className="button-glass-sheen" />
+                <span className="button-glass-tint" />
+                <span className="button-label">Clear your mind</span>
               </button>
             </div>
           </form>
@@ -1020,7 +1185,9 @@ export default function ClearYourMindPage() {
 
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
-                  Clear another thought
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Clear another thought</span>
                 </button>
               </div>
             </>
@@ -1048,7 +1215,9 @@ export default function ClearYourMindPage() {
 
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
-                  Clear another thought
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Clear another thought</span>
                 </button>
               </div>
             </>
@@ -1056,12 +1225,17 @@ export default function ClearYourMindPage() {
         </section>
       </section>
 
+      <div className="page-footer">
+        <SiteFooter />
+      </div>
+
       <style jsx>{`
         .mind-realm {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #05050a;
+          background: #02080a;
+          isolation: isolate;
         }
 
         .realm-bg-stage {
@@ -1074,18 +1248,15 @@ export default function ClearYourMindPage() {
 
         .realm-bg-image {
           position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          object-position: center;
           display: block;
-          width: auto;
-          height: auto;
-          max-width: none;
-          max-height: none;
           user-select: none;
           -webkit-user-drag: none;
-          opacity: 0.82;
-          filter: saturate(0.88) hue-rotate(32deg) brightness(0.82);
+          opacity: 0.92;
         }
 
         .realm-bg-vignette {
@@ -1095,9 +1266,9 @@ export default function ClearYourMindPage() {
           pointer-events: none;
           background: radial-gradient(
             ellipse at center,
-            rgba(0, 0, 0, 0) 34%,
-            rgba(0, 0, 0, 0.18) 68%,
-            rgba(0, 0, 0, 0.44) 100%
+            rgba(0, 0, 0, 0.1) 10%,
+            rgba(0, 0, 0, 0.3) 56%,
+            rgba(0, 0, 0, 0.62) 100%
           );
         }
 
@@ -1108,32 +1279,54 @@ export default function ClearYourMindPage() {
           pointer-events: none;
           background: linear-gradient(
             180deg,
-            rgba(10, 9, 16, 0.14) 0%,
-            rgba(10, 9, 16, 0.04) 24%,
-            rgba(10, 9, 16, 0.04) 76%,
-            rgba(10, 9, 16, 0.16) 100%
+            rgba(4, 14, 12, 0.42) 0%,
+            rgba(4, 14, 12, 0.18) 18%,
+            rgba(4, 14, 12, 0.08) 42%,
+            rgba(4, 14, 12, 0.16) 72%,
+            rgba(4, 14, 12, 0.42) 100%
           );
         }
 
-        .realm-mind-wash {
+        .realm-bg-deepen {
           position: fixed;
           inset: 0;
           z-index: 1;
           pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at 50% 24%,
-              rgba(215, 182, 255, 0.16) 0%,
-              rgba(215, 182, 255, 0.09) 16%,
-              rgba(215, 182, 255, 0.03) 34%,
-              rgba(215, 182, 255, 0) 54%
-            ),
-            radial-gradient(
-              ellipse at 82% 28%,
-              rgba(198, 210, 255, 0.06) 0%,
-              rgba(198, 210, 255, 0.02) 28%,
-              rgba(198, 210, 255, 0) 48%
-            );
+          background: radial-gradient(
+            circle at 50% 44%,
+            rgba(6, 24, 20, 0.08) 0%,
+            rgba(6, 24, 20, 0.2) 26%,
+            rgba(6, 24, 20, 0.34) 58%,
+            rgba(2, 8, 10, 0.54) 100%
+          );
+        }
+
+        .realm-bg-bottom-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(2, 8, 10, 0.04) 52%,
+            rgba(2, 8, 10, 0.18) 72%,
+            rgba(2, 8, 10, 0.5) 100%
+          );
+        }
+
+        .realm-bg-top-weight {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(2, 8, 10, 0.42) 0%,
+            rgba(2, 8, 10, 0.16) 16%,
+            rgba(2, 8, 10, 0) 34%,
+            rgba(2, 8, 10, 0) 100%
+          );
         }
 
         .realm-center-halo {
@@ -1143,21 +1336,67 @@ export default function ClearYourMindPage() {
           pointer-events: none;
           background: radial-gradient(
             ellipse at center,
-            rgba(224, 196, 255, 0.07) 0%,
-            rgba(224, 196, 255, 0.03) 20%,
-            rgba(224, 196, 255, 0.012) 34%,
-            rgba(224, 196, 255, 0) 50%
+            rgba(154, 248, 208, 0.014) 0%,
+            rgba(154, 248, 208, 0.006) 18%,
+            rgba(154, 248, 208, 0.002) 32%,
+            rgba(154, 248, 208, 0) 48%
           );
-          filter: blur(12px);
+        }
+
+        .realm-side-light {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          width: 24%;
+          z-index: 1;
+          pointer-events: none;
+          filter: blur(56px);
+          opacity: 0.44;
+        }
+
+        .realm-side-light-left {
+          left: 0;
+          background: radial-gradient(
+            circle at 34% 26%,
+            rgba(54, 220, 160, 0.08) 0%,
+            transparent 66%
+          );
+        }
+
+        .realm-side-light-right {
+          right: 0;
+          background: radial-gradient(
+            circle at 66% 24%,
+            rgba(92, 232, 182, 0.06) 0%,
+            transparent 66%
+          );
+        }
+
+        .realm-horizon-shimmer {
+          position: fixed;
+          left: 10%;
+          right: 10%;
+          top: 48%;
+          height: 7%;
+          z-index: 1;
+          pointer-events: none;
+          background: radial-gradient(
+            circle at 50% 50%,
+            rgba(218, 255, 237, 0.026) 0%,
+            rgba(218, 255, 237, 0.01) 28%,
+            transparent 60%
+          );
+          filter: blur(24px);
+          opacity: 0.42;
         }
 
         .realm-content {
           position: relative;
-          z-index: 2;
+          z-index: 20;
           width: 100%;
-          max-width: 1400px;
+          max-width: 980px;
           margin: 0 auto;
-          padding: 140px 24px 88px;
+          padding: 138px 24px 28px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1165,17 +1404,23 @@ export default function ClearYourMindPage() {
         }
 
         .realm-intro {
-          max-width: 980px;
+          width: 100%;
+          max-width: 760px;
+          min-height: 168px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
         }
 
         .realm-label {
           margin: 0 0 14px;
-          font-size: 0.78rem;
+          font-size: 0.82rem;
           font-weight: 560;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: rgba(236, 226, 246, 0.56);
-          text-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+          color: rgba(208, 240, 226, 0.54);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
         }
 
         .title {
@@ -1184,35 +1429,37 @@ export default function ClearYourMindPage() {
           font-weight: 650;
           line-height: 0.94;
           letter-spacing: -0.06em;
-          color: rgba(247, 244, 252, 0.99);
+          color: rgba(247, 250, 255, 0.98);
           text-shadow:
-            0 10px 28px rgba(0, 0, 0, 0.3),
-            0 0 24px rgba(226, 202, 255, 0.08);
+            0 10px 28px rgba(0, 0, 0, 0.4),
+            0 0 24px rgba(160, 255, 214, 0.04);
         }
 
         .subtitle {
-          margin: 16px 0 0;
-          max-width: 980px;
+          margin: 14px 0 0;
           font-size: 1.02rem;
-          line-height: 1.72;
-          color: rgba(240, 234, 248, 0.9);
-          text-shadow: 0 3px 16px rgba(0, 0, 0, 0.24);
+          line-height: 1.7;
+          color: rgba(232, 245, 240, 0.86);
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.38);
         }
 
         .bubble-stage {
+          position: relative;
+          margin-top: 4px;
           width: 100%;
-          max-width: 1280px;
-          margin-top: 18px;
-          margin-bottom: 22px;
-          padding: 0 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           overflow: visible;
         }
 
         .bubble-field {
           position: relative;
-          width: 100%;
-          height: ${FIELD_HEIGHT}px;
+          width: min(92vw, 900px);
+          height: var(--bubble-field-height);
+          min-height: var(--bubble-field-height);
           overflow: hidden;
+          pointer-events: auto;
         }
 
         .bubble-field-organizing {
@@ -1220,7 +1467,7 @@ export default function ClearYourMindPage() {
         }
 
         .bubble-field-softened .thought-bubble-real {
-          opacity: 0.92;
+          opacity: 0.94;
         }
 
         .thought-bubble {
@@ -1231,45 +1478,45 @@ export default function ClearYourMindPage() {
           height: var(--bubble-diameter);
           transform: translate(-50%, -50%);
           border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(216, 255, 235, 0.12);
           padding: 0;
           cursor: pointer;
           text-align: center;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: rgba(251, 248, 255, 0.97);
+          color: rgba(247, 252, 249, 0.97);
           background:
             radial-gradient(
               circle at 32% 24%,
-              rgba(255, 255, 255, 0.24) 0%,
-              rgba(255, 255, 255, 0.08) 16%,
+              rgba(255, 255, 255, 0.2) 0%,
+              rgba(255, 255, 255, 0.06) 16%,
               rgba(255, 255, 255, 0) 34%
             ),
             radial-gradient(
               circle at 70% 72%,
-              hsla(var(--bubble-hue), 90%, 72%, 0.12) 0%,
-              hsla(var(--bubble-hue), 90%, 72%, 0.04) 34%,
+              hsla(var(--bubble-hue), 90%, 72%, 0.1) 0%,
+              hsla(var(--bubble-hue), 90%, 72%, 0.03) 34%,
               hsla(var(--bubble-hue), 90%, 72%, 0) 62%
             ),
             conic-gradient(
               from 220deg at 50% 50%,
-              rgba(184, 165, 231, 0.18),
-              rgba(136, 117, 188, 0.08),
-              rgba(209, 194, 245, 0.18),
-              rgba(112, 94, 164, 0.12),
-              rgba(184, 165, 231, 0.18)
+              rgba(164, 237, 204, 0.16),
+              rgba(84, 180, 148, 0.06),
+              rgba(196, 247, 224, 0.16),
+              rgba(60, 130, 108, 0.1),
+              rgba(164, 237, 204, 0.16)
             ),
             linear-gradient(
               180deg,
-              rgba(204, 188, 240, 0.26) 0%,
-              rgba(126, 107, 178, 0.2) 100%
+              rgba(182, 240, 214, 0.22) 0%,
+              rgba(96, 172, 146, 0.16) 100%
             );
           box-shadow:
             0 18px 38px rgba(0, 0, 0, 0.18),
-            inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            inset 0 -16px 28px rgba(29, 24, 48, 0.2),
-            0 0 32px hsla(var(--bubble-hue), 90%, 70%, 0.12);
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            inset 0 -16px 28px rgba(10, 34, 25, 0.18),
+            0 0 24px hsla(var(--bubble-hue), 90%, 70%, 0.08);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           transition:
@@ -1296,21 +1543,21 @@ export default function ClearYourMindPage() {
           inset: 10% 14% 44% 18%;
           background: radial-gradient(
             ellipse at center,
-            rgba(255, 255, 255, 0.22) 0%,
-            rgba(255, 255, 255, 0.08) 46%,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0.06) 46%,
             rgba(255, 255, 255, 0) 78%
           );
           filter: blur(3px);
-          opacity: 0.85;
+          opacity: 0.78;
         }
 
         .thought-bubble-core-glow {
           inset: 18%;
           background: radial-gradient(
             circle at center,
-            hsla(var(--bubble-hue), 80%, 74%, 0.14) 0%,
-            hsla(var(--bubble-hue), 80%, 74%, 0.05) 42%,
-            hsla(var(--bubble-hue), 80%, 74%, 0) 72%
+            hsla(var(--bubble-hue), 82%, 74%, 0.12) 0%,
+            hsla(var(--bubble-hue), 82%, 74%, 0.04) 42%,
+            hsla(var(--bubble-hue), 82%, 74%, 0) 72%
           );
           filter: blur(8px);
         }
@@ -1325,9 +1572,9 @@ export default function ClearYourMindPage() {
           font-size: 0.68rem;
           font-weight: 560;
           letter-spacing: 0.02em;
-          color: rgba(246, 242, 252, 0.9);
-          background: rgba(12, 14, 28, 0.72);
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: rgba(244, 250, 246, 0.9);
+          background: rgba(8, 20, 16, 0.72);
+          border: 1px solid rgba(216, 255, 235, 0.12);
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
           white-space: nowrap;
           opacity: 0;
@@ -1364,28 +1611,28 @@ export default function ClearYourMindPage() {
         .thought-bubble-starter {
           cursor: default;
           box-shadow:
-            0 22px 50px rgba(0, 0, 0, 0.18),
-            inset 0 1px 0 rgba(255, 255, 255, 0.22),
-            inset 0 -18px 30px rgba(29, 24, 48, 0.18),
-            0 0 40px rgba(221, 198, 255, 0.14);
+            0 22px 46px rgba(0, 0, 0, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18),
+            inset 0 -18px 30px rgba(10, 34, 25, 0.18),
+            0 0 22px rgba(150, 255, 208, 0.06);
           animation:
             bubbleAppear 900ms cubic-bezier(0.22, 1, 0.36, 1),
             starterBubbleIdleSideways 4.2s linear infinite;
         }
 
         .thought-bubble-real:hover {
-          border-color: rgba(255, 255, 255, 0.18);
+          border-color: rgba(225, 255, 238, 0.18);
           box-shadow:
             0 18px 40px rgba(0, 0, 0, 0.2),
             inset 0 1px 0 rgba(255, 255, 255, 0.16),
-            inset 0 -14px 24px rgba(29, 24, 48, 0.18),
-            0 0 34px hsla(var(--bubble-hue), 90%, 72%, 0.14);
+            inset 0 -14px 24px rgba(10, 34, 25, 0.2),
+            0 0 28px hsla(var(--bubble-hue), 90%, 72%, 0.12);
         }
 
         .mind-form {
           width: 100%;
-          max-width: 1120px;
-          margin-top: 0;
+          max-width: 760px;
+          margin-top: 2px;
         }
 
         .autofill-trap {
@@ -1398,9 +1645,18 @@ export default function ClearYourMindPage() {
           top: -9999px;
         }
 
+        .prompt {
+          display: block;
+          margin: 0 0 14px;
+          font-size: 1.02rem;
+          font-weight: 540;
+          color: rgba(241, 250, 246, 0.96);
+          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
+        }
+
         .input-shell {
           width: 100%;
-          max-width: 720px;
+          max-width: 760px;
           margin: 0 auto;
         }
 
@@ -1419,7 +1675,7 @@ export default function ClearYourMindPage() {
           text-align: left;
           font-size: 0.93rem;
           line-height: 1.2;
-          color: rgba(232, 226, 242, 0.5);
+          color: rgba(218, 236, 228, 0.42);
           text-shadow: 0 1px 8px rgba(0, 0, 0, 0.16);
           white-space: nowrap;
           overflow: hidden;
@@ -1428,25 +1684,26 @@ export default function ClearYourMindPage() {
 
         .mind-input {
           width: 100%;
-          height: 58px;
-          padding: 0 24px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          background: linear-gradient(
-            180deg,
-            rgba(21, 18, 28, 0.54) 0%,
-            rgba(15, 14, 24, 0.62) 100%
-          );
+          min-height: 74px;
+          padding: 18px 24px;
+          border-radius: 30px;
+          border: 1px solid rgba(198, 238, 216, 0.18);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(8, 20, 18, 0.84) 0%,
+              rgba(6, 16, 14, 0.8) 100%
+            );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.11),
+            0 20px 44px rgba(0, 0, 0, 0.36),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(228, 204, 255, 0.02),
-            0 0 28px rgba(205, 176, 255, 0.03);
+            0 0 0 1px rgba(150, 228, 188, 0.03);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
-          color: rgba(247, 244, 252, 0.93);
-          font-size: 0.98rem;
+          color: rgba(243, 250, 246, 0.96);
+          font-size: 1rem;
+          line-height: 1.45;
           outline: none;
           transition:
             border-color 180ms ease,
@@ -1455,12 +1712,12 @@ export default function ClearYourMindPage() {
         }
 
         .mind-input:focus {
-          border-color: rgba(226, 202, 255, 0.28);
+          border-color: rgba(182, 240, 210, 0.3);
           box-shadow:
-            0 22px 44px rgba(0, 0, 0, 0.24),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            0 0 0 1px rgba(226, 202, 255, 0.07),
-            0 0 30px rgba(204, 170, 255, 0.06);
+            0 22px 48px rgba(0, 0, 0, 0.38),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
+            0 0 0 1px rgba(182, 240, 210, 0.08),
+            0 0 28px rgba(126, 224, 178, 0.1);
         }
 
         .actions {
@@ -1471,7 +1728,7 @@ export default function ClearYourMindPage() {
         }
 
         .actions-initial {
-          margin-top: 20px;
+          margin-top: 18px;
         }
 
         .actions-followup {
@@ -1481,17 +1738,17 @@ export default function ClearYourMindPage() {
         .primary-button,
         .secondary-button {
           position: relative;
-          min-width: 186px;
-          min-height: 56px;
-          padding: 0 24px;
+          min-width: 204px;
+          min-height: 58px;
+          padding: 0 28px;
           border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          color: rgba(247, 244, 252, 0.98);
+          border: 1px solid rgba(188, 238, 214, 0.22);
+          color: rgba(243, 250, 246, 0.96);
           font-size: 0.98rem;
-          font-weight: 550;
+          font-weight: 560;
           cursor: pointer;
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
           transition:
             transform 220ms ease,
             box-shadow 220ms ease,
@@ -1502,117 +1759,99 @@ export default function ClearYourMindPage() {
           overflow: hidden;
         }
 
-        .primary-button::before,
-        .secondary-button::before {
-          content: "";
+        .button-glass-sheen,
+        .button-glass-tint {
           position: absolute;
-          inset: 1px;
-          border-radius: inherit;
+          inset: 0;
           pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.1) 0%,
-            rgba(255, 255, 255, 0.025) 48%,
-            rgba(255, 255, 255, 0.01) 100%
-          );
+          border-radius: inherit;
+        }
+
+        .button-glass-sheen {
+          background:
+            linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.26) 0%,
+              rgba(255, 255, 255, 0.12) 22%,
+              rgba(255, 255, 255, 0.03) 42%,
+              rgba(255, 255, 255, 0) 62%
+            );
+          opacity: 0.9;
+        }
+
+        .button-glass-tint {
+          background:
+            radial-gradient(
+              ellipse at 50% 118%,
+              rgba(118, 255, 194, 0.2) 0%,
+              rgba(118, 255, 194, 0.06) 42%,
+              rgba(118, 255, 194, 0) 74%
+            );
+          opacity: 0.86;
+        }
+
+        .button-label {
+          position: relative;
+          z-index: 2;
         }
 
         .primary-button {
-          background: linear-gradient(
-            180deg,
-            rgba(138, 116, 173, 0.52) 0%,
-            rgba(99, 82, 136, 0.66) 100%
-          );
+          background:
+            linear-gradient(
+              180deg,
+              rgba(132, 225, 184, 0.18) 0%,
+              rgba(80, 184, 142, 0.16) 46%,
+              rgba(28, 88, 68, 0.2) 100%
+            );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -10px 18px rgba(42, 33, 62, 0.26),
-            0 0 22px rgba(212, 176, 255, 0.06);
+            0 18px 42px rgba(0, 0, 0, 0.32),
+            0 0 34px rgba(122, 240, 188, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -14px 24px rgba(8, 34, 24, 0.24);
         }
 
         .primary-button-ready {
-          border-color: rgba(236, 216, 255, 0.28);
-          background: linear-gradient(
-            180deg,
-            rgba(149, 126, 188, 0.58) 0%,
-            rgba(108, 89, 149, 0.72) 100%
-          );
+          border-color: rgba(208, 248, 228, 0.36);
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -10px 18px rgba(42, 33, 62, 0.26),
-            0 0 28px rgba(220, 188, 255, 0.08);
-          filter: brightness(1.03);
+            0 20px 46px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(132, 244, 196, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            inset 0 -14px 24px rgba(8, 34, 24, 0.26);
+          filter: brightness(1.04);
+          animation: buttonReadyFloat 2.8s ease-in-out infinite;
         }
 
         .secondary-button {
-          background: linear-gradient(
-            180deg,
-            rgba(113, 96, 144, 0.48) 0%,
-            rgba(82, 67, 113, 0.6) 100%
-          );
+          background:
+            linear-gradient(
+              180deg,
+              rgba(88, 184, 144, 0.16) 0%,
+              rgba(28, 88, 68, 0.22) 100%
+            );
           box-shadow:
-            0 16px 34px rgba(0, 0, 0, 0.28),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -10px 18px rgba(33, 27, 48, 0.24);
+            0 18px 42px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18),
+            inset 0 -12px 22px rgba(8, 34, 24, 0.26);
         }
 
         .primary-button:hover,
         .secondary-button:hover {
           transform: translateY(-1px);
-          border-color: rgba(255, 255, 255, 0.22);
-        }
-
-        .primary-button:hover {
-          background: linear-gradient(
-            180deg,
-            rgba(126, 105, 161, 0.66) 0%,
-            rgba(90, 74, 124, 0.8) 100%
-          );
+          border-color: rgba(224, 255, 238, 0.32);
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(33, 27, 48, 0.3),
-            0 0 24px rgba(210, 175, 255, 0.05);
-        }
-
-        .primary-button-ready:hover {
-          background: linear-gradient(
-            180deg,
-            rgba(136, 114, 174, 0.7) 0%,
-            rgba(98, 81, 136, 0.84) 100%
-          );
-          box-shadow:
-            0 20px 42px rgba(0, 0, 0, 0.34),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -12px 20px rgba(33, 27, 48, 0.3),
-            0 0 30px rgba(220, 188, 255, 0.08);
-        }
-
-        .secondary-button:hover {
-          background: linear-gradient(
-            180deg,
-            rgba(100, 84, 130, 0.64) 0%,
-            rgba(71, 58, 99, 0.76) 100%
-          );
-          box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            inset 0 -12px 20px rgba(33, 27, 48, 0.28);
+            0 22px 50px rgba(0, 0, 0, 0.34),
+            0 0 50px rgba(148, 248, 204, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.34),
+            inset 0 -14px 24px rgba(8, 34, 24, 0.28);
         }
 
         .primary-button:active,
         .secondary-button:active {
           transform: translateY(1px);
-          background: linear-gradient(
-            180deg,
-            rgba(75, 62, 104, 0.78) 0%,
-            rgba(53, 43, 77, 0.88) 100%
-          );
           box-shadow:
-            0 10px 22px rgba(0, 0, 0, 0.26),
-            inset 0 2px 6px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            0 12px 28px rgba(0, 0, 0, 0.32),
+            inset 0 2px 6px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12);
         }
 
         .primary-button:disabled,
@@ -1635,17 +1874,17 @@ export default function ClearYourMindPage() {
           font-weight: 560;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(247, 244, 252, 0.96);
+          color: rgba(243, 250, 246, 0.96);
           text-shadow:
             0 4px 16px rgba(0, 0, 0, 0.26),
-            0 0 10px rgba(222, 198, 255, 0.08);
+            0 0 10px rgba(172, 248, 210, 0.08);
           animation: solaceBreathing 3.2s ease-in-out infinite;
         }
 
         .response-zone {
-          margin-top: 18px;
+          margin-top: 6px;
           width: 100%;
-          max-width: 1120px;
+          max-width: 760px;
           min-height: 80px;
           display: flex;
           flex-direction: column;
@@ -1655,22 +1894,22 @@ export default function ClearYourMindPage() {
 
         .response-card {
           width: 100%;
-          max-width: 980px;
+          max-width: 760px;
           margin-top: 0;
           padding: 22px 26px;
           border-radius: 32px;
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          background: linear-gradient(
-            180deg,
-            rgba(21, 18, 28, 0.66) 0%,
-            rgba(15, 14, 24, 0.74) 100%
-          );
+          border: 1px solid rgba(198, 238, 216, 0.18);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(8, 20, 18, 0.84) 0%,
+              rgba(6, 16, 14, 0.8) 100%
+            );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.28),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
+            0 20px 44px rgba(0, 0, 0, 0.36),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(228, 204, 255, 0.03),
-            0 0 24px rgba(206, 176, 255, 0.03);
+            0 0 0 1px rgba(150, 228, 188, 0.03);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           animation: responseReveal 600ms ease forwards;
@@ -1679,12 +1918,13 @@ export default function ClearYourMindPage() {
         }
 
         .response-card-crisis {
-          border-color: rgba(255, 255, 255, 0.12);
-          background: linear-gradient(
-            180deg,
-            rgba(10, 14, 24, 0.72) 0%,
-            rgba(6, 10, 18, 0.78) 100%
-          );
+          border-color: rgba(216, 255, 235, 0.12);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(10, 14, 24, 0.82) 0%,
+              rgba(6, 10, 18, 0.84) 100%
+            );
           box-shadow:
             0 18px 38px rgba(0, 0, 0, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -1700,7 +1940,7 @@ export default function ClearYourMindPage() {
           font-weight: 560;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(225, 214, 238, 0.66);
+          color: rgba(224, 242, 232, 0.66);
         }
 
         .response-copy {
@@ -1711,10 +1951,18 @@ export default function ClearYourMindPage() {
 
         .response-text {
           margin: 0;
-          color: rgba(247, 244, 252, 0.96);
+          color: rgba(243, 250, 246, 0.96);
           line-height: 1.8;
           text-shadow: 0 5px 18px rgba(0, 0, 0, 0.26);
           white-space: pre-line;
+        }
+
+        .page-footer {
+          position: relative;
+          z-index: 220;
+          width: 100%;
+          isolation: isolate;
+          pointer-events: auto;
         }
 
         @keyframes bubbleAppear {
@@ -1766,15 +2014,24 @@ export default function ClearYourMindPage() {
           }
         }
 
+        @keyframes buttonReadyFloat {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-2px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+
         @media (max-width: 900px) {
           .realm-content {
             padding-top: 130px;
           }
 
-          .bubble-stage {
-            max-width: 100%;
-          }
-
+          .bubble-stage,
           .mind-form,
           .response-zone {
             max-width: 100%;
@@ -1792,13 +2049,8 @@ export default function ClearYourMindPage() {
             padding-right: 18px;
           }
 
-          .bubble-stage {
-            margin-top: 14px;
-            padding: 0 6px;
-          }
-
-          .bubble-field {
-            height: 280px;
+          .realm-intro {
+            min-height: 150px;
           }
 
           .input-shell {
@@ -1806,16 +2058,18 @@ export default function ClearYourMindPage() {
           }
 
           .mind-input {
-            height: 54px;
+            min-height: 56px;
+            height: 56px;
             padding: 0 20px;
-            font-size: 0.94rem;
+            border-radius: 26px;
+            font-size: 0.95rem;
           }
 
           .mind-input-overlay {
             left: 20px;
             right: 20px;
             font-size: 0.88rem;
-            color: rgba(232, 226, 242, 0.48);
+            color: rgba(218, 236, 228, 0.42);
           }
 
           .actions {

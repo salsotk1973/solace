@@ -210,7 +210,7 @@ function buildTitle(descriptors: AnchorDescriptor[]): string {
     ids.includes("work_pressure") &&
     ids.includes("family_responsibility")
   ) {
-    return "A lot is landing at once";
+    return "";
   }
 
   if (
@@ -218,46 +218,46 @@ function buildTitle(descriptors: AnchorDescriptor[]): string {
     ids.includes("escape_desire") &&
     ids.includes("calm_desire")
   ) {
-    return "Part of you wants relief";
+    return "";
   }
 
   if (ids.includes("job_loss") && ids.includes("money_pressure") && ids.length >= 3) {
-    return "Too much is leaning on the same point";
+    return "";
   }
 
   if (ids.includes("money_pressure") && ids.includes("work_pressure")) {
-    return "Money and work are colliding";
+    return "";
   }
 
   if (ids.includes("job_loss") && ids.includes("money_pressure")) {
-    return "Losing work sharpens everything";
+    return "";
   }
 
   if (ids.includes("home_tension") && ids.includes("family_responsibility")) {
-    return "Home already feels tight";
+    return "";
   }
 
   if (ids.length >= 4) {
-    return "Too many things are sitting on top of each other";
+    return "";
   }
 
   if (ids.includes("money_pressure")) {
-    return "Money pressure is taking up space";
+    return "";
   }
 
   if (ids.includes("work_pressure")) {
-    return "Work pressure is following you around";
+    return "";
   }
 
   if (ids.includes("family_distance")) {
-    return "Part of you is somewhere else";
+    return "";
   }
 
   if (ids.includes("escape_desire") && ids.includes("calm_desire")) {
-    return "Part of you wants breathing room";
+    return "";
   }
 
-  return "This is carrying more weight than it should";
+  return "";
 }
 
 function buildLineOne(descriptors: AnchorDescriptor[]): string {
@@ -268,7 +268,7 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
     ids.includes("work_pressure") &&
     ids.includes("family_responsibility")
   ) {
-    return "Providing, keeping up, and preparing for what is coming are all pressing on you together.";
+    return "Keeping things afloat, staying on top of demands, and getting ready for a big change are all pulling on you together.";
   }
 
   if (
@@ -276,7 +276,7 @@ function buildLineOne(descriptors: AnchorDescriptor[]): string {
     ids.includes("escape_desire") &&
     ids.includes("calm_desire")
   ) {
-    return "Part of you is carrying pressure, and another part is looking for space, relief, and a little quiet.";
+    return "Part of you is carrying pressure, and another part is quietly looking for some relief.";
   }
 
   if (
@@ -319,7 +319,7 @@ function buildLineTwo(descriptors: AnchorDescriptor[]): string {
     ids.includes("work_pressure") &&
     ids.includes("family_responsibility")
   ) {
-    return "That can make the future feel heavy before anything has even happened yet.";
+    return "That can make the future feel heavy before it has even arrived.";
   }
 
   if (
