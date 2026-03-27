@@ -26,7 +26,7 @@ npx vitest <path>  # run a single test file, e.g. npx vitest lib/engine/__tests_
 npx playwright test  # run e2e tests (requires production build running on :3000)
 ```
 
-After every implementation: confirm no TypeScript errors, no console errors, and that `localhost:3000` renders correctly.
+After every implementation: confirm no TypeScript errors, no console errors, then start the dev server, take a screenshot of localhost:3000 and review it against the spec above. If anything doesn't match, fix it and screenshot again until it does.
 
 ---
 
