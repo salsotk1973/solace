@@ -152,9 +152,7 @@ export default function BreakItDownPage() {
       if (!res.ok) {
         setResultLead("Something interrupted the reflection for a moment.");
         setResultMessage(
-          typeof data?.error === "string"
-            ? data.error
-            : "Please try again.",
+          typeof data?.error === "string" ? data.error : "Please try again.",
         );
         setIsSupport(true);
         setHasResult(true);
@@ -305,35 +303,73 @@ export default function BreakItDownPage() {
 
             <div className="amber-core-shadow" />
             <div className="amber-core-tilt">
-              <div className="amber-core">
-                <div className="amber-core-parallax amber-core-parallax-back">
+              <div className="amber-system">
+                <div className="amber-core-halo amber-core-halo-back" />
+                <div className="amber-core-halo amber-core-halo-mid" />
+                <div className="amber-core-halo amber-core-halo-front" />
+
+                <div className="amber-orbit-ring amber-orbit-ring-a" />
+                <div className="amber-orbit-ring amber-orbit-ring-b" />
+
+                <div className="amber-orbital-system">
+                  <div className="amber-orbital-lane amber-orbital-lane-1">
+                    <div className="amber-orbiter-rail">
+                      <div className="amber-orbiter amber-orbiter-1">
+                        <div className="amber-orbiter-core" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="amber-orbital-lane amber-orbital-lane-2">
+                    <div className="amber-orbiter-rail">
+                      <div className="amber-orbiter amber-orbiter-2">
+                        <div className="amber-orbiter-core" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="amber-orbital-lane amber-orbital-lane-3">
+                    <div className="amber-orbiter-rail">
+                      <div className="amber-orbiter amber-orbiter-3">
+                        <div className="amber-orbiter-core" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="amber-orbital-lane amber-orbital-lane-4">
+                    <div className="amber-orbiter-rail">
+                      <div className="amber-orbiter amber-orbiter-4">
+                        <div className="amber-orbiter-core" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="amber-orbital-lane amber-orbital-lane-5">
+                    <div className="amber-orbiter-rail">
+                      <div className="amber-orbiter amber-orbiter-5">
+                        <div className="amber-orbiter-core" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="amber-core">
                   <div className="amber-core-atmosphere amber-core-atmosphere-a" />
                   <div className="amber-core-atmosphere amber-core-atmosphere-b" />
                   <div className="amber-core-atmosphere amber-core-atmosphere-c" />
-                  <div className="amber-core-swirl amber-core-swirl-a" />
-                  <div className="amber-core-swirl amber-core-swirl-b" />
-                  <div className="amber-core-swirl amber-core-swirl-c" />
-                </div>
-
-                <div className="amber-core-parallax amber-core-parallax-mid">
-                  <div className="amber-core-mineral amber-core-mineral-a" />
-                  <div className="amber-core-mineral amber-core-mineral-b" />
-                  <div className="amber-core-mineral amber-core-mineral-c" />
-                  <div className="amber-core-mineral amber-core-mineral-d" />
-                  <div className="amber-core-line amber-core-line-a" />
-                  <div className="amber-core-line amber-core-line-b" />
-                  <div className="amber-core-line amber-core-line-c" />
-                </div>
-
-                <div className="amber-core-parallax amber-core-parallax-front">
                   <div className="amber-core-inner-glow" />
                   <div className="amber-core-hotspot" />
                   <div className="amber-core-sheen amber-core-sheen-a" />
                   <div className="amber-core-sheen amber-core-sheen-b" />
+                  <div className="amber-core-swirl amber-core-swirl-a" />
+                  <div className="amber-core-swirl amber-core-swirl-b" />
+                  <div className="amber-core-swirl amber-core-swirl-c" />
+                  <div className="amber-core-line amber-core-line-a" />
+                  <div className="amber-core-line amber-core-line-b" />
+                  <div className="amber-core-line amber-core-line-c" />
+                  <div className="amber-core-glass" />
+                  <div className="amber-core-rim" />
                 </div>
-
-                <div className="amber-core-glass" />
-                <div className="amber-core-rim" />
               </div>
             </div>
           </div>
@@ -773,510 +809,111 @@ export default function BreakItDownPage() {
           perspective: 1200px;
         }
 
-        .amber-core {
+        .amber-system {
           position: relative;
           width: 276px;
           height: 276px;
           border-radius: 50%;
-          overflow: hidden;
-          background:
-            radial-gradient(
-              circle at 50% 42%,
-              rgba(255, 249, 242, 0.98) 0%,
-              rgba(255, 226, 192, 0.92) 16%,
-              rgba(255, 178, 112, 0.8) 38%,
-              rgba(208, 112, 44, 0.92) 72%,
-              rgba(102, 42, 14, 0.98) 100%
-            );
-          box-shadow:
-            0 28px 58px rgba(0, 0, 0, 0.34),
-            0 0 44px rgba(255, 170, 102, 0.16),
-            inset 0 1px 0 rgba(255, 255, 255, 0.28),
-            inset 0 -18px 32px rgba(0, 0, 0, 0.16);
           transform-style: preserve-3d;
         }
 
-        .amber-core-rim {
+        .amber-core-halo,
+        .amber-orbit-ring,
+        .amber-orbital-system,
+        .amber-core {
           position: absolute;
           inset: 0;
           border-radius: 50%;
-          box-shadow:
-            inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-            inset 0 0 0 16px rgba(255, 255, 255, 0.014);
         }
 
-        .amber-core-glass {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          background:
-            linear-gradient(
-              135deg,
-              rgba(255, 255, 255, 0.14) 0%,
-              rgba(255, 255, 255, 0.04) 26%,
-              rgba(255, 255, 255, 0) 48%
-            ),
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.1) 0%,
-              rgba(255, 255, 255, 0) 36%,
-              rgba(0, 0, 0, 0.06) 100%
-            );
-          mix-blend-mode: screen;
+        .amber-core-halo {
           pointer-events: none;
         }
 
-        .amber-core-parallax {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          transform-style: preserve-3d;
-        }
-
-        .amber-core-parallax-back {
-          transform: translateZ(-10px);
-        }
-
-        .amber-core-parallax-mid {
-          transform: translateZ(0);
-        }
-
-        .amber-core-parallax-front {
-          transform: translateZ(12px);
-        }
-
-        .amber-core-inner-glow {
-          position: absolute;
-          left: 50%;
-          top: 44%;
-          width: 62%;
-          height: 62%;
-          transform: translate(-50%, -50%);
-          border-radius: 50%;
+        .amber-core-halo-back {
           background: radial-gradient(
             circle,
-            rgba(255, 248, 240, 0.44) 0%,
-            rgba(255, 248, 240, 0.16) 34%,
-            rgba(255, 248, 240, 0) 72%
+            rgba(255, 176, 104, 0.18) 0%,
+            rgba(255, 176, 104, 0.08) 28%,
+            rgba(255, 176, 104, 0.02) 46%,
+            rgba(255, 176, 104, 0) 70%
           );
-          filter: blur(11px);
-          opacity: 0.9;
+          filter: blur(34px);
+          opacity: 0.88;
+          transform: scale(1.32);
         }
 
-        .amber-core-hotspot {
-          position: absolute;
-          left: 58%;
-          top: 26%;
-          width: 34%;
-          height: 34%;
-          border-radius: 50%;
+        .amber-core-halo-mid {
           background: radial-gradient(
             circle,
-            rgba(255, 255, 255, 0.3) 0%,
-            rgba(255, 255, 255, 0.08) 42%,
-            rgba(255, 255, 255, 0) 76%
+            rgba(255, 216, 176, 0.18) 0%,
+            rgba(255, 216, 176, 0.06) 32%,
+            rgba(255, 216, 176, 0) 68%
           );
-          filter: blur(10px);
-          opacity: 0.78;
+          filter: blur(20px);
+          opacity: 0.82;
+          transform: scale(1.14);
         }
 
-        .amber-core-atmosphere,
-        .amber-core-sheen,
-        .amber-core-mineral,
-        .amber-core-swirl,
-        .amber-core-line {
-          position: absolute;
-          pointer-events: none;
-        }
-
-        .amber-core-atmosphere-a {
-          left: 10%;
-          top: 18%;
-          width: 80%;
-          height: 52%;
-          border-radius: 50%;
+        .amber-core-halo-front {
           background: radial-gradient(
-            ellipse at center,
-            rgba(255, 242, 224, 0.16) 0%,
-            rgba(255, 242, 224, 0.05) 44%,
-            rgba(255, 242, 224, 0) 80%
-          );
-          filter: blur(18px);
-          opacity: 0.72;
-        }
-
-        .amber-core-atmosphere-b {
-          left: 16%;
-          top: 42%;
-          width: 58%;
-          height: 24%;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 212, 162, 0.18) 0%,
-            rgba(255, 212, 162, 0.05) 42%,
-            rgba(255, 212, 162, 0) 80%
+            circle,
+            rgba(255, 246, 232, 0.18) 0%,
+            rgba(255, 246, 232, 0.08) 20%,
+            rgba(255, 246, 232, 0) 56%
           );
           filter: blur(12px);
-          opacity: 0.68;
+          opacity: 0.76;
+          transform: scale(0.92);
         }
 
-        .amber-core-atmosphere-c {
-          right: 12%;
-          bottom: 18%;
-          width: 34%;
-          height: 20%;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 170, 102, 0.22) 0%,
-            rgba(255, 170, 102, 0.06) 42%,
-            rgba(255, 170, 102, 0) 80%
-          );
-          filter: blur(10px);
-          opacity: 0.52;
-        }
-
-        .amber-core-sheen-a {
-          inset: 7% 12% auto 12%;
-          height: 46%;
-          border-radius: 50%;
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.18) 0%,
-            rgba(255, 255, 255, 0.06) 34%,
-            rgba(255, 255, 255, 0) 82%
-          );
-          filter: blur(12px);
-          transform: rotate(-10deg);
-          opacity: 0.84;
-        }
-
-        .amber-core-sheen-b {
-          left: 14%;
-          top: 12%;
-          width: 42%;
-          height: 56%;
-          border-radius: 50%;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 255, 255, 0.14) 0%,
-            rgba(255, 255, 255, 0.04) 42%,
-            rgba(255, 255, 255, 0) 76%
-          );
-          filter: blur(14px);
-          opacity: 0.72;
-        }
-
-        .amber-core-swirl {
-          border-radius: 999px;
-          border: 1px solid rgba(255, 236, 214, 0.12);
+        .amber-orbit-ring {
+          border: 1px solid rgba(255, 241, 226, 0.1);
           filter: blur(0.3px);
-          opacity: 0.48;
+          opacity: 0.4;
+          transform-origin: center;
         }
 
-        .amber-core-swirl-a {
-          left: 16%;
-          top: 28%;
-          width: 66%;
-          height: 28%;
-          transform: rotate(-10deg);
+        .amber-orbit-ring-a {
+          transform: scale(1.26) rotate(-8deg);
         }
 
-        .amber-core-swirl-b {
-          left: 20%;
-          top: 44%;
-          width: 54%;
-          height: 22%;
-          transform: rotate(7deg);
-          opacity: 0.34;
-        }
-
-        .amber-core-swirl-c {
-          left: 26%;
-          top: 58%;
-          width: 40%;
-          height: 14%;
-          transform: rotate(-4deg);
-          opacity: 0.24;
-        }
-
-        .amber-core-mineral-a {
-          left: 18%;
-          top: 28%;
-          width: 62%;
-          height: 24%;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 228, 198, 0.18) 0%,
-            rgba(255, 228, 198, 0.06) 38%,
-            rgba(255, 228, 198, 0) 74%
-          );
-          filter: blur(10px);
-          transform: rotate(-12deg);
-          opacity: 0.64;
-        }
-
-        .amber-core-mineral-b {
-          left: 22%;
-          top: 54%;
-          width: 46%;
-          height: 20%;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 214, 170, 0.16) 0%,
-            rgba(255, 214, 170, 0.05) 38%,
-            rgba(255, 214, 170, 0) 74%
-          );
-          filter: blur(10px);
-          transform: rotate(10deg);
-          opacity: 0.5;
-        }
-
-        .amber-core-mineral-c {
-          right: 16%;
-          top: 22%;
-          width: 26%;
-          height: 26%;
-          border-radius: 50%;
-          background: radial-gradient(
-            circle,
-            rgba(255, 255, 255, 0.14) 0%,
-            rgba(255, 255, 255, 0.04) 44%,
-            rgba(255, 255, 255, 0) 78%
-          );
-          filter: blur(12px);
-          opacity: 0.54;
-        }
-
-        .amber-core-mineral-d {
-          left: 28%;
-          bottom: 14%;
-          width: 28%;
-          height: 16%;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 160, 84, 0.22) 0%,
-            rgba(255, 160, 84, 0.06) 40%,
-            rgba(255, 160, 84, 0) 78%
-          );
-          filter: blur(9px);
-          transform: rotate(-12deg);
-          opacity: 0.46;
-        }
-
-        .amber-core-line {
-          left: 50%;
-          border-radius: 999px;
-          transform: translateX(-50%);
-          background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 236, 214, 0.22) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          filter: blur(1px);
-          opacity: 0.62;
-        }
-
-        .amber-core-line-a {
-          top: 39%;
-          width: 68%;
-          height: 1px;
-        }
-
-        .amber-core-line-b {
-          top: 51%;
-          width: 54%;
-          height: 1px;
-          opacity: 0.38;
-        }
-
-        .amber-core-line-c {
-          top: 63%;
-          width: 46%;
-          height: 1px;
+        .amber-orbit-ring-b {
+          transform: scale(1.26) rotate(12deg);
           opacity: 0.22;
         }
 
-        .amber-hero-idle .amber-core-tilt {
-          animation: amberTiltIdle 6.6s ease-in-out infinite;
+        .amber-orbital-system {
+          overflow: visible;
+          z-index: 3;
+          transform-style: preserve-3d;
         }
 
-        .amber-hero-idle .amber-core {
-          animation: amberCoreIdle 6.6s ease-in-out infinite;
+        .amber-orbital-lane {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          transform-origin: center;
         }
 
-        .amber-hero-idle .amber-hero-field-back {
-          animation: amberAuraIdle 6.6s ease-in-out infinite;
+        .amber-orbital-lane-1 {
+          transform: rotate(0deg);
         }
 
-        .amber-hero-idle .amber-hero-field-mid {
-          animation: amberAuraMidIdle 6.6s ease-in-out infinite;
+        .amber-orbital-lane-2 {
+          transform: rotate(72deg);
         }
 
-        .amber-hero-idle .amber-hero-field-front {
-          animation: amberAuraFrontIdle 6.6s ease-in-out infinite;
+        .amber-orbital-lane-3 {
+          transform: rotate(144deg);
         }
 
-        .amber-hero-idle .amber-hero-floor-glow {
-          animation: amberFloorIdle 6.6s ease-in-out infinite;
+        .amber-orbital-lane-4 {
+          transform: rotate(216deg);
         }
 
-        .amber-hero-idle .amber-hero-floor-core {
-          animation: amberFloorCoreIdle 6.6s ease-in-out infinite;
-        }
-
-        .amber-hero-idle .amber-core-parallax-back {
-          animation: amberParallaxBackIdle 7.2s ease-in-out infinite;
-        }
-
-        .amber-hero-idle .amber-core-parallax-mid {
-          animation: amberParallaxMidIdle 6.8s ease-in-out infinite;
-        }
-
-        .amber-hero-idle .amber-core-parallax-front {
-          animation: amberParallaxFrontIdle 6.2s ease-in-out infinite;
-        }
-
-        .amber-hero-idle .amber-core-atmosphere-a,
-        .amber-hero-idle .amber-core-atmosphere-b,
-        .amber-hero-idle .amber-core-atmosphere-c,
-        .amber-hero-idle .amber-core-sheen-a,
-        .amber-hero-idle .amber-core-sheen-b,
-        .amber-hero-idle .amber-core-mineral-a,
-        .amber-hero-idle .amber-core-mineral-b,
-        .amber-hero-idle .amber-core-mineral-c,
-        .amber-hero-idle .amber-core-mineral-d,
-        .amber-hero-idle .amber-core-swirl-a,
-        .amber-hero-idle .amber-core-swirl-b,
-        .amber-hero-idle .amber-core-swirl-c,
-        .amber-hero-idle .amber-core-line-a,
-        .amber-hero-idle .amber-core-line-b,
-        .amber-hero-idle .amber-core-line-c,
-        .amber-hero-idle .amber-core-hotspot {
-          animation: amberInteriorIdle 7.8s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core-tilt {
-          animation: amberTiltActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core {
-          animation: amberCoreActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-hero-field-back {
-          animation: amberAuraActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-hero-field-mid {
-          animation: amberAuraMidActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-hero-field-front {
-          animation: amberAuraFrontActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-hero-floor-glow {
-          animation: amberFloorActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-hero-floor-core {
-          animation: amberFloorCoreActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core-parallax-back {
-          animation: amberParallaxBackActive 3.1s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core-parallax-mid {
-          animation: amberParallaxMidActive 2.8s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core-parallax-front {
-          animation: amberParallaxFrontActive 2.5s ease-in-out infinite;
-        }
-
-        .amber-hero-active .amber-core-atmosphere-a,
-        .amber-hero-active .amber-core-atmosphere-b,
-        .amber-hero-active .amber-core-atmosphere-c,
-        .amber-hero-active .amber-core-sheen-a,
-        .amber-hero-active .amber-core-sheen-b,
-        .amber-hero-active .amber-core-mineral-a,
-        .amber-hero-active .amber-core-mineral-b,
-        .amber-hero-active .amber-core-mineral-c,
-        .amber-hero-active .amber-core-mineral-d,
-        .amber-hero-active .amber-core-swirl-a,
-        .amber-hero-active .amber-core-swirl-b,
-        .amber-hero-active .amber-core-swirl-c,
-        .amber-hero-active .amber-core-line-a,
-        .amber-hero-active .amber-core-line-b,
-        .amber-hero-active .amber-core-line-c,
-        .amber-hero-active .amber-core-hotspot {
-          animation: amberInteriorActive 3.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core-tilt {
-          animation: amberTiltSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core {
-          animation: amberCoreSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-hero-field-back {
-          animation: amberAuraSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-hero-field-mid {
-          animation: amberAuraMidSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-hero-field-front {
-          animation: amberAuraFrontSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-hero-floor-glow {
-          animation: amberFloorSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-hero-floor-core {
-          animation: amberFloorCoreSettled 5.2s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core-parallax-back {
-          animation: amberParallaxBackSettled 5.8s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core-parallax-mid {
-          animation: amberParallaxMidSettled 5.4s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core-parallax-front {
-          animation: amberParallaxFrontSettled 5.1s ease-in-out infinite;
-        }
-
-        .amber-hero-settled .amber-core-atmosphere-a,
-        .amber-hero-settled .amber-core-atmosphere-b,
-        .amber-hero-settled .amber-core-atmosphere-c,
-        .amber-hero-settled .amber-core-sheen-a,
-        .amber-hero-settled .amber-core-sheen-b,
-        .amber-hero-settled .amber-core-mineral-a,
-        .amber-hero-settled .amber-core-mineral-b,
-        .amber-hero-settled .amber-core-mineral-c,
-        .amber-hero-settled .amber-core-mineral-d,
-        .amber-hero-settled .amber-core-swirl-a,
-        .amber-hero-settled .amber-core-swirl-b,
-        .amber-hero-settled .amber-core-swirl-c,
-        .amber-hero-settled .amber-core-line-a,
-        .amber-hero-settled .amber-core-line-b,
-        .amber-hero-settled .amber-core-line-c,
-        .amber-hero-settled .amber-core-hotspot {
-          animation: amberInteriorSettled 5.8s ease-in-out infinite;
+        .amber-orbital-lane-5 {
+          transform: rotate(288deg);
         }
 
         .decision-form {
@@ -1590,160 +1227,184 @@ export default function BreakItDownPage() {
         @keyframes amberTiltIdle {
           0%,
           100% {
-            transform: translateX(-50%) rotateX(0deg) rotateY(-1deg);
+            transform: translateX(-50%) rotateX(0deg) rotateY(-0.8deg);
           }
           50% {
-            transform: translateX(-50%) rotateX(1.1deg) rotateY(1.8deg);
+            transform: translateX(-50%) rotateX(0.9deg) rotateY(1.2deg);
           }
         }
 
         @keyframes amberTiltActive {
           0%,
           100% {
-            transform: translateX(-50%) rotateX(0deg) rotateY(-1.5deg);
+            transform: translateX(-50%) rotateX(0deg) rotateY(-1deg);
           }
           50% {
-            transform: translateX(-50%) rotateX(1.8deg) rotateY(3.8deg);
+            transform: translateX(-50%) rotateX(1.1deg) rotateY(1.6deg);
           }
         }
 
         @keyframes amberTiltSettled {
           0%,
           100% {
-            transform: translateX(-50%) rotateX(0deg) rotateY(-0.8deg);
+            transform: translateX(-50%) rotateX(0deg) rotateY(-0.7deg);
           }
           50% {
-            transform: translateX(-50%) rotateX(0.9deg) rotateY(1.6deg);
-          }
-        }
-
-        @keyframes amberParallaxBackIdle {
-          0%,
-          100% {
-            transform: translateZ(-10px) translateX(-5px) scale(0.99);
-          }
-          50% {
-            transform: translateZ(-10px) translateX(6px) scale(1.02);
-          }
-        }
-
-        @keyframes amberParallaxMidIdle {
-          0%,
-          100% {
-            transform: translateZ(0) translateX(-2px) scale(1);
-          }
-          50% {
-            transform: translateZ(0) translateX(3px) scale(1.02);
-          }
-        }
-
-        @keyframes amberParallaxFrontIdle {
-          0%,
-          100% {
-            transform: translateZ(12px) translateX(4px) scale(1.01);
-          }
-          50% {
-            transform: translateZ(12px) translateX(-5px) scale(1.04);
-          }
-        }
-
-        @keyframes amberParallaxBackActive {
-          0%,
-          100% {
-            transform: translateZ(-10px) translateX(-8px) scale(0.99);
-          }
-          50% {
-            transform: translateZ(-10px) translateX(10px) scale(1.04);
-          }
-        }
-
-        @keyframes amberParallaxMidActive {
-          0%,
-          100% {
-            transform: translateZ(0) translateX(-4px) scale(1);
-          }
-          50% {
-            transform: translateZ(0) translateX(6px) scale(1.04);
-          }
-        }
-
-        @keyframes amberParallaxFrontActive {
-          0%,
-          100% {
-            transform: translateZ(12px) translateX(6px) scale(1.02);
-          }
-          50% {
-            transform: translateZ(12px) translateX(-8px) scale(1.06);
-          }
-        }
-
-        @keyframes amberParallaxBackSettled {
-          0%,
-          100% {
-            transform: translateZ(-10px) translateX(-4px) scale(1);
-          }
-          50% {
-            transform: translateZ(-10px) translateX(4px) scale(1.02);
-          }
-        }
-
-        @keyframes amberParallaxMidSettled {
-          0%,
-          100% {
-            transform: translateZ(0) translateX(-1px) scale(1);
-          }
-          50% {
-            transform: translateZ(0) translateX(2px) scale(1.02);
-          }
-        }
-
-        @keyframes amberParallaxFrontSettled {
-          0%,
-          100% {
-            transform: translateZ(12px) translateX(3px) scale(1.01);
-          }
-          50% {
-            transform: translateZ(12px) translateX(-3px) scale(1.03);
+            transform: translateX(-50%) rotateX(0.8deg) rotateY(1.1deg);
           }
         }
 
         @keyframes amberCoreIdle {
           0%,
           100% {
-            transform: translateY(0) scale(0.982);
-            box-shadow:
-              0 28px 58px rgba(0, 0, 0, 0.34),
-              0 0 44px rgba(255, 170, 102, 0.16),
-              inset 0 1px 0 rgba(255, 255, 255, 0.28),
-              inset 0 -18px 32px rgba(0, 0, 0, 0.16);
+            transform: translateY(0) scale(0.996);
+            opacity: 0.68;
+            filter: blur(0.6px);
           }
           50% {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow:
-              0 38px 70px rgba(0, 0, 0, 0.4),
-              0 0 68px rgba(255, 188, 132, 0.28),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3),
-              inset 0 -18px 32px rgba(0, 0, 0, 0.14);
+            transform: translateY(-6px) scale(1.02);
+            opacity: 0.78;
+            filter: blur(1px);
           }
         }
 
         @keyframes amberCoreActive {
-          0%,
-          100% {
-            transform: translateY(0) scale(0.982);
+          0% {
+            transform: translateY(0) scale(1);
+            opacity: 0.7;
+            filter: blur(0.8px);
           }
-          50% {
-            transform: translateY(-12px) scale(1.082);
+          45% {
+            transform: translateY(-6px) scale(0.97);
+            opacity: 0.46;
+            filter: blur(2.2px);
+          }
+          100% {
+            transform: translateY(-4px) scale(0.92);
+            opacity: 0.28;
+            filter: blur(4.6px);
           }
         }
 
         @keyframes amberCoreSettled {
           0%,
           100% {
-            transform: translateY(0) scale(0.994);
+            transform: translateY(0) scale(0.92);
+            opacity: 0.26;
+            filter: blur(4px);
           }
           50% {
-            transform: translateY(-4px) scale(1.03);
+            transform: translateY(-4px) scale(0.95);
+            opacity: 0.36;
+            filter: blur(3.2px);
+          }
+        }
+
+        @keyframes amberHaloBackIdle {
+          0%,
+          100% {
+            transform: scale(1.28);
+            opacity: 0.58;
+          }
+          50% {
+            transform: scale(1.36);
+            opacity: 0.76;
+          }
+        }
+
+        @keyframes amberHaloMidIdle {
+          0%,
+          100% {
+            transform: scale(1.1);
+            opacity: 0.46;
+          }
+          50% {
+            transform: scale(1.16);
+            opacity: 0.62;
+          }
+        }
+
+        @keyframes amberHaloFrontIdle {
+          0%,
+          100% {
+            transform: scale(0.9);
+            opacity: 0.28;
+          }
+          50% {
+            transform: scale(0.96);
+            opacity: 0.42;
+          }
+        }
+
+        @keyframes amberHaloBackActive {
+          0%,
+          100% {
+            transform: scale(1.22);
+            opacity: 0.46;
+          }
+          50% {
+            transform: scale(1.42);
+            opacity: 0.74;
+          }
+        }
+
+        @keyframes amberHaloMidActive {
+          0%,
+          100% {
+            transform: scale(1.04);
+            opacity: 0.38;
+          }
+          50% {
+            transform: scale(1.18);
+            opacity: 0.56;
+          }
+        }
+
+        @keyframes amberHaloFrontActive {
+          0%,
+          100% {
+            transform: scale(0.86);
+            opacity: 0.24;
+          }
+          50% {
+            transform: scale(1);
+            opacity: 0.4;
+          }
+        }
+
+        @keyframes amberHaloBackSettled {
+          0%,
+          100% {
+            transform: scale(1.2);
+            opacity: 0.34;
+          }
+          50% {
+            transform: scale(1.28);
+            opacity: 0.48;
+          }
+        }
+
+        @keyframes amberHaloMidSettled {
+          0%,
+          100% {
+            transform: scale(1.02);
+            opacity: 0.26;
+          }
+          50% {
+            transform: scale(1.08);
+            opacity: 0.36;
+          }
+        }
+
+        @keyframes amberHaloFrontSettled {
+          0%,
+          100% {
+            transform: scale(0.84);
+            opacity: 0.16;
+          }
+          50% {
+            transform: scale(0.9);
+            opacity: 0.26;
           }
         }
 
@@ -1754,8 +1415,8 @@ export default function BreakItDownPage() {
             opacity: 0.68;
           }
           50% {
-            transform: translateX(-50%) scale(1.14);
-            opacity: 0.98;
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.94;
           }
         }
 
@@ -1766,8 +1427,8 @@ export default function BreakItDownPage() {
             opacity: 0.66;
           }
           50% {
-            transform: translateX(-50%) scale(1.12);
-            opacity: 0.9;
+            transform: translateX(-50%) scale(1.08);
+            opacity: 0.84;
           }
         }
 
@@ -1775,11 +1436,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.965);
-            opacity: 0.58;
+            opacity: 0.54;
           }
           50% {
-            transform: translateX(-50%) scale(1.1);
-            opacity: 0.82;
+            transform: translateX(-50%) scale(1.06);
+            opacity: 0.7;
           }
         }
 
@@ -1790,8 +1451,8 @@ export default function BreakItDownPage() {
             opacity: 0.56;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.1) scaleY(1.16);
-            opacity: 0.86;
+            transform: translateX(-50%) scaleX(1.08) scaleY(1.12);
+            opacity: 0.82;
           }
         }
 
@@ -1802,19 +1463,19 @@ export default function BreakItDownPage() {
             opacity: 0.48;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.12);
-            opacity: 0.78;
+            transform: translateX(-50%) scaleX(1.08);
+            opacity: 0.72;
           }
         }
 
         @keyframes amberAuraActive {
           0%,
           100% {
-            transform: translateX(-50%) scale(0.95);
+            transform: translateX(-50%) scale(0.96);
             opacity: 0.72;
           }
           50% {
-            transform: translateX(-50%) scale(1.22);
+            transform: translateX(-50%) scale(1.18);
             opacity: 1;
           }
         }
@@ -1823,11 +1484,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.96);
-            opacity: 0.7;
+            opacity: 0.68;
           }
           50% {
-            transform: translateX(-50%) scale(1.18);
-            opacity: 1;
+            transform: translateX(-50%) scale(1.14);
+            opacity: 0.94;
           }
         }
 
@@ -1835,11 +1496,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.97);
-            opacity: 0.6;
+            opacity: 0.58;
           }
           50% {
-            transform: translateX(-50%) scale(1.16);
-            opacity: 0.96;
+            transform: translateX(-50%) scale(1.12);
+            opacity: 0.82;
           }
         }
 
@@ -1850,8 +1511,8 @@ export default function BreakItDownPage() {
             opacity: 0.58;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.18) scaleY(1.22);
-            opacity: 0.98;
+            transform: translateX(-50%) scaleX(1.16) scaleY(1.18);
+            opacity: 0.94;
           }
         }
 
@@ -1862,8 +1523,8 @@ export default function BreakItDownPage() {
             opacity: 0.52;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.18);
-            opacity: 0.9;
+            transform: translateX(-50%) scaleX(1.16);
+            opacity: 0.84;
           }
         }
 
@@ -1871,11 +1532,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.97);
-            opacity: 0.72;
+            opacity: 0.7;
           }
           50% {
-            transform: translateX(-50%) scale(1.12);
-            opacity: 0.9;
+            transform: translateX(-50%) scale(1.1);
+            opacity: 0.84;
           }
         }
 
@@ -1883,11 +1544,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.97);
-            opacity: 0.68;
+            opacity: 0.64;
           }
           50% {
-            transform: translateX(-50%) scale(1.09);
-            opacity: 0.84;
+            transform: translateX(-50%) scale(1.06);
+            opacity: 0.76;
           }
         }
 
@@ -1895,11 +1556,11 @@ export default function BreakItDownPage() {
           0%,
           100% {
             transform: translateX(-50%) scale(0.98);
-            opacity: 0.56;
+            opacity: 0.5;
           }
           50% {
-            transform: translateX(-50%) scale(1.06);
-            opacity: 0.72;
+            transform: translateX(-50%) scale(1.04);
+            opacity: 0.62;
           }
         }
 
@@ -1910,8 +1571,8 @@ export default function BreakItDownPage() {
             opacity: 0.58;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.12) scaleY(1.14);
-            opacity: 0.82;
+            transform: translateX(-50%) scaleX(1.1) scaleY(1.12);
+            opacity: 0.8;
           }
         }
 
@@ -1922,44 +1583,174 @@ export default function BreakItDownPage() {
             opacity: 0.5;
           }
           50% {
-            transform: translateX(-50%) scaleX(1.1);
-            opacity: 0.72;
+            transform: translateX(-50%) scaleX(1.08);
+            opacity: 0.68;
           }
         }
 
-        @keyframes amberInteriorIdle {
-          0%,
-          100% {
-            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
-            opacity: 0.72;
+        @keyframes amberOrbitRotateIdle {
+          from {
+            transform: rotate(0deg);
           }
-          50% {
-            transform: rotate(2.4deg) translateX(4px) translateY(-4px) scale(1.03);
-            opacity: 0.96;
+          to {
+            transform: rotate(360deg);
           }
         }
 
-        @keyframes amberInteriorActive {
-          0%,
-          100% {
-            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
-            opacity: 0.72;
+        @keyframes amberOrbitRotateActive {
+          from {
+            transform: rotate(0deg);
           }
-          50% {
-            transform: rotate(5deg) translateX(8px) translateY(-7px) scale(1.05);
-            opacity: 1;
+          to {
+            transform: rotate(360deg);
           }
         }
 
-        @keyframes amberInteriorSettled {
+        @keyframes amberOrbitRotateSettled {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes amberRingIdle {
           0%,
           100% {
-            transform: rotate(0deg) translateX(0) translateY(0) scale(1);
-            opacity: 0.76;
+            transform: scale(0.3) rotate(-8deg);
+            opacity: 0.04;
           }
           50% {
-            transform: rotate(1.5deg) translateX(3px) translateY(-2px) scale(1.02);
+            transform: scale(0.48) rotate(-4deg);
+            opacity: 0.12;
+          }
+        }
+
+        @keyframes amberRingIdleB {
+          0%,
+          100% {
+            transform: scale(0.3) rotate(12deg);
+            opacity: 0.02;
+          }
+          50% {
+            transform: scale(0.48) rotate(18deg);
+            opacity: 0.07;
+          }
+        }
+
+        @keyframes amberRingActive {
+          0% {
+            transform: scale(0.3) rotate(-8deg);
+            opacity: 0.04;
+          }
+          100% {
+            transform: scale(1.26) rotate(-8deg);
+            opacity: 0.22;
+          }
+        }
+
+        @keyframes amberRingActiveB {
+          0% {
+            transform: scale(0.3) rotate(12deg);
+            opacity: 0.02;
+          }
+          100% {
+            transform: scale(1.26) rotate(12deg);
+            opacity: 0.12;
+          }
+        }
+
+        @keyframes amberRingSettled {
+          0%,
+          100% {
+            transform: scale(1.26) rotate(-8deg);
+            opacity: 0.12;
+          }
+          50% {
+            transform: scale(1.3) rotate(-5deg);
+            opacity: 0.2;
+          }
+        }
+
+        @keyframes amberRingSettledB {
+          0%,
+          100% {
+            transform: scale(1.26) rotate(12deg);
+            opacity: 0.06;
+          }
+          50% {
+            transform: scale(1.3) rotate(16deg);
+            opacity: 0.12;
+          }
+        }
+
+        @keyframes amberOrbiterPulseIdle {
+          0%,
+          100% {
+            transform: scale(0.94);
+          }
+          50% {
+            transform: scale(1.03);
+          }
+        }
+
+        @keyframes amberOrbiterPulseActive {
+          0%,
+          100% {
+            transform: scale(0.98);
+          }
+          50% {
+            transform: scale(1.08);
+          }
+        }
+
+        @keyframes amberOrbiterPulseSettled {
+          0%,
+          100% {
+            transform: scale(0.98);
+          }
+          50% {
+            transform: scale(1.06);
+          }
+        }
+
+        @keyframes amberOrbiterGlowIdle {
+          0%,
+          100% {
+            filter: brightness(0.86) saturate(0.94);
+            opacity: 0.58;
+          }
+          50% {
+            filter: brightness(1.04) saturate(1);
+            opacity: 0.8;
+          }
+        }
+
+        @keyframes amberOrbiterGlowActive {
+          0% {
+            filter: brightness(0.92) saturate(0.96);
+            opacity: 0.68;
+          }
+          50% {
+            filter: brightness(1.16) saturate(1.06);
+            opacity: 0.94;
+          }
+          100% {
+            filter: brightness(1.08) saturate(1.04);
             opacity: 0.88;
+          }
+        }
+
+        @keyframes amberOrbiterGlowSettled {
+          0%,
+          100% {
+            filter: brightness(1) saturate(1);
+            opacity: 0.8;
+          }
+          50% {
+            filter: brightness(1.14) saturate(1.08);
+            opacity: 0.94;
           }
         }
 
