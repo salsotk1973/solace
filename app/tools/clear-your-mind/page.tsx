@@ -2,8 +2,6 @@
 
 // /app/tools/clear-your-mind/page.tsx
 
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 import {
   type CSSProperties,
   FormEvent,
@@ -629,7 +627,9 @@ export default function ClearYourMindPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCrisisFallback, setIsCrisisFallback] = useState(false);
   const [isClarityFallback, setIsClarityFallback] = useState(false);
+  const [isUnavailable, setIsUnavailable] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
+  const [showNudge, setShowNudge] = useState(false);
   const [bubbleMode, setBubbleMode] = useState<BubbleMode>("float");
   const [fieldHeight, setFieldHeight] = useState(DEFAULT_FIELD_HEIGHT);
 
@@ -743,6 +743,15 @@ export default function ClearYourMindPage() {
       inputRef.current?.focus();
     }
   }, [responseText, error, isLoading]);
+
+  useEffect(() => {
+    if (responseText && !isCrisisFallback && !isUnavailable && !isLoading) {
+      if (!localStorage.getItem("solace_upgrade_nudge_shown")) {
+        localStorage.setItem("solace_upgrade_nudge_shown", "1");
+        setShowNudge(true);
+      }
+    }
+  }, [responseText, isCrisisFallback, isUnavailable, isLoading]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -945,6 +954,7 @@ export default function ClearYourMindPage() {
     setIsLoading(true);
     setError("");
     setResponseText("");
+    setIsUnavailable(false);
     setIsCrisisFallback(false);
     setIsClarityFallback(false);
     setIsButtonReady(false);
@@ -969,6 +979,10 @@ export default function ClearYourMindPage() {
       const result = normalizeApiResult(rawResult);
 
       if (!result.ok) {
+        if (result.error === "unavailable") {
+          setIsUnavailable(true);
+          return;
+        }
         setError(result.error);
         return;
       }
@@ -991,6 +1005,7 @@ export default function ClearYourMindPage() {
     setBubbles([createStarterBubble(fieldWidth, fieldHeight)]);
     setResponseText("");
     setError("");
+    setIsUnavailable(false);
     setIsLoading(false);
     setIsCrisisFallback(false);
     setIsClarityFallback(false);
@@ -1046,8 +1061,6 @@ export default function ClearYourMindPage() {
       <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
       <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
       <div className="realm-horizon-shimmer" aria-hidden="true" />
-
-      <SiteHeader />
 
       <section className="realm-content">
         <div className="realm-intro">
@@ -1176,6 +1189,24 @@ export default function ClearYourMindPage() {
             <div className="loading-zone">
               <p className="loading-copy">{THINKING_COPY}</p>
             </div>
+          ) : isUnavailable ? (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">Taking a breath.</div>
+                <div className="response-copy">
+                  <p className="response-text">
+                    This tool is temporarily resting. Try again in a moment — it will be ready soon.
+                  </p>
+                </div>
+              </div>
+              <div className="actions actions-followup">
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Try again →</span>
+                </button>
+              </div>
+            </>
           ) : error ? (
             <>
               <div className="response-card">
@@ -1213,6 +1244,15 @@ export default function ClearYourMindPage() {
                 </div>
               </div>
 
+              {showNudge && (
+                <div className="upgrade-nudge">
+                  <p className="upgrade-nudge-text">
+                    Solace can remember this over time — so future sessions know what you&apos;ve already worked through.{" "}
+                    <a href="/pricing" className="upgrade-nudge-link">That&apos;s Pro →</a>
+                  </p>
+                </div>
+              )}
+
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
                   <span className="button-glass-sheen" />
@@ -1224,8 +1264,6 @@ export default function ClearYourMindPage() {
           ) : null}
         </section>
       </section>
-
-      <SiteFooter />
 
       <style jsx>{`
         .mind-realm {
@@ -1732,6 +1770,33 @@ export default function ClearYourMindPage() {
 
         .actions-followup {
           margin-top: 16px;
+        }
+
+        .upgrade-nudge {
+          margin-top: 20px;
+          padding: 14px 20px;
+          border-radius: 12px;
+          border: 0.5px solid rgba(123,111,160,0.2);
+          background: rgba(123,111,160,0.06);
+          text-align: center;
+        }
+
+        .upgrade-nudge-text {
+          margin: 0;
+          font-family: var(--font-body, 'DM Sans', sans-serif);
+          font-size: 13px;
+          line-height: 1.6;
+          color: rgba(155,147,200,0.52);
+        }
+
+        .upgrade-nudge-link {
+          color: rgba(200,182,248,0.7);
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .upgrade-nudge-link:hover {
+          color: rgba(200,182,248,0.95);
         }
 
         .primary-button,

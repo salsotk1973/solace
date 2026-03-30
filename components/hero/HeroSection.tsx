@@ -14,11 +14,6 @@ const LINE1_CHARS    = LINE1.split("");
 const LINE2_CHARS    = LINE2.split("");
 const TAGLINE_CHARS  = TAGLINE.split("");
 
-const NAV_LINKS = [
-  { label: "Principles", href: "/principles" },
-  { label: "Lab",        href: "/lab"        },
-  { label: "About",      href: "/about"      },
-];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -30,6 +25,7 @@ export default function HeroSection() {
   const taglineRefs    = useRef<(HTMLSpanElement | null)[]>([]);
   const subheadRef     = useRef<HTMLParagraphElement>(null);
   const taglineWrapRef = useRef<HTMLDivElement>(null);
+  const ctaRef         = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     // Helper: schedule a callback and track the timer for cleanup
@@ -63,6 +59,9 @@ export default function HeroSection() {
     // Fades in 200 ms after the last headline character lands
     const subStart = line2Start + (l2 - 1) * 100 + 200;
     schedule(() => subheadRef.current?.classList.add("visible"), subStart);
+
+    // ── CTA button — fades in 800 ms after sub-headline ───────────────────
+    schedule(() => ctaRef.current?.classList.add("visible"), subStart + 800);
 
     // ── Tagline — letter by letter ────────────────────────────────────────────
     // Starts 2200 ms after sub-headline fade begins, 68 ms per character
@@ -155,99 +154,20 @@ export default function HeroSection() {
           text-decoration: none !important;
           border-bottom: none !important;
         }
+
+        /* Start free CTA */
+        .hero-cta { opacity: 0; pointer-events: none; }
+        .hero-cta.visible {
+          animation: appear 1.4s ease forwards;
+          pointer-events: auto;
+        }
       `}</style>
 
       <div
         style={{
-          position:   "relative",
-          background:
-            "radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)",
+          position: "relative",
         }}
       >
-        {/* ── Navigation ────────────────────────────────────────────────────── */}
-        <nav style={{ position: "relative", zIndex: 10, padding: "32px 0" }}>
-          <div
-            style={{
-              maxWidth:       "1100px",
-              margin:         "0 auto",
-              padding:        "0 40px",
-              display:        "flex",
-              alignItems:     "center",
-              justifyContent: "space-between",
-            }}
-          >
-          <Link
-            href="/"
-            style={{
-              fontFamily:     "'Cormorant Garamond', serif",
-              fontWeight:     300,
-              fontSize:       "18px",
-              letterSpacing:  "0.38em",
-              color:          "rgba(228,222,250,0.88)",
-              textDecoration: "none",
-              textTransform:  "uppercase",
-            }}
-          >
-            SOLACE
-          </Link>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            {NAV_LINKS.map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                style={{
-                  fontFamily:     "'DM Sans', sans-serif",
-                  fontWeight:     400,
-                  fontSize:       "10px",
-                  letterSpacing:  "0.14em",
-                  textTransform:  "uppercase",
-                  color:          "rgba(175,167,215,0.38)",
-                  textDecoration: "none",
-                  padding:        "8px 14px",
-                  transition:     "color 200ms ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "rgba(210,202,240,0.78)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "rgba(175,167,215,0.38)";
-                }}
-              >
-                {label}
-              </Link>
-            ))}
-
-            <button
-              type="button"
-              style={{
-                fontFamily:    "'DM Sans', sans-serif",
-                fontWeight:    400,
-                fontSize:      "10px",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color:         "rgba(175,167,215,0.38)",
-                background:    "transparent",
-                border:        "0.5px solid rgba(192,184,232,0.18)",
-                padding:       "8px 18px",
-                borderRadius:  "2px",
-                cursor:        "pointer",
-                marginLeft:    "8px",
-                transition:    "color 200ms ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "rgba(210,202,240,0.78)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "rgba(175,167,215,0.38)";
-              }}
-            >
-              Sign in
-            </button>
-          </div>
-          </div>
-        </nav>
-
         {/* ── Hero content ──────────────────────────────────────────────────── */}
         <div
           style={{
@@ -347,6 +267,38 @@ export default function HeroSection() {
           >
             {SUBHEAD}
           </p>
+
+          {/* ── Start free CTA ─────────────────────────────────────────────── */}
+          <Link
+            ref={ctaRef}
+            href="/sign-up"
+            className="hero-cta"
+            style={{
+              fontFamily:     "'DM Sans', sans-serif",
+              fontWeight:     400,
+              fontSize:       "11px",
+              letterSpacing:  "0.18em",
+              textTransform:  "uppercase",
+              color:          "rgba(185,175,230,0.42)",
+              textDecoration: "none",
+              border:         "0.5px solid rgba(192,184,232,0.18)",
+              padding:        "11px 32px",
+              borderRadius:   "2px",
+              display:        "inline-block",
+              marginTop:      "36px",
+              transition:     "color 300ms ease, border-color 300ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "rgba(215,205,252,0.82)";
+              e.currentTarget.style.borderColor = "rgba(192,184,232,0.38)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(185,175,230,0.42)";
+              e.currentTarget.style.borderColor = "rgba(192,184,232,0.18)";
+            }}
+          >
+            Start free
+          </Link>
 
           {/* ── Tagline ────────────────────────────────────────────────────── */}
           <div

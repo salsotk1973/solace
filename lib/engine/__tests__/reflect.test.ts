@@ -59,6 +59,6 @@ describe("reflect engine", () => {
     });
 
     expect(Array.isArray(result.recoveryOptions)).toBe(true);
-    expect(result.recoveryOptions.length).toBeGreaterThan(0);
+    expect(result.recoveryOptions!.length).toBeGreaterThan(0);
   });
 });

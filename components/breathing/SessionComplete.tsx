@@ -1,0 +1,60 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+interface SessionCompleteProps {
+  isLoggedIn: boolean;
+  onDismiss: () => void;
+}
+
+export default function SessionComplete({ isLoggedIn, onDismiss }: SessionCompleteProps) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div
+      className={[
+        "fixed bottom-0 left-0 right-0 z-50",
+        "border-t border-[rgba(80,200,218,0.1)] bg-[rgba(9,13,20,0.96)] backdrop-blur-xl",
+        "transition-transform duration-500 ease-out",
+        visible ? "translate-y-0" : "translate-y-full",
+      ].join(" ")}
+    >
+      <div className="max-w-[720px] mx-auto px-6 py-5 flex items-center justify-between gap-6">
+        <div className="min-w-0">
+          <p className="[font-family:var(--font-display)] italic font-light text-[21px] text-[rgba(200,240,248,0.9)] mb-0.5">
+            Session complete.
+          </p>
+          <p className="[font-family:var(--font-jost)] text-[12px] text-[rgba(120,180,200,0.52)] leading-snug">
+            {isLoggedIn
+              ? "Great session. Your history has been saved."
+              : "Save history & track streaks with a free account"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {!isLoggedIn && (
+            <Link
+              href="/sign-up"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(120,215,232,0.8)] border border-[rgba(80,200,218,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(80,200,218,0.52)] hover:text-[rgba(160,235,248,0.95)] transition-all duration-300"
+            >
+              Start free →
+            </Link>
+          )}
+          <button
+            onClick={onDismiss}
+            aria-label="Dismiss"
+            className="[font-family:var(--font-jost)] text-[18px] text-[rgba(140,170,185,0.38)] hover:text-[rgba(180,210,220,0.7)] transition-colors duration-200 w-8 h-8 flex items-center justify-center"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

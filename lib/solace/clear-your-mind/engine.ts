@@ -146,6 +146,9 @@ ${thoughts.map((thought, index) => `${index + 1}. ${thought}`).join("\n")}
 Return exactly 3 lines, nothing else.
 `;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
+
   try {
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -153,6 +156,7 @@ Return exactly 3 lines, nothing else.
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-5.4",
         input: prompt,
@@ -160,12 +164,13 @@ Return exactly 3 lines, nothing else.
       }),
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
-      return [
-        "A lot seems to be landing at once.",
-        "That kind of pressure can make everything feel heavier than it looks from the outside.",
-        "Try to steady the one part that would make today feel a little more manageable.",
-      ];
+      if (response.status === 429) {
+        console.warn("[solace] Clear Your Mind: OpenAI rate limit (429)");
+      }
+      throw new Error("AI_UNAVAILABLE");
     }
 
     const data = await response.json();
@@ -178,12 +183,12 @@ Return exactly 3 lines, nothing else.
       line2 || "That kind of pressure can make everything feel heavier than it looks from the outside.",
       line3 || "Try to steady the one part that would make today feel a little more manageable.",
     ];
-  } catch {
-    return [
-      "A lot seems to be landing at once.",
-      "That kind of pressure can make everything feel heavier than it looks from the outside.",
-      "Try to steady the one part that would make today feel a little more manageable.",
-    ];
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      console.warn("[solace] Clear Your Mind: OpenAI timeout (10s)");
+    }
+    throw new Error("AI_UNAVAILABLE");
   }
 }
 
@@ -324,7 +329,6 @@ function looksLikeDecisionInput(thoughts: string[]): boolean {
   const decisionPatterns = [
     /\bshould i\b/i,
     /\bshould we\b/i,
-    /\bdo i\b/i,
     /\bcan i\b/i,
     /\bis it better\b/i,
     /\bwhich is better\b/i,

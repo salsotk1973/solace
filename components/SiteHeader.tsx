@@ -1,177 +1,168 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useAuth, UserButton } from "@clerk/nextjs";
 
 const navItems = [
-  { label: "Tools", href: "/tools" },
+  { label: "Tools",      href: "/tools"      },
   { label: "Principles", href: "/principles" },
-  { label: "Lab", href: "/lab" },
-  { label: "About", href: "/about" },
+  { label: "Lab",        href: "/lab"        },
+  { label: "About",      href: "/about"      },
 ];
 
 export default function SiteHeader() {
-  const [logoHovered, setLogoHovered] = useState(false);
-  const [hoveredPill, setHoveredPill] = useState<string | null>(null);
-
-  const HEADER_HEIGHT = 120;
+  const { isSignedIn } = useAuth();
 
   return (
     <header
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 80,
+        position:      "fixed",
+        top:           0,
+        left:          0,
+        right:         0,
+        zIndex:        80,
         pointerEvents: "none",
-        height: `${HEADER_HEIGHT}px`,
+        height:        "80px",
       }}
     >
+      {/* Atmospheric fade behind the header */}
       <div
         aria-hidden="true"
         style={{
-          position: "absolute",
-          inset: 0,
-          height: `${HEADER_HEIGHT}px`,
-          background: `
-            linear-gradient(
-              180deg,
-              rgba(18, 22, 36, 0.60) 0%,
-              rgba(18, 22, 36, 0.52) 26%,
-              rgba(18, 22, 36, 0.38) 52%,
-              rgba(18, 22, 36, 0.18) 78%,
-              rgba(18, 22, 36, 0.00) 100%
-            ),
-            linear-gradient(
-              90deg,
-              rgba(120,146,255,0.06) 0%,
-              rgba(255,255,255,0.014) 50%,
-              rgba(158,128,255,0.06) 100%
-            )
-          `,
-          backdropFilter: "blur(20px) saturate(135%) brightness(0.78)",
-          WebkitBackdropFilter: "blur(20px) saturate(135%) brightness(0.78)",
-          maskImage:
-            "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.38) 92%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:
-            "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.38) 92%, rgba(0,0,0,0) 100%)",
-          pointerEvents: "none",
+          position:              "absolute",
+          inset:                 0,
+          background:            "linear-gradient(180deg, rgba(5,5,8,0.72) 0%, rgba(5,5,8,0.48) 60%, rgba(5,5,8,0) 100%)",
+          backdropFilter:        "blur(8px)",
+          WebkitBackdropFilter:  "blur(8px)",
+          maskImage:             "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 70%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:       "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 70%, rgba(0,0,0,0) 100%)",
+          pointerEvents:         "none",
         }}
       />
 
+      {/* Content row */}
       <div
         style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: "1440px",
-          margin: "0 auto",
-          height: `${HEADER_HEIGHT}px`,
-          display: "flex",
-          alignItems: "center",
+          position:       "relative",
+          zIndex:         2,
+          maxWidth:       "1440px",
+          margin:         "0 auto",
+          height:         "80px",
+          display:        "flex",
+          alignItems:     "center",
           justifyContent: "space-between",
-          padding: "0 24px",
-          pointerEvents: "auto",
-          transform: "translateY(-10px)",
+          padding:        "0 40px",
+          pointerEvents:  "auto",
         }}
       >
+        {/* Wordmark */}
         <Link
           href="/"
           aria-label="Solace home"
-          onMouseEnter={() => setLogoHovered(true)}
-          onMouseLeave={() => setLogoHovered(false)}
           style={{
-            display: "inline-flex",
+            display:        "inline-flex",
             textDecoration: "none",
-            color: logoHovered
-              ? "rgba(172,194,255,1)"
-              : "rgba(136,166,255,0.98)",
-            fontSize: "56px",
-            fontWeight: 500,
-            letterSpacing: "-0.06em",
-            lineHeight: 0.9,
-            textShadow: logoHovered
-              ? "0 0 30px rgba(132,166,255,0.36)"
-              : "0 0 18px rgba(116,146,255,0.20)",
-            transform: logoHovered ? "translateY(-1px)" : "translateY(0)",
-            transition:
-              "color 220ms ease, text-shadow 220ms ease, transform 220ms ease",
+            fontFamily:     "'Cormorant Garamond', serif",
+            fontWeight:     300,
+            fontSize:       "28px",
+            letterSpacing:  "0.18em",
+            color:          "rgba(220,215,245,0.92)",
+            textTransform:  "uppercase",
+            transition:     "color 280ms ease, opacity 280ms ease",
           }}
+          onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)" }}
+          onMouseLeave={e => { e.currentTarget.style.color = "rgba(220,215,245,0.92)" }}
         >
-          SOLACE
+          Solace
         </Link>
 
+        {/* Nav + auth */}
         <nav
           style={{
-            display: "flex",
+            display:    "flex",
             alignItems: "center",
-            gap: "12px",
+            gap:        "32px",
           }}
         >
-          {navItems.map((item) => {
-            const isHovered = hoveredPill === item.label;
+          {/* Nav links — plain text, no pills */}
+          {navItems.map(item => (
+            <Link
+              key={item.label}
+              href={item.href}
+              style={{
+                fontFamily:     "'DM Sans', sans-serif",
+                fontWeight:     400,
+                fontSize:       "13px",
+                letterSpacing:  "0.04em",
+                color:          "rgba(215,210,240,0.72)",
+                textDecoration: "none",
+                transition:     "color 220ms ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)" }}
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.72)" }}
+            >
+              {item.label}
+            </Link>
+          ))}
 
-            return (
+          {/* Thin separator */}
+          <div style={{ width: "0.5px", height: "16px", background: "rgba(255,255,255,0.12)" }} />
+
+          {/* Auth */}
+          {isSignedIn ? (
+            <UserButton
+              appearance={{
+                elements: { avatarBox: { width: 30, height: 30 } },
+              }}
+            />
+          ) : (
+            <>
               <Link
-                key={item.label}
-                href={item.href}
-                aria-label={item.label}
-                onMouseEnter={() => setHoveredPill(item.label)}
-                onMouseLeave={() => setHoveredPill(null)}
+                href="/sign-in"
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: "50px",
-                  padding: "0 19px",
-                  borderRadius: "999px",
+                  fontFamily:     "'DM Sans', sans-serif",
+                  fontWeight:     400,
+                  fontSize:       "13px",
+                  letterSpacing:  "0.04em",
+                  color:          "rgba(215,210,240,0.65)",
                   textDecoration: "none",
-                  color: isHovered
-                    ? "rgba(255,255,255,0.99)"
-                    : "rgba(248,250,255,0.95)",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  letterSpacing: "-0.01em",
-                  background: isHovered
-                    ? `
-                      linear-gradient(180deg,
-                        rgba(255,255,255,0.24) 0%,
-                        rgba(190,206,255,0.14) 42%,
-                        rgba(82,98,154,0.22) 100%
-                      )
-                    `
-                    : `
-                      linear-gradient(180deg,
-                        rgba(255,255,255,0.20) 0%,
-                        rgba(176,196,255,0.10) 42%,
-                        rgba(70,84,136,0.16) 100%
-                      )
-                    `,
-                  border: isHovered
-                    ? "1px solid rgba(222,232,255,0.28)"
-                    : "1px solid rgba(205,218,255,0.18)",
-                  boxShadow: isHovered
-                    ? `
-                      0 16px 34px rgba(0,0,0,0.24),
-                      0 0 24px rgba(136,166,255,0.12),
-                      inset 0 1px 0 rgba(255,255,255,0.30)
-                    `
-                    : `
-                      0 12px 28px rgba(0,0,0,0.22),
-                      0 0 18px rgba(116,146,255,0.06),
-                      inset 0 1px 0 rgba(255,255,255,0.24)
-                    `,
-                  backdropFilter: "blur(12px) saturate(125%)",
-                  WebkitBackdropFilter: "blur(12px) saturate(125%)",
-                  transform: isHovered ? "translateY(-1px)" : "translateY(0)",
-                  transition:
-                    "transform 220ms ease, color 220ms ease, background 220ms ease, border 220ms ease, box-shadow 220ms ease",
+                  transition:     "color 220ms ease",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)" }}
+                onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.65)" }}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/sign-up"
+                style={{
+                  fontFamily:     "'DM Sans', sans-serif",
+                  fontWeight:     400,
+                  fontSize:       "13px",
+                  letterSpacing:  "0.04em",
+                  color:          "rgba(215,210,240,0.9)",
+                  textDecoration: "none",
+                  padding:        "7px 18px",
+                  borderRadius:   "4px",
+                  border:         "0.5px solid rgba(200,195,235,0.22)",
+                  background:     "transparent",
+                  transition:     "color 220ms ease, border-color 220ms ease, background 220ms ease",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = "rgba(240,236,255,1)"
+                  e.currentTarget.style.borderColor = "rgba(220,215,250,0.38)"
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)"
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = "rgba(215,210,240,0.9)"
+                  e.currentTarget.style.borderColor = "rgba(200,195,235,0.22)"
+                  e.currentTarget.style.background = "transparent"
                 }}
               >
-                {item.label}
+                Start free
               </Link>
-            );
-          })}
+            </>
+          )}
         </nav>
       </div>
     </header>

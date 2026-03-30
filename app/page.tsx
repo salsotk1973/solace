@@ -8,16 +8,27 @@ import { SOLACE_ROUTES } from "@/lib/solace/routes";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Dot {
-  id:       number;
-  size:     number;
-  left:     number;
-  bottom:   number;
-  alpha:    number;
-  duration: number;
-  delay:    number;
-  ty:       number;
-  tx:       number;
+  id:           number;
+  size:         number;
+  left:         number;
+  bottom:       number;
+  alpha:        number;
+  duration:     number;
+  delay:        number;
+  ty:           number;
+  tx:           number;
+  rgb:          string;
+  pulseDuration: number;
+  pulseDelay:   number;
 }
+
+const PURPLE_SHADES = [
+  "148,110,220",  // aura purple
+  "120,88,198",   // deep purple
+  "178,148,240",  // light lavender
+  "100,78,185",   // dark purple
+  "195,165,248",  // soft lilac
+];
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -63,6 +74,15 @@ const REALMS = [
   },
 ] as const;
 
+const FREE_TOOLS = [
+  { name: 'Breathing',       href: '/breathing', accent: 'rgba(60,190,210,1)' },
+  { name: 'Focus Timer',     href: '/focus',     accent: 'rgba(240,170,70,1)' },
+  { name: 'Sleep Wind-Down', href: '/sleep',     accent: 'rgba(140,120,210,1)' },
+  { name: 'Thought Reframer',href: '/reframe',   accent: 'rgba(130,185,140,1)' },
+  { name: 'Mood Tracker',    href: '/mood',      accent: 'rgba(210,150,165,1)' },
+  { name: 'Gratitude Log',   href: '/gratitude', accent: 'rgba(220,175,80,1)' },
+]
+
 const PILLS = [
   "Not medical advice",
   "Private by design",
@@ -76,27 +96,44 @@ export default function HomePage() {
   const [dots, setDots]                       = useState<Dot[]>([]);
   const [hoveredRealm, setHoveredRealm]       = useState<string | null>(null);
   const [labCtaHovered, setLabCtaHovered]     = useState(false);
-  const [footerLinkHovered, setFooterLinkHovered] = useState(false);
 
   useEffect(() => {
     setDots(
       Array.from({ length: 160 }, (_, id) => ({
         id,
-        size:     0.8  + Math.random() * 3.0,
-        left:     2    + Math.random() * 96,
-        bottom:   Math.random() * 20,
-        alpha:    0.10 + Math.random() * 0.35,
-        duration: 12   + Math.random() * 20,
-        delay:    -(Math.random() * 32),
-        ty:       40   + Math.random() * 50,
-        tx:       -50  + Math.random() * 100,
+        size:         0.8  + Math.random() * 3.0,
+        left:         2    + Math.random() * 96,
+        bottom:       Math.random() * 20,
+        alpha:        0.10 + Math.random() * 0.35,
+        duration:     12   + Math.random() * 20,
+        delay:        -(Math.random() * 32),
+        ty:           40   + Math.random() * 50,
+        tx:           -50  + Math.random() * 100,
+        rgb:          PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
+        pulseDuration: 2   + Math.random() * 3,
+        pulseDelay:   -(Math.random() * 5),
       }))
     );
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-[#050508] text-white">
-      {/* ── Ambient dots — fixed, full viewport, behind all content ────────── */}
+    <main className="min-h-screen bg-[#050508] text-white">
+      {/* ── Atmospheric background — fixed, z-index 1, behind everything ──── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position:   "fixed",
+          top:        0,
+          left:       0,
+          width:      "100vw",
+          height:     "100vh",
+          background: "radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)",
+          zIndex:     1,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Ambient dots — fixed, z-index 2, above background, below content */}
       <div
         aria-hidden="true"
         style={{
@@ -106,7 +143,7 @@ export default function HomePage() {
           width:         "100vw",
           height:        "100vh",
           pointerEvents: "none",
-          zIndex:        0,
+          zIndex:        2,
           overflow:      "hidden",
         }}
       >
@@ -119,19 +156,29 @@ export default function HomePage() {
                 width:           `${dot.size}px`,
                 height:          `${dot.size}px`,
                 borderRadius:    "50%",
-                backgroundColor: `rgba(178,162,232,${dot.alpha})`,
+                backgroundColor: "rgba(var(--rgb), var(--a))",
                 left:            `${dot.left}%`,
                 bottom:          `${dot.bottom}%`,
-                animation:       `riseUp ${dot.duration}s linear ${dot.delay}s infinite`,
+                animation:       "riseUp var(--d) ease-in-out infinite var(--dl), purplePulse var(--pd) ease-in-out infinite var(--poff)",
                 "--ty":          `-${dot.ty}vh`,
                 "--tx":          `${dot.tx}px`,
+                "--d":           `${dot.duration}s`,
+                "--dl":          `${dot.delay}s`,
+                "--rgb":         dot.rgb,
+                "--a":           `${dot.alpha}`,
+                "--size":        `${dot.size}`,
+                "--pd":          `${dot.pulseDuration}s`,
+                "--poff":        `${dot.pulseDelay}s`,
               } as React.CSSProperties
             }
           />
         ))}
       </div>
 
-      {/* ── Hero — untouched ──────────────────────────────────────────────── */}
+      {/* ── All page content — z-index 3, sits above dots ─────────────────── */}
+      <div style={{ position: "relative", zIndex: 3 }}>
+
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <HeroSection />
 
       {/* ══════════════════════════════════════════════════════════════════════
@@ -153,7 +200,7 @@ export default function HomePage() {
               fontSize:      "10px",
               letterSpacing: "0.24em",
               textTransform: "uppercase",
-              color:         "rgba(155,145,198,0.38)",
+              color:         "rgba(185,175,220,0.65)",
               margin:        "0 0 18px",
             }}
           >
@@ -173,6 +220,84 @@ export default function HomePage() {
             <em style={{ fontStyle: "italic" }}>how it feels</em>
             {" "}— not what it is.
           </h2>
+        </div>
+
+        {/* ── Free tools compact grid ──────────────────────────────────── */}
+        <div style={{ maxWidth: "1000px", margin: "0 auto 52px" }}>
+          <p
+            style={{
+              fontFamily:    "'DM Sans', sans-serif",
+              fontWeight:    400,
+              fontSize:      "9px",
+              letterSpacing: "0.26em",
+              textTransform: "uppercase",
+              color:         "rgba(155,145,200,0.42)",
+              textAlign:     "center",
+              margin:        "0 0 16px",
+            }}
+          >
+            Free tools — start here
+          </p>
+          <div
+            style={{
+              display:             "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap:                 "10px",
+            }}
+          >
+            {FREE_TOOLS.map(tool => {
+              const bg     = tool.accent.replace(/,[\d.]+\)$/, ',0.09)')
+              const border = tool.accent.replace(/,[\d.]+\)$/, ',0.18)')
+              return (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  style={{
+                    display:         "flex",
+                    alignItems:      "center",
+                    justifyContent:  "space-between",
+                    borderRadius:    "10px",
+                    padding:         "14px 18px",
+                    background:      bg,
+                    border:          `0.5px solid ${border}`,
+                    backdropFilter:  "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    textDecoration:  "none",
+                    transition:      "border-color 0.3s ease, background 0.3s ease",
+                    boxSizing:       "border-box",
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = tool.accent.replace(/,[\d.]+\)$/, ',0.32)')
+                    e.currentTarget.style.background = tool.accent.replace(/,[\d.]+\)$/, ',0.14)')
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = border
+                    e.currentTarget.style.background = bg
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily:    "'DM Sans', sans-serif",
+                      fontWeight:    400,
+                      fontSize:      "12px",
+                      letterSpacing: "0.02em",
+                      color:         "rgba(210,204,240,0.82)",
+                    }}
+                  >
+                    {tool.name}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color:    tool.accent.replace(/,[\d.]+\)$/, ',0.55)'),
+                    }}
+                  >
+                    →
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
 
         {/* Three-column grid */}
@@ -266,7 +391,7 @@ export default function HomePage() {
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 300,
                     fontSize:   "13px",
-                    color:      hov ? "rgba(165,155,205,0.7)" : "rgba(148,140,188,0.55)",
+                    color:      hov ? "rgba(185,175,220,0.85)" : "rgba(172,165,210,0.75)",
                     lineHeight: 1.75,
                     margin:     0,
                     flex:       1,
@@ -307,8 +432,8 @@ export default function HomePage() {
                     style={{
                       fontSize:   "16px",
                       color:      card.accent,
-                      opacity:    hov ? 0.72 : 0.22,
-                      transform:  hov ? "translateX(2px)" : "translateX(-4px)",
+                      opacity:    hov ? 0.75 : 0,
+                      transform:  hov ? "translateX(2px)" : "translateX(-8px)",
                       transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)",
                       lineHeight: 1,
                       display:    "inline-block",
@@ -320,6 +445,24 @@ export default function HomePage() {
               </Link>
             );
           })}
+        </div>
+
+        {/* See all tools link */}
+        <div style={{ textAlign: "center", marginTop: "28px" }}>
+          <Link
+            href="/tools"
+            style={{
+              fontFamily:    "'DM Sans', sans-serif",
+              fontWeight:    300,
+              fontSize:      "11px",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color:         "rgba(148,140,188,0.38)",
+              textDecoration: "none",
+            }}
+          >
+            See all tools →
+          </Link>
         </div>
       </section>
 
@@ -538,63 +681,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          FOOTER
-      ══════════════════════════════════════════════════════════════════════ */}
-      <footer style={{ width: "100%" }}>
-        <div
-          style={{
-            maxWidth:       "1100px",
-            margin:         "0 auto",
-            width:          "100%",
-            padding:        "18px 40px",
-            display:        "flex",
-            alignItems:     "center",
-            justifyContent: "space-between",
-            gap:            "24px",
-            boxSizing:      "border-box",
-            borderTop:      "0.5px solid rgba(255,255,255,0.04)",
-          }}
-        >
-        <p
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     300,
-            fontSize:       "10px",
-            color:          "rgba(108,100,148,0.32)",
-            letterSpacing:  "0.03em",
-            margin:         0,
-            whiteSpace:     "nowrap",
-            overflow:       "hidden",
-            textOverflow:   "ellipsis",
-          }}
-        >
-          Solace is designed for adults and offers reflective support — not medical,
-          psychological, legal, financial, or professional advice.
-        </p>
-
-        <Link
-          href="/scope"
-          onMouseEnter={() => setFooterLinkHovered(true)}
-          onMouseLeave={() => setFooterLinkHovered(false)}
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     400,
-            fontSize:       "10px",
-            letterSpacing:  "0.12em",
-            textTransform:  "uppercase",
-            color:          footerLinkHovered ? "rgba(180,168,228,0.72)" : "rgba(135,125,180,0.38)",
-            textDecoration: "none",
-            cursor:         "pointer",
-            whiteSpace:     "nowrap",
-            flexShrink:     0,
-            transition:     "color 0.3s ease",
-          }}
-        >
-          Read scope →
-        </Link>
-        </div>
-      </footer>
+      </div>{/* end content wrapper */}
     </main>
   );
 }

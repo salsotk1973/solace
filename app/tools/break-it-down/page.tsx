@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
 
 type OrbPhase = "idle" | "active" | "settled";
 
@@ -53,6 +51,8 @@ export default function BreakItDownPage() {
   >(null);
   const [redirectTitle, setRedirectTitle] = useState("");
   const [isButtonReady, setIsButtonReady] = useState(false);
+  const [isUnavailable, setIsUnavailable] = useState(false);
+  const [showNudge, setShowNudge] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -66,6 +66,15 @@ export default function BreakItDownPage() {
       inputRef.current?.focus();
     }
   }, [hasResult, isLoading]);
+
+  useEffect(() => {
+    if (hasResult && !isSupport && !isUnavailable && !isLoading) {
+      if (!localStorage.getItem("solace_upgrade_nudge_shown")) {
+        localStorage.setItem("solace_upgrade_nudge_shown", "1");
+        setShowNudge(true);
+      }
+    }
+  }, [hasResult, isSupport, isUnavailable, isLoading]);
 
   useEffect(() => {
     if (isLoading || hasResult) {
@@ -128,6 +137,7 @@ export default function BreakItDownPage() {
   async function runReflection(trimmed: string) {
     setIsLoading(true);
     setHasResult(false);
+    setIsUnavailable(false);
     clearResultState();
     setIsButtonReady(false);
     setOrbPhase("active");
@@ -139,6 +149,7 @@ export default function BreakItDownPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Solace-Age-Confirmed": "1",
         },
         body: JSON.stringify({ input: trimmed }),
       });
@@ -150,9 +161,15 @@ export default function BreakItDownPage() {
       await new Promise((resolve) => setTimeout(resolve, remaining));
 
       if (!res.ok) {
+        if ((data as { error?: string } | null)?.error === "unavailable") {
+          setIsUnavailable(true);
+          setHasResult(true);
+          setOrbPhase("settled");
+          return;
+        }
         setResultLead("Something interrupted the reflection for a moment.");
         setResultMessage(
-          typeof data?.error === "string" ? data.error : "Please try again.",
+          typeof (data as { error?: string } | null)?.error === "string" ? (data as { error?: string }).error! : "Please try again.",
         );
         setIsSupport(true);
         setHasResult(true);
@@ -251,6 +268,7 @@ export default function BreakItDownPage() {
     setInput("");
     clearResultState();
     setHasResult(false);
+    setIsUnavailable(false);
     setIsLoading(false);
     setIsButtonReady(false);
     setOrbPhase("idle");
@@ -281,8 +299,6 @@ export default function BreakItDownPage() {
       <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
       <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
       <div className="realm-horizon-shimmer" aria-hidden="true" />
-
-      <SiteHeader />
 
       <section className="realm-content">
         <div className="realm-intro">
@@ -410,7 +426,25 @@ export default function BreakItDownPage() {
             <div className="loading-zone">
               <p className="loading-copy">{THINKING_COPY}</p>
             </div>
-          ) : !hasResult ? null : (
+          ) : !hasResult ? null : isUnavailable ? (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">Taking a breath.</div>
+                <div className="response-copy">
+                  <p className="response-text">
+                    This tool is temporarily resting. Try again in a moment — it will be ready soon.
+                  </p>
+                </div>
+              </div>
+              <div className="actions actions-followup">
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Try again →</span>
+                </button>
+              </div>
+            </>
+          ) : (
             <>
               <div
                 className={`response-card ${
@@ -455,6 +489,15 @@ export default function BreakItDownPage() {
                   ) : null}
                 </div>
               </div>
+
+              {showNudge && (
+                <div className="upgrade-nudge">
+                  <p className="upgrade-nudge-text">
+                    Solace can remember this over time — so future sessions know what you&apos;ve already worked through.{" "}
+                    <a href="/pricing" className="upgrade-nudge-link">That&apos;s Pro →</a>
+                  </p>
+                </div>
+              )}
 
               <div className="actions actions-followup">
                 <button type="button" onClick={handleReset} className="secondary-button">
@@ -987,6 +1030,33 @@ export default function BreakItDownPage() {
 
         .actions-followup {
           margin-top: 16px;
+        }
+
+        .upgrade-nudge {
+          margin-top: 20px;
+          padding: 14px 20px;
+          border-radius: 12px;
+          border: 0.5px solid rgba(123,111,160,0.2);
+          background: rgba(123,111,160,0.06);
+          text-align: center;
+        }
+
+        .upgrade-nudge-text {
+          margin: 0;
+          font-family: var(--font-body, 'DM Sans', sans-serif);
+          font-size: 13px;
+          line-height: 1.6;
+          color: rgba(155,147,200,0.52);
+        }
+
+        .upgrade-nudge-link {
+          color: rgba(200,182,248,0.7);
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .upgrade-nudge-link:hover {
+          color: rgba(200,182,248,0.95);
         }
 
         .primary-button,
@@ -1828,8 +1898,6 @@ export default function BreakItDownPage() {
           }
         }
       `}</style>
-
-      <SiteFooter />
     </main>
   );
 }

@@ -37,6 +37,7 @@ type ResponseType =
       type: "support";
       lead: string;
       message: string;
+      steps?: string[];
     };
 
 type Intent =
@@ -126,13 +127,20 @@ function looksLikeGibberish(text: string) {
 function looksLikeDecision(text: string) {
   const clean = text.toLowerCase();
 
+  // "better" and "between" alone are too broad — only treat as decision signals
+  // when paired with clear choice language (or/vs/whether/which)
+  const hasBetterInChoiceContext =
+    /\bbetter\b/.test(clean) && /\b(or|vs|which|whether)\b/.test(clean);
+  const hasBetweenInChoiceContext =
+    /\bbetween\b/.test(clean) && /\b(or|vs|which|choose|decide|option)\b/.test(clean);
+
   return (
     /\bshould i\b/.test(clean) ||
-    /\bwhich\b/.test(clean) ||
+    /\bwhich (is|one|option|do)\b/.test(clean) ||
     /\bchoose\b/.test(clean) ||
     /\bdecide\b/.test(clean) ||
-    /\bbetter\b/.test(clean) ||
-    /\bbetween\b/.test(clean) ||
+    hasBetterInChoiceContext ||
+    hasBetweenInChoiceContext ||
     /\boption\b/.test(clean) ||
     /\bvs\b/.test(clean)
   );
@@ -830,10 +838,15 @@ User input:
 ${input}
 `;
 
-    const response = await openai.responses.create({
+    const aiCall = openai.responses.create({
       model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
       input: prompt,
+      max_output_tokens: 200,
     });
+    const aiTimeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI_UNAVAILABLE")), 10_000),
+    );
+    const response = await Promise.race([aiCall, aiTimeout]);
 
     const text = (response.output_text || "").trim();
     if (!text) return null;
@@ -861,8 +874,10 @@ ${input}
     }
 
     return { lead, steps };
-  } catch {
-    return null;
+  } catch (err) {
+    const e = err as { status?: number };
+    if (e.status === 429) console.warn("[solace] Break It Down: OpenAI rate limit (429)");
+    throw new Error("AI_UNAVAILABLE");
   }
 }
 
@@ -968,7 +983,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
     return {
       ...heavyResponse,
       type: "normal",
-      steps: heavyResponse.steps.slice(0, 3),
+      steps: (heavyResponse.steps ?? []).slice(0, 3),
     };
   }
 
@@ -977,7 +992,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
     return {
       ...interestingResponse,
       type: "normal",
-      steps: interestingResponse.steps.slice(0, 3),
+      steps: (interestingResponse.steps ?? []).slice(0, 3),
     };
   }
 
@@ -988,7 +1003,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
 
   return {
     ...base,
-    steps: base.steps.slice(0, 3),
+    steps: (base.steps ?? []).slice(0, 3),
     lead: contextLead || base.lead,
   };
 }
@@ -1021,6 +1036,13 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
 
 export async function POST(req: Request) {
   try {
+    if (req.headers.get("X-Solace-Age-Confirmed") !== "1") {
+      return NextResponse.json(
+        { error: "This tool is designed for adults only." },
+        { status: 403 },
+      );
+    }
+
     const clientKey = getClientIdentifierFromHeaders(req.headers);
     const rateLimit = applySlidingWindowRateLimit(
       clientKey,
@@ -1060,6 +1082,13 @@ export async function POST(req: Request) {
 
     return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
   } catch (error) {
+    if (error instanceof Error && error.message === "AI_UNAVAILABLE") {
+      return NextResponse.json(
+        { error: "unavailable", message: "This tool is temporarily resting." },
+        { status: 503 },
+      );
+    }
+
     console.error("Solace Break It Down API error:", error);
 
     const message =

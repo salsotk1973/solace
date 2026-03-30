@@ -206,10 +206,17 @@ function looksLikeDecisionInput(input: string): boolean {
   const hasDecisionLanguage =
     decisionVerbPattern.test(normalized) && firstPersonPattern.test(normalized) && wordCount >= 5;
 
+  // Narrative decision inputs without question marks: "I don't know if X is worth it"
+  const hasNarrativeDecision =
+    /\bdon'?t know (if|whether)\b|\bnot sure (if|whether)\b|\bwondering (if|whether)\b|\btorn between\b|\bcan'?t decide\b/.test(
+      normalized,
+    ) && wordCount >= 8;
+
   if (hasTwoClauseChoice) return true;
   if (hasStructuredChoice) return true;
   if (hasTradeoffStructure) return true;
   if (hasDecisionLanguage && hasQuestionMark) return true;
+  if (hasNarrativeDecision) return true;
 
   return false;
 }
@@ -469,6 +476,13 @@ function applyRateLimitHeaders(response: NextResponse, remaining: number, resetA
 
 export async function POST(req: Request) {
   try {
+    if (req.headers.get("X-Solace-Age-Confirmed") !== "1") {
+      return NextResponse.json(
+        { error: "This tool is designed for adults only." },
+        { status: 403 },
+      );
+    }
+
     const clientKey = getClientIdentifierFromHeaders(req.headers);
     const rateLimit = applySlidingWindowRateLimit(
       clientKey,
@@ -546,27 +560,49 @@ export async function POST(req: Request) {
     const context = buildDecisionContext(input);
     const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
-    const responseFromModel = await client.responses.create({
-      model,
-      max_output_tokens: 150,
-      input: [
-        {
-          role: "system",
-          content: [{ type: "input_text", text: CHOOSE_SYSTEM_PROMPT }],
-        },
-        {
-          role: "user",
-          content: [{ type: "input_text", text: getChooseUserPrompt(input, context) }],
-        },
-      ],
-    });
+    let responseFromModel;
+    try {
+      const aiCall = client.responses.create({
+        model,
+        max_output_tokens: 150,
+        input: [
+          {
+            role: "system",
+            content: [{ type: "input_text", text: CHOOSE_SYSTEM_PROMPT }],
+          },
+          {
+            role: "user",
+            content: [{ type: "input_text", text: getChooseUserPrompt(input, context) }],
+          },
+        ],
+      });
+      const aiTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("AI_UNAVAILABLE")), 10_000),
+      );
+      responseFromModel = await Promise.race([aiCall, aiTimeout]);
+    } catch (aiError) {
+      const e = aiError as { status?: number };
+      if (e.status === 429) console.warn("[solace] Choose: OpenAI rate limit (429)");
+      return applyRateLimitHeaders(
+        NextResponse.json(
+          { error: "unavailable", message: "This tool is temporarily resting." },
+          { status: 503 },
+        ),
+        rateLimit.remaining,
+        rateLimit.resetAt,
+      );
+    }
 
     const rawText = (responseFromModel.output_text || "").trim();
     let text = formatReflectionText(rawText);
 
     if (needsNaturalnessRewrite(text)) {
-      const rewritten = await rewriteForNaturalness(text);
-      text = formatReflectionText(rewritten);
+      try {
+        const rewritten = await rewriteForNaturalness(text);
+        if (rewritten) text = formatReflectionText(rewritten) || text;
+      } catch {
+        // skip rewrite on failure — keep original text
+      }
     }
 
     if (!text) {

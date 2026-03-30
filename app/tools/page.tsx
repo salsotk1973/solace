@@ -1,366 +1,238 @@
-"use client";
-
-import type { CSSProperties } from "react";
-import { useMemo, useState } from "react";
 import Link from "next/link";
-import { tools, type SolaceToolSlug } from "@/lib/solace-content/tools";
+import ToolCard     from "@/components/tools/ToolCard";
+import FamilyGroup  from "@/components/tools/FamilyGroup";
+import FaqAccordion from "@/components/tools/FaqAccordion";
 
-type CardSlug = SolaceToolSlug | null;
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
-const eyebrowStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 12,
-  lineHeight: 1.4,
-  letterSpacing: "0.18em",
-  textTransform: "uppercase",
-  color: "rgba(79,92,132,0.6)",
+export const metadata = {
+  title: "Free Mental Wellness Tools | Solace",
+  description:
+    "Six free tools for breathing, focus, sleep, thought reframing, mood tracking and gratitude. No account needed. Start anywhere.",
+  keywords: [
+    "free breathing exercise online",
+    "pomodoro timer",
+    "mood tracker",
+    "gratitude journal online",
+    "thought reframing",
+    "sleep wind down",
+    "mental wellness tools free",
+  ],
+  openGraph: {
+    title: "Free Mental Wellness Tools | Solace",
+    description:
+      "Six tools for the moments that matter. Free to try, no account needed.",
+    url: "https://solace.app/tools",
+  },
 };
 
-const titleStyle: CSSProperties = {
-  margin: "22px 0 0",
-  fontSize: "clamp(44px,4.6vw,68px)",
-  lineHeight: 0.94,
-  letterSpacing: "-0.06em",
-  fontWeight: 700,
-  color: "#4f5c84",
-  maxWidth: 760,
+// ─── FAQ JSON-LD — enables Google FAQ rich results ────────────────────────────
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is box breathing and does it actually work?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Box breathing is a simple pattern — 4 seconds in, 4 hold, 4 out, 4 hold. It gives your nervous system something to follow. Most people notice a shift within a few cycles.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is Solace a therapy app?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. Solace is designed for adults as a reflective support tool — not medical, psychological, or professional advice. If you're experiencing a mental health crisis, please reach out to a qualified professional or crisis service.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How is the Pomodoro technique different on Solace?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The mechanics are the same — 25 minutes of work, 5 of rest. The difference is the experience. Solace's Focus Timer is designed to feel like a calm container for your attention, not a productivity machine counting down at you.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do I need an account to use these tools?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. Every tool is free to use without an account. An account lets you save your history, track streaks, and see patterns over time — but the core experience is always available.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is cognitive reframing and is it safe?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Cognitive reframing is the practice of looking at a thought from a different angle — not to dismiss it, but to see it more clearly. Solace's Thought Reframer guides you through four gentle questions. It works best for everyday thinking patterns rather than clinical conditions.",
+      },
+    },
+  ],
 };
 
-const sectionTitleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: "clamp(30px,2.6vw,38px)",
-  lineHeight: 1.06,
-  letterSpacing: "-0.045em",
-  fontWeight: 700,
-  color: "#4f5c84",
-  maxWidth: 640,
-};
+// ─── Tool data ────────────────────────────────────────────────────────────────
 
-const sectionTextStyle: CSSProperties = {
-  maxWidth: 580,
-  margin: "22px 0 0",
-  fontSize: 17,
-  lineHeight: 1.9,
-  color: "rgba(79,92,132,0.78)",
-};
+const CALM_YOUR_STATE = [
+  {
+    tag:       "Breathing",
+    name:      "Breathing",
+    line:      "Box breathing and 4-7-8. Calm your nervous system in minutes.",
+    href:      "/breathing",
+    colour:    "rgba(60,190,210,0.6)",
+    tagColour: "rgba(80,200,218,0.5)",
+  },
+  {
+    tag:       "Focus",
+    name:      "Focus Timer",
+    line:      "25 minutes of work, 5 of rest. Four sessions and a long break.",
+    href:      "/focus",
+    colour:    "rgba(240,170,70,0.6)",
+    tagColour: "rgba(240,185,90,0.5)",
+  },
+  {
+    tag:       "Sleep",
+    name:      "Sleep Wind-Down",
+    line:      "4-8 breathing for the end of the day. Let the day go.",
+    href:      "/sleep",
+    colour:    "rgba(140,120,210,0.6)",
+    tagColour: "rgba(160,145,230,0.5)",
+  },
+];
 
-const feelingStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 13,
-  lineHeight: 1.4,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
-  color: "rgba(22,27,41,0.44)",
-};
+const CLEAR_YOUR_MIND = [
+  {
+    tag:       "Thought Reframing",
+    name:      "Thought Reframer",
+    line:      "Four gentle questions that shift the angle on a thought that's stuck.",
+    href:      "/reframe",
+    colour:    "rgba(130,185,140,0.6)",
+    tagColour: "rgba(145,200,155,0.5)",
+  },
+];
 
-const cardTitleStyle: CSSProperties = {
-  margin: "14px 0 0",
-  fontSize: 26,
-  lineHeight: 1.04,
-  letterSpacing: "-0.04em",
-  fontWeight: 700,
-  color: "#161b29",
-};
+const NOTICE_WHATS_GOOD = [
+  {
+    tag:       "Mood",
+    name:      "Mood Tracker",
+    line:      "Check in once a day. Notice patterns over time.",
+    href:      "/mood",
+    colour:    "rgba(210,150,165,0.6)",
+    tagColour: "rgba(225,170,185,0.5)",
+  },
+  {
+    tag:       "Gratitude",
+    name:      "Gratitude Log",
+    line:      "Three things. Every day. Nothing more, nothing less.",
+    href:      "/gratitude",
+    colour:    "rgba(220,175,80,0.6)",
+    tagColour: "rgba(225,190,100,0.5)",
+  },
+];
 
-const cardDescriptionStyle: CSSProperties = {
-  marginTop: 18,
-  marginBottom: 0,
-  fontSize: 15,
-  lineHeight: 1.85,
-  color: "rgba(22,27,41,0.8)",
-};
-
-const cardShortStyle: CSSProperties = {
-  marginTop: 24,
-  marginBottom: 0,
-  fontSize: 13,
-  lineHeight: 1.7,
-  color: "rgba(22,27,41,0.46)",
-};
-
-function getCardRestStyle(slug: SolaceToolSlug): CSSProperties {
-  if (slug === "choose") {
-    return {
-      border: "1px solid rgba(139,173,242,0.42)",
-      background: "rgba(219,232,255,0.48)",
-      boxShadow: "0 18px 40px rgba(168,154,228,0.07)",
-      transform: "translateY(0)",
-    };
-  }
-
-  if (slug === "clear-your-mind") {
-    return {
-      border: "1px solid rgba(152,190,160,0.4)",
-      background: "rgba(221,232,224,0.62)",
-      boxShadow: "0 18px 40px rgba(168,154,228,0.07)",
-      transform: "translateY(0)",
-    };
-  }
-
-  return {
-    border: "1px solid rgba(223,169,123,0.42)",
-    background: "rgba(249,234,223,0.68)",
-    boxShadow: "0 18px 40px rgba(168,154,228,0.07)",
-    transform: "translateY(0)",
-  };
-}
-
-function getCardHoverStyle(slug: SolaceToolSlug): CSSProperties {
-  if (slug === "choose") {
-    return {
-      border: "1px solid rgba(109,156,246,0.62)",
-      background: "rgba(223,235,255,0.72)",
-      boxShadow:
-        "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(139,173,242,0.14), 0 0 24px rgba(139,173,242,0.22)",
-      transform: "translateY(-6px)",
-    };
-  }
-
-  if (slug === "clear-your-mind") {
-    return {
-      border: "1px solid rgba(122,175,137,0.56)",
-      background: "rgba(225,235,228,0.76)",
-      boxShadow:
-        "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(152,190,160,0.12), 0 0 24px rgba(152,190,160,0.2)",
-      transform: "translateY(-6px)",
-    };
-  }
-
-  return {
-    border: "1px solid rgba(230,150,84,0.64)",
-    background: "rgba(252,237,227,0.82)",
-    boxShadow:
-      "0 18px 40px rgba(168,154,228,0.08), 0 14px 34px rgba(230,150,84,0.14), 0 0 24px rgba(230,150,84,0.22)",
-    transform: "translateY(-6px)",
-  };
-}
-
-function getCardStyle(slug: SolaceToolSlug, hovered: boolean): CSSProperties {
-  return {
-    minHeight: 244,
-    borderRadius: 34,
-    padding: "28px 28px 26px",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    transition:
-      "transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease, background 240ms ease",
-    ...(hovered ? getCardHoverStyle(slug) : getCardRestStyle(slug)),
-  };
-}
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ToolsPage() {
-  const [hoveredCard, setHoveredCard] = useState<CardSlug>(null);
-
-  const orderedTools = useMemo(
-    () => [...tools].sort((a, b) => a.order - b.order),
-    []
-  );
-
   return (
-    <main
-      style={{
-        width: "100%",
-        paddingTop: 120,
-        paddingBottom: 120,
-      }}
-    >
-      <section
-        style={{
-          maxWidth: 1240,
-          margin: "0 auto",
-          padding: "0 24px",
-        }}
-      >
-        <div style={{ maxWidth: 820 }}>
-          <p style={eyebrowStyle}>Tools</p>
+    <>
+      {/* FAQ JSON-LD — Google reads this from anywhere in the document */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
-          <h1 style={titleStyle}>
-            Find the right
-            <br />
-            place to begin
-          </h1>
-        </div>
-      </section>
+      <main className="min-h-screen bg-[#090d14] text-white">
 
-      <section
-        style={{
-          position: "relative",
-          maxWidth: 1240,
-          margin: "100px auto 0",
-          padding: "0 24px",
-        }}
-      >
-        <div className="breathing-band" />
+        <div className="max-w-[900px] mx-auto px-6">
 
-        <div style={{ maxWidth: 700, position: "relative", zIndex: 1 }}>
-          <h2 style={sectionTitleStyle}>Three ways Solace can help</h2>
+          {/* ── Hero ──────────────────────────────────────────────────────── */}
+          <header className="text-center pt-[180px] pb-[48px]">
+            <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(200,210,220,0.65)] mb-4">
+              Human Behaviour Lab
+            </p>
+            <h1 className="[font-family:var(--font-display)] font-light text-[clamp(38px,4.5vw,52px)] text-[rgba(210,220,230,0.88)] leading-tight mb-6">
+              Six tools for the moments{" "}
+              <em className="italic font-light text-[rgba(200,215,225,0.55)]">
+                that matter.
+              </em>
+            </h1>
+            <p className="[font-family:var(--font-jost)] font-[300] text-[14px] text-[rgba(200,210,220,0.75)] max-w-[480px] mx-auto leading-relaxed">
+              Each tool is designed around a single moment — the anxious breath,
+              the scattered mind, the end of a hard day. Start anywhere.
+              Everything is free to try.
+            </p>
+          </header>
 
-          <p style={sectionTextStyle}>
-            Most people arrive here feeling one of these things. Choose the one
-            that sounds most like your current state.
-          </p>
-        </div>
+          {/* ── Tool families ─────────────────────────────────────────────── */}
+          <section aria-label="Tools" className="flex flex-col gap-[40px] mb-24">
 
-        <div
-          className="tools-card-grid"
-          style={{ marginTop: 46, position: "relative", zIndex: 1 }}
-        >
-          {orderedTools.map((tool) => (
+            <FamilyGroup label="Calm your state" cols={3}>
+              {CALM_YOUR_STATE.map((t) => <ToolCard key={t.href} {...t} />)}
+            </FamilyGroup>
+
+            <FamilyGroup label="Clear your mind" cols={1}>
+              {CLEAR_YOUR_MIND.map((t) => <ToolCard key={t.href} {...t} />)}
+            </FamilyGroup>
+
+            <FamilyGroup label="Notice what's good" cols={2}>
+              {NOTICE_WHATS_GOOD.map((t) => <ToolCard key={t.href} {...t} />)}
+            </FamilyGroup>
+
+          </section>
+
+          {/* ── SEO content ───────────────────────────────────────────────── */}
+          <section className="max-w-[680px] mx-auto mb-24">
+            <h2 className="[font-family:var(--font-display)] font-light text-[32px] text-[rgba(200,215,225,0.7)] leading-snug mb-8">
+              Free mental wellness tools, designed around real moments.
+            </h2>
+            <div className="[font-family:var(--font-jost)] text-[14px] font-[300] text-[rgba(200,210,220,0.75)] leading-[1.9] space-y-5">
+              <p>
+                Solace is a{" "}
+                <strong className="font-[400] text-[rgba(200,210,220,0.92)]">
+                  Human Behaviour Lab
+                </strong>{" "}
+                — a set of tools built around the specific moments when people
+                need support most. Not therapy. Not journaling prompts. Tools
+                that work in the moment you&apos;re in, whether that&apos;s
+                anxiety before a meeting, a racing mind at midnight, or a low
+                Tuesday afternoon with no obvious cause.
+              </p>
+              <p>
+                Each tool is free to use. No account needed to start. The core
+                experience — the breathing rhythm, the focus timer, the thought
+                reframe — is always available. An account unlocks history,
+                patterns, and streaks for the tools that benefit from them.
+              </p>
+            </div>
+          </section>
+
+          {/* ── FAQ ───────────────────────────────────────────────────────── */}
+          <section className="max-w-[680px] mx-auto mb-24">
+            <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.24em] uppercase text-[rgba(200,210,220,0.65)] mb-8">
+              Common questions
+            </p>
+            <FaqAccordion />
+          </section>
+
+          {/* ── Upgrade strip ─────────────────────────────────────────────── */}
+          <p className="text-center [font-family:var(--font-jost)] text-[13px] font-[300] text-[rgba(200,210,220,0.72)] mb-24 max-w-[800px] mx-auto leading-relaxed whitespace-nowrap">
+            Everything above is free.{" "}
             <Link
-              key={tool.slug}
-              href={`/tools/${tool.slug}`}
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                display: "block",
-              }}
-              onMouseEnter={() => setHoveredCard(tool.slug)}
-              onMouseLeave={() => setHoveredCard(null)}
+              href="/pricing"
+              className="text-[rgba(200,210,220,0.85)] underline underline-offset-2 hover:text-[rgba(200,210,220,1)] transition-colors duration-200"
             >
-              <article style={getCardStyle(tool.slug, hoveredCard === tool.slug)}>
-                <p style={feelingStyle}>{tool.feeling}</p>
-                <h3 style={cardTitleStyle}>{tool.name}</h3>
-                <p style={cardDescriptionStyle}>{tool.description}</p>
-                <p style={cardShortStyle}>{tool.shortDescription}</p>
-              </article>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section
-        style={{
-          maxWidth: 1240,
-          margin: "120px auto 0",
-          padding: "0 24px",
-        }}
-      >
-        <div
-          style={{
-            borderRadius: 36,
-            border: "1px solid rgba(255,255,255,0.44)",
-            background: "rgba(255,255,255,0.18)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            boxShadow: "0 18px 40px rgba(168,154,228,0.06)",
-            padding: "34px 32px",
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              fontSize: 12,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "rgba(79,92,132,0.5)",
-            }}
-          >
-            A calmer way to begin
+              A Solace account
+            </Link>{" "}
+            adds history, patterns, and streaks — A$14/month or A$119/year.
           </p>
 
-          <h3
-            style={{
-              margin: "16px 0 0",
-              fontSize: "clamp(24px,2.2vw,32px)",
-              lineHeight: 1.1,
-              letterSpacing: "-0.04em",
-              color: "#4f5c84",
-              fontWeight: 600,
-            }}
-          >
-            You do not need to solve everything at once.
-          </h3>
-
-          <p
-            style={{
-              maxWidth: 720,
-              margin: "18px 0 0",
-              fontSize: 16,
-              lineHeight: 1.9,
-              color: "rgba(79,92,132,0.76)",
-            }}
-          >
-            Start with the part that feels most true right now. Solace will help
-            you narrow the noise, organise the question, and make the next step
-            feel lighter.
-          </p>
         </div>
-      </section>
 
-      <style jsx>{`
-        .tools-card-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 22px;
-        }
-
-        .breathing-band {
-          position: absolute;
-          left: 50%;
-          top: 284px;
-          width: min(1500px, calc(100% + 260px));
-          height: 210px;
-          transform: translateX(-50%);
-          pointer-events: none;
-          border-radius: 999px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(184, 148, 255, 0.26) 0%,
-            rgba(184, 148, 255, 0.19) 22%,
-            rgba(184, 148, 255, 0.11) 42%,
-            rgba(184, 148, 255, 0.05) 62%,
-            rgba(184, 148, 255, 0.018) 76%,
-            transparent 89%
-          );
-          filter: blur(44px);
-          opacity: 0.9;
-          animation: toolsBandBreath 7.5s ease-in-out infinite;
-        }
-
-        @keyframes toolsBandBreath {
-          0% {
-            transform: translateX(-50%) scaleX(0.985) scaleY(0.94);
-            opacity: 0.7;
-          }
-
-          50% {
-            transform: translateX(-50%) scaleX(1.035) scaleY(1);
-            opacity: 0.94;
-          }
-
-          100% {
-            transform: translateX(-50%) scaleX(0.985) scaleY(0.94);
-            opacity: 0.7;
-          }
-        }
-
-        @media (max-width: 980px) {
-          .tools-card-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .breathing-band {
-            top: 330px;
-            width: min(860px, calc(100% + 80px));
-            height: 700px;
-            filter: blur(68px);
-          }
-        }
-
-        @media (max-width: 720px) {
-          main {
-            padding-top: 80px !important;
-            padding-bottom: 80px !important;
-          }
-
-          .breathing-band {
-            top: 350px;
-            width: min(580px, calc(100% + 36px));
-            height: 840px;
-            filter: blur(58px);
-          }
-        }
-      `}</style>
-    </main>
+      </main>
+    </>
   );
 }

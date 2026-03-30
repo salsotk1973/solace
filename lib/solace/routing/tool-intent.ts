@@ -40,7 +40,6 @@ function looksLikeDecisionLanguage(text: string): boolean {
   const patterns = [
     /\bshould i\b/i,
     /\bshould we\b/i,
-    /\bdo i\b/i,
     /\bcan i\b/i,
     /\bwhich should i\b/i,
     /\bwhich is better\b/i,
@@ -201,10 +200,18 @@ export function classifySolaceToolIntent(params: {
 
   const detection = detectBestTool(combinedText, thoughts);
 
+  // If the user is already on clear-your-mind and the input also looks like a
+  // clear-your-mind input, do not redirect — the overwhelm routing logic runs
+  // first in detectBestTool and can steal inputs that belong here.
+  const alreadyOnCorrectTool =
+    currentTool === "clear-your-mind" &&
+    looksLikeClearYourMindInput(combinedText, thoughts);
+
   if (
     detection.detectedTool === "unknown" ||
     detection.detectedTool === currentTool ||
-    detection.confidence < 0.72
+    detection.confidence < 0.72 ||
+    alreadyOnCorrectTool
   ) {
     return {
       detectedTool: detection.detectedTool,

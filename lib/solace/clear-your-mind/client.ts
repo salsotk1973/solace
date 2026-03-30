@@ -36,6 +36,7 @@ export async function submitClearYourMindThoughts(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Solace-Age-Confirmed": "1",
       },
       body: JSON.stringify({ thoughts }),
     });
