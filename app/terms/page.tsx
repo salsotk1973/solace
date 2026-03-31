@@ -12,7 +12,7 @@ function Section({ number, title, children }: { number: string; title: string; c
     <section style={{ marginBottom: '48px' }}>
       <p
         style={{
-          fontFamily:    "'DM Sans', sans-serif",
+          fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
           fontSize:      '10px',
           letterSpacing: '0.2em',
@@ -37,7 +37,7 @@ function Section({ number, title, children }: { number: string; title: string; c
       </h2>
       <div
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Jost', sans-serif",
           fontWeight: 300,
           fontSize:   '15px',
           lineHeight: 1.85,
@@ -73,7 +73,7 @@ export default function TermsPage() {
         <header style={{ marginBottom: '64px' }}>
           <p
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      '10px',
               letterSpacing: '0.22em',
@@ -98,7 +98,7 @@ export default function TermsPage() {
           </h1>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize:   '15px',
               lineHeight: 1.8,

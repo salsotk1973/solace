@@ -6,9 +6,9 @@ import FaqAccordion from "@/components/tools/FaqAccordion";
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata = {
-  title: "Free Mental Wellness Tools | Solace",
+  title: "Mental Wellness Tools | Solace",
   description:
-    "Six free tools for breathing, focus, sleep, thought reframing, mood tracking and gratitude. No account needed. Start anywhere.",
+    "Nine tools for breathing, focus, sleep, thought reframing, mood tracking, gratitude, and AI-powered reflection. No account needed. Start anywhere.",
   keywords: [
     "free breathing exercise online",
     "pomodoro timer",
@@ -17,11 +17,13 @@ export const metadata = {
     "thought reframing",
     "sleep wind down",
     "mental wellness tools free",
+    "clear your mind",
+    "decision making tool",
   ],
   openGraph: {
-    title: "Free Mental Wellness Tools | Solace",
+    title: "Mental Wellness Tools | Solace",
     description:
-      "Six tools for the moments that matter. Free to try, no account needed.",
+      "Nine tools for the moments that matter. Free to try, no account needed.",
     url: "https://solace.app/tools",
   },
 };
@@ -76,6 +78,36 @@ const faqSchema = {
 };
 
 // ─── Tool data ────────────────────────────────────────────────────────────────
+
+const AI_REALMS = [
+  {
+    tag:      "When my mind won't stop",
+    name:     "Clear Your Mind",
+    line:     "Your thoughts are circling and you can't find the floor. Release them one by one and find what's actually there.",
+    href:     "/tools/clear-your-mind",
+    colour:   "rgba(68,200,110,1)",
+    bg:       "linear-gradient(145deg, #0a1a12, #0d2018, #081610)",
+    minHeight: "260px",
+  },
+  {
+    tag:      "When I can't decide",
+    name:     "Choose",
+    line:     "A decision keeps turning over in your mind. See it more clearly when the noise is removed.",
+    href:     "/tools/choose",
+    colour:   "rgba(68,138,228,1)",
+    bg:       "linear-gradient(145deg, #080e1a, #0c1428, #080c18)",
+    minHeight: "260px",
+  },
+  {
+    tag:      "When I feel overwhelmed",
+    name:     "Break It Down",
+    line:     "Something feels too large to begin. Watch what seemed impossible become a sequence of steps.",
+    href:     "/tools/break-it-down",
+    colour:   "rgba(218,148,48,1)",
+    bg:       "linear-gradient(145deg, #1a1008, #281808, #180e04)",
+    minHeight: "260px",
+  },
+];
 
 const CALM_YOUR_STATE = [
   {
@@ -155,7 +187,7 @@ export default function ToolsPage() {
               Human Behaviour Lab
             </p>
             <h1 className="[font-family:var(--font-display)] font-light text-[clamp(38px,4.5vw,52px)] text-[rgba(210,220,230,0.88)] leading-tight mb-6">
-              Six tools for the moments{" "}
+              Nine tools for the moments{" "}
               <em className="italic font-light text-[rgba(200,215,225,0.55)]">
                 that matter.
               </em>
@@ -169,6 +201,10 @@ export default function ToolsPage() {
 
           {/* ── Tool families ─────────────────────────────────────────────── */}
           <section aria-label="Tools" className="flex flex-col gap-[40px] mb-24">
+
+            <FamilyGroup label="AI-powered reflection" cols={3}>
+              {AI_REALMS.map((t) => <ToolCard key={t.href} {...t} />)}
+            </FamilyGroup>
 
             <FamilyGroup label="Calm your state" cols={3}>
               {CALM_YOUR_STATE.map((t) => <ToolCard key={t.href} {...t} />)}
@@ -187,7 +223,7 @@ export default function ToolsPage() {
           {/* ── SEO content ───────────────────────────────────────────────── */}
           <section className="max-w-[680px] mx-auto mb-24">
             <h2 className="[font-family:var(--font-display)] font-light text-[32px] text-[rgba(200,215,225,0.7)] leading-snug mb-8">
-              Free mental wellness tools, designed around real moments.
+              Nine mental wellness tools, designed around real moments.
             </h2>
             <div className="[font-family:var(--font-jost)] text-[14px] font-[300] text-[rgba(200,210,220,0.75)] leading-[1.9] space-y-5">
               <p>
@@ -220,7 +256,7 @@ export default function ToolsPage() {
 
           {/* ── Upgrade strip ─────────────────────────────────────────────── */}
           <p className="text-center [font-family:var(--font-jost)] text-[13px] font-[300] text-[rgba(200,210,220,0.72)] mb-24 max-w-[800px] mx-auto leading-relaxed whitespace-nowrap">
-            Everything above is free.{" "}
+            The free tools above are always free.{" "}
             <Link
               href="/pricing"
               className="text-[rgba(200,210,220,0.85)] underline underline-offset-2 hover:text-[rgba(200,210,220,1)] transition-colors duration-200"

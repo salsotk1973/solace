@@ -52,7 +52,7 @@ export default function LabToolCta({ label, href, category }: Props) {
       {/* Eyebrow */}
       <p
         style={{
-          fontFamily:    "'DM Sans', sans-serif",
+          fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
           fontSize:      '10px',
           letterSpacing: '0.22em',
@@ -81,7 +81,7 @@ export default function LabToolCta({ label, href, category }: Props) {
       {/* Subtitle */}
       <p
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Jost', sans-serif",
           fontWeight: 300,
           fontSize:   '13px',
           lineHeight: 1.72,
@@ -102,7 +102,7 @@ export default function LabToolCta({ label, href, category }: Props) {
           borderRadius:   '4px',
           border:         `0.5px solid ${accent.replace('1)', '0.28)')}`,
           background:     accentBg,
-          fontFamily:     "'DM Sans', sans-serif",
+          fontFamily:     "'Jost', sans-serif",
           fontWeight:     400,
           fontSize:       '12px',
           letterSpacing:  '0.12em',

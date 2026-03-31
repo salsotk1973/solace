@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/hero/HeroSection";
+import ToolCard from "@/components/tools/ToolCard";
 import { SOLACE_ROUTES } from "@/lib/solace/routes";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -34,45 +35,33 @@ const PURPLE_SHADES = [
 
 const REALMS = [
   {
-    id: "emerald",
-    feeling: "When my mind won't stop",
-    name: "Clear Your Mind",
-    desc: "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
-    href: SOLACE_ROUTES.clearYourMind,
-    accent: "rgba(68,200,110,1)",
-    bg: "linear-gradient(145deg, #0a1a12, #0d2018, #081610)",
-    border: "rgba(48,160,88,0.14)",
-    borderHover: "rgba(48,160,88,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(48,200,100,1), transparent)",
-    shadow: "0 12px 60px rgba(28,120,60,0.16)",
+    id:      "emerald",
+    tag:     "When my mind won't stop",
+    name:    "Clear Your Mind",
+    line:    "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
+    href:    SOLACE_ROUTES.clearYourMind,
+    colour:  "rgba(68,200,110,1)",
+    bg:      "linear-gradient(145deg, #0a1a12, #0d2018, #081610)",
   },
   {
-    id: "azure",
-    feeling: "When I can't decide",
-    name: "Choose",
-    desc: "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
-    href: SOLACE_ROUTES.choose,
-    accent: "rgba(68,138,228,1)",
-    bg: "linear-gradient(145deg, #080e1a, #0c1428, #080c18)",
-    border: "rgba(48,100,210,0.14)",
-    borderHover: "rgba(48,100,210,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(48,120,240,1), transparent)",
-    shadow: "0 12px 60px rgba(28,80,180,0.16)",
+    id:      "azure",
+    tag:     "When I can't decide",
+    name:    "Choose",
+    line:    "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
+    href:    SOLACE_ROUTES.choose,
+    colour:  "rgba(68,138,228,1)",
+    bg:      "linear-gradient(145deg, #080e1a, #0c1428, #080c18)",
   },
   {
-    id: "amber",
-    feeling: "When I feel overwhelmed",
-    name: "Break It Down",
-    desc: "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
-    href: SOLACE_ROUTES.breakItDown,
-    accent: "rgba(218,148,48,1)",
-    bg: "linear-gradient(145deg, #1a1008, #281808, #180e04)",
-    border: "rgba(200,130,40,0.14)",
-    borderHover: "rgba(200,130,40,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(220,150,40,1), transparent)",
-    shadow: "0 12px 60px rgba(160,100,20,0.16)",
+    id:      "amber",
+    tag:     "When I feel overwhelmed",
+    name:    "Break It Down",
+    line:    "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
+    href:    SOLACE_ROUTES.breakItDown,
+    colour:  "rgba(218,148,48,1)",
+    bg:      "linear-gradient(145deg, #1a1008, #281808, #180e04)",
   },
-] as const;
+];
 
 const FREE_TOOLS = [
   { name: 'Breathing',       href: '/breathing', accent: 'rgba(60,190,210,1)' },
@@ -93,9 +82,8 @@ const PILLS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const [dots, setDots]                       = useState<Dot[]>([]);
-  const [hoveredRealm, setHoveredRealm]       = useState<string | null>(null);
-  const [labCtaHovered, setLabCtaHovered]     = useState(false);
+  const [dots, setDots]                   = useState<Dot[]>([]);
+  const [labCtaHovered, setLabCtaHovered] = useState(false);
 
   useEffect(() => {
     setDots(
@@ -118,21 +106,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#050508] text-white">
-      {/* ── Atmospheric background — fixed, z-index 1, behind everything ──── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:   "fixed",
-          top:        0,
-          left:       0,
-          width:      "100vw",
-          height:     "100vh",
-          background: "radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)",
-          zIndex:     1,
-          pointerEvents: "none",
-        }}
-      />
-
       {/* ── Ambient dots — fixed, z-index 2, above background, below content */}
       <div
         aria-hidden="true"
@@ -195,7 +168,7 @@ export default function HomePage() {
         <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
           <p
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      "10px",
               letterSpacing: "0.24em",
@@ -226,7 +199,7 @@ export default function HomePage() {
         <div style={{ maxWidth: "1000px", margin: "0 auto 52px" }}>
           <p
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      "9px",
               letterSpacing: "0.26em",
@@ -277,7 +250,7 @@ export default function HomePage() {
                 >
                   <span
                     style={{
-                      fontFamily:    "'DM Sans', sans-serif",
+                      fontFamily:    "'Jost', sans-serif",
                       fontWeight:    400,
                       fontSize:      "12px",
                       letterSpacing: "0.02em",
@@ -310,141 +283,18 @@ export default function HomePage() {
             margin:              "0 auto",
           }}
         >
-          {REALMS.map((card) => {
-            const hov = hoveredRealm === card.id;
-            return (
-              <Link
-                key={card.id}
-                href={card.href}
-                onMouseEnter={() => setHoveredRealm(card.id)}
-                onMouseLeave={() => setHoveredRealm(null)}
-                style={{
-                  position:       "relative",
-                  display:        "flex",
-                  flexDirection:  "column",
-                  borderRadius:   "18px",
-                  padding:        "40px 36px 36px",
-                  minHeight:      "300px",
-                  cursor:         "pointer",
-                  textDecoration: "none",
-                  overflow:       "hidden",
-                  background:     card.bg,
-                  border:         `0.5px solid ${hov ? card.borderHover : card.border}`,
-                  boxShadow:      hov ? card.shadow : "none",
-                  transform:      hov ? "translateY(-5px)" : "translateY(0)",
-                  transition:
-                    "transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.55s cubic-bezier(0.22,1,0.36,1)",
-                  boxSizing: "border-box",
-                }}
-              >
-                {/* Shimmer line */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position:      "absolute",
-                    top:           0,
-                    left:          "20%",
-                    right:         "20%",
-                    height:        "1px",
-                    background:    card.shimmer,
-                    opacity:       hov ? 0.7 : 0.35,
-                    transition:    "opacity 0.55s ease",
-                    pointerEvents: "none",
-                  }}
-                />
-
-                {/* Feeling label */}
-                <p
-                  style={{
-                    fontFamily:    "'DM Sans', sans-serif",
-                    fontWeight:    400,
-                    fontSize:      "10px",
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                    color:         card.accent,
-                    margin:        "0 0 14px",
-                    opacity:       hov ? 0.7 : 0.42,
-                    transition:    "opacity 0.4s ease",
-                  }}
-                >
-                  {card.feeling}
-                </p>
-
-                {/* Realm name */}
-                <h3
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontWeight: 300,
-                    fontSize:   "28px",
-                    color:      hov ? "rgba(245,240,255,1)" : "rgba(235,228,255,0.9)",
-                    margin:     "0 0 16px",
-                    lineHeight: 1.2,
-                    transition: "color 0.4s ease",
-                  }}
-                >
-                  {card.name}
-                </h3>
-
-                {/* Description */}
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 300,
-                    fontSize:   "13px",
-                    color:      hov ? "rgba(185,175,220,0.85)" : "rgba(172,165,210,0.75)",
-                    lineHeight: 1.75,
-                    margin:     0,
-                    flex:       1,
-                    transition: "color 0.4s ease",
-                  }}
-                >
-                  {card.desc}
-                </p>
-
-                {/* Bottom row */}
-                <div
-                  style={{
-                    marginTop:  "32px",
-                    paddingTop: "18px",
-                    borderTop:  `0.5px solid ${hov ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`,
-                    display:    "flex",
-                    alignItems: "center",
-                    gap:        "8px",
-                    transition: "border-color 0.4s ease",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily:    "'DM Sans', sans-serif",
-                      fontWeight:    400,
-                      fontSize:      "10px",
-                      letterSpacing: "0.16em",
-                      textTransform: "uppercase",
-                      color:         card.accent,
-                      opacity:       hov ? 0.62 : 0,
-                      transform:     hov ? "translateX(0)" : "translateX(-6px)",
-                      transition:    "opacity 0.45s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-                    }}
-                  >
-                    Begin
-                  </span>
-                  <span
-                    style={{
-                      fontSize:   "16px",
-                      color:      card.accent,
-                      opacity:    hov ? 0.75 : 0,
-                      transform:  hov ? "translateX(2px)" : "translateX(-8px)",
-                      transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)",
-                      lineHeight: 1,
-                      display:    "inline-block",
-                    }}
-                  >
-                    ›
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
+          {REALMS.map((card) => (
+            <ToolCard
+              key={card.id}
+              tag={card.tag}
+              name={card.name}
+              line={card.line}
+              href={card.href}
+              colour={card.colour}
+              bg={card.bg}
+              minHeight="300px"
+            />
+          ))}
         </div>
 
         {/* See all tools link */}
@@ -452,7 +302,7 @@ export default function HomePage() {
           <Link
             href="/tools"
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    300,
               fontSize:      "11px",
               letterSpacing: "0.14em",
@@ -528,7 +378,7 @@ export default function HomePage() {
               <span
                 key={pill}
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "10px",
                   letterSpacing: "0.12em",
@@ -590,7 +440,7 @@ export default function HomePage() {
           <div style={{ position: "relative", zIndex: 1 }}>
             <p
               style={{
-                fontFamily:    "'DM Sans', sans-serif",
+                fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
                 fontSize:      "10px",
                 letterSpacing: "0.22em",
@@ -622,7 +472,7 @@ export default function HomePage() {
 
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "13px",
                 color:      "rgba(135,128,178,0.52)",
@@ -652,7 +502,7 @@ export default function HomePage() {
             >
               <span
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "11px",
                   letterSpacing: "0.18em",

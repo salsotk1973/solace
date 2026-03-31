@@ -203,7 +203,7 @@ export default function PricingPage() {
           >
             <p
               style={{
-                fontFamily:    "'DM Sans', sans-serif",
+                fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
                 fontSize:      "10px",
                 letterSpacing: "0.24em",
@@ -233,7 +233,7 @@ export default function PricingPage() {
 
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "15px",
                 color:      "rgba(148,140,188,0.62)",
@@ -267,7 +267,7 @@ export default function PricingPage() {
             >
               <span
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Jost', sans-serif",
                   fontWeight: 400,
                   fontSize:   "13px",
                   color:      isAnnual ? "rgba(148,140,188,0.45)" : "rgba(215,208,248,0.88)",
@@ -315,7 +315,7 @@ export default function PricingPage() {
 
               <span
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Jost', sans-serif",
                   fontWeight: 400,
                   fontSize:   "13px",
                   color:      isAnnual ? "rgba(215,208,248,0.88)" : "rgba(148,140,188,0.45)",
@@ -328,7 +328,7 @@ export default function PricingPage() {
                 Annual
                 <span
                   style={{
-                    fontFamily:    "'DM Sans', sans-serif",
+                    fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
                     fontSize:      "9px",
                     letterSpacing: "0.12em",
@@ -394,7 +394,7 @@ export default function PricingPage() {
 
                 <p
                   style={{
-                    fontFamily:    "'DM Sans', sans-serif",
+                    fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
                     fontSize:      "10px",
                     letterSpacing: "0.20em",
@@ -421,7 +421,7 @@ export default function PricingPage() {
                   </p>
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
                       fontSize:   "12px",
                       color:      "rgba(120,112,165,0.5)",
@@ -451,7 +451,7 @@ export default function PricingPage() {
                         display:    "flex",
                         alignItems: "flex-start",
                         gap:        "10px",
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
                         color:      "rgba(148,140,188,0.72)",
@@ -489,7 +489,7 @@ export default function PricingPage() {
                     background:     freeCtaHovered
                       ? "rgba(80,72,128,0.12)"
                       : "transparent",
-                    fontFamily:    "'DM Sans', sans-serif",
+                    fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
                     fontSize:      "12px",
                     letterSpacing: "0.12em",
@@ -553,7 +553,7 @@ export default function PricingPage() {
                 >
                   <p
                     style={{
-                      fontFamily:    "'DM Sans', sans-serif",
+                      fontFamily:    "'Jost', sans-serif",
                       fontWeight:    400,
                       fontSize:      "10px",
                       letterSpacing: "0.20em",
@@ -566,7 +566,7 @@ export default function PricingPage() {
                   </p>
                   <span
                     style={{
-                      fontFamily:    "'DM Sans', sans-serif",
+                      fontFamily:    "'Jost', sans-serif",
                       fontWeight:    400,
                       fontSize:      "9px",
                       letterSpacing: "0.12em",
@@ -600,7 +600,7 @@ export default function PricingPage() {
                     </p>
                     <p
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
                         color:      "rgba(148,140,188,0.55)",
@@ -612,7 +612,7 @@ export default function PricingPage() {
                   </div>
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
                       fontSize:   "12px",
                       color:      "rgba(120,112,165,0.55)",
@@ -643,7 +643,7 @@ export default function PricingPage() {
                         display:    "flex",
                         alignItems: "flex-start",
                         gap:        "10px",
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
                         color:      "rgba(195,188,238,0.78)",
@@ -681,7 +681,7 @@ export default function PricingPage() {
                     background:     proCtaHovered
                       ? "linear-gradient(135deg, rgba(100,80,168,0.28), rgba(80,60,140,0.2))"
                       : "linear-gradient(135deg, rgba(80,60,148,0.18), rgba(60,45,120,0.12))",
-                    fontFamily:    "'DM Sans', sans-serif",
+                    fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
                     fontSize:      "12px",
                     letterSpacing: "0.12em",
@@ -699,7 +699,7 @@ export default function PricingPage() {
 
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
                     fontSize:   "11px",
                     color:      "rgba(120,112,165,0.42)",
@@ -731,7 +731,7 @@ export default function PricingPage() {
             >
               <p
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "10px",
                   letterSpacing: "0.24em",
@@ -761,13 +761,13 @@ export default function PricingPage() {
                     borderBottom:        "0.5px solid rgba(100,92,148,0.12)",
                   }}
                 >
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)" }}>
+                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)" }}>
                     Feature
                   </span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)", textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)", textAlign: "center" }}>
                     Free
                   </span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(168,148,225,0.6)", textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(168,148,225,0.6)", textAlign: "center" }}>
                     Pro
                   </span>
                 </div>
@@ -788,7 +788,7 @@ export default function PricingPage() {
                   >
                     <span
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
                         color:      "rgba(168,160,215,0.7)",
@@ -832,7 +832,7 @@ export default function PricingPage() {
             >
               <p
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "10px",
                   letterSpacing: "0.24em",
@@ -881,7 +881,7 @@ export default function PricingPage() {
                       >
                         <span
                           style={{
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "'Jost', sans-serif",
                             fontWeight: 400,
                             fontSize:   "14px",
                             color:      isOpen
@@ -912,7 +912,7 @@ export default function PricingPage() {
                         <div style={{ padding: "0 22px 18px" }}>
                           <p
                             style={{
-                              fontFamily: "'DM Sans', sans-serif",
+                              fontFamily: "'Jost', sans-serif",
                               fontWeight: 300,
                               fontSize:   "13px",
                               color:      "rgba(148,140,188,0.65)",
@@ -974,7 +974,7 @@ export default function PricingPage() {
             >
               <span
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "11px",
                   letterSpacing: "0.18em",

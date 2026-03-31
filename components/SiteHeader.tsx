@@ -30,12 +30,13 @@ export default function SiteHeader() {
         aria-hidden="true"
         style={{
           position:              "absolute",
-          inset:                 0,
-          background:            "linear-gradient(180deg, rgba(5,5,8,0.72) 0%, rgba(5,5,8,0.48) 60%, rgba(5,5,8,0) 100%)",
-          backdropFilter:        "blur(8px)",
-          WebkitBackdropFilter:  "blur(8px)",
-          maskImage:             "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 70%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:       "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 70%, rgba(0,0,0,0) 100%)",
+          top:                   0,
+          bottom:                0,
+          left:                  "max(24px, calc(50% - 696px))",
+          right:                 "max(24px, calc(50% - 696px))",
+          background:            "linear-gradient(180deg, rgba(9,13,20,0.85) 0%, rgba(9,13,20,0.60) 50%, rgba(9,13,20,0.0) 100%)",
+          backdropFilter:        "blur(12px)",
+          WebkitBackdropFilter:  "blur(12px)",
           pointerEvents:         "none",
         }}
       />

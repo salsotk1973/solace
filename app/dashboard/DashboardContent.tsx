@@ -175,7 +175,7 @@ function StatCard({
       </p>
       <p
         style={{
-          fontFamily:    "'DM Sans', sans-serif",
+          fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
           fontSize:      "10px",
           letterSpacing: "0.16em",
@@ -206,7 +206,7 @@ function SignOutButton() {
         border:        "none",
         cursor:        "pointer",
         padding:       0,
-        fontFamily:    "'DM Sans', sans-serif",
+        fontFamily:    "'Jost', sans-serif",
         fontWeight:    400,
         fontSize:      "12px",
         letterSpacing: "0.12em",
@@ -269,7 +269,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           {/* Plan badge */}
           <span
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      "9px",
               letterSpacing: "0.16em",
@@ -290,7 +290,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
         {!isPro && (
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize:   "13px",
               color:      "rgba(148,140,188,0.52)",
@@ -327,7 +327,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           >
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "14px",
                 color:      "rgba(148,140,188,0.52)",
@@ -339,7 +339,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             <Link
               href="/tools"
               style={{
-                fontFamily:    "'DM Sans', sans-serif",
+                fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
                 fontSize:      "12px",
                 letterSpacing: "0.12em",
@@ -371,7 +371,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
       <section style={{ marginBottom: "64px" }}>
         <p
           style={{
-            fontFamily:    "'DM Sans', sans-serif",
+            fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
             fontSize:      "10px",
             letterSpacing: "0.22em",
@@ -386,7 +386,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
         {!hasSessions ? (
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize:   "13px",
               color:      "rgba(100,92,148,0.4)",
@@ -428,7 +428,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p
                         style={{
-                          fontFamily:  "'DM Sans', sans-serif",
+                          fontFamily:  "'Jost', sans-serif",
                           fontWeight:  400,
                           fontSize:    "13px",
                           color:       "rgba(195,188,238,0.8)",
@@ -449,7 +449,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                       >
                         <span
                           style={{
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "'Jost', sans-serif",
                             fontWeight: 300,
                             fontSize:   "11px",
                             color:      "rgba(120,112,165,0.5)",
@@ -459,7 +459,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                         </span>
                         <span
                           style={{
-                            fontFamily: "'DM Sans', sans-serif",
+                            fontFamily: "'Jost', sans-serif",
                             fontWeight: 300,
                             fontSize:   "11px",
                             color:      session.completed
@@ -475,7 +475,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                     <Link
                       href={toolRoute}
                       style={{
-                        fontFamily:    "'DM Sans', sans-serif",
+                        fontFamily:    "'Jost', sans-serif",
                         fontWeight:    400,
                         fontSize:      "11px",
                         letterSpacing: "0.12em",
@@ -497,7 +497,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             {!isPro && totalSessions > 7 && (
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
                   fontSize:   "12px",
                   color:      "rgba(120,112,165,0.45)",
@@ -524,7 +524,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
       <section style={{ marginBottom: "72px" }}>
         <p
           style={{
-            fontFamily:    "'DM Sans', sans-serif",
+            fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
             fontSize:      "10px",
             letterSpacing: "0.22em",
@@ -585,7 +585,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
 
                 <p
                   style={{
-                    fontFamily:    "'DM Sans', sans-serif",
+                    fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
                     fontSize:      "9px",
                     letterSpacing: "0.18em",
@@ -614,7 +614,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
 
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
                     fontSize:   "11px",
                     color:      isHov ? "rgba(155,148,200,0.65)" : "rgba(130,122,178,0.42)",
@@ -641,7 +641,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
       >
         <p
           style={{
-            fontFamily:    "'DM Sans', sans-serif",
+            fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
             fontSize:      "10px",
             letterSpacing: "0.22em",
@@ -665,7 +665,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "12px",
                 color:      "rgba(120,112,165,0.45)",
@@ -676,7 +676,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             </span>
             <span
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "12px",
                 color:      "rgba(168,160,215,0.65)",
@@ -690,7 +690,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
                 fontSize:   "12px",
                 color:      "rgba(120,112,165,0.45)",
@@ -701,7 +701,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             </span>
             <span
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 400,
                 fontSize:   "12px",
                 color:      isPro ? "rgba(195,175,245,0.72)" : "rgba(148,140,188,0.55)",
@@ -726,7 +726,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 onMouseEnter={() => setUpgradeHov(true)}
                 onMouseLeave={() => setUpgradeHov(false)}
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "12px",
                   letterSpacing: "0.12em",
@@ -745,7 +745,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 onMouseEnter={() => setManageHov(true)}
                 onMouseLeave={() => setManageHov(false)}
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      "12px",
                   letterSpacing: "0.12em",

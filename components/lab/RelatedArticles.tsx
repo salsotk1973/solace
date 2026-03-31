@@ -68,7 +68,7 @@ function RelatedCard({ article }: { article: LabArticle }) {
             borderRadius:  '100px',
             background:    accent.replace('1)', '0.12)'),
             border:        `0.5px solid ${accent.replace('1)', '0.22)')}`,
-            fontFamily:    "'DM Sans', sans-serif",
+            fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
             fontSize:      '10px',
             letterSpacing: '0.14em',
@@ -98,7 +98,7 @@ function RelatedCard({ article }: { article: LabArticle }) {
       {/* Excerpt — 2 lines */}
       <p
         style={{
-          fontFamily:      "'DM Sans', sans-serif",
+          fontFamily:      "'Jost', sans-serif",
           fontWeight:      300,
           fontSize:        '13px',
           lineHeight:      1.72,
@@ -124,7 +124,7 @@ function RelatedCard({ article }: { article: LabArticle }) {
         <span
           className="arrow-link"
           style={{
-            fontFamily:    "'DM Sans', sans-serif",
+            fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
             fontSize:      '11px',
             letterSpacing: '0.14em',
@@ -148,7 +148,7 @@ export default function RelatedArticles({ articles }: { articles: LabArticle[] }
       {/* Heading */}
       <p
         style={{
-          fontFamily:    "'DM Sans', sans-serif",
+          fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
           fontSize:      '10px',
           letterSpacing: '0.22em',

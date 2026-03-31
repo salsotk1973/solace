@@ -18,15 +18,108 @@ const CATEGORIES: { id: Category; label: string }[] = [
 
 const CATEGORY_ACCENT: Record<LabArticle['category'], string> = {
   'calm-your-state':   'rgba(68,200,110,1)',
-  'think-clearly':     'rgba(99,129,228,1)',
+  'think-clearly':     'rgba(125,211,252,1)',
   'notice-whats-good': 'rgba(218,148,48,1)',
 }
 
 const CATEGORY_BG: Record<LabArticle['category'], string> = {
   'calm-your-state':   'rgba(68,200,110,0.08)',
-  'think-clearly':     'rgba(99,129,228,0.08)',
+  'think-clearly':     'rgba(125,211,252,0.08)',
   'notice-whats-good': 'rgba(218,148,48,0.08)',
 }
+
+const FEATURED_BG: Record<string, string> = {
+  'calm-your-state':   '#0e1c1b',
+  'think-clearly':     '#121d27',
+  'notice-whats-good': '#1a1816',
+}
+
+// ─── Shared pill style ────────────────────────────────────────────────────────
+
+const PILL_BASE = {
+  display:        'inline-block',
+  padding:        '4px 12px',
+  borderRadius:   '100px',
+  fontFamily:     "'Jost', sans-serif",
+  fontWeight:     400,
+  fontSize:       '10px',
+  letterSpacing:  '0.14em',
+  textTransform:  'uppercase' as const,
+  whiteSpace:     'nowrap' as const,
+}
+
+// ─── Responsive CSS ───────────────────────────────────────────────────────────
+
+const RESPONSIVE_CSS = `
+  .lab-article-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .lab-article-card {
+    flex-direction: column;
+  }
+  .lab-card-left {
+    display: contents;
+  }
+  .lab-card-right {
+    display: contents;
+  }
+
+  @media (max-width: 768px) {
+    .lab-article-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 639px) {
+    .lab-article-grid {
+      grid-template-columns: 1fr;
+    }
+    .lab-article-card {
+      flex-direction: row !important;
+      align-items: flex-start;
+      padding: 20px 18px !important;
+      gap: 16px;
+    }
+    .lab-card-left {
+      display: flex !important;
+      flex-direction: column;
+      flex: 0 0 44%;
+      min-width: 0;
+    }
+    .lab-card-right {
+      display: flex !important;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      justify-content: space-between;
+    }
+  }
+
+  .lab-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 48px;
+    width: 100%;
+  }
+
+  /* Fit all 4 pills on one row at small screens */
+  @media (max-width: 479px) {
+    .lab-filter-pills {
+      gap: 6px;
+      justify-content: center;
+    }
+    .lab-filter-pills button {
+      padding: 6px 10px !important;
+      font-size: 10px !important;
+      letter-spacing: 0.04em !important;
+    }
+  }
+`
 
 // ─── Article grid card ────────────────────────────────────────────────────────
 
@@ -40,21 +133,22 @@ function ArticleCard({ article }: { article: LabArticle }) {
     <div
       role="link"
       tabIndex={0}
+      className="lab-article-card"
       onClick={() => router.push(`/lab/${article.slug}`)}
       onKeyDown={e => { if (e.key === 'Enter') router.push(`/lab/${article.slug}`) }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         display:             'flex',
-        flexDirection:       'column',
         borderRadius:        '18px',
         padding:             '32px 28px',
         background:          catBg,
-        border:              `1px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.20)')}`,
+        border:              `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.20)')}`,
         backdropFilter:      'blur(12px)',
         WebkitBackdropFilter:'blur(12px)',
-        transform:           hovered ? 'scale(1.01)' : 'scale(1)',
-        transition:          'transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease',
+        transform:           hovered ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow:           hovered ? `0 8px 36px ${accent.replace('1)', '0.18)')}` : 'none',
+        transition:          'transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease, box-shadow 0.4s ease',
         boxSizing:           'border-box',
         overflow:            'hidden',
         position:            'relative',
@@ -77,82 +171,98 @@ function ArticleCard({ article }: { article: LabArticle }) {
         }}
       />
 
-      {/* Category pill */}
-      <div style={{ marginBottom: '16px' }}>
-        <span
+      {/* Left column (mobile) / normal flow (desktop) */}
+      <div className="lab-card-left">
+        {/* Category pill */}
+        <div style={{ marginBottom: '14px' }}>
+          <span
+            style={{
+              ...PILL_BASE,
+              background: accent.replace('1)', '0.12)'),
+              border:     `0.5px solid ${accent.replace('1)', '0.22)')}`,
+              color:      accent,
+            }}
+          >
+            {article.category.replace(/-/g, ' ')}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3
           style={{
-            display:       'inline-block',
-            padding:       '4px 12px',
-            borderRadius:  '100px',
-            background:    accent.replace('1)', '0.12)'),
-            border:        `0.5px solid ${accent.replace('1)', '0.22)')}`,
-            fontFamily:    "'DM Sans', sans-serif",
-            fontWeight:    400,
-            fontSize:      '10px',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase' as const,
-            color:         accent,
+            fontFamily: "'Cormorant Garamond', serif",
+            fontWeight: 300,
+            fontSize:   '20px',
+            lineHeight: 1.3,
+            color:      hovered ? 'rgba(240,234,255,0.95)' : 'rgba(225,218,252,0.85)',
+            margin:     '0 0 12px',
+            transition: 'color 0.4s ease',
           }}
         >
-          {article.category.replace(/-/g, ' ')}
-        </span>
+          {article.title}
+        </h3>
       </div>
 
-      {/* Title */}
-      <h3
-        style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontWeight: 300,
-          fontSize:   '20px',
-          lineHeight: 1.3,
-          color:      hovered ? 'rgba(240,234,255,0.95)' : 'rgba(225,218,252,0.85)',
-          margin:     '0 0 12px',
-          transition: 'color 0.4s ease',
-        }}
-      >
-        {article.title}
-      </h3>
-
-      {/* Excerpt — 2 lines truncated */}
-      <p
-        style={{
-          fontFamily:      "'DM Sans', sans-serif",
-          fontWeight:      300,
-          fontSize:        '13px',
-          lineHeight:      1.72,
-          color:           'rgba(175,168,215,0.80)',
-          margin:          '0 0 20px',
-          display:         '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical' as const,
-          overflow:        'hidden',
-          flex:            1,
-        }}
-      >
-        {article.excerpt}
-      </p>
-
-      {/* Bottom: X MIN READ → */}
-      <div
-        style={{
-          paddingTop:  '16px',
-          borderTop:   `0.5px solid ${accent.replace('1)', '0.08)')}`,
-        }}
-      >
-        <span
-          className="arrow-link"
+      {/* Right column (mobile) / normal flow (desktop) */}
+      <div className="lab-card-right" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Excerpt */}
+        <p
           style={{
-            fontFamily:    "'DM Sans', sans-serif",
-            fontWeight:    400,
-            fontSize:      '11px',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase' as const,
-            color:         hovered ? accent.replace('1)', '0.72)') : accent.replace('1)', '0.45)'),
-            transition:    'color 0.4s ease',
+            fontFamily:      "'Jost', sans-serif",
+            fontWeight:      300,
+            fontSize:        '13px',
+            lineHeight:      1.72,
+            color:           'rgba(175,168,215,0.80)',
+            margin:          '0 0 20px',
+            display:         '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow:        'hidden',
+            flex:            1,
           }}
         >
-          {article.readingTime} min read <span className="arrow">→</span>
-        </span>
+          {article.excerpt}
+        </p>
+
+        {/* Bottom row — animated arrow on hover */}
+        <div
+          style={{
+            paddingTop:  '14px',
+            borderTop:   `0.5px solid ${hovered ? accent.replace('1)', '0.12)') : accent.replace('1)', '0.08)')}`,
+            display:     'flex',
+            alignItems:  'center',
+            gap:         '8px',
+            transition:  'border-color 0.4s ease',
+            marginTop:   'auto',
+          }}
+        >
+          <span
+            style={{
+              fontFamily:    "'Jost', sans-serif",
+              fontWeight:    400,
+              fontSize:      '10px',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase' as const,
+              color:         hovered ? accent.replace('1)', '0.72)') : accent.replace('1)', '0.45)'),
+              transition:    'color 0.4s ease',
+            }}
+          >
+            {article.readingTime} min read
+          </span>
+          <span
+            style={{
+              fontSize:   '14px',
+              color:      accent,
+              opacity:    hovered ? 0.75 : 0,
+              transform:  hovered ? 'translateX(2px)' : 'translateX(-8px)',
+              transition: 'opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)',
+              lineHeight: 1,
+              display:    'inline-block',
+            }}
+          >
+            →
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -166,26 +276,32 @@ function FeaturedCard({ article }: { article: LabArticle }) {
   const catBg  = CATEGORY_BG[article.category]     ?? 'rgba(148,130,210,0.08)'
 
   return (
-    <Link
-      href={`/lab/${article.slug}`}
+    <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display:             'grid',
-        gridTemplateColumns: '1fr auto',
-        gap:                 '48px',
-        alignItems:          'center',
-        borderRadius:        '22px',
-        padding:             '48px 56px',
-        background:          'linear-gradient(145deg, #0c0a1e, #090714, #0d0a1c)',
-        border:              `0.5px solid ${hovered ? accent.replace('1)', '0.2)') : accent.replace('1)', '0.1)')}`,
-        overflow:            'hidden',
-        position:            'relative',
-        textDecoration:      'none',
-        marginBottom:        '48px',
-        boxSizing:           'border-box',
-        transform:           hovered ? 'translateY(-2px)' : 'translateY(0)',
-        transition:          'transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease',
+        borderRadius: '22px',
+        background:   FEATURED_BG[article.category] ?? catBg,
+        border:       `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.18)')}`,
+        boxShadow:    hovered
+          ? `0 0 24px 6px ${accent.replace('1)', '0.35)')}`
+          : `0 0 12px 2px ${accent.replace('1)', '0.18)')}`,
+        transition:   'border-color 0.4s ease, box-shadow 0.4s ease',
+        position:     'relative',
+        marginBottom: '48px',
+      }}
+    >
+    <Link
+      href={`/lab/${article.slug}`}
+      style={{
+        display:        'block',
+        borderRadius:   '22px',
+        padding:        '48px 56px',
+        background:     'transparent',
+        textDecoration: 'none',
+        boxSizing:      'border-box',
+        transform:      hovered ? 'translateY(-2px)' : 'translateY(0)',
+        transition:     'transform 0.4s cubic-bezier(0.22,1,0.36,1)',
       }}
     >
       {/* Top shimmer */}
@@ -204,42 +320,14 @@ function FeaturedCard({ article }: { article: LabArticle }) {
         }}
       />
 
-      {/* Left content */}
+      {/* Content */}
       <div>
-        {/* Editor's pick + category pills */}
+        {/* Pills row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <span
-            style={{
-              display:       'inline-block',
-              padding:       '5px 12px',
-              borderRadius:  '100px',
-              background:    'rgba(200,168,80,0.12)',
-              border:        '0.5px solid rgba(200,168,80,0.32)',
-              fontFamily:    "'DM Sans', sans-serif",
-              fontWeight:    400,
-              fontSize:      '9px',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase' as const,
-              color:         'rgba(218,185,90,0.85)',
-            }}
-          >
-            Editor's pick
+          <span style={{ ...PILL_BASE, background: accent.replace('1)', '0.10)'), border: `0.5px solid ${accent.replace('1)', '0.30)')}`, color: accent }}>
+            Editor&apos;s pick
           </span>
-          <span
-            style={{
-              display:       'inline-block',
-              padding:       '5px 14px',
-              borderRadius:  '100px',
-              background:    catBg,
-              border:        `0.5px solid ${accent.replace('1)', '0.2)')}`,
-              fontFamily:    "'DM Sans', sans-serif",
-              fontWeight:    400,
-              fontSize:      '10px',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase' as const,
-              color:         accent,
-            }}
-          >
+          <span style={{ ...PILL_BASE, background: catBg, border: `0.5px solid ${accent.replace('1)', '0.2)')}`, color: accent }}>
             {article.category.replace(/-/g, ' ')}
           </span>
         </div>
@@ -249,11 +337,11 @@ function FeaturedCard({ article }: { article: LabArticle }) {
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
-            fontSize:   'clamp(28px, 3.2vw, 42px)',
-            lineHeight: 1.18,
-            color:      hovered ? 'rgba(245,240,255,0.95)' : 'rgba(240,234,255,0.92)',
-            margin:     '0 0 18px',
-            maxWidth:   '520px',
+            fontSize:   'clamp(32px, 3.8vw, 52px)',
+            lineHeight: 1.15,
+            color:      hovered ? 'rgba(250,246,255,0.98)' : 'rgba(240,234,255,0.92)',
+            margin:     '0 0 20px',
+            maxWidth:   '580px',
             transition: 'color 0.4s ease',
           }}
         >
@@ -263,23 +351,23 @@ function FeaturedCard({ article }: { article: LabArticle }) {
         {/* Excerpt */}
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Jost', sans-serif",
             fontWeight: 300,
             fontSize:   '14px',
             lineHeight: 1.8,
-            color:      'rgba(135,128,178,0.52)',
-            margin:     '0 0 24px',
+            color:      'rgba(135,128,178,0.48)',
+            margin:     '0 0 28px',
             maxWidth:   '480px',
           }}
         >
           {article.excerpt}
         </p>
 
-        {/* Reading time + Read link */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {/* Reading time + animated Read → */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <span
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      '11px',
               letterSpacing: '0.08em',
@@ -288,42 +376,44 @@ function FeaturedCard({ article }: { article: LabArticle }) {
           >
             {article.readingTime} min read
           </span>
-          <span
-            style={{
-              fontFamily:    "'DM Sans', sans-serif",
-              fontWeight:    400,
-              fontSize:      '12px',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase' as const,
-              color:         hovered ? 'rgba(178,162,228,0.72)' : 'rgba(148,132,215,0.45)',
-              transition:    'color 0.4s ease',
-            }}
-          >
-            Read →
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span
+              style={{
+                fontFamily:    "'Jost', sans-serif",
+                fontWeight:    400,
+                fontSize:      '10px',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase' as const,
+                color:         accent,
+                opacity:       hovered ? 0.62 : 0,
+                transform:     hovered ? 'translateX(0)' : 'translateX(-6px)',
+                transition:    'opacity 0.45s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)',
+              }}
+            >
+              Read
+            </span>
+            <span
+              style={{
+                fontSize:   '16px',
+                color:      accent,
+                opacity:    hovered ? 0.75 : 0,
+                transform:  hovered ? 'translateX(2px)' : 'translateX(-8px)',
+                transition: 'opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)',
+                lineHeight: 1,
+                display:    'inline-block',
+              }}
+            >
+              →
+            </span>
+          </div>
         </div>
       </div>
-
-      {/* Right: ambient orb glow */}
-      <div
-        aria-hidden="true"
-        style={{
-          width:        '200px',
-          height:       '200px',
-          borderRadius: '50%',
-          background:   `radial-gradient(circle at 40% 40%, ${accent.replace('1)', '0.14)')}, transparent 70%)`,
-          flexShrink:   0,
-          filter:       `blur(32px)`,
-          opacity:      hovered ? 0.9 : 0.6,
-          transition:   'opacity 0.4s ease',
-          transform:    'translateX(20px)',
-        }}
-      />
     </Link>
+    </div>
   )
 }
 
-// ─── LabFilter — filter pills + featured + article grid ───────────────────────
+// ─── LabFilter ─────────────────────────────────────────────────────────────────
 
 export default function LabFilter({
   featured,
@@ -339,77 +429,68 @@ export default function LabFilter({
     : articles.filter(a => a.category === active)
 
   return (
-    <div>
-      {/* ── Section 2: Filter pills ───────────────────────────────────── */}
-      <div
-        style={{
-          display:        'flex',
-          flexWrap:       'wrap' as const,
-          gap:            '10px',
-          justifyContent: 'center',
-          marginBottom:   '48px',
-        }}
-      >
-        {CATEGORIES.map(cat => {
-          const isActive    = active === cat.id
-          const accentColor = cat.id === 'all'
-            ? 'rgba(148,130,210,1)'
-            : CATEGORY_ACCENT[cat.id as LabArticle['category']]
+    <>
+      <style>{RESPONSIVE_CSS}</style>
 
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActive(cat.id)}
+      <div>
+        {/* ── Filter pills ─────────────────────────────────────────────── */}
+        <div className="lab-filter-pills">
+          {CATEGORIES.map(cat => {
+            const isActive    = active === cat.id
+            const accentColor = cat.id === 'all'
+              ? 'rgba(148,130,210,1)'
+              : CATEGORY_ACCENT[cat.id as LabArticle['category']]
+
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActive(cat.id)}
+                style={{
+                  padding:       '8px 20px',
+                  borderRadius:  '100px',
+                  border:        `0.5px solid ${isActive ? accentColor.replace('1)', '0.35)') : 'rgba(110,95,180,0.14)'}`,
+                  background:    isActive ? accentColor.replace('1)', '0.1)') : 'transparent',
+                  fontFamily:    "'Jost', sans-serif",
+                  fontWeight:    400,
+                  fontSize:      '12px',
+                  letterSpacing: '0.08em',
+                  color:         isActive ? accentColor : 'rgba(130,118,185,0.45)',
+                  cursor:        'pointer',
+                  transition:    'all 0.3s ease',
+                  whiteSpace:    'nowrap',
+                }}
+              >
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* ── Featured article ─────────────────────────────────────────── */}
+        {featured && <FeaturedCard article={featured} />}
+
+        {/* ── Article grid ─────────────────────────────────────────────── */}
+        <div className="lab-article-grid">
+          {filtered.map(article => (
+            <ArticleCard key={article.slug ?? article.title} article={article} />
+          ))}
+          {filtered.length === 0 && (
+            <p
               style={{
-                padding:       '8px 20px',
-                borderRadius:  '100px',
-                border:        `0.5px solid ${isActive ? accentColor.replace('1)', '0.35)') : 'rgba(110,95,180,0.14)'}`,
-                background:    isActive ? accentColor.replace('1)', '0.1)') : 'transparent',
-                fontFamily:    "'DM Sans', sans-serif",
-                fontWeight:    400,
-                fontSize:      '12px',
-                letterSpacing: '0.08em',
-                color:         isActive ? accentColor : 'rgba(130,118,185,0.45)',
-                cursor:        'pointer',
-                transition:    'all 0.3s ease',
+                gridColumn: '1 / -1',
+                textAlign:  'center',
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 300,
+                fontSize:   '13px',
+                color:      'rgba(110,102,158,0.4)',
+                padding:    '48px 0',
               }}
             >
-              {cat.label}
-            </button>
-          )
-        })}
+              No articles in this category yet.
+            </p>
+          )}
+        </div>
       </div>
-
-      {/* ── Section 3: Featured article (always shown) ───────────────── */}
-      {featured && <FeaturedCard article={featured} />}
-
-      {/* ── Section 4: Article grid (filtered) ───────────────────────── */}
-      <div
-        style={{
-          display:             'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap:                 '16px',
-        }}
-      >
-        {filtered.map(article => (
-          <ArticleCard key={article.slug ?? article.title} article={article} />
-        ))}
-        {filtered.length === 0 && (
-          <p
-            style={{
-              gridColumn:  '1 / -1',
-              textAlign:   'center',
-              fontFamily:  "'DM Sans', sans-serif",
-              fontWeight:  300,
-              fontSize:    '13px',
-              color:       'rgba(110,102,158,0.4)',
-              padding:     '48px 0',
-            }}
-          >
-            No articles in this category yet.
-          </p>
-        )}
-      </div>
-    </div>
+    </>
   )
 }

@@ -256,7 +256,7 @@ export default function HeroSection() {
             ref={subheadRef}
             className="hero-subhead"
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    300,
               fontSize:      "14px",
               letterSpacing: "0.025em",
@@ -274,7 +274,7 @@ export default function HeroSection() {
             href="/sign-up"
             className="hero-cta"
             style={{
-              fontFamily:     "'DM Sans', sans-serif",
+              fontFamily:     "'Jost', sans-serif",
               fontWeight:     400,
               fontSize:       "11px",
               letterSpacing:  "0.18em",
@@ -308,7 +308,7 @@ export default function HeroSection() {
           >
             <p
               style={{
-                fontFamily:     "'DM Sans', sans-serif",
+                fontFamily:     "'Jost', sans-serif",
                 fontWeight:     400,
                 fontSize:       "11px",
                 letterSpacing:  "0.22em",

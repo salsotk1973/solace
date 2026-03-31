@@ -54,7 +54,7 @@ export default function AboutPage() {
             marginBottom: 0,
             fontSize: 14,
             lineHeight: 1.72,
-            fontFamily: "var(--font-body, 'DM Sans', sans-serif)",
+            fontFamily: "var(--font-body, 'Jost', sans-serif)",
             color: "rgba(155,147,200,0.52)",
             maxWidth: 560,
           }}
@@ -96,7 +96,7 @@ export default function AboutPage() {
             marginBottom: 0,
             fontSize: 14,
             lineHeight: 1.72,
-            fontFamily: "var(--font-body, 'DM Sans', sans-serif)",
+            fontFamily: "var(--font-body, 'Jost', sans-serif)",
             color: "rgba(155,147,200,0.52)",
             maxWidth: 560,
           }}

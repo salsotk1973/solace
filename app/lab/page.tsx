@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { getAllArticles, getFeaturedArticle } from '@/lib/lab'
 import LabParticles   from '@/components/lab/LabParticles'
 import LabFilter      from '@/components/lab/LabFilter'
 import NewsletterForm from '@/components/lab/NewsletterForm'
+import LabCtaButton   from '@/components/lab/LabCtaButton'
 
 export default function LabPage() {
   const featured    = getFeaturedArticle()
@@ -18,21 +18,6 @@ export default function LabPage() {
         position:   'relative',
       }}
     >
-      {/* ── Atmospheric background ──────────────────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:      'fixed',
-          top:           0,
-          left:          0,
-          width:         '100vw',
-          height:        '100vh',
-          background:    'radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)',
-          zIndex:        1,
-          pointerEvents: 'none',
-        }}
-      />
-
       {/* ── Ambient particles (client) ──────────────────────────────────────── */}
       <LabParticles />
 
@@ -44,19 +29,18 @@ export default function LabPage() {
         ════════════════════════════════════════════════════════════════════ */}
         <section
           style={{
-            width:          '100%',
-            padding:        '140px 40px 80px',
-            boxSizing:      'border-box',
-            display:        'flex',
-            flexDirection:  'column',
-            alignItems:     'center',
-            textAlign:      'center',
+            width:         '100%',
+            padding:       '140px 40px 80px',
+            boxSizing:     'border-box',
+            display:       'flex',
+            flexDirection: 'column',
+            alignItems:    'center',
+            textAlign:     'center',
           }}
         >
-          {/* Eyebrow */}
           <p
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      '10px',
               letterSpacing: '0.28em',
@@ -68,7 +52,6 @@ export default function LabPage() {
             Human Behaviour Lab
           </p>
 
-          {/* H1 */}
           <h1
             style={{
               fontFamily:    "'Cormorant Garamond', serif",
@@ -87,25 +70,24 @@ export default function LabPage() {
             </em>
           </h1>
 
-          {/* Subtext */}
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize:   '15px',
               lineHeight: 1.8,
               color:      'rgba(175,168,215,0.75)',
               margin:     0,
-              maxWidth:   '520px',
+              maxWidth:   '440px',
             }}
           >
-            Research, ideas, and honest writing about how we think, feel, and
-            behave — and the small things that help.
+            Research, ideas, and honest writing about how we think, feel, and behave —<br />
+            and the small things that help.
           </p>
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTIONS 2–4 — FILTER PILLS + FEATURED + ARTICLE GRID (client)
+            SECTIONS 2–4 — FILTER PILLS + FEATURED + ARTICLE GRID
         ════════════════════════════════════════════════════════════════════ */}
         <section
           style={{
@@ -120,121 +102,130 @@ export default function LabPage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTION 5 — NEWSLETTER
+            SECTION 5 — TOOLS CTA
         ════════════════════════════════════════════════════════════════════ */}
         <section
           style={{
-            width:          '100%',
-            padding:        '0 40px 80px',
-            boxSizing:      'border-box',
-            display:        'flex',
-            justifyContent: 'center',
+            width:     '100%',
+            padding:   '120px 40px',
+            boxSizing: 'border-box',
+            textAlign: 'center',
           }}
         >
-          <div
-            style={{
-              maxWidth:     '1000px',
-              width:        '100%',
-              borderRadius: '22px',
-              padding:      '60px 64px',
-              background:   'linear-gradient(135deg, #0e0c22, #0a0818, #0c0a1e)',
-              border:       '0.5px solid rgba(120,100,195,0.13)',
-              overflow:     'hidden',
-              position:     'relative',
-              boxSizing:    'border-box',
-            }}
-          >
-            {/* Top shimmer */}
-            <div
-              aria-hidden="true"
+          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+            <p
               style={{
-                position:      'absolute',
-                top:           0,
-                left:          '15%',
-                right:         '15%',
-                height:        '1px',
-                background:    'linear-gradient(90deg, transparent, rgba(138,116,212,0.2), transparent)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            <div
-              style={{
-                display:       'flex',
-                flexDirection: 'column',
-                alignItems:    'flex-start',
-                gap:           '16px',
-                position:      'relative',
-                zIndex:        1,
+                fontFamily:    "'Jost', sans-serif",
+                fontWeight:    400,
+                fontSize:      '10px',
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color:         'rgba(68,138,228,0.50)',
+                margin:        '0 0 28px',
               }}
             >
-              <h2
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontWeight: 300,
-                  fontSize:   'clamp(26px, 2.8vw, 36px)',
-                  lineHeight: 1.2,
-                  color:      'rgba(230,222,255,0.9)',
-                  margin:     0,
-                }}
-              >
-                New thinking, weekly.
-              </h2>
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 300,
-                  fontSize:   '14px',
-                  lineHeight: 1.8,
-                  color:      'rgba(175,168,215,0.75)',
-                  margin:     '0 0 8px',
-                  maxWidth:   '400px',
-                }}
-              >
-                No noise. Just one piece of honest writing about how we think and
-                feel — straight to your inbox.
-              </p>
-              <NewsletterForm />
-            </div>
+              Human Behaviour Lab
+            </p>
+
+            <h2
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontWeight: 300,
+                fontSize:   'clamp(36px, 4.5vw, 62px)',
+                lineHeight: 1.1,
+                color:      'rgba(210,228,255,0.93)',
+                margin:     '0 0 22px',
+              }}
+            >
+              These ideas come to life{' '}
+              <em style={{ fontStyle: 'italic', color: 'rgba(90,168,250,0.52)', whiteSpace: 'nowrap' }}>
+                in the tools.
+              </em>
+            </h2>
+
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 300,
+                fontSize:   '15px',
+                lineHeight: 1.85,
+                color:      'rgba(140,180,225,0.50)',
+                margin:     '0 0 48px',
+                maxWidth:   '480px',
+                marginLeft: 'auto',
+                marginRight:'auto',
+              }}
+            >
+              Nine tools for breathing, focus, sleep, thought reframing, and AI‑powered reflection.
+            </p>
+
+            <LabCtaButton href="/tools" label="Explore the tools" />
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTION 6 — FOOTER BRIDGE
+            SECTION 6 — NEWSLETTER
+            Fully transparent — no background, no borders, no shadows
         ════════════════════════════════════════════════════════════════════ */}
         <section
           style={{
-            width:      '100%',
-            padding:    '0 40px 100px',
-            boxSizing:  'border-box',
-            textAlign:  'center',
+            width:         '100%',
+            padding:       '100px 40px 110px',
+            boxSizing:     'border-box',
+            display:       'flex',
+            flexDirection: 'column',
+            alignItems:    'center',
+            textAlign:     'center',
           }}
         >
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 300,
-              fontSize:   '13px',
-              color:      'rgba(155,145,200,0.65)',
-              margin:     '0 0 12px',
+              fontFamily:    "'Jost', sans-serif",
+              fontWeight:    400,
+              fontSize:      '10px',
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color:         'rgba(200,168,80,0.48)',
+              margin:        '0 0 20px',
             }}
           >
-            These ideas come to life in the tools.
+            Weekly dispatch
           </p>
-          <Link
-            href="/tools"
+
+          <h2
             style={{
-              fontFamily:     "'DM Sans', sans-serif",
-              fontWeight:     400,
-              fontSize:       '11px',
-              letterSpacing:  '0.16em',
-              textTransform:  'uppercase',
-              color:          'rgba(148,130,210,0.42)',
-              textDecoration: 'none',
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontSize:   'clamp(30px, 3.4vw, 46px)',
+              lineHeight: 1.12,
+              color:      'rgba(238,226,196,0.85)',
+              margin:     '0 0 16px',
+              maxWidth:   '480px',
             }}
           >
-            Explore the tools →
-          </Link>
+            New thinking,{' '}
+            <em style={{ fontStyle: 'italic', color: 'rgba(210,175,90,0.52)' }}>
+              weekly.
+            </em>
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize:   '14px',
+              lineHeight: 1.85,
+              color:      'rgba(185,172,140,0.58)',
+              margin:     '0 0 36px',
+              maxWidth:   '380px',
+            }}
+          >
+            No noise. One piece of honest writing about how we think and feel — straight to your inbox.
+          </p>
+
+          <div style={{ width: '100%', maxWidth: '460px' }}>
+            <NewsletterForm />
+          </div>
         </section>
 
       </div>

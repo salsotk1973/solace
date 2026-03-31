@@ -1337,7 +1337,7 @@ export default function ChoosePage() {
 
         .upgrade-nudge-text {
           margin: 0;
-          font-family: var(--font-body, 'DM Sans', sans-serif);
+          font-family: var(--font-body, 'Jost', sans-serif);
           font-size: 13px;
           line-height: 1.6;
           color: rgba(155,147,200,0.52);

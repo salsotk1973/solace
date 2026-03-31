@@ -9,7 +9,7 @@ const SERVICES = [
   {
     name: 'Supabase',
     href: 'https://supabase.com/privacy',
-    desc: 'stores your session history and account data securely on servers in Mumbai, India.',
+    desc: 'Supabase — stores your session history and account data securely.',
   },
   {
     name: 'Vercel',

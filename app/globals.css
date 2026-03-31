@@ -276,12 +276,33 @@ body {
 }
 
 /* --------------------------------------------------
-   ARROW LINK HOVER ANIMATION
+   GHOST PILL BUTTON — global standard for action buttons
+   Colour variables are set via inline style on the element:
+     border, background, color match the element's own scheme.
+   The hover state glows, darkens background, brightens text.
+   Override the colour tokens per context via className extensions.
 -------------------------------------------------- */
 
+.solace-ghost-btn:hover {
+  background:   rgba(68,138,228,0.16) !important;
+  border-color: rgba(68,138,228,0.48) !important;
+  color:        rgba(140,188,248,0.95) !important;
+  box-shadow:   0 0 28px rgba(68,138,228,0.22) !important;
+}
+
+/* --------------------------------------------------
+   ARROW LINK HOVER ANIMATION
+   Global standard: → slides translateX(4px) on hover, returns on mouse-out.
+   Easing: 0.35s cubic-bezier(0.22,1,0.36,1) — matches LabCtaButton.tsx React pattern.
+-------------------------------------------------- */
+
+.featured-card-bg {
+  background: rgba(125,211,252,0.20) !important;
+}
+
 .arrow-link .arrow {
-  display: inline-block;
-  transition: transform 200ms ease;
+  display:    inline-block;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .arrow-link:hover .arrow {

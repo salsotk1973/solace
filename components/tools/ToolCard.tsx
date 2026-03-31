@@ -6,27 +6,42 @@ import { useState } from "react";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ToolCardProps {
-  tag:       string;
-  name:      string;
-  line:      string;
-  href:      string;
-  colour:    string; // accent colour  e.g. "rgba(60,190,210,0.6)"
-  tagColour: string; // tag text colour e.g. "rgba(80,200,218,0.5)"
+  tag:        string;   // feeling label ("When my mind won't stop") or category ("Breathing")
+  name:       string;   // card title
+  line:       string;   // description
+  href:       string;   // destination route
+  colour:     string;   // accent colour, e.g. "rgba(68,200,110,1)"
+  tagColour?: string;   // tag text colour — derived from colour if omitted
+  bg?:        string;   // custom background (gradient string) — falls back to tinted glass
+  minHeight?: string;   // optional min-height override
 }
 
-// Derive glass colours from the accent by replacing the alpha channel
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function glass(colour: string, alpha: number): string {
   return colour.replace(/,[\d.]+\)$/, `,${alpha})`)
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function ToolCard({ tag, name, line, href, colour, tagColour }: ToolCardProps) {
+export default function ToolCard({
+  tag,
+  name,
+  line,
+  href,
+  colour,
+  tagColour,
+  bg,
+  minHeight,
+}: ToolCardProps) {
   const [hovered, setHovered] = useState(false)
 
-  const bg           = glass(colour, 0.10)
-  const borderNormal = glass(colour, 0.22)
-  const borderHover  = glass(colour, 0.38)
+  const accent       = glass(colour, 1)
+  const tagCol       = tagColour ?? glass(colour, 0.48)
+  const background   = bg ?? glass(colour, 0.10)
+  const borderNormal = glass(colour, 0.18)
+  const borderHover  = glass(colour, 0.32)
+  const shadow       = `0 12px 60px ${glass(colour, 0.18)}`
 
   return (
     <Link
@@ -34,97 +49,134 @@ export default function ToolCard({ tag, name, line, href, colour, tagColour }: T
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position:        "relative",
-        display:         "flex",
-        flexDirection:   "column",
-        borderRadius:    "16px",
-        padding:         "28px 28px 24px",
-        background:      bg,
-        border:          `1px solid ${hovered ? borderHover : borderNormal}`,
-        backdropFilter:  "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        transform:       hovered ? "scale(1.01)" : "scale(1)",
-        transition:      "transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease",
-        textDecoration:  "none",
-        overflow:        "hidden",
-        boxSizing:       "border-box",
+        position:             "relative",
+        display:              "flex",
+        flexDirection:        "column",
+        borderRadius:         "18px",
+        padding:              "36px 32px 32px",
+        minHeight:            minHeight ?? "auto",
+        background:           background,
+        border:               `0.5px solid ${hovered ? borderHover : borderNormal}`,
+        backdropFilter:       bg ? undefined : "blur(12px)",
+        WebkitBackdropFilter: bg ? undefined : "blur(12px)",
+        boxShadow:            hovered ? shadow : "none",
+        transform:            hovered ? "translateY(-5px)" : "translateY(0)",
+        transition: [
+          "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+          "box-shadow 0.55s cubic-bezier(0.22,1,0.36,1)",
+          "border-color 0.55s cubic-bezier(0.22,1,0.36,1)",
+        ].join(", "),
+        textDecoration: "none",
+        overflow:       "hidden",
+        boxSizing:      "border-box",
+        cursor:         "pointer",
       }}
     >
-      {/* Top accent line — appears on hover */}
+      {/* Shimmer line */}
       <div
         aria-hidden="true"
         style={{
-          position:   "absolute",
-          top:        0,
-          left:       "15%",
-          right:      "15%",
-          height:     "1px",
-          background: `linear-gradient(90deg, transparent, ${glass(colour, 0.5)}, transparent)`,
-          opacity:    hovered ? 0.8 : 0.25,
-          transition: "opacity 0.4s ease",
+          position:      "absolute",
+          top:           0,
+          left:          "20%",
+          right:         "20%",
+          height:        "1px",
+          background:    `linear-gradient(90deg, transparent, ${glass(colour, 0.8)}, transparent)`,
+          opacity:       hovered ? 0.7 : 0.3,
+          transition:    "opacity 0.55s ease",
           pointerEvents: "none",
         }}
       />
 
-      {/* Tag */}
+      {/* Tag / feeling label */}
       <p
         style={{
           fontFamily:    "var(--font-jost, 'Jost', sans-serif)",
           fontWeight:    400,
-          fontSize:      "9px",
-          letterSpacing: "0.22em",
+          fontSize:      "10px",
+          letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color:         tagColour,
-          margin:        "0 0 12px",
+          color:         tagCol,
+          margin:        "0 0 14px",
+          opacity:       hovered ? 0.7 : 0.42,
+          transition:    "opacity 0.4s ease",
         }}
       >
         {tag}
       </p>
 
       {/* Name */}
-      <p
+      <h3
         style={{
           fontFamily: "var(--font-display, 'Cormorant Garamond', serif)",
           fontWeight: 300,
-          fontSize:   "24px",
+          fontSize:   "clamp(22px, 2.4vw, 28px)",
           lineHeight: 1.2,
-          color:      "rgba(200,215,225,0.85)",
-          margin:     "0 0 8px",
+          color:      hovered ? "rgba(245,240,255,1)" : "rgba(235,228,255,0.9)",
+          margin:     "0 0 14px",
+          transition: "color 0.4s ease",
         }}
       >
         {name}
-      </p>
+      </h3>
 
-      {/* Line */}
+      {/* Description */}
       <p
         style={{
           fontFamily: "var(--font-jost, 'Jost', sans-serif)",
           fontWeight: 300,
           fontSize:   "13px",
-          lineHeight: 1.6,
-          color:      "rgba(200,210,220,0.72)",
-          margin:     "0 0 24px",
+          lineHeight: 1.72,
+          color:      hovered ? "rgba(185,175,220,0.85)" : "rgba(172,165,210,0.68)",
+          margin:     0,
           flex:       1,
+          transition: "color 0.4s ease",
         }}
       >
         {line}
       </p>
 
-      {/* Begin → */}
-      <span
+      {/* Bottom row — "Begin ›" appears only on hover */}
+      <div
         style={{
-          fontFamily:    "var(--font-jost, 'Jost', sans-serif)",
-          fontWeight:    400,
-          fontSize:      "11px",
-          letterSpacing: "0.16em",
-          textTransform: "uppercase",
-          color:         hovered ? "rgba(200,210,220,0.9)" : "rgba(200,210,220,0.65)",
-          transition:    "color 0.3s ease",
-          alignSelf:     "flex-start",
+          marginTop:  "28px",
+          paddingTop: "16px",
+          borderTop:  `0.5px solid ${hovered ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)"}`,
+          display:    "flex",
+          alignItems: "center",
+          gap:        "8px",
+          transition: "border-color 0.4s ease",
         }}
       >
-        Begin →
-      </span>
+        <span
+          style={{
+            fontFamily:    "var(--font-jost, 'Jost', sans-serif)",
+            fontWeight:    400,
+            fontSize:      "10px",
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color:         accent,
+            opacity:       hovered ? 0.62 : 0,
+            transform:     hovered ? "translateX(0)" : "translateX(-6px)",
+            transition:    "opacity 0.45s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+          }}
+        >
+          Begin
+        </span>
+        <span
+          style={{
+            fontSize:   "16px",
+            color:      accent,
+            opacity:    hovered ? 0.75 : 0,
+            transform:  hovered ? "translateX(2px)" : "translateX(-8px)",
+            transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+            lineHeight: 1,
+            display:    "inline-block",
+          }}
+        >
+          ›
+        </span>
+      </div>
     </Link>
-  );
+  )
 }

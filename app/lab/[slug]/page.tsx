@@ -41,7 +41,7 @@ const MDX_COMPONENTS = {
     <p
       {...props}
       style={{
-        fontFamily:  "'DM Sans', sans-serif",
+        fontFamily:  "'Jost', sans-serif",
         fontWeight:  300,
         fontSize:    '16px',
         lineHeight:  1.85,
@@ -171,7 +171,7 @@ export default async function ArticlePage(
             <Link
               href="/lab"
               style={{
-                fontFamily:     "'DM Sans', sans-serif",
+                fontFamily:     "'Jost', sans-serif",
                 fontWeight:     400,
                 fontSize:       '12px',
                 letterSpacing:  '0.08em',
@@ -194,7 +194,7 @@ export default async function ArticlePage(
                   borderRadius:  '100px',
                   background:    accentBg,
                   border:        `0.5px solid ${accent.replace('1)', '0.2)')}`,
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      '10px',
                   letterSpacing: '0.14em',
@@ -232,7 +232,7 @@ export default async function ArticlePage(
             >
               <span
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      '12px',
                   letterSpacing: '0.06em',
@@ -244,7 +244,7 @@ export default async function ArticlePage(
               <span style={{ color: 'rgba(110,102,158,0.2)', fontSize: '10px' }}>·</span>
               <span
                 style={{
-                  fontFamily:    "'DM Sans', sans-serif",
+                  fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      '12px',
                   letterSpacing: '0.06em',
@@ -313,7 +313,7 @@ export default async function ArticlePage(
                 borderRadius:   '4px',
                 border:         `0.5px solid ${accent.replace('1)', '0.28)')}`,
                 background:     accentBg,
-                fontFamily:     "'DM Sans', sans-serif",
+                fontFamily:     "'Jost', sans-serif",
                 fontWeight:     400,
                 fontSize:       '12px',
                 letterSpacing:  '0.12em',
@@ -339,7 +339,7 @@ export default async function ArticlePage(
             <Link
               href="/lab"
               style={{
-                fontFamily:     "'DM Sans', sans-serif",
+                fontFamily:     "'Jost', sans-serif",
                 fontWeight:     400,
                 fontSize:       '11px',
                 letterSpacing:  '0.16em',

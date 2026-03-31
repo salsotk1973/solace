@@ -13,7 +13,7 @@ function Section({ number, title, children }: { number: string; title: string; c
     <section style={{ marginBottom: '48px' }}>
       <p
         style={{
-          fontFamily:    "'DM Sans', sans-serif",
+          fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
           fontSize:      '10px',
           letterSpacing: '0.2em',
@@ -38,7 +38,7 @@ function Section({ number, title, children }: { number: string; title: string; c
       </h2>
       <div
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Jost', sans-serif",
           fontWeight: 300,
           fontSize:   '15px',
           lineHeight: 1.85,
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
         <header style={{ marginBottom: '64px' }}>
           <p
             style={{
-              fontFamily:    "'DM Sans', sans-serif",
+              fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
               fontSize:      '10px',
               letterSpacing: '0.22em',
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
           </h1>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
               fontSize:   '15px',
               lineHeight: 1.8,
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
               <strong style={{ fontWeight: 400, color: 'rgba(220,215,245,0.9)' }}>Clerk</strong> — handles authentication securely.
             </li>
             <li style={{ marginBottom: '10px' }}>
-              <strong style={{ fontWeight: 400, color: 'rgba(220,215,245,0.9)' }}>Supabase</strong> — stores your session data.
+              <strong style={{ fontWeight: 400, color: 'rgba(220,215,245,0.9)' }}>Supabase</strong> — stores your session history and account data securely.
             </li>
             <li style={{ marginBottom: '10px' }}>
               <strong style={{ fontWeight: 400, color: 'rgba(220,215,245,0.9)' }}>Stripe</strong> — processes payments if you upgrade. We never see your card details.
