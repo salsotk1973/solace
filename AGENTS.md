@@ -1,5 +1,49 @@
 # AGENTS.md — Solace Operating Rules
 
+## CRITICAL WORKFLOW
+
+- Claude AI = design only
+  - defines UI, UX, animations, concepts
+  - must NOT write or modify code in the repo
+
+- ChatGPT = system architect + translator
+  - converts design into precise Codex instructions
+  - ensures alignment with architecture and rules
+
+- Codex = execution layer
+  - performs all code changes
+  - applies full file replacements as instructed
+
+### CURRENT PHASE: CONTROLLED BUILD
+
+- all changes must go through Codex
+- no direct code edits from Claude
+- no parallel systems or patterns introduced
+
+### FUTURE PHASE (not active yet)
+
+- Claude → Claude Code direct execution may be allowed
+- only after architecture is stable and explicitly approved
+
+### RULES
+
+- follow `docs/solace-architecture-map.md` at all times
+- never re-import anything from `_archived/`
+- do not introduce new patterns without justification
+- keep layout consistency across all pages
+- do not refactor unrelated files
+- do one focused change at a time
+
+### IMPORTANT
+
+If unsure:
+
+- do less
+- stay within current system
+- preserve stability
+
+---
+
 ## Source of Truth
 
 The canonical architecture is defined in:
@@ -21,6 +65,24 @@ These rules are mandatory.
 
 ---
 
+## Current Baseline (April 2026)
+
+* `_archived/` is isolated; do not import from or reactivate archived code.
+* `tsconfig.json` excludes `_archived` from compilation.
+* `eslint.config.mjs` ignores `_archived/**`.
+* CI is currently passing.
+* Playwright CI injects required secrets in `.github/workflows/playwright.yml`:
+
+  * `NEXT_PUBLIC_SUPABASE_URL`
+  * `SUPABASE_SERVICE_ROLE_KEY`
+  * `OPENAI_API_KEY`
+* CI-safe Clerk fallback is in place; missing Clerk env must not block CI rendering.
+* Current lint baseline: **0 errors / 11 warnings**.
+* Pre-animation cleanup is complete.
+* Next approved focus: **Home page + Hero**.
+
+---
+
 ## 1. Session Start Rule
 
 Before making changes:
@@ -38,6 +100,7 @@ Before making changes:
 * NEVER extend legacy systems
 * NEVER revive unused components
 * NEVER create new patterns when an existing one exists
+* NEVER import from `_archived/*`
 
 ---
 

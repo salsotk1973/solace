@@ -8,6 +8,24 @@ All development (human or AI) must follow this map.
 
 ---
 
+## Current Baseline (April 2026)
+
+* `_archived/` is isolated and must not be re-imported into active app code.
+* TypeScript excludes archived code via `tsconfig.json` (`"exclude": ["node_modules", "_archived"]`).
+* ESLint ignores archived code via `eslint.config.mjs` (`globalIgnores(["_archived/**", ...])`).
+* CI is currently passing.
+* Playwright CI injects required secrets in `.github/workflows/playwright.yml`:
+
+  * `NEXT_PUBLIC_SUPABASE_URL`
+  * `SUPABASE_SERVICE_ROLE_KEY`
+  * `OPENAI_API_KEY`
+* CI-safe Clerk fallback is active (missing Clerk env must not block rendering in CI).
+* Current lint baseline: **0 errors / 11 warnings**.
+* Pre-animation cleanup is complete.
+* Next approved focus: **Home page + Hero**.
+
+---
+
 ## 1. Active Architecture (DO NOT DEVIATE)
 
 ### Core App Structure
@@ -78,12 +96,27 @@ These exist but are not part of the future system:
 
 ## 3. Deprecated Candidates (REVIEW BEFORE REMOVAL)
 
-* `components/solace/*`
-* `/api/reflect`
-* `lib/modules/*`
-* `lib/tools.ts`
+These paths have been isolated under `_archived/` and must stay isolated from active imports:
 
-👉 These may be removed later but require confirmation.
+* `_archived/components/solace/*`
+* `_archived/components/anchors/*`
+* `_archived/components/background/*`
+* `_archived/components/discovery/*`
+* `_archived/components/ToolShell.tsx`
+* `_archived/components/SiteHeaderShell`
+* `_archived/components/GlobalHeader.tsx`
+* `_archived/components/Container.tsx`
+* `_archived/lib/modules/*`
+* `_archived/lib/solace-content/tools.ts`
+* `_archived/lib/solace/break-it-down/ai.ts`
+* `_archived/lib/solace/openai.ts`
+* `_archived/lib/supabase/client.ts`
+* `_archived/lib/tools.ts`
+* `_archived/lib/tools/tool-discovery.ts`
+* `_archived/lib/thread/thread-helpers.ts`
+* `_archived/lib/thread/thread-reducer.ts`
+
+👉 Review before any removal, but do not re-activate.
 
 ---
 
@@ -91,8 +124,6 @@ These exist but are not part of the future system:
 
 * `lib/engine/*`
 * `components/ui/*`
-* `components/background/*`
-* `components/anchors/*`
 * `/app/scope`
 
 👉 Do not modify or delete until verified.
@@ -113,6 +144,7 @@ Avoid creating new endpoints outside this structure.
 
 * Build ONLY on active architecture
 * Do NOT extend legacy systems
+* Do NOT import from `_archived/*`
 * Prefer reuse over duplication
 * Keep layout consistency across pages
 * Maintain a single source of truth per system
@@ -124,6 +156,7 @@ Avoid creating new endpoints outside this structure.
 * All tools should converge into the canonical `/tools/*` system
 * Legacy systems will be removed progressively
 * Architecture must remain simple, consistent, and scalable
+* Near-term implementation focus is Home page + Hero improvements
 
 ---
 
