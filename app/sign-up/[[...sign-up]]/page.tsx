@@ -1,6 +1,8 @@
 import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {
+  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
   return (
     <div
       style={{
@@ -12,7 +14,7 @@ export default function SignUpPage() {
         padding: "24px",
       }}
     >
-      <SignUp />
+      {clerkConfigured ? <SignUp /> : null}
     </div>
   );
 }

@@ -37,6 +37,11 @@ function calculateStreak(sessions: ToolSession[]): number {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
+  const clerkConfigured =
+    Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
+    Boolean(process.env.CLERK_SECRET_KEY);
+  if (!clerkConfigured) redirect("/");
+
   // Auth guard — middleware handles this but belt-and-suspenders
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");

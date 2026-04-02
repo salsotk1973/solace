@@ -15,6 +15,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const shell = (
+    <>
+      <SiteHeader />
+      {children}
+      <SiteFooter />
+    </>
+  );
+
   return (
     <html lang="en">
       <head>
@@ -26,11 +35,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClerkProvider>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-        </ClerkProvider>
+        {clerkConfigured ? <ClerkProvider>{shell}</ClerkProvider> : shell}
       </body>
     </html>
   );
