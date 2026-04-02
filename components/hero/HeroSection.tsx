@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -60,8 +59,8 @@ export default function HeroSection() {
     const subStart = line2Start + (l2 - 1) * 100 + 200;
     schedule(() => subheadRef.current?.classList.add("visible"), subStart);
 
-    // ── CTA button — fades in 800 ms after sub-headline ───────────────────
-    schedule(() => ctaRef.current?.classList.add("visible"), subStart + 800);
+    // Keep CTA immediately interactive to avoid click interception.
+    ctaRef.current?.classList.add("visible");
 
     // ── Tagline — letter by letter ────────────────────────────────────────────
     // Starts 2200 ms after sub-headline fade begins, 68 ms per character
@@ -156,9 +155,9 @@ export default function HeroSection() {
         }
 
         /* Start free CTA */
-        .hero-cta { opacity: 0; pointer-events: none; }
+        .hero-cta { opacity: 1; pointer-events: auto; }
         .hero-cta.visible {
-          animation: appear 1.4s ease forwards;
+          animation: none;
           pointer-events: auto;
         }
       `}</style>
@@ -269,7 +268,8 @@ export default function HeroSection() {
           </p>
 
           {/* ── Start free CTA ─────────────────────────────────────────────── */}
-          <Link
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
             ref={ctaRef}
             href="/sign-up"
             className="hero-cta"
@@ -298,7 +298,7 @@ export default function HeroSection() {
             }}
           >
             Start free
-          </Link>
+          </a>
 
           {/* ── Tagline ────────────────────────────────────────────────────── */}
           <div

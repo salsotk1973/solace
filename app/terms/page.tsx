@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import PageShell from '@/components/PageShell'
 
 export const metadata: Metadata = {
   title: 'Terms of Use | Solace',
@@ -54,13 +55,7 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 export default function TermsPage() {
   return (
-    <main
-      style={{
-        minHeight:  '100vh',
-        background: '#090d14',
-        color:      'rgba(225,218,252,0.85)',
-      }}
-    >
+    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
       <div
         style={{
           maxWidth:  '680px',
@@ -195,6 +190,6 @@ export default function TermsPage() {
           </p>
         </Section>
       </div>
-    </main>
+    </PageShell>
   )
 }

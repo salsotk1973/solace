@@ -1,34 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Dot {
-  id:            number;
-  size:          number;
-  left:          number;
-  bottom:        number;
-  alpha:         number;
-  duration:      number;
-  delay:         number;
-  ty:            number;
-  tx:            number;
-  rgb:           string;
-  pulseDuration: number;
-  pulseDelay:    number;
-}
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const PURPLE_SHADES = [
-  "148,110,220",
-  "120,88,198",
-  "178,148,240",
-  "100,78,185",
-  "195,165,248",
-];
+import PageShell from "@/components/PageShell";
 
 const FREE_FEATURES = [
   "Access to all 6 tools",
@@ -98,108 +72,19 @@ export default function PricingPage() {
   const [freeCtaHovered, setFreeCtaHovered] = useState(false);
   const [proCtaHovered, setProCtaHovered]   = useState(false);
   const [footerCtaHovered, setFooterCtaHovered] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [dots, setDots] = useState<Dot[]>([]);
-
-  useEffect(() => {
-    let isActive = true;
-    const frameId = window.requestAnimationFrame(() => {
-      if (!isActive) return;
-
-      setIsMounted(true);
-      setDots(
-        Array.from({ length: 120 }, (_, id) => ({
-          id,
-          size:          0.8  + Math.random() * 3.0,
-          left:          2    + Math.random() * 96,
-          bottom:        Math.random() * 20,
-          alpha:         0.10 + Math.random() * 0.35,
-          duration:      12   + Math.random() * 20,
-          delay:         -(Math.random() * 32),
-          ty:            40   + Math.random() * 50,
-          tx:            -50  + Math.random() * 100,
-          rgb:           PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
-          pulseDuration: 2    + Math.random() * 3,
-          pulseDelay:    -(Math.random() * 5),
-        })),
-      );
-    });
-
-    return () => {
-      isActive = false;
-      window.cancelAnimationFrame(frameId);
-    };
-  }, []);
 
   const monthlyPrice  = "A$14";
   const annualMonthly = "A$9.92";
   const annualTotal   = "A$119";
 
   return (
-    <>
+    <PageShell>
       {/* JSON-LD FAQ Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
       />
 
-      <main className="min-h-screen bg-[#050508] text-white">
-
-        {/* ── Atmospheric background ──────────────────────────────────── */}
-        <div
-          aria-hidden="true"
-          style={{
-            position:      "fixed",
-            top:           0,
-            left:          0,
-            width:         "100vw",
-            height:        "100vh",
-            background:    "radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)",
-            zIndex:        1,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* ── Ambient dots ────────────────────────────────────────────── */}
-        <div
-          aria-hidden="true"
-          style={{
-            position:      "fixed",
-            top:           0,
-            left:          0,
-            width:         "100vw",
-            height:        "100vh",
-            pointerEvents: "none",
-            zIndex:        2,
-            overflow:      "hidden",
-          }}
-        >
-          {isMounted && dots.map((dot) => (
-            <div
-              key={dot.id}
-              style={
-                {
-                  position:        "absolute",
-                  width:           `${dot.size}px`,
-                  height:          `${dot.size}px`,
-                  borderRadius:    "50%",
-                  backgroundColor: "rgba(var(--rgb), var(--a))",
-                  left:            `${dot.left}%`,
-                  bottom:          `${dot.bottom}%`,
-                  animation:       "riseUp var(--d) ease-in-out infinite var(--dl)",
-                  "--ty":          `-${dot.ty}vh`,
-                  "--tx":          `${dot.tx}px`,
-                  "--d":           `${dot.duration}s`,
-                  "--dl":          `${dot.delay}s`,
-                  "--rgb":         dot.rgb,
-                  "--a":           `${dot.alpha}`,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
-
-        {/* ── Page content ────────────────────────────────────────────── */}
         <div style={{ position: "relative", zIndex: 3 }}>
 
           {/* ══════════════════════════════════════════════════════════════
@@ -1014,7 +899,6 @@ export default function PricingPage() {
           </section>
 
         </div>{/* end content wrapper */}
-      </main>
-    </>
+    </PageShell>
   );
 }

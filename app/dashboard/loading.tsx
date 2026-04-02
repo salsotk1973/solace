@@ -1,36 +1,11 @@
-import SiteHeader from "@/components/SiteHeader";
+import PageShell from "@/components/PageShell";
 
 export default function DashboardLoading() {
   return (
-    <>
-      <SiteHeader />
-      <main
-        style={{
-          minHeight:   "100vh",
-          background:  "#050508",
-          paddingTop:  "120px",
-          paddingBottom: "100px",
-        }}
-      >
-        {/* Background gradient */}
-        <div
-          aria-hidden="true"
-          style={{
-            position:      "fixed",
-            top:           0,
-            left:          0,
-            width:         "100vw",
-            height:        "100vh",
-            background:    "radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)",
-            zIndex:        1,
-            pointerEvents: "none",
-          }}
-        />
-
+    <PageShell>
+      <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
         <div
           style={{
-            position:  "relative",
-            zIndex:    3,
             maxWidth:  "1100px",
             margin:    "0 auto",
             padding:   "0 40px",
@@ -96,8 +71,8 @@ export default function DashboardLoading() {
             100% { opacity: 0.06; }
           }
         `}</style>
-      </main>
-    </>
+      </div>
+    </PageShell>
   );
 }
 

@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import PageShell from "@/components/PageShell";
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
 import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
@@ -1043,28 +1044,10 @@ export default function ClearYourMindPage() {
   }
 
   return (
-    <main className="mind-realm">
-      <div className="realm-bg-stage" aria-hidden="true">
-        <img
-          src="/realms/emerald/emerald-realm-master.png"
-          alt=""
-          className="realm-bg-image"
-        />
-      </div>
-
-      <div className="realm-bg-vignette" aria-hidden="true" />
-      <div className="realm-bg-soften" aria-hidden="true" />
-      <div className="realm-bg-deepen" aria-hidden="true" />
-      <div className="realm-bg-bottom-weight" aria-hidden="true" />
-      <div className="realm-bg-top-weight" aria-hidden="true" />
-      <div className="realm-center-halo" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
-      <div className="realm-horizon-shimmer" aria-hidden="true" />
-
+    <PageShell contentContainer={false}>
+      <div className="mind-realm">
       <section className="realm-content">
         <div className="realm-intro">
-          <p className="realm-label">Emerald Realm</p>
           <h1 className="title">Clear your mind</h1>
           <p className="subtitle">
             Untangle overthinking, mental loops, and emotional build-up into something a little
@@ -1270,160 +1253,7 @@ export default function ClearYourMindPage() {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #02080a;
           isolation: isolate;
-        }
-
-        .realm-bg-stage {
-          position: fixed;
-          inset: 0;
-          overflow: hidden;
-          z-index: 0;
-          pointer-events: none;
-        }
-
-        .realm-bg-image {
-          position: absolute;
-          inset: 0;
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          object-position: center;
-          display: block;
-          user-select: none;
-          -webkit-user-drag: none;
-          opacity: 0.92;
-        }
-
-        .realm-bg-vignette {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(0, 0, 0, 0.1) 10%,
-            rgba(0, 0, 0, 0.3) 56%,
-            rgba(0, 0, 0, 0.62) 100%
-          );
-        }
-
-        .realm-bg-soften {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(4, 14, 12, 0.42) 0%,
-            rgba(4, 14, 12, 0.18) 18%,
-            rgba(4, 14, 12, 0.08) 42%,
-            rgba(4, 14, 12, 0.16) 72%,
-            rgba(4, 14, 12, 0.42) 100%
-          );
-        }
-
-        .realm-bg-deepen {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at 50% 44%,
-            rgba(6, 24, 20, 0.08) 0%,
-            rgba(6, 24, 20, 0.2) 26%,
-            rgba(6, 24, 20, 0.34) 58%,
-            rgba(2, 8, 10, 0.54) 100%
-          );
-        }
-
-        .realm-bg-bottom-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(0, 0, 0, 0) 0%,
-            rgba(2, 8, 10, 0.04) 52%,
-            rgba(2, 8, 10, 0.18) 72%,
-            rgba(2, 8, 10, 0.5) 100%
-          );
-        }
-
-        .realm-bg-top-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(2, 8, 10, 0.42) 0%,
-            rgba(2, 8, 10, 0.16) 16%,
-            rgba(2, 8, 10, 0) 34%,
-            rgba(2, 8, 10, 0) 100%
-          );
-        }
-
-        .realm-center-halo {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(154, 248, 208, 0.014) 0%,
-            rgba(154, 248, 208, 0.006) 18%,
-            rgba(154, 248, 208, 0.002) 32%,
-            rgba(154, 248, 208, 0) 48%
-          );
-        }
-
-        .realm-side-light {
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          width: 24%;
-          z-index: 1;
-          pointer-events: none;
-          filter: blur(56px);
-          opacity: 0.44;
-        }
-
-        .realm-side-light-left {
-          left: 0;
-          background: radial-gradient(
-            circle at 34% 26%,
-            rgba(54, 220, 160, 0.08) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-side-light-right {
-          right: 0;
-          background: radial-gradient(
-            circle at 66% 24%,
-            rgba(92, 232, 182, 0.06) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-horizon-shimmer {
-          position: fixed;
-          left: 10%;
-          right: 10%;
-          top: 48%;
-          height: 7%;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at 50% 50%,
-            rgba(218, 255, 237, 0.026) 0%,
-            rgba(218, 255, 237, 0.01) 28%,
-            transparent 60%
-          );
-          filter: blur(24px);
-          opacity: 0.42;
         }
 
         .realm-content {
@@ -1449,22 +1279,14 @@ export default function ClearYourMindPage() {
           justify-content: flex-start;
         }
 
-        .realm-label {
-          margin: 0 0 14px;
-          font-size: 0.82rem;
-          font-weight: 560;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: rgba(208, 240, 226, 0.54);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-        }
-
         .title {
           margin: 0;
-          font-size: clamp(3.5rem, 7vw, 6rem);
-          font-weight: 650;
-          line-height: 0.94;
-          letter-spacing: -0.06em;
+          font-family: "Cormorant Garamond", serif;
+          font-size: clamp(3rem, 7vw, 5.4rem);
+          font-weight: 300;
+          line-height: 0.98;
+          letter-spacing: -0.02em;
+          font-style: italic;
           color: rgba(247, 250, 255, 0.98);
           text-shadow:
             0 10px 28px rgba(0, 0, 0, 0.4),
@@ -2181,6 +2003,7 @@ export default function ClearYourMindPage() {
           }
         }
       `}</style>
-    </main>
+      </div>
+    </PageShell>
   );
 }

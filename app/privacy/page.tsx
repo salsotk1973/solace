@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ServicesTable from './ServicesTable'
+import PageShell from '@/components/PageShell'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Solace',
@@ -55,13 +56,7 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 export default function PrivacyPage() {
   return (
-    <main
-      style={{
-        minHeight:  '100vh',
-        background: '#090d14',
-        color:      'rgba(225,218,252,0.85)',
-      }}
-    >
+    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
       <div
         style={{
           maxWidth:  '680px',
@@ -204,6 +199,6 @@ export default function PrivacyPage() {
           </p>
         </Section>
       </div>
-    </main>
+    </PageShell>
   )
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import GratitudeSession from "@/components/gratitude/GratitudeSession";
 import { getCurrentUser } from "@/lib/auth";
+import PageShell from "@/components/PageShell";
 
 export const metadata = {
   title: "Gratitude Log — Solace",
@@ -12,7 +13,7 @@ export default async function GratitudePage() {
   const { userId } = await getCurrentUser();
 
   return (
-    <main className="min-h-screen bg-[#090d14] text-white">
+    <PageShell>
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
 
         {/* ── Tool header ──────────────────────────────────────────────────── */}
@@ -70,7 +71,6 @@ export default async function GratitudePage() {
         </section>
 
       </div>
-
-    </main>
+    </PageShell>
   );
 }

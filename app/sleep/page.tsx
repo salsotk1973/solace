@@ -1,5 +1,6 @@
 import SleepOrb    from "@/components/sleep/SleepOrb";
 import { getCurrentUser } from "@/lib/auth";
+import PageShell from "@/components/PageShell";
 
 export const metadata = {
   title: "Sleep Wind-Down — Solace",
@@ -10,8 +11,8 @@ export default async function SleepPage() {
   const { userId } = await getCurrentUser();
 
   return (
-    <main className="min-h-screen bg-[#090d14] text-white">
+    <PageShell>
       <SleepOrb userId={userId ?? null} />
-    </main>
+    </PageShell>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import FocusTimer   from "@/components/focus/FocusTimer";
 import { getCurrentUser } from "@/lib/auth";
 import { SOLACE_ROUTES }  from "@/lib/solace/routes";
+import PageShell from "@/components/PageShell";
 
 export const metadata = {
   title: "Focus Timer — Solace",
@@ -12,7 +13,7 @@ export default async function FocusPage() {
   const { userId } = await getCurrentUser();
 
   return (
-    <main className="min-h-screen bg-[#090d14] text-white">
+    <PageShell>
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
 
         {/* ── Tool header ──────────────────────────────────────────────── */}
@@ -95,7 +96,6 @@ export default async function FocusPage() {
         </section>
 
       </div>
-
-    </main>
+    </PageShell>
   );
 }

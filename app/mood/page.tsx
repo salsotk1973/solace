@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MoodSession from "@/components/mood/MoodSession";
 import { getCurrentUser } from "@/lib/auth";
+import PageShell from "@/components/PageShell";
 
 export const metadata = {
   title: "Mood Tracker — Solace",
@@ -11,7 +12,7 @@ export default async function MoodPage() {
   const { userId } = await getCurrentUser();
 
   return (
-    <main className="min-h-screen bg-[#090d14] text-white">
+    <PageShell>
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
 
         {/* ── Tool header ──────────────────────────────────────────────────── */}
@@ -69,7 +70,6 @@ export default async function MoodPage() {
         </section>
 
       </div>
-
-    </main>
+    </PageShell>
   );
 }

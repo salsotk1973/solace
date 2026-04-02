@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import PageShell from "@/components/PageShell";
 import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
 type OrbPhase = "idle" | "active" | "settled";
@@ -231,28 +232,10 @@ export default function ChoosePage() {
   }
 
   return (
-    <main className="choose-realm">
-      <div className="realm-bg-stage" aria-hidden="true">
-        <img
-          src="/realms/azure/azure-realm-master.jpg"
-          alt=""
-          className="realm-bg-image"
-        />
-      </div>
-
-      <div className="realm-bg-vignette" aria-hidden="true" />
-      <div className="realm-bg-soften" aria-hidden="true" />
-      <div className="realm-bg-deepen" aria-hidden="true" />
-      <div className="realm-bg-bottom-weight" aria-hidden="true" />
-      <div className="realm-bg-top-weight" aria-hidden="true" />
-      <div className="realm-center-halo" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
-      <div className="realm-horizon-shimmer" aria-hidden="true" />
-
+    <PageShell contentContainer={false}>
+      <div className="choose-realm">
       <section className="realm-content">
         <div className="realm-intro">
-          <p className="realm-label">Azure Realm</p>
           <h1 className="title">Choose</h1>
           <p className="subtitle">
             Bring one decision here. Solace will help you see the choice more clearly.
@@ -261,13 +244,6 @@ export default function ChoosePage() {
 
         <div className="orb-stage">
           <div className={`azure-hero azure-hero-${orbPhase}`} aria-hidden="true">
-            <div className="azure-hero-field azure-hero-field-back" />
-            <div className="azure-hero-field azure-hero-field-mid" />
-            <div className="azure-hero-field azure-hero-field-front" />
-            <div className="azure-hero-floor-glow" />
-            <div className="azure-hero-floor-core" />
-
-            <div className="azure-core-shadow" />
             <div className="azure-core-tilt">
               <div className="azure-core">
                 <div className="azure-core-parallax azure-core-parallax-back">
@@ -411,164 +387,6 @@ export default function ChoosePage() {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #010309;
-        }
-
-        .realm-bg-stage {
-          position: fixed;
-          inset: 0;
-          overflow: hidden;
-          z-index: 0;
-          pointer-events: none;
-        }
-
-        .realm-bg-image {
-          position: absolute;
-          inset: 0;
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          object-position: center;
-          display: block;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        .realm-bg-vignette {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(0, 0, 0, 0.12) 10%,
-              rgba(0, 0, 0, 0.34) 56%,
-              rgba(0, 0, 0, 0.68) 100%
-            );
-        }
-
-        .realm-bg-soften {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(3, 7, 15, 0.46) 0%,
-              rgba(3, 7, 15, 0.22) 18%,
-              rgba(3, 7, 15, 0.12) 42%,
-              rgba(3, 7, 15, 0.22) 72%,
-              rgba(3, 7, 15, 0.48) 100%
-            );
-        }
-
-        .realm-bg-deepen {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              circle at 50% 44%,
-              rgba(8, 14, 28, 0.12) 0%,
-              rgba(8, 14, 28, 0.28) 26%,
-              rgba(8, 14, 28, 0.46) 58%,
-              rgba(1, 3, 9, 0.64) 100%
-            );
-        }
-
-        .realm-bg-bottom-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(0, 0, 0, 0) 0%,
-              rgba(1, 3, 9, 0.04) 52%,
-              rgba(1, 3, 9, 0.24) 72%,
-              rgba(1, 3, 9, 0.58) 100%
-            );
-        }
-
-        .realm-bg-top-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(1, 3, 9, 0.48) 0%,
-              rgba(1, 3, 9, 0.18) 16%,
-              rgba(1, 3, 9, 0) 34%,
-              rgba(1, 3, 9, 0) 100%
-            );
-        }
-
-        .realm-center-halo {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(154, 184, 255, 0.036) 0%,
-              rgba(154, 184, 255, 0.014) 18%,
-              rgba(154, 184, 255, 0.006) 32%,
-              rgba(154, 184, 255, 0) 48%
-            );
-        }
-
-        .realm-side-light {
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          width: 24%;
-          z-index: 1;
-          pointer-events: none;
-          filter: blur(56px);
-          opacity: 0.56;
-        }
-
-        .realm-side-light-left {
-          left: 0;
-          background: radial-gradient(
-            circle at 34% 26%,
-            rgba(76, 118, 240, 0.12) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-side-light-right {
-          right: 0;
-          background: radial-gradient(
-            circle at 66% 24%,
-            rgba(104, 96, 255, 0.1) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-horizon-shimmer {
-          position: fixed;
-          left: 10%;
-          right: 10%;
-          top: 48%;
-          height: 7%;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at 50% 50%,
-            rgba(226, 236, 255, 0.05) 0%,
-            rgba(226, 236, 255, 0.02) 28%,
-            transparent 60%
-          );
-          filter: blur(24px);
-          opacity: 0.52;
         }
 
         .realm-content {
@@ -588,22 +406,14 @@ export default function ChoosePage() {
           max-width: 760px;
         }
 
-        .realm-label {
-          margin: 0 0 14px;
-          font-size: 0.82rem;
-          font-weight: 560;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: rgba(206, 220, 255, 0.54);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-        }
-
         .title {
           margin: 0;
-          font-size: clamp(3.5rem, 7vw, 6rem);
-          font-weight: 650;
-          line-height: 0.94;
-          letter-spacing: -0.06em;
+          font-family: "Cormorant Garamond", serif;
+          font-size: clamp(3rem, 7vw, 5.4rem);
+          font-weight: 300;
+          line-height: 0.98;
+          letter-spacing: -0.02em;
+          font-style: italic;
           color: rgba(247, 250, 255, 0.98);
           text-shadow:
             0 10px 28px rgba(0, 0, 0, 0.4),
@@ -2082,6 +1892,7 @@ export default function ChoosePage() {
           }
         }
       `}</style>
-    </main>
+      </div>
+    </PageShell>
   );
 }

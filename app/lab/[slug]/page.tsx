@@ -5,7 +5,7 @@ import type { Metadata }     from 'next'
 import { getAllArticles, getArticleBySlug, getArticlesByCategory } from '@/lib/lab'
 import LabToolCta            from '@/components/lab/LabToolCta'
 import RelatedArticles       from '@/components/lab/RelatedArticles'
-import LabParticles          from '@/components/lab/LabParticles'
+import PageShell             from '@/components/PageShell'
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
@@ -123,40 +123,13 @@ export default async function ArticlePage(
   }
 
   return (
-    <main
-      style={{
-        minHeight:  '100vh',
-        background: '#090d14',
-        color:      'rgba(225,218,252,0.85)',
-        position:   'relative',
-      }}
-    >
+    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
       {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Atmospheric background */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:      'fixed',
-          top:           0,
-          left:          0,
-          width:         '100vw',
-          height:        '100vh',
-          background:    'radial-gradient(ellipse 80% 65% at 50% 38%, #0e0c1e 0%, #070610 52%, #050508 100%)',
-          zIndex:        1,
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Ambient particles */}
-      <LabParticles />
-
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 3 }}>
         <div
           style={{
             maxWidth:  '680px',
@@ -353,7 +326,6 @@ export default async function ArticlePage(
           </div>
 
         </div>
-      </div>
-    </main>
+    </PageShell>
   )
 }

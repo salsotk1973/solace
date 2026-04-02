@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import PageShell from "@/components/PageShell";
 
 type OrbPhase = "idle" | "active" | "settled";
 
@@ -281,28 +282,10 @@ export default function BreakItDownPage() {
   const displayedSteps = resultSteps.slice(0, 3);
 
   return (
-    <main className="breakdown-realm">
-      <div className="realm-bg-stage" aria-hidden="true">
-        <img
-          src="/realms/amber/break-it-down-bg.jpg"
-          alt=""
-          className="realm-bg-image"
-        />
-      </div>
-
-      <div className="realm-bg-vignette" aria-hidden="true" />
-      <div className="realm-bg-soften" aria-hidden="true" />
-      <div className="realm-bg-deepen" aria-hidden="true" />
-      <div className="realm-bg-bottom-weight" aria-hidden="true" />
-      <div className="realm-bg-top-weight" aria-hidden="true" />
-      <div className="realm-center-halo" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-left" aria-hidden="true" />
-      <div className="realm-side-light realm-side-light-right" aria-hidden="true" />
-      <div className="realm-horizon-shimmer" aria-hidden="true" />
-
+    <PageShell contentContainer={false}>
+      <div className="breakdown-realm">
       <section className="realm-content">
         <div className="realm-intro">
-          <p className="realm-label">Amber Realm</p>
           <h1 className="title">Break It Down</h1>
           <p className="subtitle">
             Bring one thing here. Solace will turn it into simple, useful steps.
@@ -311,19 +294,8 @@ export default function BreakItDownPage() {
 
         <div className="orb-stage">
           <div className={`amber-hero amber-hero-${orbPhase}`} aria-hidden="true">
-            <div className="amber-hero-field amber-hero-field-back" />
-            <div className="amber-hero-field amber-hero-field-mid" />
-            <div className="amber-hero-field amber-hero-field-front" />
-            <div className="amber-hero-floor-glow" />
-            <div className="amber-hero-floor-core" />
-
-            <div className="amber-core-shadow" />
             <div className="amber-core-tilt">
               <div className="amber-system">
-                <div className="amber-core-halo amber-core-halo-back" />
-                <div className="amber-core-halo amber-core-halo-mid" />
-                <div className="amber-core-halo amber-core-halo-front" />
-
                 <div className="amber-orbit-ring amber-orbit-ring-a" />
                 <div className="amber-orbit-ring amber-orbit-ring-b" />
 
@@ -516,164 +488,6 @@ export default function BreakItDownPage() {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          background: #080503;
-        }
-
-        .realm-bg-stage {
-          position: fixed;
-          inset: 0;
-          overflow: hidden;
-          z-index: 0;
-          pointer-events: none;
-        }
-
-        .realm-bg-image {
-          position: absolute;
-          inset: 0;
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          object-position: center;
-          display: block;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        .realm-bg-vignette {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(0, 0, 0, 0.12) 10%,
-              rgba(0, 0, 0, 0.34) 56%,
-              rgba(0, 0, 0, 0.7) 100%
-            );
-        }
-
-        .realm-bg-soften {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(22, 12, 5, 0.48) 0%,
-              rgba(22, 12, 5, 0.22) 18%,
-              rgba(22, 12, 5, 0.12) 42%,
-              rgba(22, 12, 5, 0.22) 72%,
-              rgba(22, 12, 5, 0.5) 100%
-            );
-        }
-
-        .realm-bg-deepen {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              circle at 50% 44%,
-              rgba(26, 14, 6, 0.12) 0%,
-              rgba(26, 14, 6, 0.28) 26%,
-              rgba(26, 14, 6, 0.46) 58%,
-              rgba(8, 5, 3, 0.66) 100%
-            );
-        }
-
-        .realm-bg-bottom-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(0, 0, 0, 0) 0%,
-              rgba(8, 5, 3, 0.04) 52%,
-              rgba(8, 5, 3, 0.24) 72%,
-              rgba(8, 5, 3, 0.58) 100%
-            );
-        }
-
-        .realm-bg-top-weight {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(8, 5, 3, 0.5) 0%,
-              rgba(8, 5, 3, 0.18) 16%,
-              rgba(8, 5, 3, 0) 34%,
-              rgba(8, 5, 3, 0) 100%
-            );
-        }
-
-        .realm-center-halo {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background:
-            radial-gradient(
-              ellipse at center,
-              rgba(255, 192, 116, 0.04) 0%,
-              rgba(255, 192, 116, 0.015) 18%,
-              rgba(255, 192, 116, 0.006) 32%,
-              rgba(255, 192, 116, 0) 48%
-            );
-        }
-
-        .realm-side-light {
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          width: 24%;
-          z-index: 1;
-          pointer-events: none;
-          filter: blur(56px);
-          opacity: 0.56;
-        }
-
-        .realm-side-light-left {
-          left: 0;
-          background: radial-gradient(
-            circle at 34% 26%,
-            rgba(255, 146, 58, 0.12) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-side-light-right {
-          right: 0;
-          background: radial-gradient(
-            circle at 66% 24%,
-            rgba(255, 196, 120, 0.1) 0%,
-            transparent 66%
-          );
-        }
-
-        .realm-horizon-shimmer {
-          position: fixed;
-          left: 10%;
-          right: 10%;
-          top: 48%;
-          height: 7%;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at 50% 50%,
-            rgba(255, 232, 208, 0.05) 0%,
-            rgba(255, 232, 208, 0.02) 28%,
-            transparent 60%
-          );
-          filter: blur(24px);
-          opacity: 0.52;
         }
 
         .realm-content {
@@ -693,22 +507,14 @@ export default function BreakItDownPage() {
           max-width: 760px;
         }
 
-        .realm-label {
-          margin: 0 0 14px;
-          font-size: 0.82rem;
-          font-weight: 560;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: rgba(255, 220, 184, 0.54);
-          text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-        }
-
         .title {
           margin: 0;
-          font-size: clamp(3.5rem, 7vw, 6rem);
-          font-weight: 650;
-          line-height: 0.94;
-          letter-spacing: -0.06em;
+          font-family: "Cormorant Garamond", serif;
+          font-size: clamp(3rem, 7vw, 5.4rem);
+          font-weight: 300;
+          line-height: 0.98;
+          letter-spacing: -0.02em;
+          font-style: italic;
           color: rgba(255, 248, 242, 0.98);
           text-shadow:
             0 10px 28px rgba(0, 0, 0, 0.4),
@@ -1898,6 +1704,7 @@ export default function BreakItDownPage() {
           }
         }
       `}</style>
-    </main>
+      </div>
+    </PageShell>
   );
 }

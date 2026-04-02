@@ -1,13 +1,17 @@
+import PageShell from "@/components/PageShell";
+
 export default function AboutPage() {
   return (
-    <main
-      style={{
-        width: "100%",
-        maxWidth: 1100,
-        margin: "0 auto",
-        padding: "120px 40px 96px",
-      }}
-    >
+    <PageShell>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "120px 40px 96px",
+          boxSizing: "border-box",
+        }}
+      >
       <div style={{ maxWidth: 760 }}>
         <div
           style={{
@@ -106,6 +110,7 @@ export default function AboutPage() {
           calm question at a time.
         </p>
       </section>
-    </main>
+      </div>
+    </PageShell>
   );
 }

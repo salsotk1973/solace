@@ -1,8 +1,8 @@
 import { getAllArticles, getFeaturedArticle } from '@/lib/lab'
-import LabParticles   from '@/components/lab/LabParticles'
 import LabFilter      from '@/components/lab/LabFilter'
 import NewsletterForm from '@/components/lab/NewsletterForm'
 import LabCtaButton   from '@/components/lab/LabCtaButton'
+import PageShell      from '@/components/PageShell'
 
 export default function LabPage() {
   const featured    = getFeaturedArticle()
@@ -10,19 +10,7 @@ export default function LabPage() {
   const nonFeatured = allArticles.filter(a => !a.featured)
 
   return (
-    <main
-      style={{
-        minHeight:  '100vh',
-        background: '#090d14',
-        color:      'rgba(225,218,252,0.85)',
-        position:   'relative',
-      }}
-    >
-      {/* ── Ambient particles (client) ──────────────────────────────────────── */}
-      <LabParticles />
-
-      {/* ── Page content ────────────────────────────────────────────────────── */}
-      <div style={{ position: 'relative', zIndex: 3 }}>
+    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
 
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 1 — HERO
@@ -228,7 +216,6 @@ export default function LabPage() {
           </div>
         </section>
 
-      </div>
-    </main>
+    </PageShell>
   )
 }

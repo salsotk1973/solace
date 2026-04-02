@@ -1,35 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/hero/HeroSection";
 import ToolCard from "@/components/tools/ToolCard";
 import { SOLACE_ROUTES } from "@/lib/solace/routes";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Dot {
-  id:           number;
-  size:         number;
-  left:         number;
-  bottom:       number;
-  alpha:        number;
-  duration:     number;
-  delay:        number;
-  ty:           number;
-  tx:           number;
-  rgb:          string;
-  pulseDuration: number;
-  pulseDelay:   number;
-}
-
-const PURPLE_SHADES = [
-  "148,110,220",  // aura purple
-  "120,88,198",   // deep purple
-  "178,148,240",  // light lavender
-  "100,78,185",   // dark purple
-  "195,165,248",  // soft lilac
-];
+import PageShell from "@/components/PageShell";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -83,84 +59,9 @@ const PILLS = [
 
 export default function HomePage() {
   const [labCtaHovered, setLabCtaHovered] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [dots, setDots] = useState<Dot[]>([]);
-
-  useEffect(() => {
-    let isActive = true;
-    const frameId = window.requestAnimationFrame(() => {
-      if (!isActive) return;
-
-      setIsMounted(true);
-      setDots(
-        Array.from({ length: 160 }, (_, id) => ({
-          id,
-          size:         0.8  + Math.random() * 3.0,
-          left:         2    + Math.random() * 96,
-          bottom:       Math.random() * 20,
-          alpha:        0.10 + Math.random() * 0.35,
-          duration:     12   + Math.random() * 20,
-          delay:        -(Math.random() * 32),
-          ty:           40   + Math.random() * 50,
-          tx:           -50  + Math.random() * 100,
-          rgb:          PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
-          pulseDuration: 2   + Math.random() * 3,
-          pulseDelay:   -(Math.random() * 5),
-        })),
-      );
-    });
-
-    return () => {
-      isActive = false;
-      window.cancelAnimationFrame(frameId);
-    };
-  }, []);
 
   return (
-    <main className="min-h-screen bg-[#050508] text-white">
-      {/* ── Ambient dots — fixed, z-index 2, above background, below content */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:      "fixed",
-          top:           0,
-          left:          0,
-          width:         "100vw",
-          height:        "100vh",
-          pointerEvents: "none",
-          zIndex:        2,
-          overflow:      "hidden",
-        }}
-      >
-        {isMounted && dots.map((dot) => (
-          <div
-            key={dot.id}
-            style={
-              {
-                position:        "absolute",
-                width:           `${dot.size}px`,
-                height:          `${dot.size}px`,
-                borderRadius:    "50%",
-                backgroundColor: "rgba(var(--rgb), var(--a))",
-                left:            `${dot.left}%`,
-                bottom:          `${dot.bottom}%`,
-                animation:       "riseUp var(--d) ease-in-out infinite var(--dl), purplePulse var(--pd) ease-in-out infinite var(--poff)",
-                "--ty":          `-${dot.ty}vh`,
-                "--tx":          `${dot.tx}px`,
-                "--d":           `${dot.duration}s`,
-                "--dl":          `${dot.delay}s`,
-                "--rgb":         dot.rgb,
-                "--a":           `${dot.alpha}`,
-                "--size":        `${dot.size}`,
-                "--pd":          `${dot.pulseDuration}s`,
-                "--poff":        `${dot.pulseDelay}s`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
-      </div>
-
-      {/* ── All page content — z-index 3, sits above dots ─────────────────── */}
+    <PageShell>
       <div style={{ position: "relative", zIndex: 3 }}>
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
@@ -544,6 +445,6 @@ export default function HomePage() {
       </section>
 
       </div>{/* end content wrapper */}
-    </main>
+    </PageShell>
   );
 }

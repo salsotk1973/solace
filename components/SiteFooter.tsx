@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 
 const FOOTER_NAV = [
   {
@@ -28,6 +29,15 @@ const FOOTER_NAV = [
     ],
   },
 ]
+
+const navLinkStyle: CSSProperties = {
+  fontFamily: "'Jost', sans-serif",
+  fontWeight: 300,
+  fontSize: '13px',
+  color: 'rgba(255,255,255,0.60)',
+  textDecoration: 'none',
+  transition: 'color 200ms ease',
+}
 
 export default function SiteFooter() {
   return (
@@ -79,7 +89,6 @@ export default function SiteFooter() {
           zIndex:   10,
         }}
       >
-        {/* Glass wrapper — matches header horizontal extent */}
         <div
           style={{
             margin:               '0 auto',
@@ -90,7 +99,6 @@ export default function SiteFooter() {
             WebkitBackdropFilter: 'blur(12px)',
           }}
         >
-          {/* Nav columns */}
           <div
             style={{
               padding:   '48px 16px 32px',
@@ -116,21 +124,26 @@ export default function SiteFooter() {
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {col.links.map(link => (
                       <li key={link.href}>
-                        <Link
-                          href={link.href}
-                          style={{
-                            fontFamily:     "'Jost', sans-serif",
-                            fontWeight:     300,
-                            fontSize:       '13px',
-                            color:          'rgba(255,255,255,0.60)',
-                            textDecoration: 'none',
-                            transition:     'color 200ms ease',
-                          }}
-                          onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.90)')}
-                          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.60)')}
-                        >
-                          {link.label}
-                        </Link>
+                        {link.href === '/sign-in' ? (
+                          /* eslint-disable-next-line @next/next/no-html-link-for-pages */
+                          <a
+                            href="/sign-in"
+                            style={navLinkStyle}
+                            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.90)')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.60)')}
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            style={navLinkStyle}
+                            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.90)')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.60)')}
+                          >
+                            {link.label}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -139,7 +152,6 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Divider + bottom bar */}
           <div
             style={{
               padding:   '0 16px 16px',

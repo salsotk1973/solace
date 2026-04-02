@@ -1,3 +1,5 @@
+import PageShell from "@/components/PageShell";
+
 const principleCards = [
   {
     title: "One thing at a time",
@@ -24,16 +26,19 @@ const principleCards = [
 
 export default function PrinciplesPage() {
   return (
-    <main
-      style={{
-        width: "100%",
-        paddingTop: 86,
-        paddingBottom: 96,
-        display: "grid",
-        gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-        columnGap: 24,
-      }}
-    >
+    <PageShell>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 1120,
+          margin: "0 auto",
+          padding: "86px 40px 96px",
+          boxSizing: "border-box",
+          display: "grid",
+          gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+          columnGap: 24,
+        }}
+      >
       <div style={{ gridColumn: "1 / span 8" }}>
         <div
           style={{
@@ -181,6 +186,7 @@ export default function PrinciplesPage() {
           that someone wants to stay a little longer instead of escaping quickly.
         </p>
       </section>
-    </main>
+      </div>
+    </PageShell>
   );
 }
