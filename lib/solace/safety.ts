@@ -23,7 +23,7 @@ export const SOLACE_SCOPE_FULL = [
  * 🔒 LOCKED CRISIS MESSAGE
  */
 export const SOLACE_CRISIS_FALLBACK =
-  "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.";
+  "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease know that your safety is important.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.";
 
 /**
  * Direct / explicit self-harm or suicide language.

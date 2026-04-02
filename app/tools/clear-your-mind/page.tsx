@@ -1882,7 +1882,7 @@ export default function ClearYourMindPage() {
             inset 0 1px 0 rgba(255, 255, 255, 0.3),
             inset 0 -14px 24px rgba(8, 34, 24, 0.26);
           filter: brightness(1.04);
-          animation: buttonReadyFloat 2.8s ease-in-out infinite;
+          animation: none;
         }
 
         .secondary-button {
@@ -1922,6 +1922,13 @@ export default function ClearYourMindPage() {
         .secondary-button:disabled {
           opacity: 0.65;
           cursor: default;
+          transform: none;
+        }
+
+        .primary-button,
+        .primary-button:hover,
+        .primary-button:active,
+        .primary-button:disabled {
           transform: none;
         }
 
