@@ -53,25 +53,35 @@ function buildRequestBody(toolSlug: string, question: string) {
   return { toolSlug, question };
 }
 
-function normalizeReflection(data: any): string {
-  if (typeof data?.text === "string" && data.text.trim()) {
-    return data.text.trim();
+function normalizeReflection(data: unknown): string {
+  const payload =
+    typeof data === "object" && data !== null
+      ? (data as {
+          text?: unknown;
+          message?: unknown;
+          reflection?: unknown;
+          error?: unknown;
+        })
+      : {};
+
+  if (typeof payload.text === "string" && payload.text.trim()) {
+    return payload.text.trim();
   }
 
-  if (typeof data?.message === "string" && data.message.trim()) {
-    return data.message.trim();
+  if (typeof payload.message === "string" && payload.message.trim()) {
+    return payload.message.trim();
   }
 
-  if (typeof data?.reflection === "string" && data.reflection.trim()) {
-    return data.reflection.trim();
+  if (typeof payload.reflection === "string" && payload.reflection.trim()) {
+    return payload.reflection.trim();
   }
 
-  if (Array.isArray(data?.reflection)) {
-    return data.reflection.filter(Boolean).join("\n\n").trim();
+  if (Array.isArray(payload.reflection)) {
+    return payload.reflection.filter(Boolean).join("\n\n").trim();
   }
 
-  if (typeof data?.error === "string" && data.error.trim()) {
-    return data.error.trim();
+  if (typeof payload.error === "string" && payload.error.trim()) {
+    return payload.error.trim();
   }
 
   return "Something interrupted the reflection for a moment. Please try again.";

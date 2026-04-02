@@ -81,7 +81,7 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
   // ── RAF loop ──────────────────────────────────────────────────────────────
 
-  const loop = useCallback((ts: number) => {
+  const loop = useCallback(function loopFrame(ts: number) {
     if (!isRunningRef.current) return;
 
     const phases = PATTERNS[patternRef.current];
@@ -169,8 +169,8 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
       }, 200);
     }
 
-    rafRef.current = requestAnimationFrame(loop);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    rafRef.current = requestAnimationFrame(loopFrame);
+  }, []);
 
   // ── Start / stop ──────────────────────────────────────────────────────────
 

@@ -40,25 +40,34 @@ export default function SiteFooter() {
         }
         .footer-bottom-bar {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
           gap: 16px;
         }
         .footer-bottom-disclaimer {
-          flex: 1;
+          flex: 2;
           text-align: center;
+          min-width: 0;
         }
-        .footer-bottom-left,
+        .footer-bottom-left {
+          flex: 1;
+          min-width: 0;
+        }
         .footer-bottom-right {
           flex: 1;
-        }
-        .footer-bottom-right {
           text-align: right;
+          min-width: 0;
+        }
+        @media (max-width: 900px) {
+          .footer-bottom-bar { align-items: flex-start; flex-wrap: wrap; }
+          .footer-bottom-disclaimer { flex: 100%; text-align: left; order: -1; }
+          .footer-bottom-left { flex: 1; }
+          .footer-bottom-right { flex: 1; }
         }
         @media (max-width: 640px) {
           .footer-grid { flex-direction: column; gap: 28px; }
           .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-          .footer-bottom-disclaimer { text-align: left; }
+          .footer-bottom-disclaimer { flex: unset; width: 100%; }
           .footer-bottom-right { text-align: left; }
         }
       `}</style>
@@ -157,12 +166,10 @@ export default function SiteFooter() {
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
-                  fontSize:   '11px',
+                  fontSize:   '12px',
                   lineHeight: 1.7,
-                  color:      'rgba(255,255,255,0.40)',
+                  color:      'rgba(255,255,255,0.75)',
                   margin:     0,
-                  maxWidth:   '500px',
-                  textAlign:  'center',
                 }}
               >
                 Solace is designed for adults only. It provides reflective support — not medical, psychological, legal, financial, or professional advice.

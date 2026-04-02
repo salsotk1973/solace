@@ -166,7 +166,7 @@ export default function SleepOrb({ userId }: Props) {
 
   // ── RAF loop ──────────────────────────────────────────────────────────────
 
-  const loop = useCallback((ts: number) => {
+  const loop = useCallback(function loopFrame(ts: number) {
     if (!isRunningRef.current) return;
 
     const pat         = patternKeyRef.current;
@@ -288,8 +288,8 @@ export default function SleepOrb({ userId }: Props) {
       }, 200);
     }
 
-    rafRef.current = requestAnimationFrame(loop);
-  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
+    rafRef.current = requestAnimationFrame(loopFrame);
+  }, [userId]);
 
   // ── Start / stop effect ───────────────────────────────────────────────────
 

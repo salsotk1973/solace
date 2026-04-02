@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface Dot {
   id:           number
@@ -26,25 +26,37 @@ const PURPLE_SHADES = [
 ]
 
 export default function LabParticles() {
+  const [isMounted, setIsMounted] = useState(false)
   const [dots, setDots] = useState<Dot[]>([])
 
   useEffect(() => {
-    setDots(
-      Array.from({ length: 100 }, (_, id) => ({
-        id,
-        size:          0.8 + Math.random() * 2.4,
-        left:          2   + Math.random() * 96,
-        bottom:        Math.random() * 20,
-        alpha:         0.08 + Math.random() * 0.28,
-        duration:      14  + Math.random() * 22,
-        delay:         -(Math.random() * 32),
-        ty:            40  + Math.random() * 50,
-        tx:            -50 + Math.random() * 100,
-        rgb:           PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
-        pulseDuration: 2   + Math.random() * 3,
-        pulseDelay:    -(Math.random() * 5),
-      }))
-    )
+    let isActive = true
+    const frameId = window.requestAnimationFrame(() => {
+      if (!isActive) return
+
+      setIsMounted(true)
+      setDots(
+        Array.from({ length: 100 }, (_, id) => ({
+          id,
+          size:          0.8 + Math.random() * 2.4,
+          left:          2   + Math.random() * 96,
+          bottom:        Math.random() * 20,
+          alpha:         0.08 + Math.random() * 0.28,
+          duration:      14  + Math.random() * 22,
+          delay:         -(Math.random() * 32),
+          ty:            40  + Math.random() * 50,
+          tx:            -50 + Math.random() * 100,
+          rgb:           PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
+          pulseDuration: 2   + Math.random() * 3,
+          pulseDelay:    -(Math.random() * 5),
+        })),
+      )
+    })
+
+    return () => {
+      isActive = false
+      window.cancelAnimationFrame(frameId)
+    }
   }, [])
 
   return (
@@ -61,7 +73,7 @@ export default function LabParticles() {
         overflow:      'hidden',
       }}
     >
-      {dots.map(dot => (
+      {isMounted && dots.map(dot => (
         <div
           key={dot.id}
           style={

@@ -87,7 +87,7 @@ export default function HeroSection() {
       timers.current.forEach(clearTimeout);
       timers.current = [];
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── JSX ───────────────────────────────────────────────────────────────────
 

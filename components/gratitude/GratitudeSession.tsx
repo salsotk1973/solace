@@ -107,8 +107,9 @@ export default function GratitudeSession({ userId }: Props) {
 
     load();
 
+    const timersRef = timers.current;
     return () => {
-      timers.current.forEach(clearTimeout);
+      timersRef.forEach(clearTimeout);
     };
   }, [userId]);
 

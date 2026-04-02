@@ -179,7 +179,8 @@ export default function MoodSession({ userId }: Props) {
     }
 
     load();
-    return () => { timers.current.forEach(clearTimeout); };
+    const timersRef = timers.current;
+    return () => { timersRef.forEach(clearTimeout); };
   }, [userId]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────

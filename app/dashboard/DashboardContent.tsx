@@ -334,7 +334,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 margin:     "0 0 6px",
               }}
             >
-              You haven't started a session yet.
+              You haven&apos;t started a session yet.
             </p>
             <Link
               href="/tools"

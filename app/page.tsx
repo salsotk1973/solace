@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/hero/HeroSection";
 import ToolCard from "@/components/tools/ToolCard";
@@ -82,26 +82,38 @@ const PILLS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const [dots, setDots]                   = useState<Dot[]>([]);
   const [labCtaHovered, setLabCtaHovered] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [dots, setDots] = useState<Dot[]>([]);
 
   useEffect(() => {
-    setDots(
-      Array.from({ length: 160 }, (_, id) => ({
-        id,
-        size:         0.8  + Math.random() * 3.0,
-        left:         2    + Math.random() * 96,
-        bottom:       Math.random() * 20,
-        alpha:        0.10 + Math.random() * 0.35,
-        duration:     12   + Math.random() * 20,
-        delay:        -(Math.random() * 32),
-        ty:           40   + Math.random() * 50,
-        tx:           -50  + Math.random() * 100,
-        rgb:          PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
-        pulseDuration: 2   + Math.random() * 3,
-        pulseDelay:   -(Math.random() * 5),
-      }))
-    );
+    let isActive = true;
+    const frameId = window.requestAnimationFrame(() => {
+      if (!isActive) return;
+
+      setIsMounted(true);
+      setDots(
+        Array.from({ length: 160 }, (_, id) => ({
+          id,
+          size:         0.8  + Math.random() * 3.0,
+          left:         2    + Math.random() * 96,
+          bottom:       Math.random() * 20,
+          alpha:        0.10 + Math.random() * 0.35,
+          duration:     12   + Math.random() * 20,
+          delay:        -(Math.random() * 32),
+          ty:           40   + Math.random() * 50,
+          tx:           -50  + Math.random() * 100,
+          rgb:          PURPLE_SHADES[Math.floor(Math.random() * PURPLE_SHADES.length)],
+          pulseDuration: 2   + Math.random() * 3,
+          pulseDelay:   -(Math.random() * 5),
+        })),
+      );
+    });
+
+    return () => {
+      isActive = false;
+      window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   return (
@@ -120,7 +132,7 @@ export default function HomePage() {
           overflow:      "hidden",
         }}
       >
-        {dots.map((dot) => (
+        {isMounted && dots.map((dot) => (
           <div
             key={dot.id}
             style={
@@ -352,7 +364,7 @@ export default function HomePage() {
             }}
           >
             <span style={{ display: "block" }}>
-              Solace doesn't give you{" "}
+              Solace doesn&apos;t give you{" "}
               <em style={{ fontStyle: "normal", fontWeight: 300, color: "rgba(238,232,255,0.94)" }}>
                 answers.
               </em>
