@@ -15,8 +15,9 @@ type AiTool = {
   title: string;
   body: string;
   href: string;
-  accent: string;
-  hoverClass: string;
+  cardClass: string;
+  eyebrowClass: string;
+  leftBorder: string;
 };
 
 const AI_TOOLS: AiTool[] = [
@@ -25,27 +26,30 @@ const AI_TOOLS: AiTool[] = [
     title: "Clear Your Mind",
     body: "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
     href: "/tools/clear-your-mind",
-    accent: "#2dd4bf",
-    hoverClass:
-      "hover:border-teal-400/40 hover:shadow-[0_8px_32px_rgba(45,212,191,0.12)]",
+    cardClass:
+      "border-teal-500/25 bg-teal-500/[0.07] hover:border-teal-500/50 hover:bg-teal-500/[0.12] hover:shadow-[0_8px_32px_rgba(45,212,191,0.1)] transition-all duration-300 hover:-translate-y-0.5",
+    eyebrowClass: "text-teal-400/70",
+    leftBorder: "2px solid rgba(45,212,191,0.5)",
   },
   {
     eyebrow: "WHEN I CAN'T DECIDE",
     title: "Choose",
     body: "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
     href: "/tools/choose",
-    accent: "#f59e0b",
-    hoverClass:
-      "hover:border-amber-400/40 hover:shadow-[0_8px_32px_rgba(245,158,11,0.12)]",
+    cardClass:
+      "border-amber-500/25 bg-amber-500/[0.07] hover:border-amber-500/50 hover:bg-amber-500/[0.12] hover:shadow-[0_8px_32px_rgba(245,158,11,0.1)] transition-all duration-300 hover:-translate-y-0.5",
+    eyebrowClass: "text-amber-400/70",
+    leftBorder: "2px solid rgba(245,158,11,0.5)",
   },
   {
     eyebrow: "WHEN I FEEL OVERWHELMED",
     title: "Break It Down",
     body: "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
     href: "/tools/break-it-down",
-    accent: "#818cf8",
-    hoverClass:
-      "hover:border-indigo-400/40 hover:shadow-[0_8px_32px_rgba(129,140,248,0.12)]",
+    cardClass:
+      "border-indigo-400/25 bg-indigo-400/[0.07] hover:border-indigo-400/50 hover:bg-indigo-400/[0.12] hover:shadow-[0_8px_32px_rgba(129,140,248,0.1)] transition-all duration-300 hover:-translate-y-0.5",
+    eyebrowClass: "text-indigo-400/70",
+    leftBorder: "2px solid rgba(129,140,248,0.5)",
   },
 ];
 
@@ -111,14 +115,14 @@ export default function HomePage() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`ai-tool-card group rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.03)] backdrop-blur-md p-6 min-h-[280px] flex flex-col transition-all duration-300 ease-out hover:-translate-y-1 ${tool.hoverClass}`}
+                  className={`ai-tool-card group rounded-2xl border backdrop-blur-md p-6 min-h-[280px] flex flex-col transform-gpu ${tool.cardClass}`}
+                  style={{ borderLeft: tool.leftBorder }}
                 >
                   <p
-                    className="text-[10px] tracking-[0.16em] uppercase"
+                    className={`text-[10px] tracking-[0.16em] uppercase ${tool.eyebrowClass}`}
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
-                      color: tool.accent,
                     }}
                   >
                     {tool.eyebrow}

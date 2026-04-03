@@ -80,14 +80,20 @@ export function HeroSection() {
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         {/* Line 1 clip */}
         <div className="overflow-hidden">
-          <div className="h-l1 text-5xl font-light leading-[0.95] text-white md:text-7xl [font-family:var(--font-cormorant)]">
-            When your mind is too full
+          <div
+            className="h-l1 text-[45px] md:text-[72px] font-light leading-[0.95] text-white"
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
+            When your mind is too&nbsp;full
           </div>
         </div>
 
         {/* Line 2 clip */}
         <div className="mt-1 overflow-hidden md:mt-2">
-          <div className="h-l2 text-5xl font-light leading-[0.95] text-white md:text-7xl [font-family:var(--font-cormorant)]">
+          <div
+            className="h-l2 text-[45px] md:text-[72px] italic font-light leading-[0.95] text-white"
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
             to think clearly.
           </div>
         </div>
