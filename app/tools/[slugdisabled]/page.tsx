@@ -4,6 +4,7 @@ import ToolIntro from "@/components/tool-interface/ToolIntro";
 import ThreadContainer from "@/components/tool-interface/ThreadContainer";
 import { getToolDefinition, TOOL_REGISTRY } from "@/lib/tools/tool-registry";
 import PageShell from "@/components/PageShell";
+import BgFlat from "@/components/backgrounds/BgFlat";
 
 type ToolPageProps = {
   params: Promise<{
@@ -64,13 +65,15 @@ export default async function ToolPage({ params }: ToolPageProps) {
   const accentClasses = getToolAccentClasses(tool.colorToken);
 
   return (
-    <PageShell>
-      <div className="solace-page-shell">
-        <div className={`rounded-[32px] border p-6 md:p-8 ${accentClasses}`}>
-          <ToolIntro title={tool.title} subtitle={tool.subtitle} />
-          <ThreadContainer toolSlug={tool.slug} />
+    <PageShell particles={false}>
+      <BgFlat>
+        <div className="solace-page-shell">
+          <div className={`rounded-[32px] border p-6 md:p-8 ${accentClasses}`}>
+            <ToolIntro title={tool.title} subtitle={tool.subtitle} />
+            <ThreadContainer toolSlug={tool.slug} />
+          </div>
         </div>
-      </div>
+      </BgFlat>
     </PageShell>
   );
 }

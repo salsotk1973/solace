@@ -3,6 +3,7 @@ import Link from "next/link";
 import DashboardContent, { type ToolSession } from "./DashboardContent";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import PageShell from "@/components/PageShell";
+import BgFlat from "@/components/backgrounds/BgFlat";
 
 export const metadata = {
   title: "Dashboard — Solace",
@@ -93,21 +94,23 @@ export default async function DashboardPage() {
   ).length;
 
   return (
-    <PageShell>
-      <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
-        <DashboardContent
-          data={{
-            firstName,
-            email,
-            plan,
-            sessions,
-            totalSessions,
-            distinctTools,
-            streak,
-            weekSessions,
-          }}
-        />
-      </div>
+    <PageShell particles={false}>
+      <BgFlat>
+        <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
+          <DashboardContent
+            data={{
+              firstName,
+              email,
+              plan,
+              sessions,
+              totalSessions,
+              distinctTools,
+              streak,
+              weekSessions,
+            }}
+          />
+        </div>
+      </BgFlat>
     </PageShell>
   );
 }
@@ -120,25 +123,26 @@ function DashboardSignedOutState({
   description: string;
 }) {
   return (
-    <PageShell>
-      <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "0 40px",
-            boxSizing: "border-box",
-          }}
-        >
-          <section
+    <PageShell particles={false}>
+      <BgFlat>
+        <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
+          <div
             style={{
-              borderRadius: "24px",
-              padding: "40px clamp(24px, 4vw, 48px)",
-              background: "linear-gradient(145deg, rgba(12, 10, 30, 0.92), rgba(8, 9, 26, 0.92))",
-              border: "0.5px solid rgba(100,92,148,0.18)",
-              boxShadow: "0 20px 70px rgba(3, 5, 10, 0.32)",
+              maxWidth: "1100px",
+              margin: "0 auto",
+              padding: "0 40px",
+              boxSizing: "border-box",
             }}
           >
+            <section
+              style={{
+                borderRadius: "24px",
+                padding: "40px clamp(24px, 4vw, 48px)",
+                background: "linear-gradient(145deg, rgba(12, 10, 30, 0.92), rgba(8, 9, 26, 0.92))",
+                border: "0.5px solid rgba(100,92,148,0.18)",
+                boxShadow: "0 20px 70px rgba(3, 5, 10, 0.32)",
+              }}
+            >
             <p
               style={{
                 margin: "0 0 14px",
@@ -220,9 +224,10 @@ function DashboardSignedOutState({
                 Explore tools
               </Link>
             </div>
-          </section>
+            </section>
+          </div>
         </div>
-      </div>
+      </BgFlat>
     </PageShell>
   );
 }

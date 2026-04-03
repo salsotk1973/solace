@@ -1,17 +1,19 @@
 import PageShell from "@/components/PageShell";
+import BgFlat from "@/components/backgrounds/BgFlat";
 
 export default function SignUpPage() {
   return (
-    <PageShell>
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "24px",
-        }}
-      >
+    <PageShell particles={false}>
+      <BgFlat>
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+          }}
+        >
         <section
           style={{
             width: "100%",
@@ -149,7 +151,8 @@ export default function SignUpPage() {
             </a>
           </p>
         </section>
-      </div>
+        </div>
+      </BgFlat>
     </PageShell>
   );
 }

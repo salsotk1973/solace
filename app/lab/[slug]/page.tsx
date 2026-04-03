@@ -6,6 +6,7 @@ import { getAllArticles, getArticleBySlug, getArticlesByCategory } from '@/lib/l
 import LabToolCta            from '@/components/lab/LabToolCta'
 import RelatedArticles       from '@/components/lab/RelatedArticles'
 import PageShell             from '@/components/PageShell'
+import BgFlat                from '@/components/backgrounds/BgFlat'
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
@@ -123,7 +124,8 @@ export default async function ArticlePage(
   }
 
   return (
-    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
+    <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
+      <BgFlat>
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -326,6 +328,7 @@ export default async function ArticlePage(
           </div>
 
         </div>
+      </BgFlat>
     </PageShell>
   )
 }

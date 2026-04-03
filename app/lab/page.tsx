@@ -3,6 +3,7 @@ import LabFilter      from '@/components/lab/LabFilter'
 import NewsletterForm from '@/components/lab/NewsletterForm'
 import LabCtaButton   from '@/components/lab/LabCtaButton'
 import PageShell      from '@/components/PageShell'
+import BgFlat         from '@/components/backgrounds/BgFlat'
 
 export default function LabPage() {
   const featured    = getFeaturedArticle()
@@ -10,7 +11,8 @@ export default function LabPage() {
   const nonFeatured = allArticles.filter(a => !a.featured)
 
   return (
-    <PageShell style={{ color: 'rgba(225,218,252,0.85)' }}>
+    <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
+      <BgFlat>
 
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 1 — HERO
@@ -216,6 +218,7 @@ export default function LabPage() {
           </div>
         </section>
 
+      </BgFlat>
     </PageShell>
   )
 }

@@ -69,6 +69,11 @@
   to   { color: rgba(155,147,200,0.52); }
 }
 
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.06); }
+  50% { box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.10); }
+}
+
 /* --------------------------------------------------
    RESET
 -------------------------------------------------- */
@@ -94,6 +99,19 @@ body {
   font-family: var(--font-body, 'Jost', sans-serif);
   color: #172033;
   background: #090d14;
+}
+
+@keyframes solace-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.0); }
+  50%       { box-shadow: 0 0 24px 6px rgba(255, 255, 255, 0.07); }
+}
+
+.hero-cta a {
+  animation: solace-breathe 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta a { animation: none; }
 }
 
 /* --------------------------------------------------

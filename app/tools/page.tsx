@@ -3,6 +3,7 @@ import ToolCard     from "@/components/tools/ToolCard";
 import FamilyGroup  from "@/components/tools/FamilyGroup";
 import FaqAccordion from "@/components/tools/FaqAccordion";
 import PageShell from "@/components/PageShell";
+import BgSubtle from "@/components/backgrounds/BgSubtle";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -171,12 +172,13 @@ const NOTICE_WHATS_GOOD = [
 
 export default function ToolsPage() {
   return (
-    <PageShell>
-      {/* FAQ JSON-LD — Google reads this from anywhere in the document */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+    <PageShell particles={false}>
+      <BgSubtle>
+        {/* FAQ JSON-LD — Google reads this from anywhere in the document */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
 
         <div className="max-w-[900px] mx-auto px-6">
 
@@ -266,6 +268,7 @@ export default function ToolsPage() {
           </p>
 
         </div>
+      </BgSubtle>
     </PageShell>
   );
 }

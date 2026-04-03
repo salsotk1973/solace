@@ -1,450 +1,225 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import HeroSection from "@/components/hero/HeroSection";
-import ToolCard from "@/components/tools/ToolCard";
-import { SOLACE_ROUTES } from "@/lib/solace/routes";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PageShell from "@/components/PageShell";
+import { HeroSection } from "@/components/HeroSection";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const REALMS = [
+type AiTool = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  accent: string;
+  hoverClass: string;
+};
+
+const AI_TOOLS: AiTool[] = [
   {
-    id:      "emerald",
-    tag:     "When my mind won't stop",
-    name:    "Clear Your Mind",
-    line:    "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
-    href:    SOLACE_ROUTES.clearYourMind,
-    colour:  "rgba(68,200,110,1)",
-    bg:      "linear-gradient(145deg, #0a1a12, #0d2018, #081610)",
+    eyebrow: "WHEN MY MIND WON'T STOP",
+    title: "Clear Your Mind",
+    body: "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
+    href: "/tools/clear-your-mind",
+    accent: "#2dd4bf",
+    hoverClass:
+      "hover:border-teal-400/40 hover:shadow-[0_8px_32px_rgba(45,212,191,0.12)]",
   },
   {
-    id:      "azure",
-    tag:     "When I can't decide",
-    name:    "Choose",
-    line:    "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
-    href:    SOLACE_ROUTES.choose,
-    colour:  "rgba(68,138,228,1)",
-    bg:      "linear-gradient(145deg, #080e1a, #0c1428, #080c18)",
+    eyebrow: "WHEN I CAN'T DECIDE",
+    title: "Choose",
+    body: "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
+    href: "/tools/choose",
+    accent: "#f59e0b",
+    hoverClass:
+      "hover:border-amber-400/40 hover:shadow-[0_8px_32px_rgba(245,158,11,0.12)]",
   },
   {
-    id:      "amber",
-    tag:     "When I feel overwhelmed",
-    name:    "Break It Down",
-    line:    "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
-    href:    SOLACE_ROUTES.breakItDown,
-    colour:  "rgba(218,148,48,1)",
-    bg:      "linear-gradient(145deg, #1a1008, #281808, #180e04)",
+    eyebrow: "WHEN I FEEL OVERWHELMED",
+    title: "Break It Down",
+    body: "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
+    href: "/tools/break-it-down",
+    accent: "#818cf8",
+    hoverClass:
+      "hover:border-indigo-400/40 hover:shadow-[0_8px_32px_rgba(129,140,248,0.12)]",
   },
 ];
 
 const FREE_TOOLS = [
-  { name: 'Breathing',       href: '/breathing', accent: 'rgba(60,190,210,1)' },
-  { name: 'Focus Timer',     href: '/focus',     accent: 'rgba(240,170,70,1)' },
-  { name: 'Sleep Wind-Down', href: '/sleep',     accent: 'rgba(140,120,210,1)' },
-  { name: 'Thought Reframer',href: '/reframe',   accent: 'rgba(130,185,140,1)' },
-  { name: 'Mood Tracker',    href: '/mood',      accent: 'rgba(210,150,165,1)' },
-  { name: 'Gratitude Log',   href: '/gratitude', accent: 'rgba(220,175,80,1)' },
-]
-
-const PILLS = [
-  "Not medical advice",
-  "Private by design",
-  "No data sold",
-  "Adult use only",
+  { name: "Breathing", href: "/tools/breathing" },
+  { name: "Focus Timer", href: "/tools/focus-timer" },
+  { name: "Sleep Wind-Down", href: "/tools/sleep-wind-down" },
+  { name: "Thought Reframer", href: "/tools/thought-reframer" },
+  { name: "Mood Tracker", href: "/tools/mood-tracker" },
+  { name: "Gratitude Log", href: "/tools/gratitude-log" },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function HomePage() {
-  const [labCtaHovered, setLabCtaHovered] = useState(false);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+
+  // ── Section headline parallax ────────────────────────────────────────
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.to(".ai-section-headline", {
+          y: -24,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".ai-tools-section",
+            start: "top bottom",
+            end: "center center",
+            scrub: 1.5,
+          },
+        });
+      });
+      return () => mm.revert();
+    },
+    { scope: heroRef },
+  );
 
   return (
-    <PageShell>
-      <div style={{ position: "relative", zIndex: 3 }}>
+    <PageShell particles={false}>
+      <div ref={heroRef}>
+        {/* ── Hero ──────────────────────────────────────────────────── */}
+        <HeroSection />
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <HeroSection />
+        {/* ── AI Tools ─────────────────────────────────────────────── */}
+        <section id="tools" className="ai-tools-section py-24 md:py-32">
+          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
+            <p
+              className="text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
+            >
+              WHEN YOU NEED CLARITY
+            </p>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 1 — THREE REALMS
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section
-        style={{
-          width:     "100%",
-          padding:   "0 40px 120px",
-          boxSizing: "border-box",
-        }}
-      >
-        {/* Intro */}
-        <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
-          <p
-            style={{
-              fontFamily:    "'Jost', sans-serif",
-              fontWeight:    400,
-              fontSize:      "10px",
-              letterSpacing: "0.24em",
-              textTransform: "uppercase",
-              color:         "rgba(185,175,220,0.65)",
-              margin:        "0 0 18px",
-            }}
-          >
-            Three realms. One for each kind of moment.
-          </p>
-          <h2
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontWeight: 300,
-              fontSize:   "clamp(26px, 3.2vw, 40px)",
-              color:      "rgba(235,228,255,0.85)",
-              lineHeight: 1.25,
-              margin:     0,
-            }}
-          >
-            Start from{" "}
-            <em style={{ fontStyle: "italic" }}>how it feels</em>
-            {" "}— not what it is.
-          </h2>
-        </div>
+            <h3
+              className="ai-section-headline mt-5 text-4xl md:text-5xl font-light leading-[1.15] text-[rgba(236,232,248,0.92)]"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              Start from <em className="italic">how it feels</em> — not what
+              it is.
+            </h3>
 
-        {/* ── Free tools compact grid ──────────────────────────────────── */}
-        <div style={{ maxWidth: "1000px", margin: "0 auto 52px" }}>
-          <p
-            style={{
-              fontFamily:    "'Jost', sans-serif",
-              fontWeight:    400,
-              fontSize:      "9px",
-              letterSpacing: "0.26em",
-              textTransform: "uppercase",
-              color:         "rgba(155,145,200,0.42)",
-              textAlign:     "center",
-              margin:        "0 0 16px",
-            }}
-          >
-            Free tools — start here
-          </p>
-          <div
-            style={{
-              display:             "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap:                 "10px",
-            }}
-          >
-            {FREE_TOOLS.map(tool => {
-              const bg     = tool.accent.replace(/,[\d.]+\)$/, ',0.09)')
-              const border = tool.accent.replace(/,[\d.]+\)$/, ',0.18)')
-              return (
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+              {AI_TOOLS.map((tool) => (
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  style={{
-                    display:         "flex",
-                    alignItems:      "center",
-                    justifyContent:  "space-between",
-                    borderRadius:    "10px",
-                    padding:         "14px 18px",
-                    background:      bg,
-                    border:          `0.5px solid ${border}`,
-                    backdropFilter:  "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    textDecoration:  "none",
-                    transition:      "border-color 0.3s ease, background 0.3s ease",
-                    boxSizing:       "border-box",
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = tool.accent.replace(/,[\d.]+\)$/, ',0.32)')
-                    e.currentTarget.style.background = tool.accent.replace(/,[\d.]+\)$/, ',0.14)')
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = border
-                    e.currentTarget.style.background = bg
-                  }}
+                  className={`ai-tool-card group rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.03)] backdrop-blur-md p-6 min-h-[280px] flex flex-col transition-all duration-300 ease-out hover:-translate-y-1 ${tool.hoverClass}`}
                 >
-                  <span
+                  <p
+                    className="text-[10px] tracking-[0.16em] uppercase"
                     style={{
-                      fontFamily:    "'Jost', sans-serif",
-                      fontWeight:    400,
-                      fontSize:      "12px",
-                      letterSpacing: "0.02em",
-                      color:         "rgba(210,204,240,0.82)",
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: 400,
+                      color: tool.accent,
                     }}
                   >
-                    {tool.name}
-                  </span>
-                  <span
+                    {tool.eyebrow}
+                  </p>
+                  <p
+                    className="mt-4 text-[34px] leading-[1.02] text-[rgba(240,236,252,0.95)]"
                     style={{
-                      fontSize: "14px",
-                      color:    tool.accent.replace(/,[\d.]+\)$/, ',0.55)'),
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontWeight: 300,
                     }}
                   >
-                    →
+                    {tool.title}
+                  </p>
+                  <p
+                    className="mt-4 text-[14px] leading-[1.85] text-[rgba(203,197,228,0.76)]"
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: 300,
+                    }}
+                  >
+                    {tool.body}
+                  </p>
+                  <span
+                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase text-[rgba(214,206,238,0.82)] opacity-40 transition-all duration-200 group-hover:translate-x-1.5 group-hover:opacity-100"
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: 400,
+                    }}
+                  >
+                    Open tool →
                   </span>
                 </Link>
-              )
-            })}
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Three-column grid */}
-        <div
-          style={{
-            display:             "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap:                 "14px",
-            maxWidth:            "1000px",
-            margin:              "0 auto",
-          }}
-        >
-          {REALMS.map((card) => (
-            <ToolCard
-              key={card.id}
-              tag={card.tag}
-              name={card.name}
-              line={card.line}
-              href={card.href}
-              colour={card.colour}
-              bg={card.bg}
-              minHeight="300px"
-            />
-          ))}
-        </div>
-
-        {/* See all tools link */}
-        <div style={{ textAlign: "center", marginTop: "28px" }}>
-          <Link
-            href="/tools"
-            style={{
-              fontFamily:    "'Jost', sans-serif",
-              fontWeight:    300,
-              fontSize:      "11px",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color:         "rgba(148,140,188,0.38)",
-              textDecoration: "none",
-            }}
-          >
-            See all tools →
-          </Link>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 2 — TRUST MOMENT
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section
-        style={{
-          width:      "100%",
-          padding:    "100px 40px",
-          boxSizing:  "border-box",
-        }}
-      >
-        {/* Quote + pills block */}
-        <div
-          style={{
-            display:        "flex",
-            flexDirection:  "column",
-            alignItems:     "center",
-            justifyContent: "center",
-            gap:            "36px",
-            textAlign:      "center",
-            maxWidth:       "560px",
-            margin:         "0 auto",
-          }}
-        >
-          <blockquote
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontWeight: 300,
-              fontStyle:  "italic",
-              fontSize:   "clamp(28px, 3.4vw, 42px)",
-              lineHeight: 1.45,
-              color:      "rgba(215,208,248,0.72)",
-              margin:     0,
-              padding:    0,
-            }}
-          >
-            <span style={{ display: "block" }}>
-              Solace doesn&apos;t give you{" "}
-              <em style={{ fontStyle: "normal", fontWeight: 300, color: "rgba(238,232,255,0.94)" }}>
-                answers.
-              </em>
-            </span>
-            <span style={{ display: "block" }}>
-              It helps you find{" "}
-              <em style={{ fontStyle: "normal", fontWeight: 300, color: "rgba(238,232,255,0.94)" }}>
-                your own.
-              </em>
-            </span>
-          </blockquote>
-
-          <div
-            style={{
-              display:        "flex",
-              flexDirection:  "row",
-              justifyContent: "center",
-              gap:            "10px",
-              flexWrap:       "wrap",
-            }}
-          >
-            {PILLS.map((pill) => (
-              <span
-                key={pill}
-                style={{
-                  fontFamily:    "'Jost', sans-serif",
-                  fontWeight:    400,
-                  fontSize:      "10px",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color:         "rgba(138,130,182,0.38)",
-                  border:        "0.5px solid rgba(138,130,182,0.11)",
-                  padding:       "6px 14px",
-                  borderRadius:  "100px",
-                }}
-              >
-                {pill}
-              </span>
-            ))}
-          </div>
-        </div>
-
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 3 — THE LAB
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section
-        style={{
-          width:          "100%",
-          padding:        "0 40px 100px",
-          boxSizing:      "border-box",
-          display:        "flex",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            position:     "relative",
-            maxWidth:     "1000px",
-            width:        "100%",
-            borderRadius: "22px",
-            padding:      "60px 64px",
-            background:   "linear-gradient(135deg, #0e0c22, #0a0818, #0c0a1e)",
-            border:       "0.5px solid rgba(120,100,195,0.13)",
-            overflow:     "hidden",
-            boxSizing:    "border-box",
-          }}
-        >
-          {/* Top shimmer */}
-          <div
-            aria-hidden="true"
-            style={{
-              position:      "absolute",
-              top:           0,
-              left:          "15%",
-              right:         "15%",
-              height:        "1px",
-              background:    "linear-gradient(90deg, transparent, rgba(138,116,212,0.2), transparent)",
-              pointerEvents: "none",
-            }}
-          />
-
-          {/* Content */}
-          <div style={{ position: "relative", zIndex: 1 }}>
+        {/* ── Free Tools ───────────────────────────────────────────── */}
+        <section className="free-tools-section py-16 md:py-24">
+          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
-              style={{
-                fontFamily:    "'Jost', sans-serif",
-                fontWeight:    400,
-                fontSize:      "10px",
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color:         "rgba(130,112,200,0.42)",
-                margin:        "0 0 20px",
-              }}
+              className="text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
             >
-              Inside the Lab
+              FREE — START HERE
             </p>
 
-            <h2
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontSize:   "clamp(26px, 2.8vw, 38px)",
-                lineHeight: 1.28,
-                margin:     "0 0 18px",
-                maxWidth:   "520px",
-              }}
-            >
-              <span style={{ color: "rgba(230,222,255,0.9)", display: "block" }}>
-                A growing space for understanding
-              </span>
-              <em style={{ color: "rgba(192,172,248,0.65)", fontStyle: "italic", display: "block" }}>
-                how people think, feel, and decide.
-              </em>
-            </h2>
+            <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {FREE_TOOLS.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="free-tool-card rounded-xl border border-white/10 bg-[rgba(255,255,255,0.02)] backdrop-blur-md px-5 py-4 text-[rgba(217,211,238,0.88)] hover:border-white/20 transition-colors duration-200 flex items-center justify-between gap-4"
+                  style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontWeight: 300,
+                    fontSize: "14px",
+                  }}
+                >
+                  <span>{tool.name}</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
-            <p
-              style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize:   "13px",
-                color:      "rgba(135,128,178,0.52)",
-                lineHeight: 1.8,
-                margin:     "0 0 36px",
-                maxWidth:   "440px",
-              }}
-            >
-              The Digital Human Behaviour Lab sits behind Solace — observing patterns,
-              studying responses, and using what it learns to make every interaction
-              calmer and more useful.
-            </p>
-
+        {/* ── Lab link ─────────────────────────────────────────────── */}
+        <section className="py-10">
+          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24 text-center">
             <Link
               href="/lab"
-              onMouseEnter={() => setLabCtaHovered(true)}
-              onMouseLeave={() => setLabCtaHovered(false)}
-              style={{
-                display:        "inline-flex",
-                alignItems:     "center",
-                gap:            "10px",
-                cursor:         "pointer",
-                textDecoration: "none",
-                color:          labCtaHovered ? "rgba(200,185,245,0.82)" : "rgba(168,152,225,0.45)",
-                transition:     "color 0.4s ease",
-              }}
+              className="text-[14px] text-[rgba(203,197,228,0.74)] hover:text-[rgba(221,215,242,0.9)] transition-colors duration-200"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
             >
-              <span
-                style={{
-                  fontFamily:    "'Jost', sans-serif",
-                  fontWeight:    400,
-                  fontSize:      "11px",
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  display:       "inline-block",
-                  transform:     labCtaHovered ? "translateX(-2px)" : "translateX(0)",
-                  transition:    "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-                }}
-              >
-                Enter the Lab
-              </span>
-              <span
-                style={{
-                  fontSize:   "16px",
-                  display:    "inline-block",
-                  lineHeight: 1,
-                  opacity:    labCtaHovered ? 1 : 0.4,
-                  transform:  labCtaHovered ? "translateX(6px)" : "translateX(0)",
-                  transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1)",
-                }}
-              >
-                →
-              </span>
+              From the Lab: How to calm an anxious mind →
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      </div>{/* end content wrapper */}
+        {/* ── Pricing nudge ────────────────────────────────────────── */}
+        <section className="py-16 text-center">
+          <div className="max-w-3xl mx-auto px-6">
+            <p
+              className="text-[15px] leading-[1.8] text-[rgba(206,199,232,0.78)]"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
+            >
+              Full access from A$9.92/month — less than a coffee.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-2.5 text-[11px] tracking-[0.16em] uppercase text-[rgba(214,206,238,0.82)] transition-colors duration-200 hover:text-[rgba(233,228,250,0.98)] hover:border-white/35"
+                style={{ fontFamily: "'Jost', sans-serif" }}
+              >
+                See plans →
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
     </PageShell>
   );
 }

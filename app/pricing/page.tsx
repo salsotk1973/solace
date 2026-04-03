@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import BgSubtle from "@/components/backgrounds/BgSubtle";
 
 const FREE_FEATURES = [
   "Access to all 6 tools",
@@ -78,12 +79,13 @@ export default function PricingPage() {
   const annualTotal   = "A$119";
 
   return (
-    <PageShell>
-      {/* JSON-LD FAQ Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
-      />
+    <PageShell particles={false}>
+      <BgSubtle>
+        {/* JSON-LD FAQ Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
+        />
 
         <div style={{ position: "relative", zIndex: 3 }}>
 
@@ -899,6 +901,7 @@ export default function PricingPage() {
           </section>
 
         </div>{/* end content wrapper */}
+      </BgSubtle>
     </PageShell>
   );
 }
