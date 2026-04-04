@@ -53,28 +53,12 @@ export function HeroSection() {
   return (
     <section
       ref={rootRef}
-      className="relative h-screen flex items-center justify-center overflow-hidden px-6"
+      className="relative min-h-[80vh] md:min-h-[82vh] flex items-center justify-center overflow-hidden px-6"
     >
       {/* SEO h1 */}
       <h1 className="sr-only">
         Mental clarity tools for anxiety, focus, and overwhelm
       </h1>
-
-      {/* Subtle CSS atmosphere — no canvas, no JS */}
-      <div
-        className="pointer-events-none"
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: '100%',
-          background:
-            'radial-gradient(circle at 20% 30%, rgba(45,212,191,0.06), transparent 30%), radial-gradient(circle at 80% 25%, rgba(129,140,248,0.05), transparent 28%), radial-gradient(circle at 50% 85%, rgba(245,158,11,0.04), transparent 30%)',
-        }}
-      />
 
       {/* Headline */}
       <div className="relative z-10 mx-auto max-w-4xl text-center">

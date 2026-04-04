@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PageShell from "@/components/PageShell";
 import { HeroSection } from "@/components/HeroSection";
+import { SolaceShaderBg } from "@/components/SolaceShaderBg";
+import { SolaceAmbientDust } from "@/components/SolaceAmbientDust";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -15,9 +17,10 @@ type AiTool = {
   title: string;
   body: string;
   href: string;
-  cardClass: string;
-  eyebrowClass: string;
-  leftBorder: string;
+  themeClass: string;
+  borderLeftColor: string;
+  eyebrowColor: string;
+  ctaColor: string;
 };
 
 const AI_TOOLS: AiTool[] = [
@@ -26,74 +29,145 @@ const AI_TOOLS: AiTool[] = [
     title: "Clear Your Mind",
     body: "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
     href: "/tools/clear-your-mind",
-    cardClass:
-      "border-teal-500/25 bg-teal-500/[0.07] hover:border-teal-500/50 hover:bg-teal-500/[0.12] hover:shadow-[0_8px_32px_rgba(45,212,191,0.1)] transition-all duration-300 hover:-translate-y-0.5",
-    eyebrowClass: "text-teal-400/70",
-    leftBorder: "2px solid rgba(45,212,191,0.5)",
+    themeClass:
+      "border-teal-500/20 bg-teal-500/[0.06] hover:border-teal-500/35 hover:bg-teal-500/[0.09] hover:shadow-[0_12px_36px_rgba(45,212,191,0.10)]",
+    borderLeftColor: "rgba(45,212,191,0.5)",
+    eyebrowColor: "rgba(45,212,191,0.7)",
+    ctaColor: "rgba(45,212,191,0.78)",
   },
   {
     eyebrow: "WHEN I CAN'T DECIDE",
     title: "Choose",
     body: "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
     href: "/tools/choose",
-    cardClass:
-      "border-amber-500/25 bg-amber-500/[0.07] hover:border-amber-500/50 hover:bg-amber-500/[0.12] hover:shadow-[0_8px_32px_rgba(245,158,11,0.1)] transition-all duration-300 hover:-translate-y-0.5",
-    eyebrowClass: "text-amber-400/70",
-    leftBorder: "2px solid rgba(245,158,11,0.5)",
+    themeClass:
+      "border-amber-500/20 bg-amber-500/[0.06] hover:border-amber-500/35 hover:bg-amber-500/[0.09] hover:shadow-[0_12px_36px_rgba(245,158,11,0.10)]",
+    borderLeftColor: "rgba(245,158,11,0.5)",
+    eyebrowColor: "rgba(245,158,11,0.7)",
+    ctaColor: "rgba(245,158,11,0.78)",
   },
   {
     eyebrow: "WHEN I FEEL OVERWHELMED",
     title: "Break It Down",
     body: "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
     href: "/tools/break-it-down",
-    cardClass:
-      "border-indigo-400/25 bg-indigo-400/[0.07] hover:border-indigo-400/50 hover:bg-indigo-400/[0.12] hover:shadow-[0_8px_32px_rgba(129,140,248,0.1)] transition-all duration-300 hover:-translate-y-0.5",
-    eyebrowClass: "text-indigo-400/70",
-    leftBorder: "2px solid rgba(129,140,248,0.5)",
+    themeClass:
+      "border-indigo-400/20 bg-indigo-400/[0.06] hover:border-indigo-400/35 hover:bg-indigo-400/[0.09] hover:shadow-[0_12px_36px_rgba(129,140,248,0.10)]",
+    borderLeftColor: "rgba(129,140,248,0.5)",
+    eyebrowColor: "rgba(129,140,248,0.7)",
+    ctaColor: "rgba(129,140,248,0.78)",
   },
 ];
 
 const FREE_TOOLS = [
-  { name: "Breathing", href: "/tools/breathing" },
-  { name: "Focus Timer", href: "/tools/focus-timer" },
-  { name: "Sleep Wind-Down", href: "/tools/sleep-wind-down" },
-  { name: "Thought Reframer", href: "/tools/thought-reframer" },
-  { name: "Mood Tracker", href: "/tools/mood-tracker" },
-  { name: "Gratitude Log", href: "/tools/gratitude-log" },
+  { name: "Breathing", href: "/tools/breathing", tone: "teal" as const },
+  { name: "Focus Timer", href: "/tools/focus-timer", tone: "indigo" as const },
+  { name: "Sleep Wind-Down", href: "/tools/sleep-wind-down", tone: "amber" as const },
+  { name: "Thought Reframer", href: "/tools/thought-reframer", tone: "teal" as const },
+  { name: "Mood Tracker", href: "/tools/mood-tracker", tone: "indigo" as const },
+  { name: "Gratitude Log", href: "/tools/gratitude-log", tone: "amber" as const },
 ];
 
+const FREE_TOOL_THEME: Record<
+  "teal" | "indigo" | "amber",
+  { className: string; accent: string; arrow: string }
+> = {
+  teal: {
+    className: "border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.045)] hover:border-[rgba(45,212,191,0.34)] hover:bg-[rgba(45,212,191,0.07)]",
+    accent: "rgba(45,212,191,0.55)",
+    arrow: "rgba(45,212,191,0.72)",
+  },
+  indigo: {
+    className: "border-[rgba(129,140,248,0.22)] bg-[rgba(129,140,248,0.045)] hover:border-[rgba(129,140,248,0.34)] hover:bg-[rgba(129,140,248,0.07)]",
+    accent: "rgba(129,140,248,0.55)",
+    arrow: "rgba(129,140,248,0.72)",
+  },
+  amber: {
+    className: "border-[rgba(245,158,11,0.22)] bg-[rgba(245,158,11,0.045)] hover:border-[rgba(245,158,11,0.34)] hover:bg-[rgba(245,158,11,0.07)]",
+    accent: "rgba(245,158,11,0.55)",
+    arrow: "rgba(245,158,11,0.72)",
+  },
+};
+
 export default function HomePage() {
-  const heroRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef<HTMLDivElement | null>(null);
+  const [latestLab, setLatestLab] = useState<{ title: string; slug: string } | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const res = await fetch("/api/lab/latest", { signal: controller.signal });
+        if (!res.ok) return;
+        const data = (await res.json()) as { title?: string; slug?: string };
+        if (data.title && data.slug) {
+          setLatestLab({ title: data.title, slug: data.slug });
+        }
+      } catch {
+        // Keep fallback teaser copy if latest article lookup fails.
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
 
   // ── Section headline parallax ────────────────────────────────────────
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.to(".ai-section-headline", {
-          y: -24,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".ai-tools-section",
-            start: "top bottom",
-            end: "center center",
-            scrub: 1.5,
-          },
-        });
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReduced) return;
+
+      gsap.to(".ai-section-headline", {
+        y: -24,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".ai-tools-section",
+          start: "top bottom",
+          end: "center center",
+          scrub: 1.5,
+        },
       });
-      return () => mm.revert();
+
+      gsap.from(".ai-tool-card", {
+        opacity: 0,
+        y: 28,
+        duration: 0.75,
+        stagger: 0.12,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".ai-tools-section",
+          start: "top 82%",
+          once: true,
+        },
+      });
+
+      gsap.from(".free-tool-card", {
+        opacity: 0,
+        y: 16,
+        duration: 0.5,
+        stagger: 0.06,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".free-tools-section",
+          start: "top 88%",
+          once: true,
+        },
+      });
     },
-    { scope: heroRef },
+    { scope: pageRef },
   );
 
   return (
     <PageShell particles={false}>
-      <div ref={heroRef}>
+      <SolaceShaderBg enabled />
+      <SolaceAmbientDust />
+      <div ref={pageRef} className="relative z-10">
         {/* ── Hero ──────────────────────────────────────────────────── */}
         <HeroSection />
 
         {/* ── AI Tools ─────────────────────────────────────────────── */}
-        <section id="tools" className="ai-tools-section py-24 md:py-32">
+        <section id="tools" className="ai-tools-section pt-12 pb-10 md:pt-16 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
               className="text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
@@ -115,14 +189,15 @@ export default function HomePage() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`ai-tool-card group rounded-2xl border backdrop-blur-md p-6 min-h-[280px] flex flex-col transform-gpu ${tool.cardClass}`}
-                  style={{ borderLeft: tool.leftBorder }}
+                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-6 min-h-[280px] flex flex-col transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
+                  style={{ borderLeftColor: tool.borderLeftColor }}
                 >
                   <p
-                    className={`text-[10px] tracking-[0.16em] uppercase ${tool.eyebrowClass}`}
+                    className="text-[10px] tracking-[0.16em] uppercase"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
+                      color: tool.eyebrowColor,
                     }}
                   >
                     {tool.eyebrow}
@@ -146,10 +221,11 @@ export default function HomePage() {
                     {tool.body}
                   </p>
                   <span
-                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase text-[rgba(214,206,238,0.82)] opacity-40 transition-all duration-200 group-hover:translate-x-1.5 group-hover:opacity-100"
+                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-50 group-hover:opacity-90 group-hover:translate-x-1"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
+                      color: tool.ctaColor,
                     }}
                   >
                     Open tool →
@@ -161,10 +237,10 @@ export default function HomePage() {
         </section>
 
         {/* ── Free Tools ───────────────────────────────────────────── */}
-        <section className="free-tools-section py-16 md:py-24">
+        <section id="free-tools" className="free-tools-section pb-16 md:pb-24">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
+              className="text-[10px] tracking-[0.2em] uppercase text-[rgba(174,168,205,0.5)]"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
             >
               FREE — START HERE
@@ -172,10 +248,10 @@ export default function HomePage() {
 
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {FREE_TOOLS.map((tool) => (
-                <Link
+                <a
                   key={tool.href}
                   href={tool.href}
-                  className="free-tool-card rounded-xl border border-white/10 bg-[rgba(255,255,255,0.02)] backdrop-blur-md px-5 py-4 text-[rgba(217,211,238,0.88)] hover:border-white/20 transition-colors duration-200 flex items-center justify-between gap-4"
+                  className={`free-tool-card group relative overflow-hidden rounded-xl border px-5 py-4 text-[rgba(217,211,238,0.88)] transition-all duration-200 ease-out hover:-translate-y-0.5 flex items-center justify-between gap-4 ${FREE_TOOL_THEME[tool.tone].className}`}
                   style={{
                     fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
@@ -183,22 +259,33 @@ export default function HomePage() {
                   }}
                 >
                   <span>{tool.name}</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
+                  <span
+                    aria-hidden="true"
+                    className="transition-all duration-200 opacity-45 group-hover:opacity-80 group-hover:translate-x-1"
+                    style={{ color: FREE_TOOL_THEME[tool.tone].arrow }}
+                  >
+                    →
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-0 left-4 right-4 h-px"
+                    style={{ background: FREE_TOOL_THEME[tool.tone].accent }}
+                  />
+                </a>
               ))}
             </div>
           </div>
         </section>
 
         {/* ── Lab link ─────────────────────────────────────────────── */}
-        <section className="py-10">
+        <section id="lab-teaser" className="py-10">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24 text-center">
             <Link
-              href="/lab"
+              href={latestLab ? `/lab/${latestLab.slug}` : "/lab"}
               className="text-[14px] text-[rgba(203,197,228,0.74)] hover:text-[rgba(221,215,242,0.9)] transition-colors duration-200"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
             >
-              From the Lab: How to calm an anxious mind →
+              From the Lab: {latestLab?.title ?? "How to calm an anxious mind"} →
             </Link>
           </div>
         </section>
@@ -210,7 +297,7 @@ export default function HomePage() {
               className="text-[15px] leading-[1.8] text-[rgba(206,199,232,0.78)]"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
             >
-              Full access from A$9.92/month — less than a coffee.
+              Full access from A$9.92/month — less noise, more direction.
             </p>
             <div className="mt-6">
               <Link
