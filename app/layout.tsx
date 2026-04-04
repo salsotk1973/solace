@@ -27,8 +27,17 @@ export default function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" style={{ backgroundColor: "#090d14", colorScheme: "dark" }}>
       <head>
+        <meta name="theme-color" content="#090d14" />
+        <meta name="color-scheme" content="dark" />
+        <style>{`html,body{background:#090d14 !important;}body{margin:0;}`}</style>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "document.documentElement.style.backgroundColor='#090d14';document.documentElement.style.colorScheme='dark';if(document.body){document.body.style.backgroundColor='#090d14';}",
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -36,8 +45,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>
-        {clerkConfigured ? <ClerkProvider>{shell}</ClerkProvider> : shell}
+      <body style={{ backgroundColor: "#090d14" }}>
+        <div style={{ minHeight: "100vh", backgroundColor: "#090d14" }}>
+          {clerkConfigured ? <ClerkProvider>{shell}</ClerkProvider> : shell}
+        </div>
       </body>
     </html>
   );

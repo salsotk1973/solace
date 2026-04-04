@@ -14,22 +14,32 @@ type DustDot = {
   ty: number;
 };
 
-function createDust(): DustDot[] {
-  return Array.from({ length: 14 }, (_, id) => ({
-    id,
-    left: 4 + Math.random() * 92,
-    top: 6 + Math.random() * 86,
-    size: 0.5 + Math.random() * 1.2,
-    alpha: 0.012 + Math.random() * 0.02,
-    duration: 120 + Math.random() * 120,
-    delay: -(Math.random() * 220),
-    tx: -8 + Math.random() * 16,
-    ty: -6 + Math.random() * 12,
-  }));
+function createSeededRandom(seed: number) {
+  let value = seed % 2147483647;
+  if (value <= 0) value += 2147483646;
+  return () => {
+    value = (value * 16807) % 2147483647;
+    return (value - 1) / 2147483646;
+  };
 }
 
+const DUST_DOTS: DustDot[] = (() => {
+  const random = createSeededRandom(240405);
+  return Array.from({ length: 14 }, (_, id) => ({
+    id,
+    left: 4 + random() * 92,
+    top: 6 + random() * 86,
+    size: 0.5 + random() * 1.2,
+    alpha: 0.012 + random() * 0.02,
+    duration: 120 + random() * 120,
+    delay: -(random() * 220),
+    tx: -8 + random() * 16,
+    ty: -6 + random() * 12,
+  }));
+})();
+
 export function SolaceAmbientDust() {
-  const dust = useMemo(() => createDust(), []);
+  const dust = useMemo(() => DUST_DOTS, []);
   const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {

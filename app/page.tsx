@@ -1,16 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PageShell from "@/components/PageShell";
 import { HeroSection } from "@/components/HeroSection";
 import { SolaceShaderBg } from "@/components/SolaceShaderBg";
-import { SolaceAmbientDust } from "@/components/SolaceAmbientDust";
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import { FeaturedCard } from "@/components/lab/LabFilter";
+import { getFeaturedArticle } from "@/lib/lab";
 
 type AiTool = {
   eyebrow: string;
@@ -73,100 +66,34 @@ const FREE_TOOL_THEME: Record<
   { className: string; accent: string; arrow: string }
 > = {
   teal: {
-    className: "border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.045)] hover:border-[rgba(45,212,191,0.34)] hover:bg-[rgba(45,212,191,0.07)]",
+    className:
+      "border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.045)] hover:border-[rgba(45,212,191,0.34)] hover:bg-[rgba(45,212,191,0.07)]",
     accent: "rgba(45,212,191,0.55)",
     arrow: "rgba(45,212,191,0.72)",
   },
   indigo: {
-    className: "border-[rgba(129,140,248,0.22)] bg-[rgba(129,140,248,0.045)] hover:border-[rgba(129,140,248,0.34)] hover:bg-[rgba(129,140,248,0.07)]",
+    className:
+      "border-[rgba(129,140,248,0.22)] bg-[rgba(129,140,248,0.045)] hover:border-[rgba(129,140,248,0.34)] hover:bg-[rgba(129,140,248,0.07)]",
     accent: "rgba(129,140,248,0.55)",
     arrow: "rgba(129,140,248,0.72)",
   },
   amber: {
-    className: "border-[rgba(245,158,11,0.22)] bg-[rgba(245,158,11,0.045)] hover:border-[rgba(245,158,11,0.34)] hover:bg-[rgba(245,158,11,0.07)]",
+    className:
+      "border-[rgba(245,158,11,0.22)] bg-[rgba(245,158,11,0.045)] hover:border-[rgba(245,158,11,0.34)] hover:bg-[rgba(245,158,11,0.07)]",
     accent: "rgba(245,158,11,0.55)",
     arrow: "rgba(245,158,11,0.72)",
   },
 };
 
 export default function HomePage() {
-  const pageRef = useRef<HTMLDivElement | null>(null);
-  const [latestLab, setLatestLab] = useState<{ title: string; slug: string } | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    (async () => {
-      try {
-        const res = await fetch("/api/lab/latest", { signal: controller.signal });
-        if (!res.ok) return;
-        const data = (await res.json()) as { title?: string; slug?: string };
-        if (data.title && data.slug) {
-          setLatestLab({ title: data.title, slug: data.slug });
-        }
-      } catch {
-        // Keep fallback teaser copy if latest article lookup fails.
-      }
-    })();
-
-    return () => controller.abort();
-  }, []);
-
-  // ── Section headline parallax ────────────────────────────────────────
-  useGSAP(
-    () => {
-      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (prefersReduced) return;
-
-      gsap.to(".ai-section-headline", {
-        y: -24,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".ai-tools-section",
-          start: "top bottom",
-          end: "center center",
-          scrub: 1.5,
-        },
-      });
-
-      gsap.from(".ai-tool-card", {
-        opacity: 0,
-        y: 28,
-        duration: 0.75,
-        stagger: 0.12,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".ai-tools-section",
-          start: "top 82%",
-          once: true,
-        },
-      });
-
-      gsap.from(".free-tool-card", {
-        opacity: 0,
-        y: 16,
-        duration: 0.5,
-        stagger: 0.06,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".free-tools-section",
-          start: "top 88%",
-          once: true,
-        },
-      });
-    },
-    { scope: pageRef },
-  );
+  const featuredLab = getFeaturedArticle();
 
   return (
     <PageShell particles={false}>
       <SolaceShaderBg enabled />
-      <SolaceAmbientDust />
-      <div ref={pageRef} className="relative z-10">
-        {/* ── Hero ──────────────────────────────────────────────────── */}
+      <div className="relative z-10">
         <HeroSection />
 
-        {/* ── AI Tools ─────────────────────────────────────────────── */}
         <section id="tools" className="ai-tools-section pt-12 pb-10 md:pt-16 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
@@ -180,8 +107,7 @@ export default function HomePage() {
               className="ai-section-headline mt-5 text-4xl md:text-5xl font-light leading-[1.15] text-[rgba(236,232,248,0.92)]"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
-              Start from <em className="italic">how it feels</em> — not what
-              it is.
+              Start from <em className="italic">how it feels</em> — not what it is.
             </h3>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -189,7 +115,7 @@ export default function HomePage() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-6 min-h-[280px] flex flex-col transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
+                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-6 min-h-[280px] flex flex-col transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
                   style={{ borderLeftColor: tool.borderLeftColor }}
                 >
                   <p
@@ -236,7 +162,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Free Tools ───────────────────────────────────────────── */}
         <section id="free-tools" className="free-tools-section pb-16 md:pb-24">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
@@ -277,37 +202,15 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Lab link ─────────────────────────────────────────────── */}
-        <section id="lab-teaser" className="py-10">
-          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24 text-center">
-            <Link
-              href={latestLab ? `/lab/${latestLab.slug}` : "/lab"}
-              className="text-[14px] text-[rgba(203,197,228,0.74)] hover:text-[rgba(221,215,242,0.9)] transition-colors duration-200"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
-            >
-              From the Lab: {latestLab?.title ?? "How to calm an anxious mind"} →
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Pricing nudge ────────────────────────────────────────── */}
-        <section className="py-16 text-center">
-          <div className="max-w-3xl mx-auto px-6">
+        <section id="lab-teaser" className="py-8 md:py-10">
+          <div className="max-w-[860px] mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="text-[15px] leading-[1.8] text-[rgba(206,199,232,0.78)]"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
+              className="mb-4 text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
             >
-              Full access from A$9.92/month — less noise, more direction.
+              From the Lab
             </p>
-            <div className="mt-6">
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-2.5 text-[11px] tracking-[0.16em] uppercase text-[rgba(214,206,238,0.82)] transition-colors duration-200 hover:text-[rgba(233,228,250,0.98)] hover:border-white/35"
-                style={{ fontFamily: "'Jost', sans-serif" }}
-              >
-                See plans →
-              </Link>
-            </div>
+            {featuredLab ? <FeaturedCard article={featuredLab} variant="compact" /> : null}
           </div>
         </section>
       </div>

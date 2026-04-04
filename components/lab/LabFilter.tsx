@@ -270,10 +270,17 @@ function ArticleCard({ article }: { article: LabArticle }) {
 
 // ─── Featured card ────────────────────────────────────────────────────────────
 
-function FeaturedCard({ article }: { article: LabArticle }) {
+export function FeaturedCard({
+  article,
+  variant = 'default',
+}: {
+  article: LabArticle
+  variant?: 'default' | 'compact'
+}) {
   const [hovered, setHovered] = useState(false)
   const accent = CATEGORY_ACCENT[article.category] ?? 'rgba(148,130,210,1)'
   const catBg  = CATEGORY_BG[article.category]     ?? 'rgba(148,130,210,0.08)'
+  const isCompact = variant === 'compact'
 
   return (
     <div
@@ -284,11 +291,11 @@ function FeaturedCard({ article }: { article: LabArticle }) {
         background:   FEATURED_BG[article.category] ?? catBg,
         border:       `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.18)')}`,
         boxShadow:    hovered
-          ? `0 0 24px 6px ${accent.replace('1)', '0.35)')}`
-          : `0 0 12px 2px ${accent.replace('1)', '0.18)')}`,
+          ? `0 0 ${isCompact ? '18px 4px' : '24px 6px'} ${accent.replace('1)', isCompact ? '0.24)' : '0.35)')}`
+          : `0 0 ${isCompact ? '8px 1px' : '12px 2px'} ${accent.replace('1)', isCompact ? '0.12)' : '0.18)')}`,
         transition:   'border-color 0.4s ease, box-shadow 0.4s ease',
         position:     'relative',
-        marginBottom: '48px',
+        marginBottom: isCompact ? '28px' : '48px',
       }}
     >
     <Link
@@ -296,7 +303,7 @@ function FeaturedCard({ article }: { article: LabArticle }) {
       style={{
         display:        'block',
         borderRadius:   '22px',
-        padding:        '48px 56px',
+        padding:        isCompact ? '34px 38px' : '48px 56px',
         background:     'transparent',
         textDecoration: 'none',
         boxSizing:      'border-box',
@@ -337,11 +344,11 @@ function FeaturedCard({ article }: { article: LabArticle }) {
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
-            fontSize:   'clamp(32px, 3.8vw, 52px)',
+            fontSize:   isCompact ? 'clamp(28px, 3.1vw, 42px)' : 'clamp(32px, 3.8vw, 52px)',
             lineHeight: 1.15,
             color:      hovered ? 'rgba(250,246,255,0.98)' : 'rgba(240,234,255,0.92)',
-            margin:     '0 0 20px',
-            maxWidth:   '580px',
+            margin:     isCompact ? '0 0 16px' : '0 0 20px',
+            maxWidth:   isCompact ? '520px' : '580px',
             transition: 'color 0.4s ease',
           }}
         >
@@ -353,11 +360,11 @@ function FeaturedCard({ article }: { article: LabArticle }) {
           style={{
             fontFamily: "'Jost', sans-serif",
             fontWeight: 300,
-            fontSize:   '14px',
+            fontSize:   isCompact ? '13px' : '14px',
             lineHeight: 1.8,
             color:      'rgba(135,128,178,0.48)',
-            margin:     '0 0 28px',
-            maxWidth:   '480px',
+            margin:     isCompact ? '0 0 20px' : '0 0 28px',
+            maxWidth:   isCompact ? '440px' : '480px',
           }}
         >
           {article.excerpt}

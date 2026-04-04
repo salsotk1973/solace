@@ -261,6 +261,7 @@ export function SolaceShaderBg({ enabled = false }: SolaceShaderBgProps) {
     <div
       aria-hidden="true"
       className="solace-shader-bg pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      style={{ background: '#070b12' }}
     >
       <div
         className="solace-shader-fallback"

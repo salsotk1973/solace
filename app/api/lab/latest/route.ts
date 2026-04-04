@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAllArticles } from "@/lib/lab";
+import { getFeaturedArticle } from "@/lib/lab";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const latest = getAllArticles()[0];
+  const featured = getFeaturedArticle();
 
-  if (!latest) {
-    return NextResponse.json({ title: null, slug: null }, { status: 404 });
+  if (!featured) {
+    return NextResponse.json({ article: null }, { status: 404 });
   }
 
-  return NextResponse.json({ title: latest.title, slug: latest.slug });
+  return NextResponse.json({ article: featured });
 }
