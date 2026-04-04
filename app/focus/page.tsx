@@ -3,10 +3,16 @@ import FocusTimer   from "@/components/focus/FocusTimer";
 import { getCurrentUser } from "@/lib/auth";
 import { SOLACE_ROUTES }  from "@/lib/solace/routes";
 import PageShell from "@/components/PageShell";
+import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Focus Timer — Solace",
-  description: "One thing. Done well.",
+  title: "Pomodoro Focus Timer Online | Deep Work Timer — Solace",
+  description: "Free Pomodoro timer and deep work sessions online. Set custom intervals, track focus time, and build a consistent focus practice.",
+  openGraph: {
+    title: "Focus Timer — Solace",
+    description: "Pomodoro and deep work timer for focused productivity.",
+    url: "https://solace.digital/tools/focus-timer",
+  },
 };
 
 export default async function FocusPage() {
@@ -96,6 +102,32 @@ export default async function FocusPage() {
         </section>
 
       </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Focus Timer — Solace",
+            applicationCategory: "HealthApplication",
+            operatingSystem: "Web browser",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
+          }),
+        }}
+      />
+
+      <ToolSeoContent h1="Focus timer — Pomodoro and deep work sessions online">
+        <p>Distraction is not a character flaw. It is a design problem. Modern devices are engineered to interrupt you, and your brain — wired to respond to novelty — obliges every time. A focus timer is a simple act of counter-design: a defined container of time where one thing matters.</p>
+        <p>The Pomodoro Technique: work for 25 minutes, rest for 5, repeat. The principle is not about working harder — it is about working in a way your brain can sustain.</p>
+        <SeoH2>Why timed focus sessions work</SeoH2>
+        <p>When you set a timer, Parkinson&apos;s Law kicks in — work expands to fill available time, and a defined end point forces prioritisation. Research on ultradian rhythms suggests the brain naturally cycles every 90 minutes. A 90-minute deep work block followed by genuine rest often produces more than grinding for three hours.</p>
+        <SeoH2>How to use this focus timer</SeoH2>
+        <p>Choose your session length. Before you start, write down the single thing you are working on — not a list, one thing. When the timer ends, stop. The break matters as much as the session.</p>
+        <SeoH2>Common focus problems</SeoH2>
+        <p>If you stop early, the task is probably too vague or too large — break it down first. If you ignore the break timer, schedule the rest anyway. Sustained focus without rest degrades quality without you noticing.</p>
+        <SeoDisclaimer>This tool provides reflective support only. It is not a substitute for professional support if focus difficulties significantly affect your daily life.</SeoDisclaimer>
+      </ToolSeoContent>
     </PageShell>
   );
 }

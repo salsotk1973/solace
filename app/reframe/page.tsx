@@ -2,11 +2,16 @@ import Link from "next/link";
 import ReframeSession from "@/components/reframe/ReframeSession";
 import { getCurrentUser } from "@/lib/auth";
 import PageShell from "@/components/PageShell";
+import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Thought Reframer — Solace",
-  description:
-    "Write the thought that keeps showing up. We'll look at it together — carefully, without judgment.",
+  title: "Thought Reframer — Challenge Negative Thoughts Online | Solace",
+  description: "Free online tool to reframe negative thoughts. Challenge unhelpful thinking patterns and find a more balanced, accurate perspective.",
+  openGraph: {
+    title: "Thought Reframer — Solace",
+    description: "Reframe negative thoughts and find clearer perspective.",
+    url: "https://solace.digital/tools/thought-reframer",
+  },
 };
 
 export default async function ReframePage() {
@@ -71,6 +76,31 @@ export default async function ReframePage() {
         </section>
 
       </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Thought Reframer — Solace",
+            applicationCategory: "HealthApplication",
+            operatingSystem: "Web browser",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
+          }),
+        }}
+      />
+
+      <ToolSeoContent h1="Thought reframing — challenge negative thoughts and find clarity">
+        <p>A thought is not a fact. This sounds obvious until you are inside one. When your mind produces &quot;I always fail at this&quot; or &quot;nobody wants me around,&quot; those statements feel like observations, not interpretations. The job of thought reframing is not to replace them with false positives — it is to look at them clearly and ask: is this actually true?</p>
+        <SeoH2>What thought reframing is — and what it is not</SeoH2>
+        <p>Reframing is not positive thinking. It is the practice of examining a thought with the same scepticism you would apply to a claim someone else made. The most common unhelpful patterns have names: catastrophising (assuming the worst), all-or-nothing thinking (everything is good or bad), mind-reading (assuming you know what others think), and personalisation (taking responsibility for things outside your control). Naming the pattern is half the work.</p>
+        <SeoH2>How to use this tool</SeoH2>
+        <p>Write the thought exactly as it appears in your head — not a polished version, the raw one. Then work through the questions: What evidence supports this thought? What contradicts it? What would you say to a friend who thought this? What is a more complete version of the truth? You will not eliminate the thought. But you may loosen its grip.</p>
+        <SeoH2>When thought reframing helps most</SeoH2>
+        <p>Reframing works best on repetitive thoughts — the ones that keep returning. The thought that wakes you at 3am, the one that surfaces whenever you face something difficult. These are the ones worth examining.</p>
+        <SeoDisclaimer>This tool provides reflective support only. It is not therapy. If you are experiencing persistent distressing thoughts, please speak with a qualified mental health professional.</SeoDisclaimer>
+      </ToolSeoContent>
     </PageShell>
   );
 }
