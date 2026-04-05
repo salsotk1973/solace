@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,12 +41,6 @@ const SESSION_C  = 2 * Math.PI * SESSION_R; // ~565.5
 const PHASE_C    = 2 * Math.PI * PHASE_R;   // ~653.5
 
 type ActivePhase = PhaseType | "idle";
-
-type BreathAudioContext = AudioContext;
-
-type BreathWindow = Window & typeof globalThis & {
-  webkitAudioContext?: typeof AudioContext;
-};
 
 const GLOW_SHADOWS: Record<ActivePhase, string> = {
   idle: [
@@ -96,98 +90,17 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
   const phaseRingRef   = useRef<SVGCircleElement>(null);
   const isRunningRef   = useRef(false);
   const timeoutsRef    = useRef<number[]>([]);
-  const audioCtxRef    = useRef<BreathAudioContext | null>(null);
-  const oscillatorRef  = useRef<OscillatorNode | null>(null);
-  const gainNodeRef    = useRef<GainNode | null>(null);
-  const mutedRef       = useRef(true);
+  const onCycleChangeRef = useRef(onCycleChange);
+  const onCompleteRef = useRef(onComplete);
   const [activePhase, setActivePhase] = useState<ActivePhase>("idle");
   const [phaseDuration, setPhaseDuration] = useState(1.5);
   const [label, setLabel] = useState("");
   const [cycleLabel, setCycleLabel] = useState("");
-  const [isMuted, setIsMuted] = useState(true);
-
-  const clearTimers = useCallback(() => {
-    for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
-    timeoutsRef.current = [];
-  }, []);
-
-  const stopAudio = useCallback(() => {
-    if (oscillatorRef.current) {
-      try {
-        oscillatorRef.current.stop();
-      } catch {
-        // Oscillator may already be stopped.
-      }
-      oscillatorRef.current.disconnect();
-      oscillatorRef.current = null;
-    }
-    if (gainNodeRef.current) {
-      gainNodeRef.current.disconnect();
-      gainNodeRef.current = null;
-    }
-  }, []);
-
-  const ensureAudioContext = useCallback(async () => {
-    if (typeof window === "undefined") return null;
-
-    const AudioContextCtor = window.AudioContext ?? (window as BreathWindow).webkitAudioContext;
-    if (!AudioContextCtor) return null;
-
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioContextCtor();
-    }
-
-    if (audioCtxRef.current.state === "suspended") {
-      await audioCtxRef.current.resume();
-    }
-
-    return audioCtxRef.current;
-  }, []);
-
-  const playBreathPhase = useCallback(async (
-    fromFreq: number,
-    toFreq: number,
-    fromVol: number,
-    toVol: number,
-    duration: number,
-  ) => {
-    if (mutedRef.current || duration <= 0) return;
-
-    const audioCtx = await ensureAudioContext();
-    if (!audioCtx) return;
-
-    stopAudio();
-
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(fromFreq, audioCtx.currentTime);
-    oscillator.frequency.linearRampToValueAtTime(toFreq, audioCtx.currentTime + duration);
-    gainNode.gain.setValueAtTime(fromVol, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(toVol, audioCtx.currentTime + duration * 0.9);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + duration);
-
-    oscillatorRef.current = oscillator;
-    gainNodeRef.current = gainNode;
-
-    oscillator.onended = () => {
-      oscillator.disconnect();
-      gainNode.disconnect();
-      if (oscillatorRef.current === oscillator) oscillatorRef.current = null;
-      if (gainNodeRef.current === gainNode) gainNodeRef.current = null;
-    };
-  }, [ensureAudioContext, stopAudio]);
 
   useEffect(() => {
-    mutedRef.current = isMuted;
-    if (isMuted) stopAudio();
-  }, [isMuted, stopAudio]);
+    onCycleChangeRef.current = onCycleChange;
+    onCompleteRef.current = onComplete;
+  }, [onCycleChange, onComplete]);
 
   useEffect(() => {
     if (sessionRingRef.current) {
@@ -204,15 +117,12 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
   useEffect(() => {
     isRunningRef.current = isRunning;
-
-    clearTimers();
-    stopAudio();
+    for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
+    timeoutsRef.current = [];
 
     if (!isRunning) {
       return;
     }
-
-    void ensureAudioContext();
 
     const phases = PATTERNS[pattern];
 
@@ -225,14 +135,6 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
       setLabel(phase.label);
       setCycleLabel(`Cycle ${cycleIndex + 1} of ${TOTAL_CYCLES}`);
 
-      if (phase.type === "inhale") {
-        void playBreathPhase(200, 270, 0, 0.07, phase.duration);
-      } else if (phase.type === "exhale") {
-        void playBreathPhase(270, 190, 0.07, 0, phase.duration);
-      } else {
-        stopAudio();
-      }
-
       const timeout = window.setTimeout(() => {
         if (!isRunningRef.current) return;
 
@@ -244,28 +146,28 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
         const nextCycle = cycleIndex + 1;
         if (nextCycle < TOTAL_CYCLES) {
-          onCycleChange(nextCycle);
+          onCycleChangeRef.current(nextCycle);
           runPhase(nextCycle, 0);
           return;
         }
 
         isRunningRef.current = false;
-        stopAudio();
         setLabel("");
-        onComplete();
+        onCompleteRef.current();
       }, phase.duration * 1000);
 
       timeoutsRef.current.push(timeout);
     };
 
-    onCycleChange(0);
+    onCycleChangeRef.current(0);
     runPhase(0, 0);
 
     return () => {
-      clearTimers();
-      stopAudio();
+      isRunningRef.current = false;
+      for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
+      timeoutsRef.current = [];
     };
-  }, [clearTimers, ensureAudioContext, isRunning, onComplete, onCycleChange, pattern, playBreathPhase, stopAudio]);
+  }, [isRunning, pattern]);
 
   const displayPhase: ActivePhase = isRunning ? activePhase : "idle";
   const displayLabel = isRunning ? label : "";
@@ -285,16 +187,6 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
       {/* ── Orb stage ──────────────────────────────────────────────────── */}
       <div className="relative w-[240px] h-[240px]">
-        <button
-          type="button"
-          onClick={() => setIsMuted((value) => !value)}
-          className="absolute right-2 top-2 z-30 flex h-7 w-7 items-center justify-center rounded-full border border-white/8 bg-white/[0.02] text-[13px] text-white/35 hover:text-white/60 transition-colors duration-200"
-          aria-label={isMuted ? "Enable breathing sound" : "Mute breathing sound"}
-          aria-pressed={!isMuted}
-        >
-          {isMuted ? "🔇" : "🔊"}
-        </button>
-
         {/* Progress rings — rotated so arc starts from top (12 o'clock) */}
         <svg
           className="absolute inset-0 -rotate-90 pointer-events-none"
