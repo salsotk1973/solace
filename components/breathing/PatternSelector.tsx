@@ -1,7 +1,5 @@
 "use client";
 
-import { Lock } from "lucide-react";
-
 type Pattern = "box" | "478";
 
 interface PatternSelectorProps {
@@ -52,13 +50,12 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         <button
           key={p.name}
           disabled
-          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] cursor-not-allowed opacity-60"
+          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] cursor-not-allowed"
         >
-          <span className="[font-family:var(--font-jost)] flex items-center gap-1.5 text-[12px] tracking-[-0.01em]">
-            <Lock size={9} className="opacity-50" />
+          <span className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em]">
             {p.name}
           </span>
-          <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-40">
+          <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
             {p.timing}
           </span>
         </button>

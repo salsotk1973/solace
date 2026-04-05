@@ -44,29 +44,29 @@ type ActivePhase = PhaseType | "idle";
 
 const GLOW_SHADOWS: Record<ActivePhase, string> = {
   idle: [
-    "0 0 40px 8px rgba(45,212,191,0.12)",
-    "0 0 80px 20px rgba(45,212,191,0.07)",
-    "0 0 140px 40px rgba(45,212,191,0.04)",
+    "0 0 40px 12px rgba(45,212,191,0.18)",
+    "0 0 80px 30px rgba(45,212,191,0.10)",
+    "0 0 160px 70px rgba(45,212,191,0.05)",
   ].join(", "),
   inhale: [
-    "0 0 60px 20px rgba(45,212,191,0.22)",
-    "0 0 120px 50px rgba(45,212,191,0.12)",
-    "0 0 200px 80px rgba(45,212,191,0.06)",
+    "0 0 60px 20px rgba(45,212,191,0.28)",
+    "0 0 120px 50px rgba(45,212,191,0.16)",
+    "0 0 240px 100px rgba(45,212,191,0.07)",
   ].join(", "),
   "hold-in": [
-    "0 0 70px 25px rgba(45,212,191,0.25)",
-    "0 0 140px 60px rgba(45,212,191,0.14)",
-    "0 0 220px 90px rgba(45,212,191,0.07)",
+    "0 0 60px 20px rgba(45,212,191,0.28)",
+    "0 0 120px 50px rgba(45,212,191,0.16)",
+    "0 0 240px 100px rgba(45,212,191,0.07)",
   ].join(", "),
   exhale: [
-    "0 0 40px 8px rgba(45,212,191,0.12)",
-    "0 0 80px 20px rgba(45,212,191,0.07)",
-    "0 0 140px 40px rgba(45,212,191,0.04)",
+    "0 0 40px 12px rgba(45,212,191,0.18)",
+    "0 0 80px 30px rgba(45,212,191,0.10)",
+    "0 0 160px 70px rgba(45,212,191,0.05)",
   ].join(", "),
   "hold-out": [
-    "0 0 40px 8px rgba(45,212,191,0.12)",
-    "0 0 80px 20px rgba(45,212,191,0.07)",
-    "0 0 140px 40px rgba(45,212,191,0.04)",
+    "0 0 40px 12px rgba(45,212,191,0.18)",
+    "0 0 80px 30px rgba(45,212,191,0.10)",
+    "0 0 160px 70px rgba(45,212,191,0.05)",
   ].join(", "),
 };
 
@@ -222,9 +222,10 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
         {/* Glow layer */}
         <div
-          className="glow-idle absolute w-[280px] h-[280px] rounded-full top-[-20px] left-[-20px]"
+          className="glow-idle absolute inset-0 z-0 rounded-full pointer-events-none"
           style={{
             animation: glowAnimation,
+            background: "radial-gradient(circle at center, rgba(45,212,191,0.16) 0%, rgba(45,212,191,0.08) 34%, rgba(45,212,191,0.02) 62%, rgba(45,212,191,0) 82%)",
             boxShadow: GLOW_SHADOWS[displayPhase],
             opacity: running ? 1 : 0.78,
             transition: "box-shadow 1.5s ease-in-out, opacity 1.5s ease-in-out",
@@ -258,7 +259,7 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
         {/* Orb sphere */}
         <div
-          className="orb-idle absolute w-[160px] h-[160px] rounded-full top-[40px] left-[40px] z-10 bg-[radial-gradient(circle_at_center,rgba(120,241,231,0.34),rgba(56,190,181,0.2),rgba(14,108,122,0.14))] [border:0.5px_solid_rgba(80,220,205,0.16)]"
+          className="orb-idle absolute w-[192px] h-[192px] rounded-full top-[24px] left-[24px] z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(148,248,239,0.48)_0%,rgba(92,222,211,0.28)_34%,rgba(48,168,162,0.16)_62%,rgba(24,100,112,0.06)_84%,rgba(24,100,112,0.01)_100%)]"
           style={{
             animation: orbAnimation,
             filter: displayPhase === "exhale" ? "blur(0px)" : "none",
