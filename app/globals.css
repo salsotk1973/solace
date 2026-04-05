@@ -74,6 +74,21 @@
   50% { box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.10); }
 }
 
+@keyframes orbIdle {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.07); }
+}
+
+@keyframes glowIdle {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-idle { animation: none !important; }
+  .glow-idle { animation: none !important; }
+}
+
 /* --------------------------------------------------
    RESET
 -------------------------------------------------- */

@@ -16,8 +16,8 @@ const FREE_PATTERNS: { id: Pattern; name: string; timing: string }[] = [
 ];
 
 const LOCKED_PATTERNS = [
-  { name: "Resonant",            timing: "5 · 5"  },
-  { name: "Physiological Sigh",  timing: "Custom" },
+  { name: "Calm",          timing: "5 · 5"  },
+  { name: "Double Exhale", timing: "Custom" },
 ];
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
@@ -34,8 +34,8 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
               "flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border transition-all duration-300",
               "disabled:cursor-not-allowed",
               active
-                ? "border-[rgba(80,200,218,0.42)] bg-[rgba(80,200,218,0.07)] text-[rgba(140,228,240,0.95)]"
-                : "border-[rgba(255,255,255,0.07)] text-[rgba(160,195,210,0.45)] hover:border-[rgba(80,200,218,0.22)] hover:text-[rgba(140,228,240,0.7)]",
+                ? "border-[rgba(45,212,191,0.6)] bg-[rgba(45,212,191,0.1)] text-[rgba(45,212,191,0.95)]"
+                : "border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] hover:border-[rgba(255,255,255,0.28)] hover:text-[rgba(255,255,255,0.72)]",
             ].join(" ")}
           >
             <span className="[font-family:var(--font-jost)] text-[12px] font-[400] tracking-[-0.01em]">
@@ -52,7 +52,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         <button
           key={p.name}
           disabled
-          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.04)] text-[rgba(110,130,140,0.28)] cursor-not-allowed"
+          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] cursor-not-allowed opacity-60"
         >
           <span className="[font-family:var(--font-jost)] flex items-center gap-1.5 text-[12px] tracking-[-0.01em]">
             <Lock size={9} className="opacity-50" />
