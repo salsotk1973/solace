@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useAuth, UserButton } from "@clerk/nextjs";
 
 const navItems = [
   { label: "Tools",      href: "/tools"      },
@@ -11,66 +10,7 @@ const navItems = [
   { label: "About",      href: "/about"      },
 ];
 
-const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-
 function DesktopAuthLinks() {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  if (!isLoaded) {
-    return (
-      <>
-        <Link
-          href="/sign-in"
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     400,
-            fontSize:       "13px",
-            letterSpacing:  "0.04em",
-            color:          "rgba(215,210,240,0.65)",
-            textDecoration: "none",
-            transition:     "color 220ms ease",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)"; }}
-          onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.65)"; }}
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/sign-up"
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     400,
-            fontSize:       "13px",
-            letterSpacing:  "0.04em",
-            color:          "rgba(215,210,240,0.9)",
-            textDecoration: "none",
-            padding:        "7px 18px",
-            borderRadius:   "4px",
-            border:         "0.5px solid rgba(200,195,235,0.22)",
-            background:     "transparent",
-            transition:     "color 220ms ease, border-color 220ms ease, background 220ms ease",
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.color = "rgba(240,236,255,1)";
-            e.currentTarget.style.borderColor = "rgba(220,215,250,0.38)";
-            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.color = "rgba(215,210,240,0.9)";
-            e.currentTarget.style.borderColor = "rgba(200,195,235,0.22)";
-            e.currentTarget.style.background = "transparent";
-          }}
-        >
-          Start free
-        </Link>
-      </>
-    );
-  }
-
-  if (isLoaded && isSignedIn) {
-    return <UserButton appearance={{ elements: { avatarBox: { width: 30, height: 30 } } }} />;
-  }
-
   return (
     <>
       <Link
@@ -122,52 +62,6 @@ function DesktopAuthLinks() {
 }
 
 function MobileAuthLinks({ onNavigate }: { onNavigate: () => void }) {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  if (!isLoaded) {
-    return (
-      <>
-        <Link
-          href="/sign-in"
-          onClick={onNavigate}
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     400,
-            fontSize:       "14px",
-            color:          "rgba(215,210,240,0.60)",
-            textDecoration: "none",
-            transition:     "color 220ms ease",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)"; }}
-          onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.60)"; }}
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/sign-up"
-          onClick={onNavigate}
-          style={{
-            fontFamily:     "'DM Sans', sans-serif",
-            fontWeight:     400,
-            fontSize:       "14px",
-            color:          "rgba(215,210,240,0.9)",
-            textDecoration: "none",
-            padding:        "8px 20px",
-            borderRadius:   "4px",
-            border:         "0.5px solid rgba(200,195,235,0.22)",
-            background:     "transparent",
-          }}
-        >
-          Start free
-        </Link>
-      </>
-    );
-  }
-
-  if (isLoaded && isSignedIn) {
-    return <UserButton appearance={{ elements: { avatarBox: { width: 30, height: 30 } } }} />;
-  }
-
   return (
     <>
       <Link
@@ -314,56 +208,7 @@ export default function SiteHeader() {
 
             <div style={{ width: "0.5px", height: "16px", background: "rgba(255,255,255,0.12)" }} />
 
-            {clerkConfigured ? (
-              <DesktopAuthLinks />
-            ) : (
-              <>
-                <Link
-                  href="/sign-in"
-                  style={{
-                    fontFamily:     "'DM Sans', sans-serif",
-                    fontWeight:     400,
-                    fontSize:       "13px",
-                    letterSpacing:  "0.04em",
-                    color:          "rgba(215,210,240,0.65)",
-                    textDecoration: "none",
-                    transition:     "color 220ms ease",
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.65)"; }}
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/sign-up"
-                  style={{
-                    fontFamily:     "'DM Sans', sans-serif",
-                    fontWeight:     400,
-                    fontSize:       "13px",
-                    letterSpacing:  "0.04em",
-                    color:          "rgba(215,210,240,0.9)",
-                    textDecoration: "none",
-                    padding:        "7px 18px",
-                    borderRadius:   "4px",
-                    border:         "0.5px solid rgba(200,195,235,0.22)",
-                    background:     "transparent",
-                    transition:     "color 220ms ease, border-color 220ms ease, background 220ms ease",
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = "rgba(240,236,255,1)";
-                    e.currentTarget.style.borderColor = "rgba(220,215,250,0.38)";
-                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = "rgba(215,210,240,0.9)";
-                    e.currentTarget.style.borderColor = "rgba(200,195,235,0.22)";
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  Start free
-                </Link>
-              </>
-            )}
+            <DesktopAuthLinks />
           </nav>
 
           {/* Hamburger — mobile only, absolutely positioned, same element in both states */}
@@ -442,45 +287,7 @@ export default function SiteHeader() {
             <div style={{ height: "0.5px", background: "rgba(255,255,255,0.08)", margin: "16px 0" }} />
 
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              {clerkConfigured ? (
-                <MobileAuthLinks onNavigate={() => setMenuOpen(false)} />
-              ) : (
-                <>
-                  <Link
-                    href="/sign-in"
-                    onClick={() => setMenuOpen(false)}
-                    style={{
-                      fontFamily:     "'DM Sans', sans-serif",
-                      fontWeight:     400,
-                      fontSize:       "14px",
-                      color:          "rgba(215,210,240,0.60)",
-                      textDecoration: "none",
-                      transition:     "color 220ms ease",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.color = "rgba(240,236,255,1)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = "rgba(215,210,240,0.60)"; }}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    onClick={() => setMenuOpen(false)}
-                    style={{
-                      fontFamily:     "'DM Sans', sans-serif",
-                      fontWeight:     400,
-                      fontSize:       "14px",
-                      color:          "rgba(215,210,240,0.9)",
-                      textDecoration: "none",
-                      padding:        "8px 20px",
-                      borderRadius:   "4px",
-                      border:         "0.5px solid rgba(200,195,235,0.22)",
-                      background:     "transparent",
-                    }}
-                  >
-                    Start free
-                  </Link>
-                </>
-              )}
+              <MobileAuthLinks onNavigate={() => setMenuOpen(false)} />
             </div>
           </nav>
         </div>

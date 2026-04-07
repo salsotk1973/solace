@@ -4,6 +4,7 @@ import DashboardContent, { type ToolSession } from "./DashboardContent";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import PageShell from "@/components/PageShell";
 import BgFlat from "@/components/backgrounds/BgFlat";
+import ClerkClientProvider from "@/components/ClerkClientProvider";
 
 export const metadata = {
   title: "Dashboard — Solace",
@@ -97,18 +98,20 @@ export default async function DashboardPage() {
     <PageShell particles={false}>
       <BgFlat>
         <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
-          <DashboardContent
-            data={{
-              firstName,
-              email,
-              plan,
-              sessions,
-              totalSessions,
-              distinctTools,
-              streak,
-              weekSessions,
-            }}
-          />
+          <ClerkClientProvider>
+            <DashboardContent
+              data={{
+                firstName,
+                email,
+                plan,
+                sessions,
+                totalSessions,
+                distinctTools,
+                streak,
+                weekSessions,
+              }}
+            />
+          </ClerkClientProvider>
         </div>
       </BgFlat>
     </PageShell>

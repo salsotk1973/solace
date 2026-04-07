@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
@@ -15,17 +14,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const clerkConfigured =
-    Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
-    Boolean(process.env.CLERK_SECRET_KEY);
-  const shell = (
-    <>
-      <SiteHeader />
-      {children}
-      <SiteFooter />
-    </>
-  );
-
   return (
     <html lang="en" style={{ backgroundColor: "#090d14", colorScheme: "dark" }}>
       <head>
@@ -47,7 +35,9 @@ export default function RootLayout({
       </head>
       <body style={{ backgroundColor: "#090d14" }}>
         <div style={{ minHeight: "100vh", backgroundColor: "#090d14" }}>
-          {clerkConfigured ? <ClerkProvider>{shell}</ClerkProvider> : shell}
+          <SiteHeader />
+          {children}
+          <SiteFooter />
         </div>
       </body>
     </html>

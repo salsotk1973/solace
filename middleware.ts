@@ -2,6 +2,7 @@ import { clerkMiddleware } from '@clerk/nextjs/server'
 import { NextResponse, type NextFetchEvent, type NextRequest } from 'next/server'
 
 const clerkConfigured =
+  process.env.NODE_ENV !== 'development' &&
   Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
   Boolean(process.env.CLERK_SECRET_KEY)
 

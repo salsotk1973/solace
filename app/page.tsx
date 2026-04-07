@@ -1,8 +1,6 @@
 import Link from "next/link";
-import PageShell from "@/components/PageShell";
 import { HeroSection } from "@/components/HeroSection";
-import { SolaceShaderBg } from "@/components/SolaceShaderBg";
-import { FeaturedCard } from "@/components/lab/LabFilter";
+import FeaturedLabCard from "@/components/home/FeaturedLabCard";
 import { getFeaturedArticle } from "@/lib/lab";
 
 type AiTool = {
@@ -89,9 +87,32 @@ export default function HomePage() {
   const featuredLab = getFeaturedArticle();
 
   return (
-    <PageShell particles={false}>
-      <SolaceShaderBg enabled />
-      <div className="relative z-10">
+    <main
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "#090d14",
+        color: "white",
+        position: "relative",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 12%, rgba(74,90,138,0.24), transparent 34%), radial-gradient(circle at 20% 56%, rgba(45,212,191,0.08), transparent 30%), linear-gradient(180deg, #090d14 0%, #070b12 56%, #090d14 100%)",
+        }}
+      />
+      <div
+        className="relative z-10"
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "1440px",
+          margin: "0 auto",
+        }}
+      >
         <HeroSection />
 
         <section id="tools" className="ai-tools-section pt-12 pb-10 md:pt-16 md:pb-14">
@@ -210,10 +231,10 @@ export default function HomePage() {
             >
               From the Lab
             </p>
-            {featuredLab ? <FeaturedCard article={featuredLab} variant="compact" /> : null}
+            {featuredLab ? <FeaturedLabCard article={featuredLab} /> : null}
           </div>
         </section>
       </div>
-    </PageShell>
+    </main>
   );
 }
