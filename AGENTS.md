@@ -1,5 +1,7 @@
 # AGENTS.md — Solace Operating Rules
 
+Before making changes, read `CURRENT_STATE.md`.
+
 ## CRITICAL WORKFLOW
 
 - Claude AI = design only

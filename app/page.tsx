@@ -96,9 +96,10 @@ export default function HomePage() {
       style={{
         minHeight: "100vh",
         width: "100%",
-        background: "#090d14",
+        background: "#030712",
         color: "white",
         position: "relative",
+        isolation: "isolate",
       }}
     >
       <div
@@ -106,7 +107,7 @@ export default function HomePage() {
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(circle at 50% 12%, rgba(74,90,138,0.24), transparent 34%), radial-gradient(circle at 20% 56%, rgba(45,212,191,0.08), transparent 30%), linear-gradient(180deg, #090d14 0%, #070b12 56%, #090d14 100%)",
+            "radial-gradient(ellipse 70% 50% at 50% 18%, rgba(57,84,138,0.148) 0%, rgba(57,84,138,0.087) 28%, rgba(57,84,138,0.029) 54%, rgba(3,7,18,0) 78%), radial-gradient(ellipse 44% 38% at 18% 72%, rgba(45,212,191,0.040) 0%, rgba(45,212,191,0.018) 42%, rgba(3,7,18,0) 76%), radial-gradient(ellipse 42% 38% at 82% 74%, rgba(99,102,241,0.045) 0%, rgba(99,102,241,0.020) 42%, rgba(3,7,18,0) 76%), linear-gradient(180deg, #030712 0%, #050a14 48%, #030712 100%)",
         }}
       />
       <div

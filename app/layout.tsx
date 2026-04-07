@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import SitePageTransition from "@/components/SitePageTransition";
 import "./globals.css";
 import "../styles/tokens.css";
 
@@ -37,7 +36,7 @@ export default function RootLayout({
       <body style={{ backgroundColor: "#090d14" }}>
         <div style={{ minHeight: "100vh", backgroundColor: "#090d14" }}>
           <SiteHeader />
-          <SitePageTransition>{children}</SitePageTransition>
+          {children}
           <SiteFooter />
         </div>
       </body>
