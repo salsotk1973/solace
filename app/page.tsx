@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/HeroSection";
-import FeaturedLabCard from "@/components/home/FeaturedLabCard";
-import { getFeaturedArticle } from "@/lib/lab";
+import FeaturedLabCard, { type FeaturedLabArticle } from "@/components/home/FeaturedLabCard";
 
 type AiTool = {
   eyebrow: string;
@@ -83,9 +82,15 @@ const FREE_TOOL_THEME: Record<
   },
 };
 
-export default function HomePage() {
-  const featuredLab = getFeaturedArticle();
+const FEATURED_LAB: FeaturedLabArticle = {
+  title: "Why you can't stop overthinking",
+  slug: "why-you-cant-stop-overthinking",
+  category: "think-clearly",
+  excerpt: "Your brain isn't broken. It's doing exactly what it was designed to do — just at the wrong moment.",
+  readingTime: 6,
+};
 
+export default function HomePage() {
   return (
     <main
       style={{
@@ -231,7 +236,7 @@ export default function HomePage() {
             >
               From the Lab
             </p>
-            {featuredLab ? <FeaturedLabCard article={featuredLab} /> : null}
+            <FeaturedLabCard article={FEATURED_LAB} />
           </div>
         </section>
       </div>

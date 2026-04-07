@@ -1,19 +1,26 @@
 import Link from "next/link";
-import type { LabArticle } from "@/lib/lab";
 
-const CATEGORY_ACCENT: Record<LabArticle["category"], string> = {
+export type FeaturedLabArticle = {
+  title: string;
+  slug: string;
+  category: "calm-your-state" | "think-clearly" | "notice-whats-good";
+  excerpt: string;
+  readingTime: number;
+};
+
+const CATEGORY_ACCENT: Record<FeaturedLabArticle["category"], string> = {
   "calm-your-state": "rgba(68,200,110,1)",
   "think-clearly": "rgba(125,211,252,1)",
   "notice-whats-good": "rgba(218,148,48,1)",
 };
 
-const CATEGORY_BG: Record<LabArticle["category"], string> = {
+const CATEGORY_BG: Record<FeaturedLabArticle["category"], string> = {
   "calm-your-state": "rgba(68,200,110,0.08)",
   "think-clearly": "rgba(125,211,252,0.08)",
   "notice-whats-good": "rgba(218,148,48,0.08)",
 };
 
-const FEATURED_BG: Record<LabArticle["category"], string> = {
+const FEATURED_BG: Record<FeaturedLabArticle["category"], string> = {
   "calm-your-state": "#0e1c1b",
   "think-clearly": "#121d27",
   "notice-whats-good": "#1a1816",
@@ -31,7 +38,7 @@ const PILL_BASE = {
   whiteSpace: "nowrap" as const,
 };
 
-export default function FeaturedLabCard({ article }: { article: LabArticle }) {
+export default function FeaturedLabCard({ article }: { article: FeaturedLabArticle }) {
   const accent = CATEGORY_ACCENT[article.category] ?? "rgba(148,130,210,1)";
   const catBg = CATEGORY_BG[article.category] ?? "rgba(148,130,210,0.08)";
 
