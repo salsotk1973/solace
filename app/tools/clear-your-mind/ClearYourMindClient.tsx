@@ -11,7 +11,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { Lock } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import AIToolInputSection from "@/components/tools/AIToolInputSection";
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
 import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
@@ -27,6 +29,7 @@ const BUTTON_READY_DELAY_MS = 900;
 const PROMPT_COPY = "What is bothering you?";
 const INPUT_HELPER_COPY =
   "Write a thought, press Enter (max. 3). To remove it, just click it.";
+const PROMPT_TEXT_COLOR = "rgba(236, 250, 246, 0.94)";
 
 type BubbleMode = "float" | "organizing" | "aligned";
 
@@ -376,12 +379,12 @@ function getBubbleFontSize(text: string, diameter: number): number {
 }
 
 function getBubbleHue(importance: number): number {
-  if (importance >= 90) return 144;
-  if (importance >= 78) return 150;
-  if (importance >= 62) return 156;
-  if (importance >= 44) return 162;
-  if (importance >= 26) return 168;
-  return 174;
+  if (importance >= 90) return 178;
+  if (importance >= 78) return 178;
+  if (importance >= 62) return 178;
+  if (importance >= 44) return 178;
+  if (importance >= 26) return 178;
+  return 178;
 }
 
 function getResponsiveFieldHeight(
@@ -431,7 +434,7 @@ function createStarterBubble(fieldWidth: number, fieldHeight: number): BubbleIte
     y: fieldHeight / 2,
     vx: 0,
     vy: 0,
-    hue: 164,
+    hue: 178,
     delay: 0,
     seed: 0.5,
     fontSize: 16,
@@ -1097,34 +1100,43 @@ export default function ClearYourMindPage() {
         </div>
 
         {showInitialForm ? (
-          <form
-            className="mind-form"
+          <AIToolInputSection
             onSubmit={handleSubmit}
             autoComplete="off"
             data-form-type="other"
-          >
-            <input
-              type="text"
-              name="fake-solace-username"
-              autoComplete="username"
-              tabIndex={-1}
-              aria-hidden="true"
-              className="autofill-trap"
-            />
-            <input
-              type="password"
-              name="fake-solace-password"
-              autoComplete="new-password"
-              tabIndex={-1}
-              aria-hidden="true"
-              className="autofill-trap"
-            />
-
-            <label htmlFor="clear-your-mind-input" className="prompt">
-              {PROMPT_COPY}
-            </label>
-
-            <div className="input-shell">
+            formOffsetTop={205}
+            beforeFields={
+              <>
+                <input
+                  type="text"
+                  name="fake-solace-username"
+                  autoComplete="username"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  className="autofill-trap"
+                />
+                <input
+                  type="password"
+                  name="fake-solace-password"
+                  autoComplete="new-password"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  className="autofill-trap"
+                />
+              </>
+            }
+            prompt={
+              <label htmlFor="clear-your-mind-input" className="prompt">
+                {PROMPT_COPY}
+              </label>
+            }
+            trustLine={
+              <p className="trust-line">
+                <Lock size={12} aria-hidden="true" />
+                <span>This is private. Only you can see what you write here.</span>
+              </p>
+            }
+            input={
               <div className="mind-input-wrap">
                 {showHelperOverlay ? (
                   <span className="mind-input-overlay">{INPUT_HELPER_COPY}</span>
@@ -1151,9 +1163,8 @@ export default function ClearYourMindPage() {
                   data-bwignore="true"
                 />
               </div>
-            </div>
-
-            <div className="actions actions-initial">
+            }
+            primaryAction={
               <button
                 type="submit"
                 className={`primary-button ${isButtonReady ? "primary-button-ready" : ""}`}
@@ -1161,10 +1172,19 @@ export default function ClearYourMindPage() {
               >
                 <span className="button-glass-sheen" />
                 <span className="button-glass-tint" />
-                <span className="button-label">Clear your mind</span>
+                <span className="button-label" style={{ color: PROMPT_TEXT_COLOR }}>
+                  Clear your mind
+                  <span
+                    className="button-label-arrow"
+                    aria-hidden="true"
+                    style={{ color: PROMPT_TEXT_COLOR }}
+                  >
+                    →
+                  </span>
+                </span>
               </button>
-            </div>
-          </form>
+            }
+          />
         ) : null}
 
         <section className="response-zone" aria-live="polite">
@@ -1487,12 +1507,6 @@ export default function ClearYourMindPage() {
             0 0 28px hsla(var(--bubble-hue), 90%, 72%, 0.12);
         }
 
-        .mind-form {
-          width: 100%;
-          max-width: 760px;
-          margin-top: 205px;
-        }
-
         .autofill-trap {
           position: absolute;
           opacity: 0;
@@ -1508,14 +1522,22 @@ export default function ClearYourMindPage() {
           margin: 0 0 14px;
           font-size: 1.02rem;
           font-weight: 540;
-          color: rgba(241, 250, 246, 0.96);
+          color: rgba(236, 250, 246, 0.94);
           text-shadow: 0 4px 14px rgba(0, 0, 0, 0.34);
         }
 
-        .input-shell {
+        .trust-line {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin: 0 0 12px;
           width: 100%;
-          max-width: 760px;
-          margin: 0 auto;
+          font-family: "Jost", sans-serif;
+          font-size: 0.75rem;
+          line-height: 1.5;
+          color: rgba(112, 236, 222, 0.42);
+          text-align: center;
         }
 
         .mind-input-wrap {
@@ -1533,7 +1555,7 @@ export default function ClearYourMindPage() {
           text-align: left;
           font-size: 0.93rem;
           line-height: 1.2;
-          color: rgba(218, 236, 228, 0.42);
+          color: rgba(112, 236, 222, 0.42);
           text-shadow: 0 1px 8px rgba(0, 0, 0, 0.16);
           white-space: nowrap;
           overflow: hidden;
@@ -1546,21 +1568,21 @@ export default function ClearYourMindPage() {
           height: 88px;
           padding: 0 24px;
           border-radius: 30px;
-          border: 1px solid rgba(198, 238, 216, 0.18);
+          border: 1px solid rgba(196, 240, 234, 0.18);
           background:
             linear-gradient(
               180deg,
-              rgba(8, 20, 18, 0.84) 0%,
-              rgba(6, 16, 14, 0.8) 100%
+              rgba(8, 18, 20, 0.84) 0%,
+              rgba(6, 14, 16, 0.8) 100%
             );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.36),
+            0 0 18px rgba(110, 232, 220, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
             inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(150, 228, 188, 0.03);
+            0 0 0 1px rgba(132, 232, 220, 0.03);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
-          color: rgba(243, 250, 246, 0.96);
+          color: rgba(178, 228, 221, 0.78);
           font-size: 1rem;
           line-height: 1.45;
           outline: none;
@@ -1571,12 +1593,11 @@ export default function ClearYourMindPage() {
         }
 
         .mind-input:focus {
-          border-color: rgba(182, 240, 210, 0.3);
+          border-color: rgba(184, 242, 234, 0.3);
           box-shadow:
-            0 22px 48px rgba(0, 0, 0, 0.38),
             inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            0 0 0 1px rgba(182, 240, 210, 0.08),
-            0 0 28px rgba(126, 224, 178, 0.1);
+            0 0 0 1px rgba(184, 242, 234, 0.08),
+            0 0 28px rgba(112, 226, 214, 0.1);
         }
 
         .actions {
@@ -1584,10 +1605,6 @@ export default function ClearYourMindPage() {
           gap: 14px;
           justify-content: center;
           flex-wrap: wrap;
-        }
-
-        .actions-initial {
-          margin-top: 18px;
         }
 
         .actions-followup {
@@ -1628,8 +1645,8 @@ export default function ClearYourMindPage() {
           min-height: 58px;
           padding: 0 28px;
           border-radius: 999px;
-          border: 1px solid rgba(188, 238, 214, 0.22);
-          color: rgba(243, 250, 246, 0.96);
+          border: 1px solid rgba(188, 240, 234, 0.22);
+          color: rgba(236, 250, 246, 0.94);
           font-size: 0.98rem;
           font-weight: 560;
           cursor: pointer;
@@ -1669,9 +1686,9 @@ export default function ClearYourMindPage() {
           background:
             radial-gradient(
               ellipse at 50% 118%,
-              rgba(118, 255, 194, 0.2) 0%,
-              rgba(118, 255, 194, 0.06) 42%,
-              rgba(118, 255, 194, 0) 74%
+              rgba(112, 236, 222, 0.2) 0%,
+              rgba(112, 236, 222, 0.06) 42%,
+              rgba(112, 236, 222, 0) 74%
             );
           opacity: 0.86;
         }
@@ -1681,28 +1698,39 @@ export default function ClearYourMindPage() {
           z-index: 2;
         }
 
+        .primary-button .button-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          color: rgba(236, 250, 246, 0.94);
+        }
+
+        .button-label-arrow {
+          display: inline-block;
+          color: rgba(236, 250, 246, 0.94);
+          transition: transform 200ms ease;
+        }
+
         .primary-button {
           background:
             linear-gradient(
               180deg,
-              rgba(132, 225, 184, 0.18) 0%,
-              rgba(80, 184, 142, 0.16) 46%,
-              rgba(28, 88, 68, 0.2) 100%
+              rgba(112, 224, 210, 0.18) 0%,
+              rgba(68, 176, 170, 0.16) 46%,
+              rgba(18, 84, 88, 0.2) 100%
             );
           box-shadow:
-            0 18px 42px rgba(0, 0, 0, 0.32),
-            0 0 34px rgba(122, 240, 188, 0.08),
+            0 0 34px rgba(110, 232, 220, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.28),
-            inset 0 -14px 24px rgba(8, 34, 24, 0.24);
+            inset 0 -14px 24px rgba(8, 28, 34, 0.24);
         }
 
         .primary-button-ready {
-          border-color: rgba(208, 248, 228, 0.36);
+          border-color: rgba(208, 248, 242, 0.36);
           box-shadow:
-            0 20px 46px rgba(0, 0, 0, 0.34),
-            0 0 44px rgba(132, 244, 196, 0.12),
+            0 0 44px rgba(118, 236, 224, 0.12),
             inset 0 1px 0 rgba(255, 255, 255, 0.3),
-            inset 0 -14px 24px rgba(8, 34, 24, 0.26);
+            inset 0 -14px 24px rgba(8, 28, 34, 0.26);
           filter: brightness(1.04);
           animation: none;
         }
@@ -1711,31 +1739,33 @@ export default function ClearYourMindPage() {
           background:
             linear-gradient(
               180deg,
-              rgba(88, 184, 144, 0.16) 0%,
-              rgba(28, 88, 68, 0.22) 100%
+              rgba(74, 172, 166, 0.16) 0%,
+              rgba(18, 84, 88, 0.22) 100%
             );
           box-shadow:
-            0 18px 42px rgba(0, 0, 0, 0.3),
+            0 0 34px rgba(110, 232, 220, 0.08),
             inset 0 1px 0 rgba(255, 255, 255, 0.18),
-            inset 0 -12px 22px rgba(8, 34, 24, 0.26);
+            inset 0 -12px 22px rgba(8, 28, 34, 0.26);
         }
 
         .primary-button:hover,
         .secondary-button:hover {
           transform: translateY(-1px);
-          border-color: rgba(224, 255, 238, 0.32);
+          border-color: rgba(224, 255, 248, 0.32);
           box-shadow:
-            0 22px 50px rgba(0, 0, 0, 0.34),
-            0 0 50px rgba(148, 248, 204, 0.14),
+            0 0 50px rgba(126, 236, 226, 0.14),
             inset 0 1px 0 rgba(255, 255, 255, 0.34),
-            inset 0 -14px 24px rgba(8, 34, 24, 0.28);
+            inset 0 -14px 24px rgba(8, 28, 34, 0.28);
+        }
+
+        .primary-button:hover .button-label-arrow {
+          transform: translateX(0.25rem);
         }
 
         .primary-button:active,
         .secondary-button:active {
           transform: translateY(1px);
           box-shadow:
-            0 12px 28px rgba(0, 0, 0, 0.32),
             inset 0 2px 6px rgba(0, 0, 0, 0.18),
             inset 0 1px 0 rgba(255, 255, 255, 0.12);
         }
@@ -1770,7 +1800,7 @@ export default function ClearYourMindPage() {
           color: rgba(243, 250, 246, 0.96);
           text-shadow:
             0 4px 16px rgba(0, 0, 0, 0.26),
-            0 0 10px rgba(172, 248, 210, 0.08);
+            0 0 10px rgba(136, 236, 224, 0.08);
           animation: solaceBreathing 3.2s ease-in-out infinite;
         }
 
@@ -1791,18 +1821,16 @@ export default function ClearYourMindPage() {
           margin-top: 172;
           padding: 22px 26px;
           border-radius: 32px;
-          border: 1px solid rgba(198, 238, 216, 0.18);
+          border: 1px solid rgba(196, 240, 234, 0.18);
           background:
             linear-gradient(
               180deg,
-              rgba(8, 20, 18, 0.84) 0%,
-              rgba(6, 16, 14, 0.8) 100%
+              rgba(8, 18, 20, 0.84) 0%,
+              rgba(6, 14, 16, 0.8) 100%
             );
           box-shadow:
-            0 20px 44px rgba(0, 0, 0, 0.36),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-            0 0 0 1px rgba(150, 228, 188, 0.03);
+            0 0 20px rgba(110, 232, 220, 0.08),
+            0 0 0 1px rgba(132, 232, 220, 0.03);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           animation: responseReveal 600ms ease forwards;
@@ -1819,9 +1847,7 @@ export default function ClearYourMindPage() {
               rgba(6, 10, 18, 0.84) 100%
             );
           box-shadow:
-            0 18px 38px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+            0 0 18px rgba(110, 232, 220, 0.06),
             0 0 0 1px rgba(255, 255, 255, 0.02);
           backdrop-filter: blur(22px);
           -webkit-backdrop-filter: blur(22px);
@@ -1833,7 +1859,7 @@ export default function ClearYourMindPage() {
           font-weight: 560;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(224, 242, 232, 0.66);
+          color: rgba(214, 238, 234, 0.66);
         }
 
         .response-copy {
@@ -1917,13 +1943,8 @@ export default function ClearYourMindPage() {
           }
 
           .bubble-stage,
-          .mind-form,
           .response-zone {
             max-width: 100%;
-          }
-
-          .input-shell {
-            max-width: 660px;
           }
         }
 
@@ -1946,10 +1967,6 @@ export default function ClearYourMindPage() {
 
           .bubble-field {
             --bubble-y-offset: 42px;
-          }
-
-          .input-shell {
-            max-width: 100%;
           }
 
           .mind-input {

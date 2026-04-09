@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import {
   CHOOSE_SYSTEM_PROMPT,
-  NATURALNESS_REWRITE_SYSTEM_PROMPT,
   getChooseUserPrompt,
   type ChooseDecisionContext,
   type ChooseDecisionType,
@@ -18,11 +17,17 @@ import {
   isSharedSolaceRedFlagText,
 } from "@/lib/solace/safety/shared";
 import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
+import {
+  SOLACE_AI_UNAVAILABLE_ERROR,
+  SOLACE_SERVER_AI_TIMEOUT_MS,
+  SOLACE_UNAVAILABLE_ERROR,
+  SOLACE_UNAVAILABLE_MESSAGE,
+  withTimeout,
+} from "@/lib/solace/runtime";
 import { getOpenAIClient } from "@/lib/server/openai";
 
 const CHOOSE_RATE_LIMIT = 5;
 const CHOOSE_RATE_WINDOW_MS = 60_000;
-
 function extractInputFromUnknown(value: unknown): string {
   if (typeof value === "string") {
     return value.trim();
@@ -403,51 +408,6 @@ function formatReflectionText(text: string): string {
   return sentences.slice(0, 3).join("\n\n");
 }
 
-function needsNaturalnessRewrite(text: string): boolean {
-  const normalized = normalizeText(text);
-
-  const bannedPatterns = [
-    /\bit's normal to\b/,
-    /\bit is normal to\b/,
-    /\blife often\b/,
-    /\bthis kind of choice\b/,
-    /\bthis moment\b/,
-    /\beither way\b/,
-    /\bwhatever you decide\b/,
-    /\byou might feel\b/,
-    /\byou may feel\b/,
-  ];
-
-  return bannedPatterns.some((pattern) => pattern.test(normalized));
-}
-
-async function rewriteForNaturalness(text: string): Promise<string> {
-  const client = getOpenAIClient();
-  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
-
-  const response = await client.responses.create({
-    model,
-    max_output_tokens: 140,
-    input: [
-      {
-        role: "system",
-        content: [{ type: "input_text", text: NATURALNESS_REWRITE_SYSTEM_PROMPT }],
-      },
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: `Rewrite this Solace reflection:\n\n${text}`,
-          },
-        ],
-      },
-    ],
-  });
-
-  return (response.output_text || "").trim();
-}
-
 function buildRateLimitResponse(resetAt: number): NextResponse {
   const retryAfterSeconds = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
 
@@ -562,30 +522,30 @@ export async function POST(req: Request) {
 
     let responseFromModel;
     try {
-      const aiCall = client.responses.create({
-        model,
-        max_output_tokens: 150,
-        input: [
-          {
-            role: "system",
-            content: [{ type: "input_text", text: CHOOSE_SYSTEM_PROMPT }],
-          },
-          {
-            role: "user",
-            content: [{ type: "input_text", text: getChooseUserPrompt(input, context) }],
-          },
-        ],
-      });
-      const aiTimeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("AI_UNAVAILABLE")), 10_000),
+      responseFromModel = await withTimeout(
+        client.responses.create({
+          model,
+          max_output_tokens: 150,
+          input: [
+            {
+              role: "system",
+              content: [{ type: "input_text", text: CHOOSE_SYSTEM_PROMPT }],
+            },
+            {
+              role: "user",
+              content: [{ type: "input_text", text: getChooseUserPrompt(input, context) }],
+            },
+          ],
+        }),
+        SOLACE_SERVER_AI_TIMEOUT_MS,
+        SOLACE_AI_UNAVAILABLE_ERROR,
       );
-      responseFromModel = await Promise.race([aiCall, aiTimeout]);
     } catch (aiError) {
       const e = aiError as { status?: number };
       if (e.status === 429) console.warn("[solace] Choose: OpenAI rate limit (429)");
       return applyRateLimitHeaders(
         NextResponse.json(
-          { error: "unavailable", message: "This tool is temporarily resting." },
+          { error: SOLACE_UNAVAILABLE_ERROR, message: SOLACE_UNAVAILABLE_MESSAGE },
           { status: 503 },
         ),
         rateLimit.remaining,
@@ -594,16 +554,7 @@ export async function POST(req: Request) {
     }
 
     const rawText = (responseFromModel.output_text || "").trim();
-    let text = formatReflectionText(rawText);
-
-    if (needsNaturalnessRewrite(text)) {
-      try {
-        const rewritten = await rewriteForNaturalness(text);
-        if (rewritten) text = formatReflectionText(rewritten) || text;
-      } catch {
-        // skip rewrite on failure — keep original text
-      }
-    }
+    const text = formatReflectionText(rawText);
 
     if (!text) {
       const response = NextResponse.json(

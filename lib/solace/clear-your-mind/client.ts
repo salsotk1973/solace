@@ -1,4 +1,9 @@
 // lib/solace/clear-your-mind/client.ts
+import { postJsonWithTimeout } from "@/lib/solace/client-request";
+import {
+  isSolaceClientTimeoutError,
+  SOLACE_UNAVAILABLE_ERROR,
+} from "@/lib/solace/runtime";
 
 export type SubmitThought = {
   id: string;
@@ -32,22 +37,30 @@ export async function submitClearYourMindThoughts(
   thoughts: SubmitThought[],
 ): Promise<ClearYourMindClientResult> {
   try {
-    const res = await fetch("/api/solace/clear-your-mind", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Solace-Age-Confirmed": "1",
+    const { response, data } = await postJsonWithTimeout<unknown>(
+      "/api/solace/clear-your-mind",
+      { thoughts },
+      {
+        headers: {
+          "X-Solace-Age-Confirmed": "1",
+        },
       },
-      body: JSON.stringify({ thoughts }),
-    });
+    );
 
-    const data: unknown = await res.json();
-
-    // 🚨 Basic shape check
     if (!isObject(data)) {
       return {
         ok: false,
-        error: "Invalid response from Solace.",
+        error: response.ok ? "Invalid response from Solace." : "Something went wrong. Please try again.",
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        error:
+          typeof data.error === "string"
+            ? data.error
+            : "Something went wrong. Please try again.",
       };
     }
 
@@ -172,7 +185,8 @@ export async function submitClearYourMindThoughts(
 
     return {
       ok: false,
-      error: "Something went wrong. Please try again.",
+      error:
+        isSolaceClientTimeoutError(error) ? SOLACE_UNAVAILABLE_ERROR : "Something went wrong. Please try again.",
     };
   }
 }

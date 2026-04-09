@@ -3,6 +3,11 @@ import { evaluateClearYourMind } from "@/lib/solace/clear-your-mind/engine";
 import { classifySafetyThoughts } from "@/lib/solace/safety/classify";
 import { ClearYourMindInput } from "@/lib/solace/clear-your-mind/types";
 import { applySlidingWindowRateLimit } from "@/lib/solace/rate-limit";
+import {
+  isAiUnavailableError,
+  SOLACE_UNAVAILABLE_ERROR,
+  SOLACE_UNAVAILABLE_MESSAGE,
+} from "@/lib/solace/runtime";
 
 const CYM_RATE_LIMIT = 5;
 const CYM_RATE_WINDOW_MS = 60_000;
@@ -186,9 +191,9 @@ export async function POST(request: Request) {
       rateLimit.resetAt,
     );
   } catch (error) {
-    if (error instanceof Error && error.message === "AI_UNAVAILABLE") {
+    if (isAiUnavailableError(error)) {
       return NextResponse.json(
-        { ok: false, error: "unavailable", message: "This tool is temporarily resting." },
+        { ok: false, error: SOLACE_UNAVAILABLE_ERROR, message: SOLACE_UNAVAILABLE_MESSAGE },
         { status: 503 },
       );
     }

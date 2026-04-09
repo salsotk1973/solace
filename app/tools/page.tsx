@@ -87,8 +87,8 @@ const AI_REALMS = [
     name:     "Clear Your Mind",
     line:     "Your thoughts are circling and you can't find the floor. Release them one by one and find what's actually there.",
     href:     "/tools/clear-your-mind",
-    colour:   "rgba(68,200,110,1)",
-    bg:       "linear-gradient(145deg, #0a1a12, #0d2018, #081610)",
+    colour:   "rgba(74,208,196,1)",
+    bg:       "linear-gradient(145deg, #07191b, #0a2224, #071416)",
     minHeight: "260px",
   },
   {
@@ -96,8 +96,8 @@ const AI_REALMS = [
     name:     "Choose",
     line:     "A decision keeps turning over in your mind. See it more clearly when the noise is removed.",
     href:     "/tools/choose",
-    colour:   "rgba(68,138,228,1)",
-    bg:       "linear-gradient(145deg, #080e1a, #0c1428, #080c18)",
+    colour:   "rgba(218,148,48,1)",
+    bg:       "linear-gradient(145deg, #1a1008, #281808, #180e04)",
     minHeight: "260px",
   },
   {
@@ -105,8 +105,8 @@ const AI_REALMS = [
     name:     "Break It Down",
     line:     "Something feels too large to begin. Watch what seemed impossible become a sequence of steps.",
     href:     "/tools/break-it-down",
-    colour:   "rgba(218,148,48,1)",
-    bg:       "linear-gradient(145deg, #1a1008, #281808, #180e04)",
+    colour:   "rgba(124,116,222,1)",
+    bg:       "linear-gradient(145deg, #0d1020, #14182c, #0a0d18)",
     minHeight: "260px",
   },
 ];

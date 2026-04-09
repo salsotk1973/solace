@@ -1,4 +1,4 @@
-import {
+import type {
   ClearYourMindInput,
   ClearYourMindResponse,
   SafetyAssessment,
@@ -10,6 +10,12 @@ import {
   SOLACE_SHARED_CLARITY_TITLE,
 } from "@/lib/solace/safety/shared";
 import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
+import { getOpenAIClient } from "@/lib/server/openai";
+import {
+  SOLACE_AI_UNAVAILABLE_ERROR,
+  SOLACE_SERVER_AI_TIMEOUT_MS,
+  withTimeout,
+} from "@/lib/solace/runtime";
 
 function normalizeText(value: string): string {
   return value
@@ -146,36 +152,20 @@ ${thoughts.map((thought, index) => `${index + 1}. ${thought}`).join("\n")}
 Return exactly 3 lines, nothing else.
 `;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10_000);
+  const client = getOpenAIClient();
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-5.4",
+    const response = await withTimeout(
+      client.responses.create({
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
         input: prompt,
         max_output_tokens: 180,
       }),
-    });
+      SOLACE_SERVER_AI_TIMEOUT_MS,
+      SOLACE_AI_UNAVAILABLE_ERROR,
+    );
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      if (response.status === 429) {
-        console.warn("[solace] Clear Your Mind: OpenAI rate limit (429)");
-      }
-      throw new Error("AI_UNAVAILABLE");
-    }
-
-    const data = await response.json();
-    const text = extractResponseText(data);
-
+    const text = extractResponseText(response);
     const [line1, line2, line3] = splitIntoThreeLines(text);
 
     return [
@@ -184,11 +174,14 @@ Return exactly 3 lines, nothing else.
       line3 || "Try to steady the one part that would make today feel a little more manageable.",
     ];
   } catch (err) {
-    clearTimeout(timeoutId);
-    if (err instanceof Error && err.name === "AbortError") {
-      console.warn("[solace] Clear Your Mind: OpenAI timeout (10s)");
+    const e = err as { status?: number; message?: string };
+    if (e.status === 429) {
+      console.warn("[solace] Clear Your Mind: OpenAI rate limit (429)");
     }
-    throw new Error("AI_UNAVAILABLE");
+    if (e.message === SOLACE_AI_UNAVAILABLE_ERROR) {
+      console.warn("[solace] Clear Your Mind: OpenAI timeout (8s)");
+    }
+    throw new Error(SOLACE_AI_UNAVAILABLE_ERROR);
   }
 }
 

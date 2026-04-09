@@ -79,7 +79,7 @@ function ShellParticles() {
         width: "100vw",
         height: "100vh",
         pointerEvents: "none",
-        zIndex: 2,
+        zIndex: 0,
         overflow: "hidden",
       }}
     >
@@ -133,6 +133,7 @@ export default function PageShell({
         background: "#090d14",
         color: "white",
         position: "relative",
+        isolation: "isolate",
         ...style,
       }}
     >
@@ -142,6 +143,7 @@ export default function PageShell({
         className={contentClassName}
         style={{
           position: "relative",
+          zIndex: 1,
           width: "100%",
           maxWidth: contentContainer ? "1440px" : undefined,
           margin: contentContainer ? "0 auto" : undefined,

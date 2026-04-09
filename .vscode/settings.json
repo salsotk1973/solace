@@ -1,0 +1,20 @@
+{
+  "files.exclude": {
+    "**/solace-engine-archive/**": true,
+    "../solace-engine-archive/**": true
+  },
+  "files.watcherExclude": {
+    "**/solace-engine-archive/**": true,
+    "../solace-engine-archive/**": true
+  },
+  "search.exclude": {
+    "**/solace-engine-archive/**": true,
+    "../solace-engine-archive/**": true
+  },
+  "typescript.tsserver.watchOptions": {
+    "excludeDirectories": [
+      "**/solace-engine-archive/**",
+      "../solace-engine-archive/**"
+    ]
+  }
+}

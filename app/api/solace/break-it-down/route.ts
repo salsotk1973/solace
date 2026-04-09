@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
 import {
   applySlidingWindowRateLimit,
   getClientIdentifierFromHeaders,
@@ -10,10 +9,14 @@ import {
 } from "@/lib/solace/safety/shared";
 import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
 import { buildContextLead } from "@/lib/solace/break-it-down/context";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { getOpenAIClient } from "@/lib/server/openai";
+import {
+  SOLACE_AI_UNAVAILABLE_ERROR,
+  SOLACE_SERVER_AI_TIMEOUT_MS,
+  SOLACE_UNAVAILABLE_ERROR,
+  SOLACE_UNAVAILABLE_MESSAGE,
+  withTimeout,
+} from "@/lib/solace/runtime";
 
 type ResponseType =
   | {
@@ -838,15 +841,16 @@ User input:
 ${input}
 `;
 
-    const aiCall = openai.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
-      input: prompt,
-      max_output_tokens: 200,
-    });
-    const aiTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("AI_UNAVAILABLE")), 10_000),
+    const client = getOpenAIClient();
+    const response = await withTimeout(
+      client.responses.create({
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+        input: prompt,
+        max_output_tokens: 200,
+      }),
+      SOLACE_SERVER_AI_TIMEOUT_MS,
+      SOLACE_AI_UNAVAILABLE_ERROR,
     );
-    const response = await Promise.race([aiCall, aiTimeout]);
 
     const text = (response.output_text || "").trim();
     if (!text) return null;
@@ -875,9 +879,12 @@ ${input}
 
     return { lead, steps };
   } catch (err) {
-    const e = err as { status?: number };
+    const e = err as { status?: number; message?: string };
     if (e.status === 429) console.warn("[solace] Break It Down: OpenAI rate limit (429)");
-    throw new Error("AI_UNAVAILABLE");
+    if (e.message === SOLACE_AI_UNAVAILABLE_ERROR) {
+      console.warn("[solace] Break It Down: OpenAI timeout (8s)");
+    }
+    throw new Error(SOLACE_AI_UNAVAILABLE_ERROR);
   }
 }
 
@@ -1082,9 +1089,9 @@ export async function POST(req: Request) {
 
     return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
   } catch (error) {
-    if (error instanceof Error && error.message === "AI_UNAVAILABLE") {
+    if (error instanceof Error && error.message === SOLACE_AI_UNAVAILABLE_ERROR) {
       return NextResponse.json(
-        { error: "unavailable", message: "This tool is temporarily resting." },
+        { error: SOLACE_UNAVAILABLE_ERROR, message: SOLACE_UNAVAILABLE_MESSAGE },
         { status: 503 },
       );
     }

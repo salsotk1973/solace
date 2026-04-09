@@ -34,42 +34,55 @@ export default function ChoosePage() {
         }}
       />
 
-      <ToolSeoContent h1="Choose — decision clarity when you feel stuck">
-        <p>
-          Decision paralysis is usually not a lack of intelligence. It is a lack of
-          signal. When both options feel loaded, your mind keeps simulating outcomes
-          without landing. Choose helps you separate facts, fears, and priorities.
-        </p>
-        <p>
-          The goal is not a perfect answer. The goal is a clearer answer you can
-          trust enough to act on.
-        </p>
-        <SeoH2>Why decision tools help</SeoH2>
-        <p>
-          Most difficult decisions are emotional plus practical. If you only analyse
-          logic, you miss what matters. If you only follow emotion, you may miss
-          consequences. A structured reflection lets both sides be seen at the same
-          time.
-        </p>
-        <SeoH2>How to use Choose</SeoH2>
-        <p>
-          State the decision in one sentence. Name the options clearly. Then test
-          each option against your values, likely outcomes, and what future-you would
-          most respect. Clarity often arrives as reduction: one option starts to feel
-          cleaner.
-        </p>
-        <SeoH2>When to use this tool</SeoH2>
-        <p>
-          Use Choose for career moves, relationship crossroads, financial decisions,
-          and any moment where indecision is draining your energy. Decide, then
-          commit to a next step.
-        </p>
-        <SeoDisclaimer>
-          This tool provides reflective support only. It is not legal, financial, or
-          medical advice. For high-stakes decisions, consult an appropriate
-          professional.
-        </SeoDisclaimer>
-      </ToolSeoContent>
+    <ToolSeoContent h1="Choose — decision clarity when life feels too loud to think straight">
+  <p>
+    When you've been going back and forth for weeks, the problem isn't that you
+    don't know enough. It's that everything feels equally weighted. Choose helps
+    you separate what's fear, what's fact, and what actually matters to you.
+  </p>
+  <p>
+    You don't need a perfect answer. You need a clearer one — one you can trust
+    enough to take the next step.
+  </p>
+
+  <SeoH2>What to bring here</SeoH2>
+  <p>
+    Bring the decision that keeps you awake. Career change, relationship
+    crossroads, a life chapter ending or beginning. Write it as a question:
+    "Should I leave?" "Should I say yes?" Start there. You don't need to
+    explain everything — just the question that won't leave you alone.
+  </p>
+
+  <SeoH2>Why you can't think your way out of this</SeoH2>
+  <p>
+    Hard decisions are never just logical. If they were, you'd have decided
+    already. What makes them hard is that emotion and practicality are pulling
+    in different directions — and most tools only address one side. Choose holds
+    both at once.
+  </p>
+
+  <SeoH2>How Choose helps you move forward</SeoH2>
+  <p>
+    Choose won't tell you what to do. It helps you hear yourself more clearly —
+    what you're afraid of, what you actually value, and what future-you will
+    respect. Most people find that clarity arrives quietly: one path simply
+    starts to feel more like them than the other.
+  </p>
+
+  <SeoH2>When this tool is for you</SeoH2>
+  <p>
+    If you're burnt out, overwhelmed, or standing at a crossroads — and the
+    people around you are too close to it to help — this is the space to think
+    it through. Private, calm, without judgement. Use it once and see what
+    surfaces.
+  </p>
+
+  <SeoDisclaimer>
+    This tool provides reflective support only. It is not legal, financial, or
+    medical advice. For high-stakes decisions, consult an appropriate
+    professional.
+  </SeoDisclaimer>
+</ToolSeoContent>
     </>
   );
 }
