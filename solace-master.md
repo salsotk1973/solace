@@ -184,9 +184,51 @@ privately, gently, without judgement.
 ---
 
 ## Current Session Status
-- **SEO copy:** All 6 client tools completed (inclusive audience, identity gatekeeping removed) — ready for Codex integration
-- **Next step:** Hand 6-tool SEO copy spec to Codex, verify implementation on each tool page, then update master file after screenshots confirm
-- **Handoff format:** Master file load at session start to replace 5+ individual skills
+- **Breathing Tool:** Free/paid gating spec complete and ready for Codex
+- **Next step:** Hand breathing-free-paid-spec.md to Codex, implement Phase 1 (7-day cutoff) + Phase 2 (upgrade messaging), screenshot, verify, ready to ship
+- **After Breathing ships:** Same process for Focus Timer → Sleep Wind-Down → Thought Reframer → Mood Tracker → Gratitude Log (each with custom free/paid boundaries)
+
+---
+
+## Tool-by-Tool Free/Paid Strategy (Locked)
+
+### Breathing Tool (CURRENT — SPEC READY)
+**Free features:** Unlimited sessions, all paces, 7-day history, basic stats
+**Paid features:** Full history, export, pattern analysis, streak tracking
+**Conversion trigger:** Day 8 history cutoff (user sees they can't access older sessions)
+**Copy strategy:** "Paid users never lose their history" (not shame-based)
+**Implementation:** Phase 1 (cutoff) + Phase 2 (messaging); Phase 3-4 deferred post-launch
+**Spec file:** breathing-free-paid-spec.md (ready for Codex)
+
+### Focus Timer (NEXT)
+**Free features:** Timer, basic stats, 7-day history
+**Paid features:** Productivity insights, weekly reports, focus streaks
+**Conversion trigger:** User notices trend ("you're 30% more productive at 9am") — unlock with paid
+**Positioning:** "See your productivity patterns"
+
+### Sleep Wind-Down (AFTER FOCUS)
+**Free features:** Sessions, 7-day history
+**Paid features:** Sleep quality tracking, personalized routines, export
+**Conversion trigger:** User realizes they can't track sleep patterns long-term
+**Positioning:** "Track your sleep over time"
+
+### Thought Reframer (AFTER SLEEP)
+**Free features:** Reframe sessions, 7-day history
+**Paid features:** Pattern detection ("you spiral on X topics"), AI insights, export
+**Conversion trigger:** User reframes same thought twice — unlock patterns to see they're not alone
+**Positioning:** "See your thinking patterns"
+
+### Mood Tracker (HIGHEST VALUE — AFTER REFRAMER)
+**Free features:** Daily check-in, 7-day history
+**Paid features:** **Pattern analysis is THE value** — correlations, triggers, trends, export
+**Conversion trigger:** User realizes "I'm always low on Mondays" — unlock analysis to confirm
+**Positioning:** "Understand what affects your mood"
+
+### Gratitude Log (LAST)
+**Free features:** Daily entries, 7-day history
+**Paid features:** Export, reflection prompts by mood, archive search
+**Conversion trigger:** User wants to revisit past gratitudes (beyond 7 days)
+**Positioning:** "Build your gratitude practice"
 
 ---
 
