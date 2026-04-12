@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 import "../styles/tokens.css";
 
@@ -30,11 +28,7 @@ export default function RootLayout({
           />
         </head>
         <body style={{ backgroundColor: "#090d14" }}>
-          <div style={{ minHeight: "100vh", backgroundColor: "#090d14" }}>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-          </div>
+          {children}
         </body>
       </html>
     </ClerkProvider>
