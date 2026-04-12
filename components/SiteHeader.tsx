@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 import SiteHeaderMobileMenu from "@/components/SiteHeaderMobileMenu";
+import SiteHeaderAuthControls from "@/components/SiteHeaderAuthControls";
 
 const navItems = [
   { label: "Tools", href: "/tools" },
@@ -8,7 +10,10 @@ const navItems = [
   { label: "About", href: "/about" },
 ];
 
-export default function SiteHeader() {
+export default async function SiteHeader() {
+  const { userId } = await auth();
+  const isSignedIn = !!userId;
+
   return (
     <>
       <style>{`
@@ -133,44 +138,11 @@ export default function SiteHeader() {
               }}
             />
 
-            <Link
-              href="/sign-in"
-              className="site-header-auth-link"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: "13px",
-                letterSpacing: "0.04em",
-                color: "rgba(215,210,240,0.65)",
-                textDecoration: "none",
-                transition: "color 220ms ease",
-              }}
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/sign-up"
-              className="site-header-auth-button"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: "13px",
-                letterSpacing: "0.04em",
-                color: "rgba(215,210,240,0.9)",
-                textDecoration: "none",
-                padding: "7px 18px",
-                borderRadius: "4px",
-                border: "0.5px solid rgba(200,195,235,0.22)",
-                background: "transparent",
-                transition: "color 220ms ease, border-color 220ms ease, background 220ms ease",
-              }}
-            >
-              Start free
-            </Link>
+            <SiteHeaderAuthControls isSignedIn={isSignedIn} />
           </nav>
         </div>
 
-        <SiteHeaderMobileMenu navItems={navItems} isSignedIn={false} />
+        <SiteHeaderMobileMenu navItems={navItems} isSignedIn={isSignedIn} />
       </header>
     </>
   );

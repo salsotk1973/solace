@@ -6,7 +6,7 @@ import PageShell from "@/components/PageShell";
 import {
   SOLACE_SCOPE_FULL,
   SOLACE_TOOL_NOTICE,
-} from "../../lib/solace/safety";
+} from "@/lib/solace/safety";
 
 export default function ScopePage() {
   return (
@@ -97,7 +97,7 @@ export default function ScopePage() {
                   </h2>
 
                   <div className="mt-3 space-y-3">
-                    {SOLACE_SCOPE_FULL.map((line, index) => (
+                    {SOLACE_SCOPE_FULL.map((line: string, index: number) => (
                       <p
                         key={`${line}-${index}`}
                         className="text-[15px] leading-7 text-white/72"

@@ -1,6 +1,6 @@
 "use client";
-
 import Link from "next/link";
+import { useClerk, UserButton } from "@clerk/nextjs";
 
 type Props = {
   isSignedIn: boolean;
@@ -58,10 +58,11 @@ export default function SiteHeaderAuthControls({
   mobile = false,
   onNavigate,
 }: Props) {
-  const linkClassName = mobile ? "site-header-mobile-auth-link" : "site-header-auth-link";
-  const buttonClassName = mobile ? "site-header-mobile-auth-button" : "site-header-auth-button";
+  const { signOut } = useClerk();
   const linkStyle = mobile ? mobileLinkStyle : desktopLinkStyle;
   const buttonStyle = mobile ? mobileButtonStyle : desktopButtonStyle;
+  const linkClassName = mobile ? "site-header-mobile-auth-link" : "site-header-auth-link";
+  const buttonClassName = mobile ? "site-header-mobile-auth-button" : "site-header-auth-button";
 
   if (!isSignedIn) {
     return (
@@ -96,15 +97,26 @@ export default function SiteHeaderAuthControls({
       >
         Dashboard
       </Link>
-
-      <Link
-        href="/sign-out"
-        onClick={onNavigate}
+      <button
+        onClick={() => signOut({ redirectUrl: "/" })}
         className={buttonClassName}
-        style={buttonStyle}
+        style={{ ...buttonStyle, cursor: "pointer" }}
       >
         Sign out
-      </Link>
+      </button>
+      {!mobile && (
+        <UserButton
+          appearance={{
+            elements: {
+              avatarBox: "w-7 h-7",
+              userButtonPopoverCard: "bg-[#0f1623] border border-white/10",
+              userButtonPopoverActionButton: "text-[#e4def6] hover:bg-white/5",
+              userButtonPopoverActionButtonText: "text-[#e4def6]",
+              userButtonPopoverFooter: "hidden",
+            },
+          }}
+        />
+      )}
     </>
   );
 }
