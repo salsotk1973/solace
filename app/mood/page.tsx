@@ -5,11 +5,13 @@ import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Daily Mood Tracker Online | Emotional Wellbeing Journal — Solace",
-  description: "Track your daily mood and emotional patterns online. Free mood tracking with history and insights. Understand how you feel — and why.",
+  title: "Mood Tracking to Understand Emotional Patterns — Solace",
+  description:
+    "Mood tracking that helps you understand patterns in stress, sleep, and wellbeing. Track your mood and connect it to real life context.",
   openGraph: {
     title: "Mood Tracker — Solace",
-    description: "Track your daily mood and discover patterns over time.",
+    description:
+      "Understand your emotional patterns with mood tracking that reveals what actually affects your wellbeing.",
     url: "https://solace.digital/tools/mood-tracker",
   },
 };
@@ -91,15 +93,52 @@ export default async function MoodPage() {
         }}
       />
 
-      <ToolSeoContent h1="Daily mood tracker — understand your emotional patterns">
-        <p>You cannot manage what you cannot see. Most people have a rough sense of how they have been feeling lately — good week, hard month — but the details are lost almost immediately. The bad afternoon disappears into the good morning. A mood tracker gives you back the details.</p>
-        <SeoH2>Why tracking your mood matters</SeoH2>
-        <p>Emotional patterns are real and legible — but only if you record them. Many people discover after a few weeks that their mood follows patterns they had never noticed: consistently lower on Sundays, better after exercise, worse in certain seasons. You cannot act on &quot;I have been feeling off&quot; but you can act on &quot;my mood drops every Sunday evening.&quot;</p>
+      <ToolSeoContent h1="Understand your patterns — mood tracking that reveals what actually affects your wellbeing">
+        <p>
+          You know your mood fluctuates, but you might not know why. One day
+          you&apos;re steady, the next you&apos;re overwhelmed. Is it sleep?
+          Stress? Unmet needs? When you&apos;re managing multiple demands, mood
+          tracking feels like one more thing. But it&apos;s actually the
+          opposite. It&apos;s the clarity tool that shows you what actually
+          matters for your steadiness.
+        </p>
+        <p>
+          Most mood trackers ask &quot;how do you feel?&quot; and leave you
+          hanging. This one helps you connect mood to context, so patterns
+          emerge. Over time, you see what genuinely affects you, and what you
+          can influence.
+        </p>
+        <SeoH2>Why understanding your patterns matters</SeoH2>
+        <p>
+          When life is complex, you lose track of what triggers and stabilises
+          you. Mood tracking creates the data you need to make better choices.
+          You see that sleep matters more than you thought. That certain
+          conversations drain you more than others. That some people energise
+          you and others leave you empty. That&apos;s not weakness,
+          that&apos;s information.
+        </p>
         <SeoH2>How to use the mood tracker</SeoH2>
-        <p>Check in once a day — the same time works best. Choose a number that reflects how you have felt in the last few hours, not just right now. Add a brief note if anything significant happened. The value is in the accumulation, not the precision of any single entry. With a week of entries, patterns start to emerge. With a month, they become clear.</p>
-        <SeoH2>What to do with your mood data</SeoH2>
-        <p>Look for correlations. Sleep, exercise, social contact, and work stress are the most common influences. When you have a low-mood stretch, look back at what was happening. Your own data is more accurate than any generalisation about what affects wellbeing.</p>
-        <SeoDisclaimer>This tool provides reflective support only. If your mood has been significantly low for an extended period, please speak with a healthcare professional.</SeoDisclaimer>
+        <p>
+          Check in once or twice daily. Rate your mood simply. Add one note if
+          you want: sleep quality, what happened, what you need. Over weeks,
+          patterns show up. You&apos;ll notice what stabilises you and what
+          destabilises you. Use that knowledge to protect yourself.
+        </p>
+        <SeoH2>When to use this tool</SeoH2>
+        <p>
+          If mood shifts feel unpredictable. If you&apos;re not sure what
+          helps. If you want to connect your feelings to your life
+          circumstances. If you&apos;re trying to understand whether something
+          is a phase or a pattern. If you want data for conversations with
+          healthcare providers.
+        </p>
+        <SeoDisclaimer>
+          This tool provides mood tracking support only. It is not a diagnostic
+          tool and does not replace professional mental health assessment. If
+          you experience persistent low mood, unusual mood changes, or thoughts
+          of self-harm, contact a qualified mental health professional or crisis
+          service.
+        </SeoDisclaimer>
       </ToolSeoContent>
     </PageShell>
   );

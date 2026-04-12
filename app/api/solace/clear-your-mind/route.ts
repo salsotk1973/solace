@@ -139,9 +139,23 @@ export async function POST(request: Request) {
       return buildRateLimitResponse(rateLimit.resetAt);
     }
 
-    const body = (await request.json()) as Partial<ClearYourMindInput> & {
+    let body: (Partial<ClearYourMindInput> & {
       thoughts?: ThoughtLike[];
-    };
+    }) | null = null;
+
+    try {
+      body = (await request.json()) as Partial<ClearYourMindInput> & {
+        thoughts?: ThoughtLike[];
+      };
+    } catch {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Invalid request body.",
+        },
+        { status: 400 },
+      );
+    }
 
     const normalizedThoughts = normalizeThoughts(body?.thoughts);
     const thoughtTexts = normalizedThoughts.map((item) => item.text);

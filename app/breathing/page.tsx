@@ -1,25 +1,27 @@
 import Link from "next/link";
 import BreathingSession from "@/components/breathing/BreathingSession";
-import { getCurrentUser }   from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/auth-user";
 import { SOLACE_ROUTES }    from "@/lib/solace/routes";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Box Breathing Exercise Online | Breathing Tool — Solace",
-  description: "Free box breathing and 4-7-8 breathing exercises online. Calm anxiety, reduce stress, and regain focus in minutes. No account needed.",
+  title: "Guided Breathing for Anxiety | Calm Your Nervous System — Solace",
+  description:
+    "Guided breathing for anxiety, stress, and overwhelm. Calm your nervous system in 3-5 minutes with breathing patterns designed for clarity and steadiness.",
   openGraph: {
-    title: "Box Breathing Exercise — Solace",
-    description: "Calm your nervous system in minutes with guided breathing patterns.",
+    title: "Calm Your Nervous System — Solace",
+    description:
+      "Guided breathing for anxiety, stress, and overwhelm to help you feel steady enough to think clearly.",
     url: "https://solace.digital/tools/breathing",
   },
 };
 
 export default async function BreathingPage() {
-  const { userId } = await getCurrentUser();
+  const userId = await getCurrentUserId();
 
   return (
-    <PageShell>
+    <PageShell particles={false}>
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
 
         {/* ── Tool header ───────────────────────────────────────────────── */}
@@ -48,6 +50,7 @@ export default async function BreathingPage() {
           <div className="grid grid-cols-2 gap-4">
             <Link
               href={SOLACE_ROUTES.clearYourMind}
+              prefetch={false}
               className="group rounded-[14px] p-7 border border-[rgba(68,200,110,0.1)] bg-[linear-gradient(145deg,#0a1a12,#0d2018,#081610)] hover:border-[rgba(68,200,110,0.26)] transition-all duration-500"
             >
               <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(68,200,110,0.42)] mb-2.5">
@@ -59,6 +62,7 @@ export default async function BreathingPage() {
             </Link>
             <Link
               href={SOLACE_ROUTES.breakItDown}
+              prefetch={false}
               className="group rounded-[14px] p-7 border border-[rgba(218,148,48,0.1)] bg-[linear-gradient(145deg,#1a1008,#281808,#180e04)] hover:border-[rgba(218,148,48,0.26)] transition-all duration-500"
             >
               <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(218,148,48,0.42)] mb-2.5">
@@ -91,16 +95,46 @@ export default async function BreathingPage() {
         }}
       />
 
-      <ToolSeoContent h1="Breathing exercises for anxiety, focus, and calm">
-        <p>Your breath is one of the few things in your body you can consciously control — and that control reaches places most techniques cannot. When you slow your breathing deliberately, your nervous system follows. Heart rate drops. Cortisol falls. The part of your brain that has been screaming quiets down.</p>
-        <p>This breathing tool offers three patterns, each designed for a different moment. You do not need experience. You just need to breathe along.</p>
-        <SeoH2>Box breathing — the 4-4-4-4 technique</SeoH2>
-        <p>Box breathing is used by Navy SEALs, surgeons, and anyone who needs to perform under pressure. Inhale for 4 counts, hold for 4, exhale for 4, hold for 4. The hold phases activate the parasympathetic nervous system — the part of your body that signals safety. Four rounds is enough to feel a difference. Eight rounds is a reset.</p>
-        <SeoH2>The 4-7-8 breathing method</SeoH2>
-        <p>Inhale for 4, hold for 7, exhale for 8. The extended exhale directly stimulates the vagus nerve, triggering a calm response almost immediately. Many people find 4-7-8 more powerful for acute anxiety. The extended hold can feel uncomfortable at first. Stick with it.</p>
-        <SeoH2>When to use breathing exercises</SeoH2>
-        <p>Breathing exercises work best used before you need them — a daily five minutes builds baseline calm. But they work reactively too. The most common mistake is stopping too soon. Three to four complete cycles is where the shift begins.</p>
-        <SeoDisclaimer>This tool provides reflective support only. It is not medical advice. If you are experiencing a mental health crisis, please contact a qualified professional or crisis service in your area.</SeoDisclaimer>
+      <ToolSeoContent h1="Calm your nervous system — guided breathing for clarity and steadiness">
+        <p>
+          When stress rises, breathing becomes shallow and fast. Your nervous
+          system reads this as a threat. Breathing slowly, deeply, and
+          intentionally sends the opposite signal. Solace guides you through
+          breathing patterns designed to lower activation, so your body knows
+          it&apos;s safe enough to think clearly.
+        </p>
+        <p>
+          This isn&apos;t meditation. It&apos;s a biological reset. In 3-5
+          minutes, the right breathing pattern shifts you from reactive panic
+          toward grounded decision-making. You stay in control.
+        </p>
+        <SeoH2>Why breathing works for stress and anxiety</SeoH2>
+        <p>
+          Your nervous system controls breathing automatically, but you can
+          hijack that circuit intentionally. Slow, deep breathing activates the
+          vagus nerve, which tells your body to downshift from fight-or-flight
+          toward rest-and-digest. Research shows controlled breathing reduces
+          stress hormones within minutes. When stress is high, breathing is
+          your fastest tool.
+        </p>
+        <SeoH2>How to use Solace&apos;s breathing tool</SeoH2>
+        <p>
+          Choose your pace: slow for deep calm, moderate for gentle reset,
+          faster for energy. Follow the guide. Breathe in rhythm. Most users
+          feel noticeably different within 3-5 minutes. Use it before difficult
+          conversations, after bad news, or when you feel overwhelm rising.
+        </p>
+        <SeoH2>When to use this tool</SeoH2>
+        <p>
+          Before you make a decision you&apos;ll regret. After a conflict. When
+          anxiety is rising. When your mind is racing and you need 5 minutes of
+          steadiness. When the weight of everything feels too much.
+        </p>
+        <SeoDisclaimer>
+          This tool provides breathing guidance only. It is not medical or
+          mental health advice. If you experience chest pain or serious
+          breathing difficulty, seek medical attention immediately.
+        </SeoDisclaimer>
       </ToolSeoContent>
     </PageShell>
   );

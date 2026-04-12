@@ -35,46 +35,15 @@ const ORB_MAX      = 1.18;
 // SVG geometry
 const SVG_SIZE   = 240;
 const SVG_CENTER = 120;
-const SESSION_R  = 90;
-const PHASE_R    = 104;
-const SESSION_C  = 2 * Math.PI * SESSION_R; // ~565.5
-const PHASE_C    = 2 * Math.PI * PHASE_R;   // ~653.5
+const SESSION_R  = 128;
+const SESSION_C  = 2 * Math.PI * SESSION_R; // ~741.4
 
 type ActivePhase = PhaseType | "idle";
 
-const GLOW_SHADOWS: Record<ActivePhase, string> = {
-  idle: [
-    "0 0 40px 12px rgba(45,212,191,0.18)",
-    "0 0 80px 30px rgba(45,212,191,0.10)",
-    "0 0 160px 70px rgba(45,212,191,0.05)",
-  ].join(", "),
-  inhale: [
-    "0 0 60px 20px rgba(45,212,191,0.28)",
-    "0 0 120px 50px rgba(45,212,191,0.16)",
-    "0 0 240px 100px rgba(45,212,191,0.07)",
-  ].join(", "),
-  "hold-in": [
-    "0 0 60px 20px rgba(45,212,191,0.28)",
-    "0 0 120px 50px rgba(45,212,191,0.16)",
-    "0 0 240px 100px rgba(45,212,191,0.07)",
-  ].join(", "),
-  exhale: [
-    "0 0 40px 12px rgba(45,212,191,0.18)",
-    "0 0 80px 30px rgba(45,212,191,0.10)",
-    "0 0 160px 70px rgba(45,212,191,0.05)",
-  ].join(", "),
-  "hold-out": [
-    "0 0 40px 12px rgba(45,212,191,0.18)",
-    "0 0 80px 30px rgba(45,212,191,0.10)",
-    "0 0 160px 70px rgba(45,212,191,0.05)",
-  ].join(", "),
-};
-
-const RING_CONFIG = [
-  { size: 200, width: 1.5, inactive: "rgba(45,212,191,0)", active: "rgba(45,212,191,0.26)", shadow: "0 0 18px 3px rgba(45,212,191,0.18), 0 0 36px 10px rgba(45,212,191,0.08)", delay: 0 },
-  { size: 240, width: 1, inactive: "rgba(45,212,191,0)", active: "rgba(45,212,191,0.18)", shadow: "0 0 20px 4px rgba(45,212,191,0.12), 0 0 44px 14px rgba(45,212,191,0.05)", delay: 0.2 },
-  { size: 290, width: 1, inactive: "rgba(45,212,191,0)", active: "rgba(45,212,191,0.1)", shadow: "0 0 28px 6px rgba(45,212,191,0.08), 0 0 54px 18px rgba(45,212,191,0.04)", delay: 0.4 },
-] as const;
+const GLOW_MIN_SCALE = 1.05;
+const GLOW_MAX_SCALE = 1.3;
+const GLOW_MIN_OPACITY = 0.28;
+const GLOW_MAX_OPACITY = 0.46;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -83,15 +52,24 @@ interface Props {
   isRunning: boolean;
   onCycleChange: (cycle: number) => void;
   onComplete: () => void;
+  onPhaseChange?: (phase: PhaseType | "idle", duration: number) => void;
 }
 
-export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComplete }: Props) {
+export default function BreathingOrb({
+  pattern,
+  isRunning,
+  onCycleChange,
+  onComplete,
+  onPhaseChange,
+}: Props) {
   const sessionRingRef = useRef<SVGCircleElement>(null);
   const phaseRingRef   = useRef<SVGCircleElement>(null);
+  const progressBeadRef = useRef<SVGGElement>(null);
   const isRunningRef   = useRef(false);
   const timeoutsRef    = useRef<number[]>([]);
   const onCycleChangeRef = useRef(onCycleChange);
   const onCompleteRef = useRef(onComplete);
+  const onPhaseChangeRef = useRef(onPhaseChange);
   const [activePhase, setActivePhase] = useState<ActivePhase>("idle");
   const [phaseDuration, setPhaseDuration] = useState(1.5);
   const [label, setLabel] = useState("");
@@ -100,18 +78,23 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
   useEffect(() => {
     onCycleChangeRef.current = onCycleChange;
     onCompleteRef.current = onComplete;
-  }, [onCycleChange, onComplete]);
+    onPhaseChangeRef.current = onPhaseChange;
+  }, [onCycleChange, onComplete, onPhaseChange]);
 
   useEffect(() => {
     if (sessionRingRef.current) {
-      sessionRingRef.current.style.stroke = "none";
+      sessionRingRef.current.style.stroke = "rgba(190,250,255,0.5)";
       sessionRingRef.current.style.opacity = "0";
       sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
     }
     if (phaseRingRef.current) {
       phaseRingRef.current.style.stroke = "none";
       phaseRingRef.current.style.opacity = "0";
-      phaseRingRef.current.style.strokeDashoffset = `${PHASE_C}`;
+      phaseRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+    }
+    if (progressBeadRef.current) {
+      progressBeadRef.current.style.opacity = "0";
+      progressBeadRef.current.style.transform = "rotate(0deg)";
     }
   }, []);
 
@@ -121,10 +104,49 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
     timeoutsRef.current = [];
 
     if (!isRunning) {
+      onPhaseChangeRef.current?.("idle", 0);
+      if (sessionRingRef.current) {
+        sessionRingRef.current.style.transition = "none";
+        sessionRingRef.current.style.opacity = "0";
+        sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+      }
+      if (progressBeadRef.current) {
+        progressBeadRef.current.style.transition = "none";
+        progressBeadRef.current.style.opacity = "0";
+        progressBeadRef.current.style.transform = "rotate(0deg)";
+      }
       return;
     }
 
     const phases = PATTERNS[pattern];
+    const sessionDuration = phases.reduce(
+      (total, phase) => total + phase.duration,
+      0,
+    ) * TOTAL_CYCLES;
+
+    if (sessionRingRef.current) {
+      sessionRingRef.current.style.transition = "none";
+      sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+      sessionRingRef.current.style.opacity = "0.7";
+
+      window.requestAnimationFrame(() => {
+        if (!sessionRingRef.current || !isRunningRef.current) return;
+        sessionRingRef.current.style.transition = `stroke-dashoffset ${sessionDuration}s linear`;
+        sessionRingRef.current.style.strokeDashoffset = "0";
+      });
+    }
+
+    if (progressBeadRef.current) {
+      progressBeadRef.current.style.transition = "none";
+      progressBeadRef.current.style.opacity = "0.9";
+      progressBeadRef.current.style.transform = "rotate(0deg)";
+
+      window.requestAnimationFrame(() => {
+        if (!progressBeadRef.current || !isRunningRef.current) return;
+        progressBeadRef.current.style.transition = `transform ${sessionDuration}s linear`;
+        progressBeadRef.current.style.transform = "rotate(360deg)";
+      });
+    }
 
     const runPhase = (cycleIndex: number, phaseIndex: number) => {
       if (!isRunningRef.current) return;
@@ -134,6 +156,7 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
       setPhaseDuration(phase.duration);
       setLabel(phase.label);
       setCycleLabel(`Cycle ${cycleIndex + 1} of ${TOTAL_CYCLES}`);
+      onPhaseChangeRef.current?.(phase.type, phase.duration);
 
       const timeout = window.setTimeout(() => {
         if (!isRunningRef.current) return;
@@ -153,6 +176,7 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
         isRunningRef.current = false;
         setLabel("");
+        onPhaseChangeRef.current?.("idle", 0);
         onCompleteRef.current();
       }, phase.duration * 1000);
 
@@ -166,6 +190,7 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
       isRunningRef.current = false;
       for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
       timeoutsRef.current = [];
+      onPhaseChangeRef.current?.("idle", 0);
     };
   }, [isRunning, pattern]);
 
@@ -174,11 +199,12 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
   const displayCycleLabel = isRunning ? cycleLabel : "";
   const displayDuration = isRunning ? phaseDuration : 1.5;
   const orbScale = displayPhase === "inhale" || displayPhase === "hold-in" ? ORB_MAX : ORB_MIN;
-  const ringActive = displayPhase === "inhale";
+  const glowActive = displayPhase === "inhale" || displayPhase === "hold-in";
   const running = isRunning && displayPhase !== "idle";
   const orbTransition = `transform ${displayDuration}s ease-in-out, filter ${displayDuration}s ease-in-out`;
-  const glowAnimation = running ? "none" : "glowIdle 4s ease-in-out infinite";
-  const orbAnimation = running ? "none" : "orbIdle 4s ease-in-out infinite";
+  const orbAnimation = "none";
+  const glowScale = glowActive ? GLOW_MAX_SCALE : GLOW_MIN_SCALE;
+  const glowOpacity = glowActive ? GLOW_MAX_OPACITY : GLOW_MIN_OPACITY;
 
   // ── JSX ───────────────────────────────────────────────────────────────────
 
@@ -187,79 +213,27 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
 
       {/* ── Orb stage ──────────────────────────────────────────────────── */}
       <div className="relative w-[240px] h-[240px]">
-        {/* Progress rings — rotated so arc starts from top (12 o'clock) */}
-        <svg
-          className="absolute inset-0 -rotate-90 pointer-events-none"
-          width={SVG_SIZE}
-          height={SVG_SIZE}
-          viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
-        >
-          {/* Session ring — outer */}
-          <circle
-            ref={sessionRingRef}
-            cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
-            fill="none"
-            stroke="none"
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeDasharray={SESSION_C}
-            strokeDashoffset={SESSION_C}
-            opacity={0}
-          />
-          {/* Phase arc — inner */}
-          <circle
-            ref={phaseRingRef}
-            cx={SVG_CENTER} cy={SVG_CENTER} r={PHASE_R}
-            fill="none"
-            stroke="none"
-            strokeWidth={1}
-            strokeLinecap="round"
-            strokeDasharray={PHASE_C}
-            strokeDashoffset={PHASE_C}
-            opacity={0}
-          />
-        </svg>
-
-        {/* Glow layer */}
+        {/* Base glow layer */}
         <div
-          className="glow-idle absolute inset-0 z-0 rounded-full pointer-events-none"
+          className="absolute z-0 rounded-full pointer-events-none"
           style={{
-            animation: glowAnimation,
-            background: "radial-gradient(circle at center, rgba(45,212,191,0.16) 0%, rgba(45,212,191,0.08) 34%, rgba(45,212,191,0.02) 62%, rgba(45,212,191,0) 82%)",
-            boxShadow: GLOW_SHADOWS[displayPhase],
-            opacity: running ? 1 : 0.78,
-            transition: "box-shadow 1.5s ease-in-out, opacity 1.5s ease-in-out",
+            animation: "none",
+            width: "192px",
+            height: "192px",
+            left: "24px",
+            top: "24px",
+            background: "rgba(45, 212, 191, 0.55)",
+            filter: "blur(42px)",
+            opacity: glowOpacity,
+            transform: `scale(${glowScale})`,
+            transformOrigin: "center",
+            transition: `opacity ${displayDuration}s ease-in-out, transform ${displayDuration}s ease-in-out`,
           }}
         />
 
-        {RING_CONFIG.map((ring, index) => {
-          const offset = (240 - ring.size) / 2;
-          return (
-            <div
-              key={ring.size}
-              className="absolute rounded-full pointer-events-none"
-              style={{
-                width: `${ring.size}px`,
-                height: `${ring.size}px`,
-                left: `${offset}px`,
-                top: `${offset}px`,
-                background: "transparent",
-                border: `${ring.width}px solid ${ringActive ? ring.active : ring.inactive}`,
-                boxShadow: ringActive ? ring.shadow : "none",
-                opacity: ringActive ? 1 : 0,
-                mixBlendMode: "screen",
-                filter: ringActive ? "blur(0.15px)" : "none",
-                transform: `scale(${ringActive ? 1.03 + index * 0.015 : 0.96})`,
-                transition: "border-color 0.8s ease, box-shadow 0.8s ease, opacity 0.8s ease, transform 1s ease-out, filter 0.8s ease",
-                transitionDelay: ringActive ? `${ring.delay}s` : "0s",
-              }}
-            />
-          );
-        })}
-
         {/* Orb sphere */}
         <div
-          className="orb-idle absolute w-[192px] h-[192px] rounded-full top-[24px] left-[24px] z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(148,248,239,0.48)_0%,rgba(92,222,211,0.28)_34%,rgba(48,168,162,0.16)_62%,rgba(24,100,112,0.06)_84%,rgba(24,100,112,0.01)_100%)]"
+          className="orb-idle absolute w-[192px] h-[192px] rounded-full top-[24px] left-[24px] z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(148,248,239,0.36)_0%,rgba(92,222,211,0.22)_38%,rgba(45,150,150,0.14)_72%,rgba(22,82,96,0.12)_100%)]"
           style={{
             animation: orbAnimation,
             filter: displayPhase === "exhale" ? "blur(0px)" : "none",
@@ -268,9 +242,66 @@ export default function BreathingOrb({ pattern, isRunning, onCycleChange, onComp
           }}
         />
 
+        {/* Session progress ring — rotated so arc starts from top (12 o'clock) */}
+        <svg
+          className="absolute inset-0 z-20 -rotate-90 pointer-events-none"
+          width={SVG_SIZE}
+          height={SVG_SIZE}
+          viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
+          overflow="visible"
+        >
+          <circle
+            cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
+            fill="none"
+            stroke="rgba(180,245,250,0.16)"
+            strokeWidth={1.25}
+            strokeLinecap="round"
+            opacity={0.9}
+          />
+          <circle
+            ref={sessionRingRef}
+            cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
+            fill="none"
+            stroke="rgba(190,250,255,0.5)"
+            strokeWidth={1.75}
+            strokeLinecap="round"
+            strokeDasharray={SESSION_C}
+            strokeDashoffset={SESSION_C}
+            opacity={0}
+          />
+          <circle
+            ref={phaseRingRef}
+            cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
+            fill="none"
+            stroke="none"
+            strokeWidth={1}
+            strokeLinecap="round"
+            strokeDasharray={SESSION_C}
+            strokeDashoffset={SESSION_C}
+            opacity={0}
+          />
+          <g
+            ref={progressBeadRef}
+            style={{
+              opacity: 0,
+              transformOrigin: `${SVG_CENTER}px ${SVG_CENTER}px`,
+            }}
+          >
+            <circle
+              cx={SVG_CENTER + SESSION_R}
+              cy={SVG_CENTER}
+              r={2.35}
+              fill="rgba(210,252,255,0.96)"
+              style={{
+                filter: "drop-shadow(0 0 4px rgba(190,250,255,0.52))",
+              }}
+            />
+          </g>
+        </svg>
+
         {/* Phase label */}
         <span
-          className="absolute inset-0 z-20 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out opacity-0"
+          className="absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out opacity-0"
           style={{ opacity: running ? 0.88 : 0 }}
         >
           {displayLabel}

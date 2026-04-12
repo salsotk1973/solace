@@ -1,21 +1,23 @@
 import Link from "next/link";
 import ReframeSession from "@/components/reframe/ReframeSession";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/auth-user";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Thought Reframer — Challenge Negative Thoughts Online | Solace",
-  description: "Free online tool to reframe negative thoughts. Challenge unhelpful thinking patterns and find a more balanced, accurate perspective.",
+  title: "Reframe Anxious Thoughts | Cognitive Reframing Tool — Solace",
+  description:
+    "Reframe thoughts when anxious thinking, self-doubt, or catastrophising takes over. A cognitive reframing tool for clearer perspective and steadier thinking.",
   openGraph: {
     title: "Thought Reframer — Solace",
-    description: "Reframe negative thoughts and find clearer perspective.",
+    description:
+      "Shift perspective when self-doubt and anxious thinking get loud with guided cognitive reframing.",
     url: "https://solace.digital/tools/thought-reframer",
   },
 };
 
 export default async function ReframePage() {
-  const { userId } = await getCurrentUser();
+  const userId = await getCurrentUserId();
 
   return (
     <PageShell>
@@ -91,15 +93,47 @@ export default async function ReframePage() {
         }}
       />
 
-      <ToolSeoContent h1="Thought reframing — challenge negative thoughts and find clarity">
-        <p>A thought is not a fact. This sounds obvious until you are inside one. When your mind produces &quot;I always fail at this&quot; or &quot;nobody wants me around,&quot; those statements feel like observations, not interpretations. The job of thought reframing is not to replace them with false positives — it is to look at them clearly and ask: is this actually true?</p>
-        <SeoH2>What thought reframing is — and what it is not</SeoH2>
-        <p>Reframing is not positive thinking. It is the practice of examining a thought with the same scepticism you would apply to a claim someone else made. The most common unhelpful patterns have names: catastrophising (assuming the worst), all-or-nothing thinking (everything is good or bad), mind-reading (assuming you know what others think), and personalisation (taking responsibility for things outside your control). Naming the pattern is half the work.</p>
-        <SeoH2>How to use this tool</SeoH2>
-        <p>Write the thought exactly as it appears in your head — not a polished version, the raw one. Then work through the questions: What evidence supports this thought? What contradicts it? What would you say to a friend who thought this? What is a more complete version of the truth? You will not eliminate the thought. But you may loosen its grip.</p>
-        <SeoH2>When thought reframing helps most</SeoH2>
-        <p>Reframing works best on repetitive thoughts — the ones that keep returning. The thought that wakes you at 3am, the one that surfaces whenever you face something difficult. These are the ones worth examining.</p>
-        <SeoDisclaimer>This tool provides reflective support only. It is not therapy. If you are experiencing persistent distressing thoughts, please speak with a qualified mental health professional.</SeoDisclaimer>
+      <ToolSeoContent h1="Reframe anxious thoughts — shift perspective when self-doubt takes over">
+        <p>
+          Anxious thinking follows patterns. You imagine the worst. You
+          catastrophise small mistakes. You assume others are judging you. These
+          thought spirals feel like facts, but they&apos;re habits your brain
+          learned under stress. Reframing isn&apos;t positive thinking. It&apos;s
+          stepping back from the spiral to see what&apos;s actually true.
+        </p>
+        <p>
+          When you&apos;re overwhelmed, anxious thoughts get louder. This tool
+          helps you notice the pattern, question it, and find a steadier
+          perspective. Not forced optimism, just clarity.
+        </p>
+        <SeoH2>Why anxious thinking intensifies under pressure</SeoH2>
+        <p>
+          Under stress and complexity, your brain learns to scan for danger.
+          That same vigilance that once kept you safe now creates false alarms.
+          Every possibility feels like a probability. Every small thing feels
+          like evidence that you&apos;re failing. This tool helps you separate
+          signal from noise.
+        </p>
+        <SeoH2>How to use the thought reframer</SeoH2>
+        <p>
+          Name the thought you&apos;re stuck in. Write it out. Then examine it:
+          is this fact or story? What evidence contradicts it? What would I tell
+          a friend in this situation? The reframe isn&apos;t dismissing your
+          feeling, it&apos;s shifting from spiral to assessment.
+        </p>
+        <SeoH2>When to use this tool</SeoH2>
+        <p>
+          When you&apos;re catastrophising a conversation. When self-doubt is
+          loud. When you&apos;re convinced something will go wrong. When
+          anxiety is disguised as planning. When you need to separate real risk
+          from imagined threat.
+        </p>
+        <SeoDisclaimer>
+          This tool provides cognitive reframing support only. It is not
+          therapy or mental health treatment. For diagnosed anxiety disorders or
+          severe anxiety, work with a qualified mental health professional. This
+          tool complements but does not replace professional care.
+        </SeoDisclaimer>
       </ToolSeoContent>
     </PageShell>
   );

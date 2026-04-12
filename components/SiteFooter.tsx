@@ -1,43 +1,41 @@
-'use client'
-
-import Link from 'next/link'
-import type { CSSProperties } from 'react'
+import Link from "next/link";
+import type { CSSProperties } from "react";
 
 const FOOTER_NAV = [
   {
-    heading: 'Product',
+    heading: "Product",
     links: [
-      { label: 'Tools',     href: '/tools'     },
-      { label: 'Pricing',   href: '/pricing'   },
-      { label: 'Dashboard', href: '/dashboard' },
+      { label: "Tools", href: "/tools" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Dashboard", href: "/dashboard" },
     ],
   },
   {
-    heading: 'Learn',
+    heading: "Learn",
     links: [
-      { label: 'Lab',        href: '/lab'        },
-      { label: 'Principles', href: '/principles' },
-      { label: 'About',      href: '/about'      },
+      { label: "Lab", href: "/lab" },
+      { label: "Principles", href: "/principles" },
+      { label: "About", href: "/about" },
     ],
   },
   {
-    heading: 'Legal',
+    heading: "Legal",
     links: [
-      { label: 'Privacy', href: '/privacy'  },
-      { label: 'Terms',   href: '/terms'    },
-      { label: 'Sign in', href: '/sign-in'  },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Sign in", href: "/sign-in" },
     ],
   },
-]
+];
 
 const navLinkStyle: CSSProperties = {
   fontFamily: "'Jost', sans-serif",
   fontWeight: 300,
-  fontSize: '13px',
-  color: 'rgba(255,255,255,0.60)',
-  textDecoration: 'none',
-  transition: 'color 200ms ease',
-}
+  fontSize: "13px",
+  color: "rgba(255,255,255,0.60)",
+  textDecoration: "none",
+  transition: "color 200ms ease",
+};
 
 export default function SiteFooter() {
   return (
@@ -68,6 +66,9 @@ export default function SiteFooter() {
           text-align: right;
           min-width: 0;
         }
+        .footer-nav-link:hover {
+          color: rgba(255,255,255,0.90) !important;
+        }
         @media (max-width: 900px) {
           .footer-bottom-bar { align-items: flex-start; flex-wrap: wrap; }
           .footer-bottom-disclaimer { flex: 100%; text-align: left; order: -1; }
@@ -84,63 +85,62 @@ export default function SiteFooter() {
 
       <footer
         style={{
-          width:    '100%',
-          position: 'relative',
-          zIndex:   10,
+          width: "100%",
+          position: "relative",
+          zIndex: 10,
         }}
       >
         <div
           style={{
-            margin:               '0 auto',
-            maxWidth:             '1440px',
-            padding:              '8px 24px 28px',
-            background:           'linear-gradient(0deg, rgba(9,13,20,0.85) 0%, rgba(9,13,20,0.60) 50%, rgba(9,13,20,0.0) 100%)',
-            backdropFilter:       'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            margin: "0 auto",
+            maxWidth: "1440px",
+            padding: "8px 24px 28px",
+            background:
+              "linear-gradient(0deg, rgba(9,13,20,0.85) 0%, rgba(9,13,20,0.60) 50%, rgba(9,13,20,0.0) 100%)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
           }}
         >
           <div
             style={{
-              padding:   '48px 16px 32px',
-              boxSizing: 'border-box',
+              padding: "48px 16px 32px",
+              boxSizing: "border-box",
             }}
           >
             <div className="footer-grid">
-              {FOOTER_NAV.map(col => (
+              {FOOTER_NAV.map((col) => (
                 <div key={col.heading}>
                   <p
                     style={{
-                      fontFamily:    "'Jost', sans-serif",
-                      fontWeight:    400,
-                      fontSize:      '10px',
-                      letterSpacing: '0.18em',
-                      textTransform: 'uppercase',
-                      color:         'rgba(255,255,255,0.35)',
-                      margin:        '0 0 14px',
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: 400,
+                      fontSize: "10px",
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.35)",
+                      margin: "0 0 14px",
                     }}
                   >
                     {col.heading}
                   </p>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {col.links.map(link => (
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      padding: 0,
+                      margin: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+                    {col.links.map((link) => (
                       <li key={link.href}>
-                        {link.href === '/sign-in' ? (
-                          /* eslint-disable-next-line @next/next/no-html-link-for-pages */
-                          <a
-                            href="/sign-in"
-                            style={navLinkStyle}
-                            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.90)')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.60)')}
-                          >
+                        {link.href === "/sign-in" ? (
+                          <a href="/sign-in" className="footer-nav-link" style={navLinkStyle}>
                             {link.label}
                           </a>
                         ) : (
-                          <Link
-                            href={link.href}
-                            style={navLinkStyle}
-                            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.90)')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.60)')}
-                          >
+                          <Link href={link.href} className="footer-nav-link" style={navLinkStyle}>
                             {link.label}
                           </Link>
                         )}
@@ -154,11 +154,17 @@ export default function SiteFooter() {
 
           <div
             style={{
-              padding:   '0 16px 16px',
-              boxSizing: 'border-box',
+              padding: "0 16px 16px",
+              boxSizing: "border-box",
             }}
           >
-            <div style={{ height: '0.5px', background: 'rgba(255,255,255,0.08)', marginBottom: '20px' }} />
+            <div
+              style={{
+                height: "0.5px",
+                background: "rgba(255,255,255,0.08)",
+                marginBottom: "20px",
+              }}
+            />
 
             <div className="footer-bottom-bar">
               <p
@@ -166,9 +172,9 @@ export default function SiteFooter() {
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
-                  fontSize:   '11px',
-                  color:      'rgba(255,255,255,0.28)',
-                  margin:     0,
+                  fontSize: "11px",
+                  color: "rgba(255,255,255,0.28)",
+                  margin: 0,
                 }}
               >
                 © 2026 Solace. All rights reserved.
@@ -178,22 +184,23 @@ export default function SiteFooter() {
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
-                  fontSize:   '12px',
+                  fontSize: "12px",
                   lineHeight: 1.7,
-                  color:      'rgba(255,255,255,0.75)',
-                  margin:     0,
+                  color: "rgba(255,255,255,0.75)",
+                  margin: 0,
                 }}
               >
-                Solace is designed for adults only. It provides reflective support — not medical, psychological, legal, financial, or professional advice.
+                Solace is designed for adults only. It provides reflective support
+                {" — "}not medical, psychological, legal, financial, or professional advice.
               </p>
               <p
                 className="footer-bottom-right"
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
-                  fontSize:   '11px',
-                  color:      'rgba(255,255,255,0.35)',
-                  margin:     0,
+                  fontSize: "11px",
+                  color: "rgba(255,255,255,0.35)",
+                  margin: 0,
                   flexShrink: 0,
                 }}
               >
@@ -204,5 +211,5 @@ export default function SiteFooter() {
         </div>
       </footer>
     </>
-  )
+  );
 }

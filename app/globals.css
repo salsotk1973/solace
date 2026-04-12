@@ -13,8 +13,7 @@
 }
 
 /* --------------------------------------------------
-   HERO KEYFRAMES
-   (also mirrored in HeroSection via <style jsx global> for guaranteed delivery)
+   SHARED PARTICLE / ORB KEYFRAMES
 -------------------------------------------------- */
 
 @keyframes riseUp {
@@ -33,45 +32,6 @@
     background:  rgba(var(--rgb), calc(var(--a) * 2.2));
     box-shadow:  0 0 calc(var(--size) * 4px) rgba(168, 130, 240, 0.6);
   }
-}
-
-@keyframes appear {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes letterLand {
-  0%   { opacity: 0; text-shadow: none; }
-  30%  { opacity: 1; text-shadow: 0 0 18px rgba(230,218,255,0.95), 0 0 6px rgba(210,195,255,0.7); }
-  70%  { opacity: 1; text-shadow: 0 0 10px rgba(220,208,255,0.6), 0 0 3px rgba(210,195,255,0.4); }
-  100% { opacity: 1; text-shadow: 0 0 8px rgba(215,202,255,0.35), 0 0 2px rgba(205,190,255,0.2); }
-}
-
-@keyframes floatUpDown {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-7px); }
-}
-
-@keyframes breatheReveal {
-  from { color: rgba(190,178,238,0);    letter-spacing: 0.9em; }
-  to   { color: rgba(190,178,238,0.32); letter-spacing: 0.5em; }
-}
-
-@keyframes breathePulse {
-  0%   { color: rgba(190,178,238,0.32); letter-spacing: 0.5em;  }
-  42%  { color: rgba(215,200,255,0.5);  letter-spacing: 0.58em; }
-  62%  { color: rgba(190,178,238,0.2);  letter-spacing: 0.5em;  }
-  100% { color: rgba(190,178,238,0.32); letter-spacing: 0.5em;  }
-}
-
-@keyframes heroColorFadeIn {
-  from { color: rgba(155,147,200,0);    }
-  to   { color: rgba(155,147,200,0.52); }
-}
-
-@keyframes breathe {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.06); }
-  50% { box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.10); }
 }
 
 @keyframes orbIdle {
@@ -115,19 +75,6 @@ body {
   font-family: var(--font-body, 'Jost', sans-serif);
   color: #172033;
   background: #090d14;
-}
-
-@keyframes solace-breathe {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.0); }
-  50%       { box-shadow: 0 0 24px 6px rgba(255, 255, 255, 0.07); }
-}
-
-.hero-cta a {
-  animation: solace-breathe 5s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-cta a { animation: none; }
 }
 
 /* --------------------------------------------------
@@ -329,10 +276,6 @@ body {
    Global standard: → slides translateX(4px) on hover, returns on mouse-out.
    Easing: 0.35s cubic-bezier(0.22,1,0.36,1) — matches LabCtaButton.tsx React pattern.
 -------------------------------------------------- */
-
-.featured-card-bg {
-  background: rgba(125,211,252,0.20) !important;
-}
 
 @keyframes drift-a {
   0% {

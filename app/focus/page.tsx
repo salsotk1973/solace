@@ -1,22 +1,24 @@
 import Link from "next/link";
 import FocusTimer   from "@/components/focus/FocusTimer";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/auth-user";
 import { SOLACE_ROUTES }  from "@/lib/solace/routes";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
 
 export const metadata = {
-  title: "Pomodoro Focus Timer Online | Deep Work Timer — Solace",
-  description: "Free Pomodoro timer and deep work sessions online. Set custom intervals, track focus time, and build a consistent focus practice.",
+  title: "Deep Work Focus Timer | Focus Without Distraction — Solace",
+  description:
+    "A focus timer for deep work, time management, and focus without distraction. Built for demanding seasons when your attention is pulled in too many directions.",
   openGraph: {
     title: "Focus Timer — Solace",
-    description: "Pomodoro and deep work timer for focused productivity.",
+    description:
+      "Deep work without distraction with a focus timer designed for real life, real interruptions, and real mental load.",
     url: "https://solace.digital/tools/focus-timer",
   },
 };
 
 export default async function FocusPage() {
-  const { userId } = await getCurrentUser();
+  const userId = await getCurrentUserId();
 
   return (
     <PageShell>
@@ -117,16 +119,49 @@ export default async function FocusPage() {
         }}
       />
 
-      <ToolSeoContent h1="Focus timer — Pomodoro and deep work sessions online">
-        <p>Distraction is not a character flaw. It is a design problem. Modern devices are engineered to interrupt you, and your brain — wired to respond to novelty — obliges every time. A focus timer is a simple act of counter-design: a defined container of time where one thing matters.</p>
-        <p>The Pomodoro Technique: work for 25 minutes, rest for 5, repeat. The principle is not about working harder — it is about working in a way your brain can sustain.</p>
-        <SeoH2>Why timed focus sessions work</SeoH2>
-        <p>When you set a timer, Parkinson&apos;s Law kicks in — work expands to fill available time, and a defined end point forces prioritisation. Research on ultradian rhythms suggests the brain naturally cycles every 90 minutes. A 90-minute deep work block followed by genuine rest often produces more than grinding for three hours.</p>
-        <SeoH2>How to use this focus timer</SeoH2>
-        <p>Choose your session length. Before you start, write down the single thing you are working on — not a list, one thing. When the timer ends, stop. The break matters as much as the session.</p>
-        <SeoH2>Common focus problems</SeoH2>
-        <p>If you stop early, the task is probably too vague or too large — break it down first. If you ignore the break timer, schedule the rest anyway. Sustained focus without rest degrades quality without you noticing.</p>
-        <SeoDisclaimer>This tool provides reflective support only. It is not a substitute for professional support if focus difficulties significantly affect your daily life.</SeoDisclaimer>
+      <ToolSeoContent h1="Deep work without distraction — focus timer for anyone managing complex responsibilities">
+        <p>
+          When life is complex and demanding, work pressure, multiple
+          responsibilities, competing needs, uninterrupted focus feels
+          impossible. Your attention gets fragmented by context-switching,
+          notifications, and the mental load of everything you&apos;re holding.
+          A focus timer isn&apos;t about willpower. It&apos;s about structure
+          that protects your time.
+        </p>
+        <p>
+          Most focus timers are generic. This one is built for reality: real
+          interruptions, real responsibilities, real distractions. It
+          doesn&apos;t shame you for needing breaks. It helps you reclaim the
+          focus you know you&apos;re capable of.
+        </p>
+        <SeoH2>Why deep work matters when you&apos;re overwhelmed</SeoH2>
+        <p>
+          Fragmented attention compounds stress. When you can&apos;t finish a
+          thought, decisions take longer, mistakes creep in, and the mental
+          load grows. One session of uninterrupted focus, 25 or 45 minutes,
+          creates enough momentum to finish something real. Completion itself is
+          calming.
+        </p>
+        <SeoH2>How to use the focus timer</SeoH2>
+        <p>
+          Set a duration. Remove distractions you can control. Honour the
+          session. When it ends, take a real break. The structure isn&apos;t
+          rigid, adjust duration to what works for your day. One good session
+          beats a distracted afternoon.
+        </p>
+        <SeoH2>When to use this tool</SeoH2>
+        <p>
+          When you need to finish something important but keep getting pulled
+          away. When you have limited time and need to make it count. When
+          you&apos;ve been putting something off because everything feels too
+          fragmented. When reclaiming focus feels like an act of self-respect.
+        </p>
+        <SeoDisclaimer>
+          This tool provides time management support only. It is not a
+          replacement for addressing underlying attention difficulties or sleep
+          deprivation. If focus problems persist despite good sleep and reduced
+          stress, consult a healthcare provider.
+        </SeoDisclaimer>
       </ToolSeoContent>
     </PageShell>
   );

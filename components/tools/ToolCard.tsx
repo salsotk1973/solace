@@ -46,6 +46,7 @@ export default function ToolCard({
   return (
     <Link
       href={href}
+      prefetch={false}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
