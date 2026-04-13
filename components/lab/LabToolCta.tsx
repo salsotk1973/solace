@@ -85,7 +85,7 @@ export default function LabToolCta({ label, href, category }: Props) {
           fontWeight: 300,
           fontSize:   '13px',
           lineHeight: 1.72,
-          color:      'rgba(135,128,178,0.52)',
+          color:      'rgba(255,255,255,0.65)',
           margin:     '0 0 24px',
         }}
       >

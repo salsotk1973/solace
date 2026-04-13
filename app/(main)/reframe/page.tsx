@@ -48,7 +48,7 @@ export default async function ReframePage() {
 
         {/* ── Other tools cross-links ───────────────────────────────────────── */}
         <section>
-          <p className="text-center [font-family:var(--font-jost)] text-[9px] tracking-[0.24em] uppercase text-[rgba(130,155,145,0.32)] mb-6">
+          <p className="text-center [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase text-[rgba(130,155,145,0.32)] mb-6">
             Other tools
           </p>
           <div className="grid grid-cols-2 gap-4">
@@ -56,7 +56,7 @@ export default async function ReframePage() {
               href="/breathing"
               className="group rounded-[14px] p-7 border border-[rgba(130,185,140,0.1)] bg-[linear-gradient(145deg,#0a1812,#0c1e14,#081410)] hover:border-[rgba(130,185,140,0.26)] transition-all duration-500"
             >
-              <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(130,185,140,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(130,185,140,0.42)] mb-2.5">
                 When I need to calm down
               </p>
               <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(210,235,215,0.85)]">
@@ -67,7 +67,7 @@ export default async function ReframePage() {
               href="/sleep"
               className="group rounded-[14px] p-7 border border-[rgba(130,185,140,0.1)] bg-[linear-gradient(145deg,#0a1812,#0c1e14,#081410)] hover:border-[rgba(130,185,140,0.26)] transition-all duration-500"
             >
-              <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(130,185,140,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(130,185,140,0.42)] mb-2.5">
                 Before sleep
               </p>
               <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(210,235,215,0.85)]">

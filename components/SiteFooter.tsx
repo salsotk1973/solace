@@ -172,7 +172,7 @@ export default function SiteFooter() {
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
                   fontSize: "11px",
-                  color: "rgba(255,255,255,0.28)",
+                  color: "rgba(255,255,255,0.50)",
                   margin: 0,
                 }}
               >
@@ -198,7 +198,7 @@ export default function SiteFooter() {
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
                   fontSize: "11px",
-                  color: "rgba(255,255,255,0.35)",
+                  color: "rgba(255,255,255,0.50)",
                   margin: 0,
                   flexShrink: 0,
                 }}

@@ -362,7 +362,7 @@ export function FeaturedCard({
             fontWeight: 300,
             fontSize:   isCompact ? '13px' : '14px',
             lineHeight: 1.8,
-            color:      'rgba(135,128,178,0.48)',
+            color:      'rgba(255,255,255,0.65)',
             margin:     isCompact ? '0 0 20px' : '0 0 28px',
             maxWidth:   isCompact ? '440px' : '480px',
           }}

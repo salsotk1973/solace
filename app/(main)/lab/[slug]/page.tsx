@@ -273,7 +273,7 @@ export default async function ArticlePage(
                 fontStyle:  'italic',
                 fontSize:   '20px',
                 lineHeight: 1.5,
-                color:      'rgba(168,158,220,0.55)',
+                color:      'rgba(255,255,255,0.72)',
                 margin:     '0 0 20px',
               }}
             >
