@@ -34,11 +34,7 @@ const CATEGORY_BG: Record<LabArticle['category'], string> = {
   'notice-whats-good': labAccent('notice-whats-good').replace('1)', '0.08)'),
 }
 
-const FEATURED_BG: Record<string, string> = {
-  'calm-your-state':   '#0e1c1b',
-  'think-clearly':     '#121d27',
-  'notice-whats-good': '#1a1816',
-}
+const FEATURED_BG = '#090d14'
 
 // ─── Shared pill style ────────────────────────────────────────────────────────
 
@@ -294,7 +290,7 @@ export function FeaturedCard({
       onMouseLeave={() => setHovered(false)}
       style={{
         borderRadius: '22px',
-        background:   FEATURED_BG[article.category] ?? catBg,
+        background:   FEATURED_BG,
         border:       `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.18)')}`,
         boxShadow:    hovered
           ? `0 0 ${isCompact ? '18px 4px' : '24px 6px'} ${accent.replace('1)', isCompact ? '0.24)' : '0.35)')}`
