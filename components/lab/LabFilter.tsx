@@ -298,7 +298,7 @@ export function FeaturedCard({
         border:       `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.18)')}`,
         boxShadow:    hovered
           ? `0 0 ${isCompact ? '18px 4px' : '24px 6px'} ${accent.replace('1)', isCompact ? '0.24)' : '0.35)')}`
-          : `0 0 ${isCompact ? '8px 1px' : '12px 2px'} ${accent.replace('1)', isCompact ? '0.12)' : '0.18)')}`,
+          : isCompact ? `0 0 8px 1px ${accent.replace('1)', '0.12)')}` : 'none',
         transition:   'border-color 0.4s ease, box-shadow 0.4s ease',
         position:     'relative',
         marginBottom: isCompact ? '28px' : '48px',
