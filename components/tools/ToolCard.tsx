@@ -58,8 +58,9 @@ export default function ToolCard({
         minHeight:            minHeight ?? "auto",
         background:           background,
         border:               `0.5px solid ${hovered ? borderHover : borderNormal}`,
-        backdropFilter:       bg ? undefined : "blur(12px)",
-        WebkitBackdropFilter: bg ? undefined : "blur(12px)",
+        borderLeft:           `2px solid ${glass(colour, 0.5)}`,
+        backdropFilter:       "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
         boxShadow:            hovered ? shadow : "none",
         transform:            hovered ? "translateY(-5px)" : "translateY(0)",
         transition: [
