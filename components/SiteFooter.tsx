@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import FooterAuthLink from "@/components/FooterAuthLink";
 
 const FOOTER_NAV = [
   {
@@ -136,9 +137,7 @@ export default function SiteFooter() {
                     {col.links.map((link) => (
                       <li key={link.href}>
                         {link.href === "/sign-in" ? (
-                          <a href="/sign-in" className="footer-nav-link" style={navLinkStyle}>
-                            {link.label}
-                          </a>
+                          <FooterAuthLink />
                         ) : (
                           <Link href={link.href} className="footer-nav-link" style={navLinkStyle}>
                             {link.label}
