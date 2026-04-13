@@ -4,7 +4,7 @@ import FamilyGroup  from "@/components/tools/FamilyGroup";
 import FaqAccordion from "@/components/tools/FaqAccordion";
 import PageShell from "@/components/PageShell";
 import BgSubtle from "@/components/backgrounds/BgSubtle";
-import { CATEGORY_COLOURS } from "@/lib/design-tokens";
+import { CATEGORY_COLOURS, glassBackground } from "@/lib/design-tokens";
 
 // ─── Colour helpers — no-space rgb strings for ToolCard's glass() function ────
 const cRgb = CATEGORY_COLOURS.calm.rgb.replace(/, /g, ',')     // '60,192,212'
@@ -95,8 +95,8 @@ const AI_REALMS = [
     name:     "Clear Your Mind",
     line:     "Your thoughts are circling and you can't find the floor. Release them one by one and find what's actually there.",
     href:     "/tools/clear-your-mind",
-    colour:   `rgba(${cRgb},1)`,   // calm / teal — matches bg gradient
-    bg:       "linear-gradient(145deg, #07191b, #0a2224, #071416)",
+    colour:   `rgba(${xRgb},1)`,   // clarity / gold
+    bg:       glassBackground('clear'),
     minHeight: "260px",
   },
   {
@@ -104,8 +104,8 @@ const AI_REALMS = [
     name:     "Choose",
     line:     "A decision keeps turning over in your mind. See it more clearly when the noise is removed.",
     href:     "/tools/choose",
-    colour:   `rgba(${xRgb},1)`,   // clarity / amber — matches bg gradient
-    bg:       "linear-gradient(145deg, #1a1008, #281808, #180e04)",
+    colour:   `rgba(${dRgb},1)`,   // decide / violet
+    bg:       glassBackground('choose'),
     minHeight: "260px",
   },
   {
@@ -114,7 +114,7 @@ const AI_REALMS = [
     line:     "Something feels too large to begin. Watch what seemed impossible become a sequence of steps.",
     href:     "/tools/break-it-down",
     colour:   `rgba(${dRgb},1)`,   // decide / violet
-    bg:       "linear-gradient(145deg, #0d1020, #14182c, #0a0d18)",
+    bg:       glassBackground('breakdown'),
     minHeight: "260px",
   },
 ];
