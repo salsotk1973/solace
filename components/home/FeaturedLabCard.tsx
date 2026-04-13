@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getLabCategoryRgb } from "@/lib/design-tokens";
 
 export type FeaturedLabArticle = {
   title: string;
@@ -6,24 +7,6 @@ export type FeaturedLabArticle = {
   category: "calm-your-state" | "think-clearly" | "notice-whats-good";
   excerpt: string;
   readingTime: number;
-};
-
-const CATEGORY_ACCENT: Record<FeaturedLabArticle["category"], string> = {
-  "calm-your-state": "rgba(68,200,110,1)",
-  "think-clearly": "rgba(125,211,252,1)",
-  "notice-whats-good": "rgba(218,148,48,1)",
-};
-
-const CATEGORY_BG: Record<FeaturedLabArticle["category"], string> = {
-  "calm-your-state": "rgba(68,200,110,0.08)",
-  "think-clearly": "rgba(125,211,252,0.08)",
-  "notice-whats-good": "rgba(218,148,48,0.08)",
-};
-
-const FEATURED_BG: Record<FeaturedLabArticle["category"], string> = {
-  "calm-your-state": "#0e1c1b",
-  "think-clearly": "#121d27",
-  "notice-whats-good": "#1a1816",
 };
 
 const PILL_BASE = {
@@ -39,14 +22,16 @@ const PILL_BASE = {
 };
 
 export default function FeaturedLabCard({ article }: { article: FeaturedLabArticle }) {
-  const accent = CATEGORY_ACCENT[article.category] ?? "rgba(148,130,210,1)";
-  const catBg = CATEGORY_BG[article.category] ?? "rgba(148,130,210,0.08)";
+  const _rgb   = getLabCategoryRgb(article.category).replace(/, /g, ',')
+  const accent = `rgba(${_rgb},1)`
+  const catBg  = `rgba(${_rgb},0.08)`
+  const featBg = `rgba(${_rgb},0.05)`
 
   return (
     <div
       style={{
         borderRadius: "22px",
-        background: FEATURED_BG[article.category] ?? catBg,
+        background: featBg,
         border: `0.5px solid ${accent.replace("1)", "0.18)")}`,
         boxShadow: `0 0 8px 1px ${accent.replace("1)", "0.12)")}`,
         position: "relative",
