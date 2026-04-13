@@ -3,23 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { LabArticle } from '@/lib/lab'
-
-const CATEGORY_ACCENT: Record<LabArticle['category'], string> = {
-  'calm-your-state':   'rgba(68,200,110,1)',
-  'think-clearly':     'rgba(99,129,228,1)',
-  'notice-whats-good': 'rgba(218,148,48,1)',
-}
-
-const CATEGORY_BG: Record<LabArticle['category'], string> = {
-  'calm-your-state':   'rgba(68,200,110,0.08)',
-  'think-clearly':     'rgba(99,129,228,0.08)',
-  'notice-whats-good': 'rgba(218,148,48,0.08)',
-}
+import { getLabCategoryRgb } from '@/lib/design-tokens'
 
 function RelatedCard({ article }: { article: LabArticle }) {
   const [hovered, setHovered] = useState(false)
-  const accent = CATEGORY_ACCENT[article.category] ?? 'rgba(148,130,210,1)'
-  const catBg  = CATEGORY_BG[article.category]     ?? 'rgba(148,130,210,0.08)'
+  const _rgb   = getLabCategoryRgb(article.category).replace(/, /g, ',')
+  const accent = `rgba(${_rgb},1)`
+  const catBg  = `rgba(${_rgb},0.08)`
 
   return (
     <Link

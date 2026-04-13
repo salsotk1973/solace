@@ -4,6 +4,12 @@ import FamilyGroup  from "@/components/tools/FamilyGroup";
 import FaqAccordion from "@/components/tools/FaqAccordion";
 import PageShell from "@/components/PageShell";
 import BgSubtle from "@/components/backgrounds/BgSubtle";
+import { CATEGORY_COLOURS } from "@/lib/design-tokens";
+
+// ─── Colour helpers — no-space rgb strings for ToolCard's glass() function ────
+const cRgb = CATEGORY_COLOURS.calm.rgb.replace(/, /g, ',')     // '60,192,212'
+const xRgb = CATEGORY_COLOURS.clarity.rgb.replace(/, /g, ',')  // '232,168,62'
+const dRgb = CATEGORY_COLOURS.decide.rgb.replace(/, /g, ',')   // '124,111,205'
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -81,13 +87,15 @@ const faqSchema = {
 
 // ─── Tool data ────────────────────────────────────────────────────────────────
 
+// ─── Tool data — colours sourced from design tokens ──────────────────────────
+
 const AI_REALMS = [
   {
     tag:      "When my mind won't stop",
     name:     "Clear Your Mind",
     line:     "Your thoughts are circling and you can't find the floor. Release them one by one and find what's actually there.",
     href:     "/tools/clear-your-mind",
-    colour:   "rgba(74,208,196,1)",
+    colour:   `rgba(${xRgb},1)`,   // clarity / gold
     bg:       "linear-gradient(145deg, #07191b, #0a2224, #071416)",
     minHeight: "260px",
   },
@@ -96,7 +104,7 @@ const AI_REALMS = [
     name:     "Choose",
     line:     "A decision keeps turning over in your mind. See it more clearly when the noise is removed.",
     href:     "/tools/choose",
-    colour:   "rgba(218,148,48,1)",
+    colour:   `rgba(${dRgb},1)`,   // decide / violet
     bg:       "linear-gradient(145deg, #1a1008, #281808, #180e04)",
     minHeight: "260px",
   },
@@ -105,7 +113,7 @@ const AI_REALMS = [
     name:     "Break It Down",
     line:     "Something feels too large to begin. Watch what seemed impossible become a sequence of steps.",
     href:     "/tools/break-it-down",
-    colour:   "rgba(124,116,222,1)",
+    colour:   `rgba(${dRgb},1)`,   // decide / violet
     bg:       "linear-gradient(145deg, #0d1020, #14182c, #0a0d18)",
     minHeight: "260px",
   },
@@ -117,24 +125,24 @@ const CALM_YOUR_STATE = [
     name:      "Breathing",
     line:      "Box breathing and 4-7-8. Calm your nervous system in minutes.",
     href:      "/breathing",
-    colour:    "rgba(60,190,210,0.6)",
-    tagColour: "rgba(80,200,218,0.5)",
+    colour:    `rgba(${cRgb},0.6)`,  // calm / teal
+    tagColour: `rgba(${cRgb},0.5)`,
   },
   {
     tag:       "Focus",
     name:      "Focus Timer",
     line:      "25 minutes of work, 5 of rest. Four sessions and a long break.",
     href:      "/focus",
-    colour:    "rgba(240,170,70,0.6)",
-    tagColour: "rgba(240,185,90,0.5)",
+    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.5)`,
   },
   {
     tag:       "Sleep",
     name:      "Sleep Wind-Down",
     line:      "4-8 breathing for the end of the day. Let the day go.",
     href:      "/sleep",
-    colour:    "rgba(140,120,210,0.6)",
-    tagColour: "rgba(160,145,230,0.5)",
+    colour:    `rgba(${cRgb},0.6)`,  // calm / teal
+    tagColour: `rgba(${cRgb},0.5)`,
   },
 ];
 
@@ -144,8 +152,8 @@ const CLEAR_YOUR_MIND = [
     name:      "Thought Reframer",
     line:      "Four gentle questions that shift the angle on a thought that's stuck.",
     href:      "/reframe",
-    colour:    "rgba(130,185,140,0.6)",
-    tagColour: "rgba(145,200,155,0.5)",
+    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.5)`,
   },
 ];
 
@@ -155,16 +163,16 @@ const NOTICE_WHATS_GOOD = [
     name:      "Mood Tracker",
     line:      "Check in once a day. Notice patterns over time.",
     href:      "/mood",
-    colour:    "rgba(210,150,165,0.6)",
-    tagColour: "rgba(225,170,185,0.5)",
+    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.5)`,
   },
   {
     tag:       "Gratitude",
     name:      "Gratitude Log",
     line:      "Three things. Every day. Nothing more, nothing less.",
     href:      "/gratitude",
-    colour:    "rgba(220,175,80,0.6)",
-    tagColour: "rgba(225,190,100,0.5)",
+    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.5)`,
   },
 ];
 

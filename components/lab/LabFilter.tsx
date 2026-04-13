@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { LabArticle } from '@/lib/lab'
+import { getLabCategoryRgb } from '@/lib/design-tokens'
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
@@ -16,16 +17,21 @@ const CATEGORIES: { id: Category; label: string }[] = [
   { id: 'notice-whats-good', label: "Notice what's good" },
 ]
 
+// Derive accent colours from design tokens — single source of truth
+function labAccent(category: LabArticle['category'] | string): string {
+  return `rgba(${getLabCategoryRgb(category).replace(/, /g, ',')},1)`
+}
+
 const CATEGORY_ACCENT: Record<LabArticle['category'], string> = {
-  'calm-your-state':   'rgba(68,200,110,1)',
-  'think-clearly':     'rgba(125,211,252,1)',
-  'notice-whats-good': 'rgba(218,148,48,1)',
+  'calm-your-state':   labAccent('calm-your-state'),
+  'think-clearly':     labAccent('think-clearly'),
+  'notice-whats-good': labAccent('notice-whats-good'),
 }
 
 const CATEGORY_BG: Record<LabArticle['category'], string> = {
-  'calm-your-state':   'rgba(68,200,110,0.08)',
-  'think-clearly':     'rgba(125,211,252,0.08)',
-  'notice-whats-good': 'rgba(218,148,48,0.08)',
+  'calm-your-state':   labAccent('calm-your-state').replace('1)', '0.08)'),
+  'think-clearly':     labAccent('think-clearly').replace('1)', '0.08)'),
+  'notice-whats-good': labAccent('notice-whats-good').replace('1)', '0.08)'),
 }
 
 const FEATURED_BG: Record<string, string> = {

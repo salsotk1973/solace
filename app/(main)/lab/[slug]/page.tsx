@@ -7,6 +7,7 @@ import LabToolCta            from '@/components/lab/LabToolCta'
 import RelatedArticles       from '@/components/lab/RelatedArticles'
 import PageShell             from '@/components/PageShell'
 import BgFlat                from '@/components/backgrounds/BgFlat'
+import { getLabCategoryRgb } from '@/lib/design-tokens'
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
@@ -90,19 +91,10 @@ export default async function ArticlePage(
     .filter(a => a.slug !== slug)
     .slice(0, 2)
 
-  // Category accent colour
-  const ACCENT: Record<string, string> = {
-    'calm-your-state':   'rgba(68,200,110,1)',
-    'clear-your-mind':   'rgba(100,185,145,1)',
-    'notice-whats-good': 'rgba(218,148,48,1)',
-  }
-  const ACCENT_BG: Record<string, string> = {
-    'calm-your-state':   'rgba(68,200,110,0.08)',
-    'clear-your-mind':   'rgba(100,185,145,0.08)',
-    'notice-whats-good': 'rgba(218,148,48,0.08)',
-  }
-  const accent   = ACCENT[article.category]   ?? 'rgba(148,130,210,1)'
-  const accentBg = ACCENT_BG[article.category] ?? 'rgba(148,130,210,0.08)'
+  // Category accent colour — derived from design tokens, fixes 'clear-your-mind' key mismatch
+  const _rgb     = getLabCategoryRgb(article.category).replace(/, /g, ',')
+  const accent   = `rgba(${_rgb},1)`
+  const accentBg = `rgba(${_rgb},0.08)`
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', {
     day:   'numeric',

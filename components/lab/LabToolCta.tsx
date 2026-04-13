@@ -1,11 +1,6 @@
 import Link from 'next/link'
 import type { LabArticle } from '@/lib/lab'
-
-const CATEGORY_ACCENT: Record<LabArticle['category'], string> = {
-  'calm-your-state':   'rgba(68,200,110,1)',
-  'think-clearly':     'rgba(99,129,228,1)',
-  'notice-whats-good': 'rgba(218,148,48,1)',
-}
+import { getLabCategoryRgb } from '@/lib/design-tokens'
 
 interface Props {
   label:    string
@@ -14,7 +9,8 @@ interface Props {
 }
 
 export default function LabToolCta({ label, href, category }: Props) {
-  const accent = CATEGORY_ACCENT[category]
+  const _rgb   = getLabCategoryRgb(category).replace(/, /g, ',')
+  const accent = `rgba(${_rgb},1)`
   const accentDim    = accent.replace('1)', '0.45)')
   const accentBorder = accent.replace('1)', '0.18)')
   const accentBg     = accent.replace('1)', '0.08)')

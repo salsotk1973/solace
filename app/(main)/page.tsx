@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/HeroSection";
 import FeaturedLabCard, { type FeaturedLabArticle } from "@/components/home/FeaturedLabCard";
+import { CATEGORY_COLOURS } from "@/lib/design-tokens";
+
+// ─── Colour helpers derived from design tokens ────────────────────────────────
+// Tailwind className strings must be static — values below mirror CATEGORY_COLOURS exactly.
+// Inline style values (borderLeftColor, etc.) use template literals for live derivation.
+
+const { calm, clarity, decide } = CATEGORY_COLOURS;
 
 type AiTool = {
   eyebrow: string;
@@ -13,72 +20,80 @@ type AiTool = {
   ctaColor: string;
 };
 
+// Static Tailwind class strings — rgb values match CATEGORY_COLOURS tokens
 const AI_TOOLS: AiTool[] = [
   {
     eyebrow: "WHEN MY MIND WON'T STOP",
     title: "Clear Your Mind",
     body: "Your thoughts are circling and you can't find the floor. Release them one by one, watch them take shape, and find what's actually there.",
     href: "/tools/clear-your-mind",
+    // clarity / gold — rgba(232,168,62)
     themeClass:
-      "border-teal-500/20 bg-teal-500/[0.06] hover:border-teal-500/35 hover:bg-teal-500/[0.09] hover:shadow-[0_12px_36px_rgba(45,212,191,0.10)]",
-    borderLeftColor: "rgba(45,212,191,0.5)",
-    eyebrowColor: "rgba(45,212,191,0.7)",
-    ctaColor: "rgba(45,212,191,0.78)",
+      "border-[rgba(232,168,62,0.20)] bg-[rgba(232,168,62,0.06)] hover:border-[rgba(232,168,62,0.35)] hover:bg-[rgba(232,168,62,0.09)] hover:shadow-[0_12px_36px_rgba(232,168,62,0.10)]",
+    borderLeftColor: `rgba(${clarity.rgb},0.5)`,
+    eyebrowColor:    `rgba(${clarity.rgb},0.7)`,
+    ctaColor:        `rgba(${clarity.rgb},0.78)`,
   },
   {
     eyebrow: "WHEN I CAN'T DECIDE",
     title: "Choose",
     body: "A decision keeps turning over in your mind. Two paths, one answer — seen with more clarity when the noise is removed.",
     href: "/tools/choose",
+    // decide / violet — rgba(124,111,205)
     themeClass:
-      "border-amber-500/20 bg-amber-500/[0.06] hover:border-amber-500/35 hover:bg-amber-500/[0.09] hover:shadow-[0_12px_36px_rgba(245,158,11,0.10)]",
-    borderLeftColor: "rgba(245,158,11,0.5)",
-    eyebrowColor: "rgba(245,158,11,0.7)",
-    ctaColor: "rgba(245,158,11,0.78)",
+      "border-[rgba(124,111,205,0.20)] bg-[rgba(124,111,205,0.06)] hover:border-[rgba(124,111,205,0.35)] hover:bg-[rgba(124,111,205,0.09)] hover:shadow-[0_12px_36px_rgba(124,111,205,0.10)]",
+    borderLeftColor: `rgba(${decide.rgb},0.5)`,
+    eyebrowColor:    `rgba(${decide.rgb},0.7)`,
+    ctaColor:        `rgba(${decide.rgb},0.78)`,
   },
   {
     eyebrow: "WHEN I FEEL OVERWHELMED",
     title: "Break It Down",
     body: "Something feels too large to begin. Watch what seemed impossible become a sequence of steps you can actually take.",
     href: "/tools/break-it-down",
+    // decide / violet — rgba(124,111,205)
     themeClass:
-      "border-indigo-400/20 bg-indigo-400/[0.06] hover:border-indigo-400/35 hover:bg-indigo-400/[0.09] hover:shadow-[0_12px_36px_rgba(129,140,248,0.10)]",
-    borderLeftColor: "rgba(129,140,248,0.5)",
-    eyebrowColor: "rgba(129,140,248,0.7)",
-    ctaColor: "rgba(129,140,248,0.78)",
+      "border-[rgba(124,111,205,0.20)] bg-[rgba(124,111,205,0.06)] hover:border-[rgba(124,111,205,0.35)] hover:bg-[rgba(124,111,205,0.09)] hover:shadow-[0_12px_36px_rgba(124,111,205,0.10)]",
+    borderLeftColor: `rgba(${decide.rgb},0.5)`,
+    eyebrowColor:    `rgba(${decide.rgb},0.7)`,
+    ctaColor:        `rgba(${decide.rgb},0.78)`,
   },
 ];
 
 const FREE_TOOLS = [
-  { name: "Breathing", href: "/tools/breathing", tone: "teal" as const },
-  { name: "Focus Timer", href: "/tools/focus-timer", tone: "indigo" as const },
-  { name: "Sleep Wind-Down", href: "/tools/sleep-wind-down", tone: "amber" as const },
-  { name: "Thought Reframer", href: "/tools/thought-reframer", tone: "teal" as const },
-  { name: "Mood Tracker", href: "/tools/mood-tracker", tone: "indigo" as const },
-  { name: "Gratitude Log", href: "/tools/gratitude-log", tone: "amber" as const },
+  { name: "Breathing",        href: "/tools/breathing",        tone: "calm"    as const },
+  { name: "Focus Timer",      href: "/tools/focus-timer",      tone: "clarity" as const },
+  { name: "Sleep Wind-Down",  href: "/tools/sleep-wind-down",  tone: "calm"    as const },
+  { name: "Thought Reframer", href: "/tools/thought-reframer", tone: "clarity" as const },
+  { name: "Mood Tracker",     href: "/tools/mood-tracker",     tone: "clarity" as const },
+  { name: "Gratitude Log",    href: "/tools/gratitude-log",    tone: "clarity" as const },
 ];
 
+// Static Tailwind className strings — rgb values match CATEGORY_COLOURS tokens
 const FREE_TOOL_THEME: Record<
-  "teal" | "indigo" | "amber",
+  "calm" | "clarity" | "decide",
   { className: string; accent: string; arrow: string }
 > = {
-  teal: {
+  // calm / teal — rgba(60,192,212)
+  calm: {
     className:
-      "border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.045)] hover:border-[rgba(45,212,191,0.34)] hover:bg-[rgba(45,212,191,0.07)]",
-    accent: "rgba(45,212,191,0.55)",
-    arrow: "rgba(45,212,191,0.72)",
+      "border-[rgba(60,192,212,0.22)] bg-[rgba(60,192,212,0.045)] hover:border-[rgba(60,192,212,0.34)] hover:bg-[rgba(60,192,212,0.07)]",
+    accent: `rgba(${calm.rgb},0.55)`,
+    arrow:  `rgba(${calm.rgb},0.72)`,
   },
-  indigo: {
+  // clarity / gold — rgba(232,168,62)
+  clarity: {
     className:
-      "border-[rgba(129,140,248,0.22)] bg-[rgba(129,140,248,0.045)] hover:border-[rgba(129,140,248,0.34)] hover:bg-[rgba(129,140,248,0.07)]",
-    accent: "rgba(129,140,248,0.55)",
-    arrow: "rgba(129,140,248,0.72)",
+      "border-[rgba(232,168,62,0.22)] bg-[rgba(232,168,62,0.045)] hover:border-[rgba(232,168,62,0.34)] hover:bg-[rgba(232,168,62,0.07)]",
+    accent: `rgba(${clarity.rgb},0.55)`,
+    arrow:  `rgba(${clarity.rgb},0.72)`,
   },
-  amber: {
+  // decide / violet — rgba(124,111,205)
+  decide: {
     className:
-      "border-[rgba(245,158,11,0.22)] bg-[rgba(245,158,11,0.045)] hover:border-[rgba(245,158,11,0.34)] hover:bg-[rgba(245,158,11,0.07)]",
-    accent: "rgba(245,158,11,0.55)",
-    arrow: "rgba(245,158,11,0.72)",
+      "border-[rgba(124,111,205,0.22)] bg-[rgba(124,111,205,0.045)] hover:border-[rgba(124,111,205,0.34)] hover:bg-[rgba(124,111,205,0.07)]",
+    accent: `rgba(${decide.rgb},0.55)`,
+    arrow:  `rgba(${decide.rgb},0.72)`,
   },
 };
 
