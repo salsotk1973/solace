@@ -1,7 +1,7 @@
 # Solace Master Reference
 
 ## Product Definition
-**Solace** is a wellness SaaS focused on **decision clarity and mental uncluttering** for **women 38–52, burnt out, overwhelmed by life choices** — career crossroads, relationship strain, feeling lost at mid-life. NOT a meditation app. NOT a journal. A thinking partner.
+**Solace** is a wellness SaaS focused on **decision clarity and mental uncluttering** for people overwhelmed by life — career crossroads, relationship strain, feeling lost. NOT a meditation app. NOT a journal. A thinking partner.
 
 **Positioning (locked):** "Clarity and decisions for people overwhelmed by life"
 
@@ -33,6 +33,15 @@ privately, gently, without judgement.
 
 ---
 
+## Domain & Infrastructure
+- **Production domain:** `try-solace.app` (Cloudflare Registrar, purchased April 2026)
+- **Canonical URL:** `https://www.try-solace.app`
+- **Vercel project:** `solace` — auto-deploys on push to `main`
+- **Clerk:** Production instance active, domain verified, Google OAuth configured with real credentials
+- **Google Cloud project:** `solace-493201` — OAuth credentials stored in `Solace Private` folder on Google Drive
+
+---
+
 ## Pricing (Locked — Do Not Revisit)
 - **Free tier:** Choose (1 AI session/day) + all 6 client tools unlimited + 7-day history
 - **Paid tier:** A$9/month or A$79/year
@@ -44,25 +53,47 @@ privately, gently, without judgement.
 
 ---
 
+## Category System (Locked — Single Source of Truth)
+All 9 tools belong to one of 3 categories. Colour = category. No per-tool colours.
+Defined in: `lib/design-tokens.ts`
+
+| Category | Colour | Hex | Tools |
+|---|---|---|---|
+| **Calm** | Teal | `#3CC0D4` | Breathing, Sleep Wind-Down |
+| **Clarity** | Gold | `#E8A83E` | Focus Timer, Mood Tracker, Thought Reframer, Gratitude Log, Clear Your Mind (AI) |
+| **Decide** | Violet | `#7C6FCD` | Choose (AI), Break It Down (AI) |
+
+**Lab categories map to the same colours:**
+- `calm-your-state` → Teal
+- `think-clearly` → Gold
+- `notice-whats-good` → Violet
+
+**Rules:**
+- Never define tool colours inline anywhere — always import from `lib/design-tokens.ts`
+- New tools get assigned to an existing category — no new colours ever
+- Lab articles use the category colour of the tool they link to
+
+---
+
 ## The 6 Client-Side Tools (Unlimited for all users)
-1. **Breathing** — teal colour identity — guided breathing exercises
-2. **Focus Timer** — amber colour identity — distraction-free work sessions
-3. **Sleep Wind-Down** — deep indigo — evening relaxation sequence
-4. **Thought Reframer** — sage green — reframe anxious thoughts
-5. **Mood Tracker** — rose — daily emotional check-in with patterns
-6. **Gratitude Log** — honey gold — gratitude practice with reflection
+1. **Breathing** — Calm (teal) — guided breathing exercises
+2. **Sleep Wind-Down** — Calm (teal) — evening relaxation sequence
+3. **Focus Timer** — Clarity (gold) — distraction-free work sessions
+4. **Thought Reframer** — Clarity (gold) — reframe anxious thoughts
+5. **Mood Tracker** — Clarity (gold) — daily emotional check-in with patterns
+6. **Gratitude Log** — Clarity (gold) — gratitude practice with reflection
 
 ---
 
 ## The 3 AI Tools (Gated by paywall)
-- **Choose** — amber colour identity — helps users make decisions they've been stuck on
+- **Choose** — Decide (violet) — helps users make decisions they've been stuck on
   - Free tier: 1 session/day
   - Paid tier: unlimited
-  
-- **Clear Your Mind** (Clear It) — teal — dumps mental load, clears noise
+
+- **Clear Your Mind** — Clarity (gold) — dumps mental load, clears noise
   - Paid tier only
-  
-- **Break It Down** — indigo — makes overwhelming things manageable
+
+- **Break It Down** — Decide (violet) — makes overwhelming things manageable
   - Paid tier only
 
 ---
@@ -71,20 +102,31 @@ privately, gently, without judgement.
 
 ### Colours
 - **Background:** `#090d14` dark navy across all pages
-- **Tool colour identities:**
-  - Breathing: teal
-  - Focus Timer: amber
-  - Sleep Wind-Down: deep indigo
-  - Thought Reframer: sage green
-  - Mood Tracker: rose
-  - Gratitude Log: honey gold
+- **Category colours:** See Category System above — import from `lib/design-tokens.ts`
+- **Never hardcode rgba tool colour values inline** — always use token helpers
 
 ### Typography
 - **Display/headlines:** Cormorant Garamond (serif)
 - **UI/body:** Jost (sans-serif)
+- **Logo/wordmark:** "SOLACE" in Cormorant Garamond, spaced caps — Direction C (wordmark only, no icon)
+
+### Text Standards (from `lib/design-tokens.ts`)
+- **Primary text:** `rgba(255,255,255,1.0)` — headings, key labels
+- **Body text:** `rgba(255,255,255,0.80)` — descriptions, paragraph copy
+- **Secondary text:** `rgba(255,255,255,0.65)` — metadata, dates, supporting copy
+- **Tertiary text:** `rgba(255,255,255,0.45)` — hints, placeholders, decorative only
+- **Never below 0.50** for any user-facing functional text
+
+### Font Size Floors (from `lib/design-tokens.ts`)
+- Functional labels (streak, history, section headings): `12px` minimum
+- Body/description text: `14px` minimum
+- Eyebrow pills/tags: `11px` minimum
+- Button labels: `13px` minimum
+- Metadata (dates, read time): `12px` minimum
+- **Never use `text-[9px]` or `text-[10px]` for functional content**
 
 ### Components
-- **Cards:** Tinted glass cards with per-tool realm colours
+- **Cards:** Tinted glass cards — colour from `glassBackground()` / `glassBorder()` token helpers
 - **Buttons:** Ghost pill buttons, no borders
 - **Layout:** No white bands between sections; dark mode only
 - **Arrows:** On tool cards — invisible at rest, appears on hover only
@@ -92,7 +134,21 @@ privately, gently, without judgement.
 ### Background & Animation Rules
 - ALL background effects and animations: `position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;`
 - Always full-screen, never constrained to a section or container
-- **SiteHeader.tsx and SiteFooter.tsx locked — never modify**
+- **SiteHeader.tsx and SiteFooter.tsx locked — never modify layout or structure**
+- FooterAuthLink.tsx handles auth-aware sign in/sign out in footer — do not replace with static link
+
+---
+
+## Design Token File (lib/design-tokens.ts)
+Single source of truth for all design values. Exports:
+- `CATEGORY_COLOURS` — 3 categories with hex, rgb, tool slugs, Lab category slug
+- `TOOL_CATEGORY` — all 9 tool slugs mapped to category key
+- `getToolColour(slug)` / `getToolRgb(slug)` / `getToolCategory(slug)` — tool helpers
+- `getLabCategoryColour(cat)` / `getLabCategoryRgb(cat)` — Lab helpers
+- `TEXT_OPACITY` — 5 semantic opacity levels
+- `TEXT_COLOURS` — pre-built rgba strings for inline use
+- `FONT_SIZE` — size floors for 5 content roles
+- `glassBackground(slug)` / `glassBorder(slug)` — card tint helpers
 
 ---
 
@@ -101,6 +157,7 @@ privately, gently, without judgement.
 - **Status:** 10 SEO-optimised articles completed
 - **SEO metadata:** 400+ words of copy per article, JSON-LD schema
 - **Linking rule:** Every Lab article links to one specific tool (no orphan content)
+- **Category colours:** Fixed — Lab categories now map to same token system as tools
 - **Post-launch strategy:** 1–2 articles/week, long-tail high-intent tool-adjacent keywords only
 - **Homepage teaser:** Currently hardcoded; future task: make dynamic (pull latest MDX title + slug)
 
@@ -108,15 +165,23 @@ privately, gently, without judgement.
 
 ## Completed Features
 
+### Infrastructure
+- Production domain `try-solace.app` live on Vercel + Cloudflare
+- Clerk Production instance: domain verified, Google OAuth with real credentials, 5 DNS CNAME records in Cloudflare
+- FooterAuthLink.tsx — auth-aware sign in/out in footer (client component, minimal)
+- Breathing layout.tsx stale boilerplate fixed (was rendering own html/body)
+
+### Design System
+- `lib/design-tokens.ts` — complete token system (colours, text, font sizes, glass helpers)
+- Global text contrast fixed — 11 opacity values corrected, 25 font size instances fixed
+- All tool + Lab colours wired to token system — no more scattered inline rgba values
+- Logo direction locked: Direction C — wordmark only, Cormorant Garamond spaced caps, S as favicon
+
 ### Pages & Components
 - All 9 tool pages built (6 client + 3 AI)
-- **SEO copy completed & locked:**
-  - 3 AI tools: Choose, Clear Your Mind, Break It Down (completed in previous session)
-  - 6 client tools: Breathing, Focus Timer, Sleep Wind-Down, Thought Reframer, Mood Tracker, Gratitude Log (NEW — inclusive audience, no identity gatekeeping)
-  - All 9 tools: 400+ words of original, evidence-based SEO copy each; mirrors Clear Your Mind structure
-  - All copy rewritten for universal audience (removed "women," "hormones," "midlife," "demanding seasons") while maintaining warm, understanding tone
+- SEO copy completed & locked (universal audience, no identity gatekeeping)
 - Tool page SEO metadata with HowTo schema (Breathing) and WebApplication schema (others)
-- Shared `components/ToolSeoContent.tsx` with `ToolSeoContent`, `SeoH2`, `SeoDisclaimer`
+- Shared `components/ToolSeoContent.tsx`
 - Glassmorphism SiteHeader.tsx and SiteFooter.tsx (locked)
 - HeroSection.tsx with h-screen, CSS radial gradient, GSAP curtain reveal
 - Privacy and Terms pages
@@ -126,24 +191,25 @@ privately, gently, without judgement.
 - 4-table schema with RLS enabled
 - Clerk auth integration with `isPaidUser()` and `requirePaidPlan()` helpers in `lib/auth.ts`
 
-### Choose Tool Animation Spec (Ready to hand to Codex)
-**Concept:** Two dusty amber spheres idle on screen representing two sides of an unresolved decision. When user submits, they converge and merge like liquid mercury into one clear, sharp, luminous amber sphere — representing clarity arrived.
-
-**Technical approach:** Metaball SDF (signed distance field) threshold technique on HTML5 Canvas. For every pixel, compute combined sphere influence — if above threshold, pixel is inside blob. Produces naturally fluid merge with zero seams.
-
-**Full spec location:** `choose-full-spec.md` (already written, awaiting Codex handoff)
-
-**Spec covers:**
-- Part 1: All UI colours updated to amber (input, placeholder, trust line, button, cards)
-- Part 2: Full metaball canvas animation spec with all states (idle, converging, settled)
-- Part 3: Copy confirmation
+### Breathing Tool — Gating (partially implemented)
+- History API: 7-day cutoff for free users, full history for paid — EXISTS
+- `hasOlderSessions` flag — EXISTS
+- `BreathingUpgradePrompt` component — EXISTS (needs visual polish)
+- Locked patterns (Calm, Double Exhale) — UI dead, no upgrade path — NEEDS SPEC
+- SessionComplete post-session drawer — no upsell for free users — NEEDS SPEC
+- Pattern lock spec: Option A — lock icon on button, click goes to `/pricing` (approved)
 
 ---
 
 ## Launch Checklist
 
 ### Pre-Launch (Must complete before Vercel deploy)
-- [ ] Free/paid gating on 6 client tools (7-day history cutoff + upgrade nudge)
+- [x] Domain purchased and connected (`try-solace.app`)
+- [x] Clerk Production instance configured
+- [x] Design token system created
+- [x] Global text contrast fixed
+- [x] Footer auth-aware sign in/out
+- [ ] Free/paid gating on 6 client tools — Breathing pattern lock + SessionComplete upsell NEXT
 - [ ] Verify Choose gives one free AI session/day
 - [ ] Choose animation implemented and tested on mobile
 - [ ] Fix 4 bugs:
@@ -151,12 +217,12 @@ privately, gently, without judgement.
   - [ ] Ghost header on homepage
   - [ ] White band on /tools page
   - [ ] "Everything above is free" single line formatting
-- [ ] Visual consistency pass — tinted glass cards, arrow hover animation, category colours, homepage tool hierarchy
+- [ ] Visual consistency pass — tinted glass cards, arrow hover animation, homepage tool hierarchy
 - [ ] Stripe + Clerk webhook payment flow complete
 - [ ] Cormorant Garamond font fix
-- [ ] AI card colour tints finalized
 - [ ] Homepage OGL shader background (if proceeding)
 - [ ] GSAP curtain animation confirmed
+- [ ] Favicon — implement S in Cormorant Garamond as favicon/app icon
 
 ### Immediately After Vercel Deploy
 - [ ] Activate Google Search Console
@@ -184,26 +250,27 @@ privately, gently, without judgement.
 ---
 
 ## Current Session Status
-- **Breathing Tool:** Free/paid gating spec complete and ready for Codex
-- **Next step:** Hand breathing-free-paid-spec.md to Codex, implement Phase 1 (7-day cutoff) + Phase 2 (upgrade messaging), screenshot, verify, ready to ship
-- **After Breathing ships:** Same process for Focus Timer → Sleep Wind-Down → Thought Reframer → Mood Tracker → Gratitude Log (each with custom free/paid boundaries)
+- **Completed this session:** Domain, Clerk Production, design tokens, text contrast, colour system, footer auth fix
+- **Next session starts with:** Breathing tool — pattern lock (Option A) + SessionComplete upsell spec → then remaining 5 tools
 
 ---
 
 ## Tool-by-Tool Free/Paid Strategy (Locked)
 
-### Breathing Tool (CURRENT — SPEC READY)
-**Free features:** Unlimited sessions, all paces, 7-day history, basic stats
-**Paid features:** Full history, export, pattern analysis, streak tracking
-**Conversion trigger:** Day 8 history cutoff (user sees they can't access older sessions)
-**Copy strategy:** "Paid users never lose their history" (not shame-based)
-**Implementation:** Phase 1 (cutoff) + Phase 2 (messaging); Phase 3-4 deferred post-launch
-**Spec file:** breathing-free-paid-spec.md (ready for Codex)
+### Breathing Tool (NEXT — audit complete, pattern lock approved)
+**Free features:** Unlimited sessions, Box + 4-7-8 patterns, 7-day history, basic stats
+**Paid features:** Full history, Calm + Double Exhale patterns, export, pattern analysis, streak tracking
+**Conversion triggers:**
+1. Day 8 history cutoff (user sees they can't access older sessions)
+2. Locked pattern — lock icon on Calm + Double Exhale buttons, click → `/pricing`
+3. Post-session — SessionComplete drawer needs free-user upsell copy
+**Pattern lock UI:** Option A — lock icon on button, direct to `/pricing` on click, more visible styling than current disabled state
+**Existing gating:** History cutoff + `BreathingUpgradePrompt` exist but need visual polish
 
-### Focus Timer (NEXT)
+### Focus Timer (AFTER BREATHING)
 **Free features:** Timer, basic stats, 7-day history
 **Paid features:** Productivity insights, weekly reports, focus streaks
-**Conversion trigger:** User notices trend ("you're 30% more productive at 9am") — unlock with paid
+**Conversion trigger:** User notices trend — unlock with paid
 **Positioning:** "See your productivity patterns"
 
 ### Sleep Wind-Down (AFTER FOCUS)
@@ -214,14 +281,14 @@ privately, gently, without judgement.
 
 ### Thought Reframer (AFTER SLEEP)
 **Free features:** Reframe sessions, 7-day history
-**Paid features:** Pattern detection ("you spiral on X topics"), AI insights, export
-**Conversion trigger:** User reframes same thought twice — unlock patterns to see they're not alone
+**Paid features:** Pattern detection, AI insights, export
+**Conversion trigger:** User reframes same thought twice
 **Positioning:** "See your thinking patterns"
 
 ### Mood Tracker (HIGHEST VALUE — AFTER REFRAMER)
 **Free features:** Daily check-in, 7-day history
-**Paid features:** **Pattern analysis is THE value** — correlations, triggers, trends, export
-**Conversion trigger:** User realizes "I'm always low on Mondays" — unlock analysis to confirm
+**Paid features:** Pattern analysis — correlations, triggers, trends, export
+**Conversion trigger:** User realizes "I'm always low on Mondays"
 **Positioning:** "Understand what affects your mood"
 
 ### Gratitude Log (LAST)
@@ -233,14 +300,18 @@ privately, gently, without judgement.
 ---
 
 ## Key Rules (Never Break)
-- SiteHeader.tsx and SiteFooter.tsx locked — never modify
+- SiteHeader.tsx and SiteFooter.tsx locked — never modify layout or structure
 - Background always fixed, full-screen
 - Never duplicate footer
-- Specs always written to file via bash, presented with present_files
+- Specs always written to file via bash_tool, presented with present_files
 - One spec per task — short and focused
 - Every Claude Code instruction ends with: "After implementing, start dev server, take screenshot of localhost:3001, review against spec. Fix and screenshot again until it matches."
 - Design decisions locked in mockup before implementation begins
-- **Stress-test all specs before handing to Codex**
+- **Stress-test all specs before handing to Claude Code**
+- Never define tool/category colours inline — always import from `lib/design-tokens.ts`
+- Never use `text-[9px]` or `text-[10px]` for functional content
+- Never use opacity below 0.50 for user-facing functional text
+- Always use Claude Code (claude CLI) for implementation — never ask Juan to run terminal commands
 
 ---
 
@@ -249,18 +320,24 @@ privately, gently, without judgement.
 - Email stack upgrade: alfred_ or Superhuman when support exceeds ~20 emails/week
 - Make Lab homepage teaser dynamic
 - Build Solace Weekly Intelligence Report (~day 30 post-launch)
+- Enable Cloudflare bot fight mode + AI Labyrinth post-launch when real traffic arrives
+- Update Cloudflare account type from Personal to Business + add ABN once Pty Ltd formed (~A$20K MRR)
 
 ---
 
-## Master Files & Workflow (Locked)
+Master Files & Workflow (Locked)
+GitHub raw URL: https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md
 
-### Session Start
+Session Start
 When starting any session (new chat or continuation):
-```
 Load solace-master. Working on: [specific task]. Go.
-```
+I fetch it via web_fetch from the URL above — no browser MCP, no pasting.
+Why This Works
 
-I fetch the live version from GitHub: `https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md`
+No re-pasting files every session
+Token-efficient — only loads when needed
+Live GitHub version always current
+Clear Git audit trail
 
 ### Updating Master Files
 When new information needs documenting:
@@ -271,17 +348,10 @@ When new information needs documenting:
 5. Terminal: Run the Git commit prompt I provide
 
 ### Git Commit Prompt
-After updating in VS Code, run in terminal:
+After updating in VS Code, run in Claude Code:
 ```bash
-cd solace-clean && git add solace-master.md && git commit -m "Update: [describe what changed]" && git push
+cd /Users/angelamanzano/Documents/Solace/solace-clean && git add solace-master.md && git commit -m "Update: [describe what changed]" && git push
 ```
-
-Or for multiple master files:
-```bash
-cd solace-clean && git add solace-master.md vida-digital-master.md && git commit -m "Update: [describe what changed]" && git push
-```
-
-I provide the exact prompt every time. You copy/paste into terminal.
 
 ### Why This Works
 - No re-pasting files every session
