@@ -167,40 +167,56 @@ export default function BreathingSession({ userId }: Props) {
       />
 
       {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
-      {/* Mobile: flex-row → orb (DOM first) LEFT, button (DOM second) RIGHT        */}
-      {/* Desktop: flex-col → button on TOP, orb below (matching original layout)   */}
-      <div className="flex flex-row items-center justify-center gap-6 mt-2 mb-2 md:flex-col md:gap-8 md:mb-16">
+      {/* Mobile: orb centred in full width; Begin button absolutely right of orb   */}
+      {/* Desktop: flex-col → Begin button on TOP, orb below                        */}
 
-        {/* Orb — DOM first → appears LEFT on mobile */}
-        <div className="flex justify-center">
-          <BreathingOrb
-            pattern={pattern}
-            isRunning={isRunning}
-            onCycleChange={handleCycleChange}
-            onComplete={handleComplete}
-            size={orbSize}
-          />
-        </div>
+      {/* Desktop-only Begin/Stop button (above orb) */}
+      <div className="hidden md:flex md:flex-col md:items-center md:mb-8">
+        {!isRunning ? (
+          <button
+            onClick={handleStart}
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.22)] px-8 py-3 rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.42)] transition-all duration-300"
+          >
+            {sessionComplete ? "Begin again" : "Begin"}
+          </button>
+        ) : (
+          <button
+            onClick={handleStop}
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-3"
+          >
+            Stop
+          </button>
+        )}
+      </div>
 
-        {/* Button — DOM second → appears RIGHT on mobile */}
-        <div className="flex flex-col items-center shrink-0">
+      {/* Orb row — full width so orb centres correctly on mobile */}
+      <div className="relative flex justify-center mt-3 mb-2 md:mb-16">
+        <BreathingOrb
+          pattern={pattern}
+          isRunning={isRunning}
+          onCycleChange={handleCycleChange}
+          onComplete={handleComplete}
+          size={orbSize}
+        />
+
+        {/* Mobile-only Begin/Stop button — absolutely positioned right of orb */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 md:hidden">
           {!isRunning ? (
             <button
               onClick={handleStart}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.35)] px-4 py-1.5 md:px-8 md:py-3 rounded-full md:rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.55)] transition-all duration-300"
+              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.35)] px-4 py-1.5 rounded-full hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.55)] transition-all duration-300"
             >
               {sessionComplete ? "Again" : "Begin"}
             </button>
           ) : (
             <button
               onClick={handleStop}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-4 py-1.5 md:px-6 md:py-3"
+              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-4 py-1.5"
             >
               Stop
             </button>
           )}
         </div>
-
       </div>
 
       {/* ── Info cards ───────────────────────────────────────────────────── */}
