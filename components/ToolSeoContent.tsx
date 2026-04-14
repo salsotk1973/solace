@@ -46,7 +46,7 @@ export function SeoH2({ children }: { children: ReactNode }) {
 export function SeoDisclaimer({ children }: { children: ReactNode }) {
   return (
     <p
-      className="mt-12 border-t pt-6 text-xs text-white/28"
+      className="mt-12 border-t pt-6 text-xs text-white/65"
       style={{ borderColor: "rgba(255,255,255,0.06)" }}
     >
       {children}
