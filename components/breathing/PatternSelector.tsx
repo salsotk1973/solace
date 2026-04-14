@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 type Pattern = "box" | "478";
 
 interface PatternSelectorProps {
@@ -11,8 +9,8 @@ interface PatternSelectorProps {
 }
 
 const FREE_PATTERNS: { id: Pattern; name: string; timing: string }[] = [
-  { id: "box",  name: "Box Breathing", timing: "4 · 4 · 4 · 4" },
-  { id: "478",  name: "4-7-8",         timing: "4 · 7 · 8"     },
+  { id: "box", name: "Box Breathing", timing: "4 · 4 · 4 · 4" },
+  { id: "478", name: "4-7-8",         timing: "4 · 7 · 8"     },
 ];
 
 const LOCKED_PATTERNS = [
@@ -22,7 +20,11 @@ const LOCKED_PATTERNS = [
 
 function LockIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="ml-1 opacity-60" aria-hidden="true">
+    <svg
+      width="11" height="11" viewBox="0 0 24 24" fill="none"
+      aria-hidden="true"
+      style={{ marginLeft: "4px", opacity: 0.55, flexShrink: 0 }}
+    >
       <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/>
       <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
@@ -31,7 +33,9 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-3 mb-14">
+    <div className="flex flex-wrap justify-center gap-3 mb-6 md:mb-14">
+
+      {/* ── Free patterns ────────────────────────────────────────────────── */}
       {FREE_PATTERNS.map((p) => {
         const active = selected === p.id;
         return (
@@ -57,13 +61,17 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         );
       })}
 
+      {/* ── Locked patterns — plain <a> to avoid next/link client issues ─── */}
       {LOCKED_PATTERNS.map((p) => (
-        <Link
+        <a
           key={p.name}
           href="/pricing"
-          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.1)] bg-transparent text-[rgba(255,255,255,0.38)] opacity-50 hover:opacity-70 transition-opacity duration-200"
+          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.14)] bg-transparent text-[rgba(255,255,255,0.42)] hover:text-[rgba(255,255,255,0.68)] hover:border-[rgba(255,255,255,0.26)] transition-all duration-200"
         >
-          <span className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em] flex items-center">
+          <span
+            className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em]"
+            style={{ display: "flex", alignItems: "center" }}
+          >
             {p.name}
             <LockIcon />
           </span>
@@ -72,8 +80,9 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
               {p.timing}
             </span>
           )}
-        </Link>
+        </a>
       ))}
+
     </div>
   );
 }

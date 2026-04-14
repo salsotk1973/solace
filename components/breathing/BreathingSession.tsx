@@ -166,10 +166,27 @@ export default function BreathingSession({ userId }: Props) {
         disabled={!canSwitch}
       />
 
-      {/* ── Orb stage ────────────────────────────────────────────────────── */}
-      {/* flex-col-reverse on mobile: button renders first (top), orb below.
-          md:flex-col on desktop: orb first, button below. */}
-      <div className="flex flex-col-reverse md:flex-col items-center gap-8 mb-8 md:mb-16">
+      {/* ── Begin / Stop button — sits between selector and orb ─────────── */}
+      <div className="flex flex-col items-center mb-6 md:mb-8">
+        {!isRunning ? (
+          <button
+            onClick={handleStart}
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.22)] px-8 py-3 rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.42)] transition-all duration-300"
+          >
+            {sessionComplete ? "Begin again" : "Begin"}
+          </button>
+        ) : (
+          <button
+            onClick={handleStop}
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-3"
+          >
+            Stop
+          </button>
+        )}
+      </div>
+
+      {/* ── Orb ─────────────────────────────────────────────────────────── */}
+      <div className="flex justify-center mb-8 md:mb-16">
         <BreathingOrb
           pattern={pattern}
           isRunning={isRunning}
@@ -177,25 +194,6 @@ export default function BreathingSession({ userId }: Props) {
           onComplete={handleComplete}
           size={orbSize}
         />
-
-        <div className="flex flex-col items-center gap-4">
-          {/* Start / Stop */}
-          {!isRunning ? (
-            <button
-              onClick={handleStart}
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.22)] px-8 py-3 rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.42)] transition-all duration-300"
-            >
-              {sessionComplete ? "Begin again" : "Begin"}
-            </button>
-          ) : (
-            <button
-              onClick={handleStop}
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-3"
-            >
-              Stop
-            </button>
-          )}
-        </div>
       </div>
 
       {/* ── Info cards ───────────────────────────────────────────────────── */}
