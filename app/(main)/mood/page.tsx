@@ -3,6 +3,7 @@ import MoodSession from "@/components/mood/MoodSession";
 import { getCurrentUser } from "@/lib/auth";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
+import { glassBackground, getToolRgb } from "@/lib/design-tokens";
 
 export const metadata = {
   title: "Mood Tracking to Understand Emotional Patterns — Solace",
@@ -54,23 +55,27 @@ export default async function MoodPage() {
           <div className="grid grid-cols-2 gap-4">
             <Link
               href="/gratitude"
-              className="group rounded-[14px] p-7 border border-[rgba(160,130,210,0.1)] bg-[linear-gradient(145deg,#100c1a,#140e20,#0e0a16)] hover:border-[rgba(160,130,210,0.26)] transition-all duration-500"
+              className="group rounded-[14px] p-7 border border-[rgba(232,168,62,0.1)] hover:border-[rgba(232,168,62,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('gratitude') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(160,130,210,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('gratitude').replace(/, /g, ',')},0.42)` }}>
                 When I want to find the good
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(215,200,240,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(245,232,210,0.85)]">
                 Gratitude Log
               </p>
             </Link>
             <Link
               href="/reframe"
-              className="group rounded-[14px] p-7 border border-[rgba(160,130,210,0.1)] bg-[linear-gradient(145deg,#100c1a,#140e20,#0e0a16)] hover:border-[rgba(160,130,210,0.26)] transition-all duration-500"
+              className="group rounded-[14px] p-7 border border-[rgba(232,168,62,0.1)] hover:border-[rgba(232,168,62,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('reframe') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(160,130,210,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('reframe').replace(/, /g, ',')},0.42)` }}>
                 When a thought won&apos;t go away
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(215,200,240,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(245,232,210,0.85)]">
                 Thought Reframer
               </p>
             </Link>

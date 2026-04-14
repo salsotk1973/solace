@@ -4,6 +4,7 @@ import { getCurrentUserId } from "@/lib/auth-user";
 import { SOLACE_ROUTES }  from "@/lib/solace/routes";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
+import { glassBackground, getToolRgb } from "@/lib/design-tokens";
 
 export const metadata = {
   title: "Deep Work Focus Timer | Focus Without Distraction — Solace",
@@ -80,23 +81,27 @@ export default async function FocusPage() {
           <div className="grid grid-cols-2 gap-4">
             <Link
               href="/breathing"
-              className="rounded-[14px] p-7 border border-[rgba(80,195,215,0.1)] bg-[linear-gradient(145deg,#080e18,#0a1420,#070c14)] hover:border-[rgba(80,195,215,0.26)] transition-all duration-500"
+              className="rounded-[14px] p-7 border border-[rgba(60,192,212,0.1)] hover:border-[rgba(60,192,212,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('breathing') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(80,195,215,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('breathing').replace(/, /g, ',')},0.42)` }}>
                 When I can&apos;t breathe
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(210,240,248,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(225,240,245,0.85)]">
                 Breathing
               </p>
             </Link>
             <Link
               href={SOLACE_ROUTES.breakItDown}
-              className="rounded-[14px] p-7 border border-[rgba(218,148,48,0.1)] bg-[linear-gradient(145deg,#1a1008,#281808,#180e04)] hover:border-[rgba(218,148,48,0.26)] transition-all duration-500"
+              className="rounded-[14px] p-7 border border-[rgba(124,111,205,0.1)] hover:border-[rgba(124,111,205,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('breakdown') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(218,148,48,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('breakdown').replace(/, /g, ',')},0.42)` }}>
                 When I feel overwhelmed
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(245,232,215,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(230,225,250,0.85)]">
                 Break It Down
               </p>
             </Link>
