@@ -7,7 +7,8 @@
 
 **Hero copy (locked):**
 ```
-You know something needs to change. You just can't see it clearly yet.
+You know something needs to change.
+You just can't see it clearly yet.
 Solace gives you the space to think it through — privately, gently, without judgement.
 [Find some clarity →]
 ```
@@ -155,15 +156,18 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Supabase `users` table: `stripe_customer_id`, `stripe_subscription_id`, `subscription_status` columns added
 - All env vars in Vercel (Production)
 - **End-to-end sandbox test PASSED** — checkout → webhook → users.plan='paid' confirmed ✅
+- **Stripe Customer Portal activated** in sandbox ✅
 
 ### Dashboard ✅
 - `app/(main)/dashboard/page.tsx` — server component, shows plan status, streak, sessions
+- `app/(main)/dashboard/DashboardContent.tsx` — all 9 tool cards using canonical colours from `design-tokens.ts`
 - `components/dashboard/BillingPortalButton.tsx` — redirects to Stripe Customer Portal
 - `components/dashboard/UpgradeBanner.tsx` — auto-dismisses after 5s on ?upgraded=true
 - Dashboard shows PRO badge for paid users ✅
+- All text readability fixed — `TEXT_COLOURS` and `FONT_SIZE` from design-tokens.ts ✅
 
 ### Clerk Webhook ✅
-- `app/api/webhooks/clerk/route.ts` — handles user.created + user.updated, upserts Supabase users row
+- `app/api/webhooks/clerk/route.ts` — handles user.created + user.updated, upserts Supabase users row + adds to Brevo + sends welcome email
 - Clerk webhook endpoint registered: `https://www.try-solace.app/api/webhooks/clerk`
 - Events subscribed: `user.created`, `user.updated`
 - `CLERK_WEBHOOK_SECRET` in Vercel ✅
@@ -171,15 +175,48 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 
 ### Middleware ✅
 - `/api/stripe/(.*)` added to public routes — no longer blocked by Clerk middleware
+- `/sitemap.xml` and `/robots.txt` added to public routes ✅
+
+### SEO ✅
+- `app/sitemap.ts` — generates `/sitemap.xml` with all 9 tool pages + core pages
+- Google Search Console verified — domain `try-solace.app` ✅
+- Sitemap submitted to Search Console ✅
+
+### Analytics ✅
+- PostHog installed — `components/PostHogProvider.tsx` + `components/PostHogPageView.tsx`
+- Pageview tracking live on all routes ✅
+- `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` in Vercel ✅
+- PostHog project: `us.posthog.com/project/382430`
+
+### Email System — Brevo ✅ (Phase 1)
+- **Brevo account:** active, `try-solace.app` domain authenticated + DKIM + DMARC ✅
+- **Sender:** `hello@try-solace.app` verified ✅
+- **Lists:**
+  - `Solace Users` — ID **3** (all signups)
+  - `Solace Newsletter` — ID **5** (opt-in only, not yet wired)
+- **Templates:**
+  - ID 1: Welcome — "You've found a quieter place."
+  - ID 2: Day 3 follow-up — "How's it going?"
+  - ID 3: Day 14 check-in — "Still here when you need it."
+- **Code:** `lib/brevo.ts` — `addBrevoContact` + `sendBrevoTemplate`
+- **Clerk webhook** — on `user.created`: adds to list 3 + sends template 1 ✅
+- **Brevo Automation #1** — Active: contact added to list 3 → wait 3 days → template 2 → wait 11 days → template 3 ✅
+- **Tested:** welcome email delivered, contact appears in Solace Users list ✅
+- `BREVO_API_KEY` in Vercel ✅
+
+### Email System — Planned (Phase 2, post-launch)
+Full sequence planned (requires Supabase login tracking + Stripe webhook triggers):
+1. Welcome sequence — Day 0, 2, 5
+2. Free-to-paid nudge — Day 1, 4, 8 (requires plan check)
+3. Re-engagement — Day 14, 21, 30 with no login (requires last_login tracking)
+4. Post-upgrade onboarding — Day 0, 3, 30 (requires Stripe webhook trigger)
 
 ### Still Needed
-- [ ] Enable Stripe Customer Portal in Stripe sandbox dashboard (Settings → Billing → Customer portal)
-- [ ] Verify Clerk webhook fires for brand new users (test with fresh Google account)
-- [ ] Dashboard tool card readability fix (cards too dark/low contrast)
-- [ ] Switch Stripe from sandbox to live mode when ready
-- [ ] Activate Google Search Console
-- [ ] Activate PostHog analytics
+- [ ] Dashboard tool card fix — spec written (v3), not yet run in Claude Code
+- [ ] Switch Stripe from sandbox to live mode
+- [ ] Newsletter opt-in — wire `Solace Newsletter` list (ID 5) to signup flow
 - [ ] Export feature — not built for any tool
+- [ ] Phase 2 email sequences
 
 ---
 
@@ -195,11 +232,12 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## Post-Launch Tasks
-- Email sequences in Brevo (4 sequences)
+- Phase 2 email sequences (4 sequences — see Email System above)
 - Make Lab homepage teaser dynamic
 - Solace Weekly Intelligence Report (~day 30)
 - Enable Cloudflare bot fight mode + AI Labyrinth post-launch
 - Update Cloudflare account to Business + ABN at ~A$20K MRR
+- Set up PostHog saved insights after 7 days of traffic data
 
 ---
 
@@ -210,7 +248,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ```
 Load solace-master. Working on: [specific task]. Go.
 ```
-I fetch via web_fetch from the URL above.
+I fetch via Chrome MCP navigate + get_page_text from the URL above.
 
 ### Updating Master Files
 1. I present updated file
