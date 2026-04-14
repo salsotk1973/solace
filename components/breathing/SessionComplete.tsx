@@ -5,10 +5,11 @@ import Link from "next/link";
 
 interface SessionCompleteProps {
   isLoggedIn: boolean;
+  isPaid?: boolean;
   onDismiss: () => void;
 }
 
-export default function SessionComplete({ isLoggedIn, onDismiss }: SessionCompleteProps) {
+export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: SessionCompleteProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -44,6 +45,14 @@ export default function SessionComplete({ isLoggedIn, onDismiss }: SessionComple
               className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(120,215,232,0.8)] border border-[rgba(80,200,218,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(80,200,218,0.52)] hover:text-[rgba(160,235,248,0.95)] transition-all duration-300"
             >
               Start free →
+            </Link>
+          )}
+          {isLoggedIn && !isPaid && (
+            <Link
+              href="/pricing"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(80,200,218,0.80)] border border-[rgba(80,200,218,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(80,200,218,0.52)] hover:text-[rgba(120,230,245,0.95)] transition-all duration-300"
+            >
+              Unlock full history →
             </Link>
           )}
           <button

@@ -322,6 +322,7 @@ export default function BreathingSession({ userId }: Props) {
       {sessionComplete && !dismissed && (
         <SessionComplete
           isLoggedIn={!!userId}
+          isPaid={history?.isPaid}
           onDismiss={() => setDismissed(true)}
         />
       )}
