@@ -23,6 +23,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/solace/clear-your-mind(.*)",
   "/api/webhooks(.*)",
   "/api/stripe/(.*)",
+  "/sitemap.xml",
+  "/robots.txt",
 ]);
 
 const darkFailureHtml = `<!doctype html><html lang="en" style="background:#090d14;color-scheme:dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d14"><title>Solace</title><style>html,body{margin:0;min-height:100%;background:#090d14;color:#e4def6}body{min-height:100vh;display:block}</style></head><body></body></html>`;
