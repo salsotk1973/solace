@@ -23,11 +23,11 @@ export default async function BreathingPage() {
 
   return (
     <PageShell particles={false}>
-      <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
+      <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[68px] md:pt-[140px] pb-28">
 
         {/* ── Tool header ───────────────────────────────────────────────── */}
-        <header className="text-center mb-14">
-          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(100,195,218,0.38)] mb-3">
+        <header className="text-center mb-2 md:mb-14">
+          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(100,195,218,0.72)] mb-2 md:mb-3">
             Calm your state
           </p>
           <h1 className="[font-family:var(--font-display)] font-light text-[clamp(36px,5vw,56px)] text-[rgba(225,242,248,0.92)] leading-tight">

@@ -33,7 +33,7 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-3 mb-6 md:mb-14">
+    <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-2 md:mb-14">
 
       {/* ── Free patterns ────────────────────────────────────────────────── */}
       {FREE_PATTERNS.map((p) => {
@@ -44,7 +44,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
             onClick={() => !disabled && onChange(p.id)}
             disabled={disabled}
             className={[
-              "flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border transition-all duration-300",
+              "flex flex-col items-center gap-0.5 px-7 py-2 md:py-3 rounded-full border transition-all duration-300",
               "disabled:cursor-not-allowed",
               active
                 ? "border-[rgba(45,212,191,0.6)] bg-[rgba(45,212,191,0.1)] text-[rgba(45,212,191,0.95)]"
@@ -66,7 +66,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         <a
           key={p.name}
           href="/pricing"
-          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.14)] bg-transparent text-[rgba(255,255,255,0.42)] hover:text-[rgba(255,255,255,0.68)] hover:border-[rgba(255,255,255,0.26)] transition-all duration-200"
+          className="flex flex-col items-center gap-0.5 px-7 py-2 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
         >
           <span
             className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em]"
