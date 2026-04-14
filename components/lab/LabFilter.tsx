@@ -290,7 +290,7 @@ export function FeaturedCard({
       onMouseLeave={() => setHovered(false)}
       style={{
         borderRadius: '22px',
-        background:   FEATURED_BG,
+        background:   catBg,
         border:       `0.5px solid ${hovered ? accent.replace('1)', '0.35)') : accent.replace('1)', '0.18)')}`,
         boxShadow:    hovered
           ? `0 0 ${isCompact ? '18px 4px' : '24px 6px'} ${accent.replace('1)', isCompact ? '0.24)' : '0.35)')}`
