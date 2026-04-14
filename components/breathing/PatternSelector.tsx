@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 type Pattern = "box" | "478";
 
 interface PatternSelectorProps {
@@ -14,9 +16,18 @@ const FREE_PATTERNS: { id: Pattern; name: string; timing: string }[] = [
 ];
 
 const LOCKED_PATTERNS = [
-  { name: "Calm",          timing: "5 · 5"  },
-  { name: "Double Exhale", timing: "Custom" },
+  { name: "Calm",          timing: "5 · 5" },
+  { name: "Double Exhale", timing: ""      },
 ];
+
+function LockIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="ml-1 opacity-60" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
@@ -47,18 +58,21 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
       })}
 
       {LOCKED_PATTERNS.map((p) => (
-        <button
+        <Link
           key={p.name}
-          disabled
-          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] cursor-not-allowed"
+          href="/pricing"
+          className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.1)] bg-transparent text-[rgba(255,255,255,0.38)] opacity-50 hover:opacity-70 transition-opacity duration-200"
         >
-          <span className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em]">
+          <span className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em] flex items-center">
             {p.name}
+            <LockIcon />
           </span>
-          <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
-            {p.timing}
-          </span>
-        </button>
+          {p.timing && (
+            <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
+              {p.timing}
+            </span>
+          )}
+        </Link>
       ))}
     </div>
   );

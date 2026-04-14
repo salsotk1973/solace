@@ -133,6 +133,15 @@ export default function BreathingSession({ userId }: Props) {
     }
   }, [loadHistory, pattern, userId]);
 
+  // ── Responsive orb size ─────────────────────────────────────────────────────
+  const [orbSize, setOrbSize] = useState<number>(240);
+  useEffect(() => {
+    const update = () => setOrbSize(window.innerWidth < 768 ? 160 : 240);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   const canSwitch = !isRunning && !sessionComplete;
   const info      = INFO[pattern];
   const historyLabel = history?.isPaid ? "Full history" : "7-day history";
@@ -158,12 +167,15 @@ export default function BreathingSession({ userId }: Props) {
       />
 
       {/* ── Orb stage ────────────────────────────────────────────────────── */}
-      <div className="flex flex-col items-center gap-8 mb-16">
+      {/* flex-col-reverse on mobile: button renders first (top), orb below.
+          md:flex-col on desktop: orb first, button below. */}
+      <div className="flex flex-col-reverse md:flex-col items-center gap-8 mb-8 md:mb-16">
         <BreathingOrb
           pattern={pattern}
           isRunning={isRunning}
           onCycleChange={handleCycleChange}
           onComplete={handleComplete}
+          size={orbSize}
         />
 
         <div className="flex flex-col items-center gap-4">
