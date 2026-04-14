@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import PatternSelector, { type SleepPattern } from "./PatternSelector";
 import ProgressRing, { RING_CIRCUMFERENCE } from "./ProgressRing";
+import { glassBackground, getToolRgb } from "@/lib/design-tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,9 +61,14 @@ interface Props {
 }
 
 export default function SleepOrb({ userId }: Props) {
-  const [pattern,   setPattern]   = useState<SleepPattern>("48");
-  const [isRunning, setIsRunning] = useState(false);
-  const [started,   setStarted]   = useState(false);
+  const [pattern,      setPattern]      = useState<SleepPattern>("48");
+  const [isRunning,    setIsRunning]    = useState(false);
+  const [started,      setStarted]      = useState(false);
+  const [hovBreathing, setHovBreathing] = useState(false);
+  const [hovReframe,   setHovReframe]   = useState(false);
+
+  const rgbBreathing = getToolRgb('breathing').replace(/, /g, ',')  // '60,192,212'
+  const rgbReframe   = getToolRgb('reframe').replace(/, /g, ',')    // '232,168,62'
 
   // ── Orb / ring refs (all updated directly in the RAF loop) ───────────────
   const orbRef   = useRef<HTMLDivElement>(null);
@@ -480,13 +486,13 @@ export default function SleepOrb({ userId }: Props) {
               key={label}
               className="flex flex-col items-center gap-1.5 px-4 py-4 rounded-[12px] border border-[rgba(140,120,210,0.08)] bg-[rgba(140,120,210,0.03)]"
             >
-              <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.2em] uppercase text-[rgba(140,120,210,0.38)]">
+              <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.2em] uppercase text-[rgba(140,120,210,0.38)]">
                 {label}
               </p>
               <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(180,165,235,0.8)] leading-none">
                 {value}
               </p>
-              <p className="[font-family:var(--font-jost)] text-[9px] text-[rgba(155,145,200,0.35)] tracking-[0.06em]">
+              <p className="[font-family:var(--font-jost)] text-[11px] text-[rgba(155,145,200,0.35)] tracking-[0.06em]">
                 {sub}
               </p>
             </div>
@@ -503,29 +509,45 @@ export default function SleepOrb({ userId }: Props) {
 
         {/* ── Other tools cross-links — dimmable ──────────────────────────── */}
         <section ref={crossLinksRef} className="transition-opacity duration-[3000ms]">
-          <p className="text-center [font-family:var(--font-jost)] text-[9px] tracking-[0.24em] uppercase text-[rgba(130,145,158,0.3)] mb-6">
+          <p className="text-center [font-family:var(--font-jost)] text-[11px] tracking-[0.24em] uppercase text-[rgba(130,145,158,0.3)] mb-6">
             Other tools
           </p>
           <div className="grid grid-cols-2 gap-4">
             <Link
               href="/breathing"
-              className="rounded-[14px] p-7 border border-[rgba(80,195,215,0.1)] bg-[linear-gradient(145deg,#080e18,#0a1420,#070c14)] hover:border-[rgba(80,195,215,0.26)] transition-all duration-500"
+              className="rounded-[14px] p-7 transition-all duration-500"
+              style={{
+                background: glassBackground('breathing'),
+                border: `1px solid rgba(${rgbBreathing},${hovBreathing ? 0.26 : 0.1})`,
+              }}
+              onMouseEnter={() => setHovBreathing(true)}
+              onMouseLeave={() => setHovBreathing(false)}
             >
-              <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(80,195,215,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${rgbBreathing},0.42)` }}>
                 During the day
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(210,240,248,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px]"
+                 style={{ color: `rgba(${rgbBreathing},0.85)` }}>
                 Breathing
               </p>
             </Link>
             <Link
               href="/reframe"
-              className="rounded-[14px] p-7 border border-[rgba(200,170,90,0.1)] bg-[linear-gradient(145deg,#181208,#221808,#140e04)] hover:border-[rgba(200,170,90,0.26)] transition-all duration-500"
+              className="rounded-[14px] p-7 transition-all duration-500"
+              style={{
+                background: glassBackground('reframe'),
+                border: `1px solid rgba(${rgbReframe},${hovReframe ? 0.26 : 0.1})`,
+              }}
+              onMouseEnter={() => setHovReframe(true)}
+              onMouseLeave={() => setHovReframe(false)}
             >
-              <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(200,170,90,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${rgbReframe},0.42)` }}>
                 When thoughts race
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(240,230,200,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px]"
+                 style={{ color: `rgba(${rgbReframe},0.85)` }}>
                 Thought Reframer
               </p>
             </Link>

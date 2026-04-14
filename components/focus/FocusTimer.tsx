@@ -225,7 +225,7 @@ export default function FocusTimer({ userId }: Props) {
               "[transition:stroke_0.8s_ease]",
               isWork
                 ? "[stroke:rgba(240,170,70,0.35)]"
-                : "[stroke:rgba(80,195,215,0.32)]",
+                : "[stroke:rgba(60,192,212,0.32)]",
             ].join(" ")}
             strokeWidth={3}
             strokeLinecap="round"

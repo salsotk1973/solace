@@ -44,7 +44,7 @@ export default function EntryList({ entries }: Props) {
             <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(220,200,160,0.8)] leading-relaxed">
               {entry.text}
             </p>
-            <p className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(200,170,100,0.38)] mt-2">
+            <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(232,168,62,0.38)] mt-2">
               {getDayName(entry.timestamp)}
             </p>
           </div>

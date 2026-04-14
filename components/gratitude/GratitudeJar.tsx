@@ -107,8 +107,8 @@ export default function GratitudeJar({ count, maxEntries = 7 }: Props) {
         textAnchor="middle"
         dominantBaseline="middle"
         className="[font-family:var(--font-jost)]"
-        fill="rgba(200,170,100,0.3)"
-        fontSize="9"
+        fill="rgba(232,168,62,0.3)"
+        fontSize="11"
         letterSpacing="3"
       >
         THIS WEEK
