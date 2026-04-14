@@ -33,7 +33,8 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-2 md:mb-14">
+    // Mobile: strict 2×2 grid. Desktop: flex-wrap with natural pill widths.
+    <div className="grid grid-cols-2 gap-2 mb-2 md:flex md:flex-wrap md:justify-center md:gap-3 md:mb-14">
 
       {/* ── Free patterns ────────────────────────────────────────────────── */}
       {FREE_PATTERNS.map((p) => {
@@ -44,14 +45,14 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
             onClick={() => !disabled && onChange(p.id)}
             disabled={disabled}
             className={[
-              "flex flex-col items-center gap-0.5 px-7 py-2 md:py-3 rounded-full border transition-all duration-300",
+              "flex flex-col items-center gap-0.5 px-4 py-2 md:px-7 md:py-3 rounded-full border transition-all duration-300",
               "disabled:cursor-not-allowed",
               active
                 ? "border-[rgba(45,212,191,0.6)] bg-[rgba(45,212,191,0.1)] text-[rgba(45,212,191,0.95)]"
                 : "border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] hover:border-[rgba(255,255,255,0.28)] hover:text-[rgba(255,255,255,0.72)]",
             ].join(" ")}
           >
-            <span className="[font-family:var(--font-jost)] text-[12px] font-[400] tracking-[-0.01em]">
+            <span className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] font-[400] tracking-[-0.01em]">
               {p.name}
             </span>
             <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
@@ -61,15 +62,15 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         );
       })}
 
-      {/* ── Locked patterns — plain <a> to avoid next/link client issues ─── */}
+      {/* ── Locked patterns ──────────────────────────────────────────────── */}
       {LOCKED_PATTERNS.map((p) => (
         <a
           key={p.name}
           href="/pricing"
-          className="flex flex-col items-center gap-0.5 px-7 py-2 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
+          className="flex flex-col items-center gap-0.5 px-4 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
         >
           <span
-            className="[font-family:var(--font-jost)] text-[12px] tracking-[-0.01em]"
+            className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[-0.01em]"
             style={{ display: "flex", alignItems: "center" }}
           >
             {p.name}

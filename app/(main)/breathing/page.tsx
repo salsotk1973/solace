@@ -27,10 +27,10 @@ export default async function BreathingPage() {
 
         {/* ── Tool header ───────────────────────────────────────────────── */}
         <header className="text-center mb-2 md:mb-14">
-          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(100,195,218,0.72)] mb-2 md:mb-3">
+          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(100,195,218,0.80)] mb-2 md:mb-3">
             Calm your state
           </p>
-          <h1 className="[font-family:var(--font-display)] font-light text-[clamp(36px,5vw,56px)] text-[rgba(225,242,248,0.92)] leading-tight">
+          <h1 className="[font-family:var(--font-display)] font-light text-[26px] md:text-[clamp(36px,5vw,56px)] text-[rgba(225,242,248,0.92)] leading-tight">
             Breathe with intention.
           </h1>
         </header>

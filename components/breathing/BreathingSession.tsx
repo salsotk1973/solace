@@ -166,38 +166,45 @@ export default function BreathingSession({ userId }: Props) {
         disabled={!canSwitch}
       />
 
-      {/* ── Begin / Stop button — sits between selector and orb ─────────── */}
-      <div className="flex flex-col items-center mb-2 md:mb-8">
-        {!isRunning ? (
-          <button
-            onClick={handleStart}
-            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.22)] px-6 py-2 md:px-8 md:py-3 rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.42)] transition-all duration-300"
-          >
-            {sessionComplete ? "Begin again" : "Begin"}
-          </button>
-        ) : (
-          <button
-            onClick={handleStop}
-            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-3"
-          >
-            Stop
-          </button>
-        )}
-      </div>
+      {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
+      {/* Mobile: flex-row-reverse → button (first in DOM) appears RIGHT, orb LEFT  */}
+      {/* Desktop: flex-col → button on TOP, orb below (matching original layout)    */}
+      <div className="flex flex-row-reverse items-center justify-center gap-6 mb-3 md:flex-col md:gap-8 md:mb-16">
 
-      {/* ── Orb ─────────────────────────────────────────────────────────── */}
-      <div className="flex justify-center mb-3 md:mb-16">
-        <BreathingOrb
-          pattern={pattern}
-          isRunning={isRunning}
-          onCycleChange={handleCycleChange}
-          onComplete={handleComplete}
-          size={orbSize}
-        />
+        {/* Button — DOM first so flex-row-reverse pushes it right on mobile */}
+        <div className="flex flex-col items-center shrink-0">
+          {!isRunning ? (
+            <button
+              onClick={handleStart}
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.22)] px-6 py-2 md:px-8 md:py-3 rounded-[2px] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.42)] transition-all duration-300"
+            >
+              {sessionComplete ? "Begin again" : "Begin"}
+            </button>
+          ) : (
+            <button
+              onClick={handleStop}
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-3"
+            >
+              Stop
+            </button>
+          )}
+        </div>
+
+        {/* Orb — DOM second so flex-row-reverse places it LEFT on mobile */}
+        <div className="flex justify-center">
+          <BreathingOrb
+            pattern={pattern}
+            isRunning={isRunning}
+            onCycleChange={handleCycleChange}
+            onComplete={handleComplete}
+            size={orbSize}
+          />
+        </div>
+
       </div>
 
       {/* ── Info cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-2 md:gap-3 max-w-[520px] mx-auto mb-6 md:mb-20">
+      <div className="grid grid-cols-3 gap-1.5 md:gap-3 max-w-[520px] mx-auto mb-4 md:mb-20">
         {[
           { label: "Duration", value: info.duration },
           { label: "Pattern",  value: info.pattern  },
@@ -205,12 +212,12 @@ export default function BreathingSession({ userId }: Props) {
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-4 rounded-[12px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.03)]"
+            className="flex flex-col items-center gap-0.5 md:gap-1.5 p-2 md:px-4 md:py-4 rounded-[10px] md:rounded-[12px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.03)]"
           >
-            <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.2em] uppercase text-[rgba(100,190,210,0.38)]">
+            <p className="[font-family:var(--font-jost)] text-[9px] md:text-[12px] tracking-[0.18em] uppercase text-[rgba(100,190,210,0.38)]">
               {label}
             </p>
-            <p className="[font-family:var(--font-display)] font-light text-[13px] md:text-[15px] text-[rgba(180,230,240,0.75)] text-center leading-snug">
+            <p className="[font-family:var(--font-display)] font-light text-[11px] md:text-[15px] text-[rgba(180,230,240,0.75)] text-center leading-snug">
               {value}
             </p>
           </div>
