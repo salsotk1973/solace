@@ -118,7 +118,7 @@ export default function SiteFooter() {
                       fontSize: "10px",
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",
-                      color: "rgba(255,255,255,0.35)",
+                      color: "rgba(255,255,255,0.65)",
                       margin: "0 0 14px",
                     }}
                   >
