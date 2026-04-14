@@ -5,6 +5,14 @@ import Link from "next/link";
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import BillingPortalButton from "@/components/dashboard/BillingPortalButton";
+import {
+  getToolColour,
+  getToolRgb,
+  glassBackground,
+  glassBorder,
+  TEXT_COLOURS,
+  FONT_SIZE,
+} from "@/lib/design-tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,115 +61,17 @@ const TOOL_ROUTES: Record<string, string> = {
   "sleep":           "/sleep",
 };
 
+// Slugs must match TOOL_CATEGORY keys in lib/design-tokens.ts exactly
 const QUICK_TOOLS = [
-  {
-    slug:    "clear-your-mind",
-    name:    "Clear Your Mind",
-    feeling: "When my mind won't stop",
-    family:  "Clear your mind",
-    href:    "/tools/clear-your-mind",
-    accent:  "#2dd4bf",
-    bg:      "linear-gradient(145deg, #081a1a, #0c2222, #081818)",
-    border:  "rgba(45,212,191,0.14)",
-    borderH: "rgba(45,212,191,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(45,212,191,0.55), transparent)",
-  },
-  {
-    slug:    "choose",
-    name:    "Choose",
-    feeling: "When I can't decide",
-    family:  "Clear your mind",
-    href:    "/tools/choose",
-    accent:  "#f59e0b",
-    bg:      "linear-gradient(145deg, #1a1108, #221808, #181008)",
-    border:  "rgba(245,158,11,0.14)",
-    borderH: "rgba(245,158,11,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(245,158,11,0.55), transparent)",
-  },
-  {
-    slug:    "break-it-down",
-    name:    "Break It Down",
-    feeling: "When I feel overwhelmed",
-    family:  "Clear your mind",
-    href:    "/tools/break-it-down",
-    accent:  "#818cf8",
-    bg:      "linear-gradient(145deg, #0c0c1e, #10102a, #080820)",
-    border:  "rgba(129,140,248,0.14)",
-    borderH: "rgba(129,140,248,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(129,140,248,0.55), transparent)",
-  },
-  {
-    slug:    "breathing",
-    name:    "Breathing",
-    feeling: "When I need to slow down",
-    family:  "Calm your state",
-    href:    "/breathing",
-    accent:  "#86efac",
-    bg:      "linear-gradient(145deg, #081a10, #0c2218, #081410)",
-    border:  "rgba(134,239,172,0.14)",
-    borderH: "rgba(134,239,172,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(134,239,172,0.55), transparent)",
-  },
-  {
-    slug:    "focus-timer",
-    name:    "Focus Timer",
-    feeling: "When I need to concentrate",
-    family:  "Calm your state",
-    href:    "/focus",
-    accent:  "#f59e0b",
-    bg:      "linear-gradient(145deg, #1a1108, #221808, #181008)",
-    border:  "rgba(245,158,11,0.14)",
-    borderH: "rgba(245,158,11,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(245,158,11,0.55), transparent)",
-  },
-  {
-    slug:    "reframe",
-    name:    "Reframe",
-    feeling: "When I'm stuck in a thought",
-    family:  "Calm your state",
-    href:    "/reframe",
-    accent:  "#86efac",
-    bg:      "linear-gradient(145deg, #081a10, #0c2218, #081410)",
-    border:  "rgba(134,239,172,0.14)",
-    borderH: "rgba(134,239,172,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(134,239,172,0.55), transparent)",
-  },
-  {
-    slug:    "mood",
-    name:    "Mood Tracker",
-    feeling: "When I want to check in",
-    family:  "Notice what's good",
-    href:    "/mood",
-    accent:  "#fb7185",
-    bg:      "linear-gradient(145deg, #1a0810, #22080e, #18080c)",
-    border:  "rgba(251,113,133,0.14)",
-    borderH: "rgba(251,113,133,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(251,113,133,0.55), transparent)",
-  },
-  {
-    slug:    "gratitude",
-    name:    "Gratitude",
-    feeling: "When I want to notice the good",
-    family:  "Notice what's good",
-    href:    "/gratitude",
-    accent:  "#fcd34d",
-    bg:      "linear-gradient(145deg, #18140a, #20180a, #161008)",
-    border:  "rgba(252,211,77,0.14)",
-    borderH: "rgba(252,211,77,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(252,211,77,0.55), transparent)",
-  },
-  {
-    slug:    "sleep",
-    name:    "Sleep Wind-Down",
-    feeling: "When I can't switch off",
-    family:  "Calm your state",
-    href:    "/sleep",
-    accent:  "#818cf8",
-    bg:      "linear-gradient(145deg, #0c0c1e, #10102a, #080820)",
-    border:  "rgba(129,140,248,0.14)",
-    borderH: "rgba(129,140,248,0.3)",
-    shimmer: "linear-gradient(90deg, transparent, rgba(129,140,248,0.55), transparent)",
-  },
+  { slug: "clear",     name: "Clear Your Mind",  feeling: "When my mind won't stop",        family: "Clarity", href: "/tools/clear-your-mind" },
+  { slug: "choose",    name: "Choose",            feeling: "When I can't decide",             family: "Decide",  href: "/tools/choose" },
+  { slug: "breakdown", name: "Break It Down",     feeling: "When I feel overwhelmed",         family: "Decide",  href: "/tools/break-it-down" },
+  { slug: "breathing", name: "Breathing",         feeling: "When I need to slow down",        family: "Calm",    href: "/breathing" },
+  { slug: "focus",     name: "Focus Timer",       feeling: "When I need to concentrate",      family: "Clarity", href: "/focus" },
+  { slug: "reframe",   name: "Reframe",           feeling: "When I'm stuck in a thought",     family: "Clarity", href: "/reframe" },
+  { slug: "mood",      name: "Mood Tracker",      feeling: "When I want to check in",         family: "Clarity", href: "/mood" },
+  { slug: "gratitude", name: "Gratitude",         feeling: "When I want to notice the good",  family: "Clarity", href: "/gratitude" },
+  { slug: "sleep",     name: "Sleep Wind-Down",   feeling: "When I can't switch off",         family: "Calm",    href: "/sleep" },
 ] as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -204,7 +114,7 @@ function StatCard({
           fontWeight: 300,
           fontSize:   "44px",
           lineHeight: 1,
-          color:      empty ? "rgba(148,140,188,0.28)" : "rgba(215,208,248,0.88)",
+          color:      empty ? TEXT_COLOURS.disabled : TEXT_COLOURS.primary,
           margin:     "0 0 8px",
         }}
       >
@@ -214,10 +124,10 @@ function StatCard({
         style={{
           fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
-          fontSize:      "10px",
+          fontSize:      `${FONT_SIZE.functionalLabel}px`,
           letterSpacing: "0.16em",
           textTransform: "uppercase",
-          color:         "rgba(160,152,210,0.7)",
+          color:         TEXT_COLOURS.secondary,
           margin:        0,
         }}
       >
@@ -245,10 +155,10 @@ function SignOutButton() {
         padding:       0,
         fontFamily:    "'Jost', sans-serif",
         fontWeight:    400,
-        fontSize:      "12px",
+        fontSize:      `${FONT_SIZE.metadata}px`,
         letterSpacing: "0.12em",
         textTransform: "uppercase",
-        color:         hov ? "rgba(215,208,248,0.55)" : "rgba(120,112,165,0.4)",
+        color:         hov ? TEXT_COLOURS.body : TEXT_COLOURS.secondary,
         transition:    "color 0.3s ease",
       }}
     >
@@ -261,10 +171,10 @@ function SignOutButton() {
 
 export default function DashboardContent({ data }: { data: DashboardData }) {
   const { firstName, email, plan, sessions, totalSessions, distinctTools, streak, weekSessions } = data;
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [hoveredCard, setHoveredCard]       = useState<string | null>(null);
   const [hoveredSession, setHoveredSession] = useState<string | null>(null);
-  const [upgradeHov, setUpgradeHov] = useState(false);
-  const [manageHov, setManageHov]   = useState(false);
+  const [upgradeHov, setUpgradeHov]         = useState(false);
+  const [manageHov, setManageHov]           = useState(false);
 
   const recentSessions = sessions.slice(0, 7);
   const hasSessions    = totalSessions > 0;
@@ -283,10 +193,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
       <header style={{ marginBottom: "56px" }}>
         <div
           style={{
-            display:    "flex",
-            alignItems: "center",
-            gap:        "14px",
-            flexWrap:   "wrap",
+            display:      "flex",
+            alignItems:   "center",
+            gap:          "14px",
+            flexWrap:     "wrap",
             marginBottom: "12px",
           }}
         >
@@ -296,7 +206,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
               fontWeight: 300,
               fontSize:   "clamp(32px, 4vw, 48px)",
               lineHeight: 1.1,
-              color:      "rgba(235,228,255,0.9)",
+              color:      TEXT_COLOURS.primary,
               margin:     0,
             }}
           >
@@ -308,10 +218,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             style={{
               fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
-              fontSize:      "9px",
+              fontSize:      `${FONT_SIZE.eyebrow}px`,
               letterSpacing: "0.16em",
               textTransform: "uppercase",
-              color:         isPro ? "rgba(195,175,245,0.82)" : "rgba(148,140,188,0.55)",
+              color:         isPro ? "rgba(195,175,245,0.82)" : TEXT_COLOURS.secondary,
               background:    isPro ? "rgba(80,60,140,0.2)" : "rgba(60,55,90,0.15)",
               border:        isPro ? "0.5px solid rgba(140,120,200,0.3)" : "0.5px solid rgba(100,92,148,0.18)",
               borderRadius:  "100px",
@@ -329,8 +239,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize:   "13px",
-              color:      "rgba(148,140,188,0.52)",
+              fontSize:   `${FONT_SIZE.body}px`,
+              color:      TEXT_COLOURS.secondary,
               margin:     0,
             }}
           >
@@ -338,7 +248,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             <Link
               href="/pricing"
               style={{
-                color:          "rgba(168,148,225,0.72)",
+                color:          TEXT_COLOURS.body,
                 textDecoration: "none",
                 borderBottom:   "0.5px solid rgba(140,120,200,0.28)",
                 paddingBottom:  "1px",
@@ -366,8 +276,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
-                fontSize:   "14px",
-                color:      "rgba(148,140,188,0.52)",
+                fontSize:   `${FONT_SIZE.body}px`,
+                color:      TEXT_COLOURS.secondary,
                 margin:     "0 0 6px",
               }}
             >
@@ -378,10 +288,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
               style={{
                 fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
-                fontSize:      "12px",
+                fontSize:      `${FONT_SIZE.metadata}px`,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                color:         "rgba(168,148,225,0.62)",
+                color:         TEXT_COLOURS.body,
                 textDecoration: "none",
               }}
             >
@@ -410,10 +320,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           style={{
             fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
-            fontSize:      "11px",
+            fontSize:      `${FONT_SIZE.eyebrow}px`,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color:         "rgba(160,152,210,0.75)",
+            color:         TEXT_COLOURS.secondary,
             margin:        "0 0 20px",
           }}
         >
@@ -425,8 +335,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize:   "13px",
-              color:      "rgba(100,92,148,0.4)",
+              fontSize:   `${FONT_SIZE.body}px`,
+              color:      TEXT_COLOURS.secondary,
               margin:     0,
               padding:    "16px 0",
               borderTop:  "0.5px solid rgba(100,92,148,0.1)",
@@ -436,11 +346,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           </p>
         ) : (
           <>
-            <div
-              style={{
-                borderTop: "0.5px solid rgba(100,92,148,0.1)",
-              }}
-            >
+            <div style={{ borderTop: "0.5px solid rgba(100,92,148,0.1)" }}>
               {recentSessions.map((session) => {
                 const toolName  = TOOL_NAMES[session.tool] ?? session.tool;
                 const toolRoute = TOOL_ROUTES[session.tool] ?? "/tools";
@@ -465,31 +371,25 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p
                         style={{
-                          fontFamily:  "'Jost', sans-serif",
-                          fontWeight:  400,
-                          fontSize:    "13px",
-                          color:       "rgba(195,188,238,0.8)",
-                          margin:      "0 0 3px",
-                          whiteSpace:  "nowrap",
-                          overflow:    "hidden",
+                          fontFamily:   "'Jost', sans-serif",
+                          fontWeight:   400,
+                          fontSize:     `${FONT_SIZE.body}px`,
+                          color:        TEXT_COLOURS.body,
+                          margin:       "0 0 3px",
+                          whiteSpace:   "nowrap",
+                          overflow:     "hidden",
                           textOverflow: "ellipsis",
                         }}
                       >
                         {toolName}
                       </p>
-                      <div
-                        style={{
-                          display:    "flex",
-                          alignItems: "center",
-                          gap:        "12px",
-                        }}
-                      >
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                         <span
                           style={{
                             fontFamily: "'Jost', sans-serif",
                             fontWeight: 300,
-                            fontSize:   "11px",
-                            color:      "rgba(120,112,165,0.5)",
+                            fontSize:   `${FONT_SIZE.metadata}px`,
+                            color:      TEXT_COLOURS.secondary,
                           }}
                         >
                           {relativeDate(session.created_at)}
@@ -498,10 +398,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                           style={{
                             fontFamily: "'Jost', sans-serif",
                             fontWeight: 300,
-                            fontSize:   "11px",
+                            fontSize:   `${FONT_SIZE.metadata}px`,
                             color:      session.completed
-                              ? "rgba(68,200,110,0.45)"
-                              : "rgba(120,112,165,0.35)",
+                              ? "rgba(60,192,212,0.7)"
+                              : TEXT_COLOURS.secondary,
                           }}
                         >
                           {session.completed ? "Completed" : "In progress"}
@@ -514,10 +414,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                       style={{
                         fontFamily:    "'Jost', sans-serif",
                         fontWeight:    400,
-                        fontSize:      "11px",
+                        fontSize:      `${FONT_SIZE.metadata}px`,
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
-                        color:         isHov ? "rgba(168,148,225,0.72)" : "rgba(120,112,165,0.35)",
+                        color:         isHov ? TEXT_COLOURS.body : TEXT_COLOURS.secondary,
                         textDecoration: "none",
                         flexShrink:    0,
                         transition:    "color 0.25s ease",
@@ -536,8 +436,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
-                  fontSize:   "12px",
-                  color:      "rgba(120,112,165,0.45)",
+                  fontSize:   `${FONT_SIZE.metadata}px`,
+                  color:      TEXT_COLOURS.secondary,
                   margin:     "16px 0 0",
                 }}
               >
@@ -545,7 +445,7 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 <Link
                   href="/pricing"
                   style={{
-                    color:          "rgba(168,148,225,0.65)",
+                    color:          TEXT_COLOURS.body,
                     textDecoration: "none",
                   }}
                 >
@@ -563,10 +463,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           style={{
             fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
-            fontSize:      "11px",
+            fontSize:      `${FONT_SIZE.eyebrow}px`,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color:         "rgba(160,152,210,0.75)",
+            color:         TEXT_COLOURS.secondary,
             margin:        "0 0 20px",
           }}
         >
@@ -594,11 +494,11 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                   flexDirection:  "column",
                   borderRadius:   "14px",
                   padding:        "22px 22px 18px",
-                  background:     tool.bg,
-                  border:         `0.5px solid ${isHov ? tool.borderH : tool.border}`,
+                  background:     glassBackground(tool.slug, isHov ? 0.12 : 0.07),
+                  border:         `0.5px solid ${glassBorder(tool.slug, isHov ? 0.35 : 0.18)}`,
                   boxShadow:      isHov ? "0 8px 32px rgba(0,0,0,0.25)" : "none",
                   transform:      isHov ? "translateY(-3px)" : "translateY(0)",
-                  transition:     "transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.45s cubic-bezier(0.22,1,0.36,1), border-color 0.45s cubic-bezier(0.22,1,0.36,1)",
+                  transition:     "transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.45s cubic-bezier(0.22,1,0.36,1), border-color 0.45s cubic-bezier(0.22,1,0.36,1), background 0.45s ease",
                   textDecoration: "none",
                   overflow:       "hidden",
                   boxSizing:      "border-box",
@@ -613,35 +513,36 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                     left:          "20%",
                     right:         "20%",
                     height:        "1px",
-                    background:    tool.shimmer,
-                    opacity:       isHov ? 0.6 : 0.28,
+                    background:    `linear-gradient(90deg, transparent, rgba(${getToolRgb(tool.slug)}, 0.5), transparent)`,
+                    opacity:       isHov ? 0.7 : 0.3,
                     transition:    "opacity 0.45s ease",
                     pointerEvents: "none",
                   }}
                 />
 
+                {/* Family eyebrow */}
                 <p
                   style={{
                     fontFamily:    "'Jost', sans-serif",
-                    fontWeight:    400,
-                    fontSize:      "9px",
+                    fontWeight:    500,
+                    fontSize:      `${FONT_SIZE.eyebrow}px`,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
-                    color:         tool.accent,
-                    opacity:       0.85,
+                    color:         getToolColour(tool.slug),
                     margin:        "0 0 8px",
                   }}
                 >
                   {tool.family}
                 </p>
 
+                {/* Tool name */}
                 <p
                   style={{
                     fontFamily: "'Cormorant Garamond', serif",
                     fontWeight: 300,
                     fontSize:   "20px",
                     lineHeight: 1.2,
-                    color:      isHov ? "rgba(240,235,255,1)" : "rgba(215,208,248,0.88)",
+                    color:      isHov ? TEXT_COLOURS.primary : TEXT_COLOURS.body,
                     margin:     "0 0 6px",
                     transition: "color 0.3s ease",
                   }}
@@ -649,12 +550,13 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                   {tool.name}
                 </p>
 
+                {/* Feeling / description */}
                 <p
                   style={{
                     fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
-                    fontSize:   "11px",
-                    color:      isHov ? "rgba(185,178,235,0.85)" : "rgba(168,160,215,0.72)",
+                    fontSize:   `${FONT_SIZE.body}px`,
+                    color:      TEXT_COLOURS.secondary,
                     margin:     0,
                     lineHeight: 1.55,
                     transition: "color 0.3s ease",
@@ -671,8 +573,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
       {/* ── 5. Account section ────────────────────────────────────────── */}
       <section
         style={{
-          borderTop:   "0.5px solid rgba(100,92,148,0.12)",
-          paddingTop:  "40px",
+          borderTop:     "0.5px solid rgba(100,92,148,0.12)",
+          paddingTop:    "40px",
           paddingBottom: "0",
         }}
       >
@@ -680,10 +582,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           style={{
             fontFamily:    "'Jost', sans-serif",
             fontWeight:    400,
-            fontSize:      "11px",
+            fontSize:      `${FONT_SIZE.eyebrow}px`,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color:         "rgba(160,152,210,0.75)",
+            color:         TEXT_COLOURS.secondary,
             margin:        "0 0 24px",
           }}
         >
@@ -702,10 +604,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span
               style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize:   "12px",
-                color:      "rgba(160,152,210,0.72)",
+                fontFamily:    "'Jost', sans-serif",
+                fontWeight:    300,
+                fontSize:      `${FONT_SIZE.metadata}px`,
+                color:         TEXT_COLOURS.secondary,
                 letterSpacing: "0.03em",
               }}
             >
@@ -715,8 +617,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
-                fontSize:   "12px",
-                color:      "rgba(195,188,238,0.8)",
+                fontSize:   `${FONT_SIZE.metadata}px`,
+                color:      TEXT_COLOURS.body,
               }}
             >
               {email ?? "—"}
@@ -727,10 +629,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span
               style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize:   "12px",
-                color:      "rgba(160,152,210,0.72)",
+                fontFamily:    "'Jost', sans-serif",
+                fontWeight:    300,
+                fontSize:      `${FONT_SIZE.metadata}px`,
+                color:         TEXT_COLOURS.secondary,
                 letterSpacing: "0.03em",
               }}
             >
@@ -740,8 +642,8 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 400,
-                fontSize:   "12px",
-                color:      isPro ? "rgba(195,175,245,0.72)" : "rgba(148,140,188,0.55)",
+                fontSize:   `${FONT_SIZE.metadata}px`,
+                color:      isPro ? "rgba(195,175,245,0.82)" : TEXT_COLOURS.secondary,
               }}
             >
               {isPro ? "Pro" : "Free"}
@@ -765,10 +667,10 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 style={{
                   fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
-                  fontSize:      "12px",
+                  fontSize:      `${FONT_SIZE.metadata}px`,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  color:         upgradeHov ? "rgba(215,200,255,0.85)" : "rgba(168,148,225,0.62)",
+                  color:         upgradeHov ? TEXT_COLOURS.primary : TEXT_COLOURS.body,
                   textDecoration: "none",
                   transition:    "color 0.3s ease",
                 }}
