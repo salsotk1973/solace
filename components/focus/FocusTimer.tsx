@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import ModeSelector   from "./ModeSelector";
 import SessionDots    from "./SessionDots";
 import SessionComplete from "./SessionComplete";
+import { useToolHistory } from "@/hooks/useToolHistory";
+import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -49,12 +51,18 @@ export default function FocusTimer({ userId }: Props) {
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
   useEffect(() => { workDoneRef.current  = workDone;  }, [workDone]);
 
+  // ── History ───────────────────────────────────────────────────────────────
+
+  const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("focus", userId);
+
   // ── Save on completion ───────────────────────────────────────────────────
 
   useEffect(() => {
     if (!allDone || !userId) return;
-    fetch("/api/focus", { method: "POST" }).catch(() => {});
-  }, [allDone, userId]);
+    fetch("/api/focus", { method: "POST" })
+      .then(() => loadHistory())
+      .catch(() => {});
+  }, [allDone, userId, loadHistory]);
 
   // ── Timer interval ────────────────────────────────────────────────────────
   // Re-creates when isRunning or phaseIdx changes (phase transitions restart it)
@@ -282,10 +290,51 @@ export default function FocusTimer({ userId }: Props) {
         </div>
       )}
 
+      {/* ── History ─────────────────────────────────────────────────────── */}
+      {userId && history && (
+        <section className="max-w-[520px] mx-auto mb-10 mt-4">
+          <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase text-[rgba(232,168,62,0.50)] mb-4 text-center">
+            {history.isPaid ? "Full history" : "7-day history"}
+          </p>
+          <div className="rounded-[14px] border border-[rgba(232,168,62,0.08)] bg-[rgba(232,168,62,0.025)] px-5 py-4">
+            <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
+              {!history.isPaid
+                ? "Free users keep 7 days of focus history. Your older sessions are still there."
+                : history.sessions.length > 0
+                ? `${history.sessions.length} focus ${history.sessions.length === 1 ? "session" : "sessions"} saved.`
+                : "No focus sessions saved yet."}
+            </p>
+            {history.hasStreak && (
+              <div className="mt-4 text-center">
+                <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase text-[rgba(232,168,62,0.42)] mb-1">
+                  Current streak
+                </p>
+                <p className="[font-family:var(--font-display)] font-light text-[24px] text-[rgba(255,215,150,0.80)]">
+                  {history.currentStreakDays} day{history.currentStreakDays === 1 ? "" : "s"}
+                </p>
+                <p className="[font-family:var(--font-jost)] text-[12px] font-light text-[rgba(200,185,155,0.52)] mt-2">
+                  {history.streakFraming === "full"
+                    ? "A quiet record of the days you chose to focus."
+                    : "Consistency gets easier when you can see the full picture."}
+                </p>
+              </div>
+            )}
+            {shouldShowUpgradePrompt && (
+              <ToolUpgradePrompt
+                hasOlderSessions={history.hasOlderSessions}
+                toolColour="232, 168, 62"
+                toolName="Focus Timer"
+              />
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ── Session complete nudge ──────────────────────────────────────── */}
       {allDone && !dismissed && (
         <SessionComplete
           isLoggedIn={!!userId}
+          isPaid={history?.isPaid}
           onDismiss={() => setDismissed(true)}
         />
       )}

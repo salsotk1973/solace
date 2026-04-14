@@ -5,10 +5,11 @@ import Link from "next/link";
 
 interface SessionCompleteProps {
   isLoggedIn: boolean;
+  isPaid?: boolean;
   onDismiss: () => void;
 }
 
-export default function SessionComplete({ isLoggedIn, onDismiss }: SessionCompleteProps) {
+export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: SessionCompleteProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -32,7 +33,9 @@ export default function SessionComplete({ isLoggedIn, onDismiss }: SessionComple
             {isLoggedIn ? "Great work." : "Session complete."}
           </p>
           <p className="[font-family:var(--font-jost)] text-[12px] text-[rgba(170,180,190,0.5)] leading-snug">
-            {isLoggedIn
+            {isLoggedIn && isPaid
+              ? "Your session has been saved."
+              : isLoggedIn
               ? "Your session has been saved."
               : "Save history & weekly totals with a free account"}
           </p>
@@ -45,6 +48,14 @@ export default function SessionComplete({ isLoggedIn, onDismiss }: SessionComple
               className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(255,200,120,0.8)] border border-[rgba(240,170,70,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(240,170,70,0.52)] hover:text-[rgba(255,215,150,0.95)] transition-all duration-300"
             >
               Start free →
+            </Link>
+          )}
+          {isLoggedIn && !isPaid && (
+            <Link
+              href="/pricing"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(232,168,62,0.80)] border border-[rgba(232,168,62,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(232,168,62,0.52)] hover:text-[rgba(255,200,100,0.95)] transition-all duration-300"
+            >
+              Unlock full history →
             </Link>
           )}
           <button
