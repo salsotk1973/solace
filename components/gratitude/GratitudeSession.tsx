@@ -6,6 +6,8 @@ import EntryInput from "./EntryInput";
 import EntryList, { type Entry } from "./EntryList";
 import StreakRow from "./StreakRow";
 import SessionComplete from "./SessionComplete";
+import { useToolHistory } from "@/hooks/useToolHistory";
+import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -78,6 +80,8 @@ interface Props {
 }
 
 export default function GratitudeSession({ userId }: Props) {
+  const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("gratitude", userId);
+
   const [entries, setEntries] = useState<Entry[]>([]);
   const [inputText, setInputText] = useState("");
   const [showNudge, setShowNudge] = useState(false);
@@ -143,7 +147,9 @@ export default function GratitudeSession({ userId }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ entry: text }),
-      }).catch(() => {});
+      })
+        .then(() => loadHistory())
+        .catch(() => {});
     } else {
       // Strip isNew before saving to storage
       const toSave = next.map(({ isNew: _, ...e }) => e);
@@ -183,11 +189,61 @@ export default function GratitudeSession({ userId }: Props) {
         <StreakRow entries={entries} />
       </div>
 
+      {/* ── History ──────────────────────────────────────────────────────────── */}
+      {userId && history && (
+        <section className="max-w-[520px] mx-auto mb-10 mt-4">
+          <p
+            className="[font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center"
+            style={{ color: "rgba(232, 168, 62, 0.50)" }}
+          >
+            {history.isPaid ? "Full history" : "7-day history"}
+          </p>
+          <div
+            className="rounded-[14px] px-5 py-4"
+            style={{ border: "1px solid rgba(232, 168, 62, 0.08)", background: "rgba(232, 168, 62, 0.025)" }}
+          >
+            <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
+              {!history.isPaid
+                ? "Free users keep 7 days of history. Your older sessions are still there."
+                : history.sessions.length > 0
+                ? `${history.sessions.length} session${history.sessions.length === 1 ? "" : "s"} saved.`
+                : "No sessions saved yet."}
+            </p>
+            {history.hasStreak && (
+              <div className="mt-4 text-center">
+                <p
+                  className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase mb-1"
+                  style={{ color: "rgba(232, 168, 62, 0.42)" }}
+                >
+                  Current streak
+                </p>
+                <p className="[font-family:var(--font-display)] font-light text-[24px] text-[rgba(255,255,255,0.80)]">
+                  {history.currentStreakDays} day{history.currentStreakDays === 1 ? "" : "s"}
+                </p>
+                <p className="[font-family:var(--font-jost)] text-[12px] font-light text-[rgba(255,255,255,0.45)] mt-2">
+                  {history.streakFraming === "full"
+                    ? "A quiet record of the days you returned."
+                    : "Consistency gets easier when you can see the full picture."}
+                </p>
+              </div>
+            )}
+            {shouldShowUpgradePrompt && (
+              <ToolUpgradePrompt
+                hasOlderSessions={history.hasOlderSessions}
+                toolColour="232, 168, 62"
+                toolName="Gratitude Log"
+              />
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ── Session complete nudge ──────────────────────────────────────────── */}
       {!nudgeDismissed && (
         <SessionComplete
           visible={showNudge}
           isLoggedIn={!!userId}
+          isPaid={history?.isPaid}
           onDismiss={() => setNudgeDismissed(true)}
         />
       )}

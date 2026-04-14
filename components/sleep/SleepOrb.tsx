@@ -5,6 +5,8 @@ import Link from "next/link";
 import PatternSelector, { type SleepPattern } from "./PatternSelector";
 import ProgressRing, { RING_CIRCUMFERENCE } from "./ProgressRing";
 import { glassBackground, getToolRgb } from "@/lib/design-tokens";
+import { useToolHistory } from "@/hooks/useToolHistory";
+import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -170,6 +172,12 @@ export default function SleepOrb({ userId }: Props) {
   const doSilentResetRef = useRef(doSilentReset);
   useEffect(() => { doSilentResetRef.current = doSilentReset; }, [doSilentReset]);
 
+  // ── History ───────────────────────────────────────────────────────────────
+  const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("sleep", userId);
+  // Keep loadHistory reachable from RAF without stale closure
+  const loadHistoryRef = useRef(loadHistory);
+  useEffect(() => { loadHistoryRef.current = loadHistory; }, [loadHistory]);
+
   // ── RAF loop ──────────────────────────────────────────────────────────────
 
   const loop = useCallback(function loopFrame(ts: number) {
@@ -255,9 +263,11 @@ export default function SleepOrb({ userId }: Props) {
                 cycles:           totalCycles,
                 duration_seconds: durationSeconds,
               }),
-            }).catch((err) => {
-              console.error("[sleep] session save failed:", err);
-            });
+            })
+              .then(() => loadHistoryRef.current())
+              .catch((err) => {
+                console.error("[sleep] session save failed:", err);
+              });
           }
 
           // Fade orb to 0.3 over 3 s, then reset silently after 5 s
@@ -506,6 +516,55 @@ export default function SleepOrb({ userId }: Props) {
         >
           The day is done. Your body already knows what to do.
         </p>
+
+        {/* ── History ──────────────────────────────────────────────────────── */}
+        {userId && history && (
+          <section className="max-w-[520px] mx-auto mb-10 mt-4">
+            <p
+              className="[font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center"
+              style={{ color: "rgba(60, 192, 212, 0.50)" }}
+            >
+              {history.isPaid ? "Full history" : "7-day history"}
+            </p>
+            <div
+              className="rounded-[14px] px-5 py-4"
+              style={{ border: "1px solid rgba(60, 192, 212, 0.08)", background: "rgba(60, 192, 212, 0.025)" }}
+            >
+              <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
+                {!history.isPaid
+                  ? "Free users keep 7 days of history. Your older sessions are still there."
+                  : history.sessions.length > 0
+                  ? `${history.sessions.length} session${history.sessions.length === 1 ? "" : "s"} saved.`
+                  : "No sessions saved yet."}
+              </p>
+              {history.hasStreak && (
+                <div className="mt-4 text-center">
+                  <p
+                    className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase mb-1"
+                    style={{ color: "rgba(60, 192, 212, 0.42)" }}
+                  >
+                    Current streak
+                  </p>
+                  <p className="[font-family:var(--font-display)] font-light text-[24px] text-[rgba(255,255,255,0.80)]">
+                    {history.currentStreakDays} day{history.currentStreakDays === 1 ? "" : "s"}
+                  </p>
+                  <p className="[font-family:var(--font-jost)] text-[12px] font-light text-[rgba(255,255,255,0.45)] mt-2">
+                    {history.streakFraming === "full"
+                      ? "A quiet record of the nights you chose to wind down."
+                      : "Consistency gets easier when you can see the full picture."}
+                  </p>
+                </div>
+              )}
+              {shouldShowUpgradePrompt && (
+                <ToolUpgradePrompt
+                  hasOlderSessions={history.hasOlderSessions}
+                  toolColour="60, 192, 212"
+                  toolName="Sleep Wind-Down"
+                />
+              )}
+            </div>
+          </section>
+        )}
 
         {/* ── Other tools cross-links — dimmable ──────────────────────────── */}
         <section ref={crossLinksRef} className="transition-opacity duration-[3000ms]">

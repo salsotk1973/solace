@@ -5,10 +5,11 @@ import Link from "next/link";
 interface Props {
   visible: boolean;
   isLoggedIn: boolean;
+  isPaid?: boolean;
   onDismiss: () => void;
 }
 
-export default function SessionComplete({ visible, isLoggedIn, onDismiss }: Props) {
+export default function SessionComplete({ visible, isLoggedIn, isPaid, onDismiss }: Props) {
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-[550ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
@@ -38,6 +39,14 @@ export default function SessionComplete({ visible, isLoggedIn, onDismiss }: Prop
                 Start free →
               </Link>
             </>
+          )}
+          {isLoggedIn && !isPaid && (
+            <Link
+              href="/pricing"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(232,168,62,0.80)] border border-[rgba(232,168,62,0.28)] px-4 py-2 rounded-[2px] hover:border-[rgba(232,168,62,0.52)] hover:text-[rgba(255,200,100,0.95)] transition-all duration-300 whitespace-nowrap flex-shrink-0"
+            >
+              Unlock full history →
+            </Link>
           )}
           <button
             onClick={onDismiss}

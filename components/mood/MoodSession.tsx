@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import MoodDial from "./MoodDial";
+import { useToolHistory } from "@/hooks/useToolHistory";
+import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,10 +80,12 @@ function getMoodColor(value: number): string {
 function SessionComplete({
   visible,
   isLoggedIn,
+  isPaid,
   onDismiss,
 }: {
   visible: boolean;
   isLoggedIn: boolean;
+  isPaid?: boolean;
   onDismiss: () => void;
 }) {
   return (
@@ -114,6 +118,14 @@ function SessionComplete({
               </Link>
             </>
           )}
+          {isLoggedIn && !isPaid && (
+            <Link
+              href="/pricing"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(232,168,62,0.80)] border border-[rgba(232,168,62,0.28)] px-4 py-2 rounded-[2px] hover:border-[rgba(232,168,62,0.52)] hover:text-[rgba(255,200,100,0.95)] transition-all duration-300 whitespace-nowrap flex-shrink-0"
+            >
+              Unlock full history →
+            </Link>
+          )}
           <button
             onClick={onDismiss}
             className="[font-family:var(--font-jost)] text-[18px] font-light text-[rgba(160,130,210,0.32)] hover:text-[rgba(160,130,210,0.72)] transition-colors duration-200 cursor-pointer flex-shrink-0 leading-none"
@@ -133,6 +145,8 @@ interface Props {
 }
 
 export default function MoodSession({ userId }: Props) {
+  const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("mood", userId);
+
   const [moodValue, setMoodValue] = useState(5);
   const [moodWord, setMoodWord] = useState("");
   const [entries, setEntries] = useState<MoodEntry[]>([]);
@@ -202,7 +216,9 @@ export default function MoodSession({ userId }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ value: moodValue, word: moodWord.trim() }),
-      }).catch(() => {});
+      })
+        .then(() => loadHistory())
+        .catch(() => {});
     } else {
       saveToStorage(next);
     }
@@ -367,11 +383,61 @@ export default function MoodSession({ userId }: Props) {
         </p>
       </div>
 
+      {/* ── History ──────────────────────────────────────────────────────── */}
+      {userId && history && (
+        <section className="max-w-[520px] mx-auto mb-10 mt-4">
+          <p
+            className="[font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center"
+            style={{ color: "rgba(232, 168, 62, 0.50)" }}
+          >
+            {history.isPaid ? "Full history" : "7-day history"}
+          </p>
+          <div
+            className="rounded-[14px] px-5 py-4"
+            style={{ border: "1px solid rgba(232, 168, 62, 0.08)", background: "rgba(232, 168, 62, 0.025)" }}
+          >
+            <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
+              {!history.isPaid
+                ? "Free users keep 7 days of history. Your older sessions are still there."
+                : history.sessions.length > 0
+                ? `${history.sessions.length} session${history.sessions.length === 1 ? "" : "s"} saved.`
+                : "No sessions saved yet."}
+            </p>
+            {history.hasStreak && (
+              <div className="mt-4 text-center">
+                <p
+                  className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase mb-1"
+                  style={{ color: "rgba(232, 168, 62, 0.42)" }}
+                >
+                  Current streak
+                </p>
+                <p className="[font-family:var(--font-display)] font-light text-[24px] text-[rgba(255,255,255,0.80)]">
+                  {history.currentStreakDays} day{history.currentStreakDays === 1 ? "" : "s"}
+                </p>
+                <p className="[font-family:var(--font-jost)] text-[12px] font-light text-[rgba(255,255,255,0.45)] mt-2">
+                  {history.streakFraming === "full"
+                    ? "A quiet record of the days you returned."
+                    : "Consistency gets easier when you can see the full picture."}
+                </p>
+              </div>
+            )}
+            {shouldShowUpgradePrompt && (
+              <ToolUpgradePrompt
+                hasOlderSessions={history.hasOlderSessions}
+                toolColour="232, 168, 62"
+                toolName="Mood Tracker"
+              />
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ── Nudge ────────────────────────────────────────────────────────── */}
       {!nudgeDismissed && (
         <SessionComplete
           visible={showNudge}
           isLoggedIn={!!userId}
+          isPaid={history?.isPaid}
           onDismiss={() => setNudgeDismissed(true)}
         />
       )}
