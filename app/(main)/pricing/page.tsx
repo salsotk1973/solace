@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import CheckoutButton from "@/components/pricing/CheckoutButton";
 import BgSubtle from "@/components/backgrounds/BgSubtle";
 
 const FREE_FEATURES = [
@@ -74,9 +75,9 @@ export default function PricingPage() {
   const [proCtaHovered, setProCtaHovered]   = useState(false);
   const [footerCtaHovered, setFooterCtaHovered] = useState(false);
 
-  const monthlyPrice  = "A$14";
-  const annualMonthly = "A$9.92";
-  const annualTotal   = "A$119";
+  const monthlyPrice  = "A$9";
+  const annualMonthly = "A$6.58";
+  const annualTotal   = "A$79";
 
   return (
     <PageShell particles={false}>
@@ -241,7 +242,7 @@ export default function PricingPage() {
                     transition:    "opacity 0.3s ease",
                   }}
                 >
-                  Save 30%
+                  Save 26%
                 </span>
               </span>
             </div>
@@ -564,13 +565,17 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                {/* TODO: Replace /sign-up href with Stripe Pro checkout link when Stripe is live */}
-                <Link
-                  href="/sign-up"
+                <CheckoutButton
+                  priceId={
+                    isAnnual
+                      ? process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID!
+                      : process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID!
+                  }
                   onMouseEnter={() => setProCtaHovered(true)}
                   onMouseLeave={() => setProCtaHovered(false)}
                   style={{
                     display:        "block",
+                    width:          "100%",
                     textAlign:      "center",
                     padding:        "14px 24px",
                     borderRadius:   "2px",
@@ -584,17 +589,17 @@ export default function PricingPage() {
                     fontWeight:    400,
                     fontSize:      "12px",
                     letterSpacing: "0.12em",
-                    textTransform: "uppercase",
+                    textTransform: "uppercase" as const,
                     color:         proCtaHovered
                       ? "rgba(225,215,255,0.95)"
                       : "rgba(195,180,245,0.8)",
-                    textDecoration: "none",
                     transition:    "background 0.3s ease, border-color 0.3s ease, color 0.3s ease",
                     marginBottom:  "12px",
+                    boxSizing:     "border-box" as const,
                   }}
                 >
                   Start free trial
-                </Link>
+                </CheckoutButton>
 
                 <p
                   style={{
