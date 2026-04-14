@@ -33,9 +33,9 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    // Mobile: strict 2×2 CSS grid, max-width constrained so cells are ~156px each.
+    // Mobile: strict 2×2 CSS grid, max-width 320px so cells are ~156px each.
     // Desktop: flex-wrap with natural pill widths, no max-width.
-    <div className="grid grid-cols-2 gap-2 w-full max-w-[320px] mx-auto mb-2 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
+    <div className="grid grid-cols-2 gap-2 w-full max-w-[320px] mx-auto mb-3 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
 
       {/* ── Free patterns ────────────────────────────────────────────────── */}
       {FREE_PATTERNS.map((p) => {
@@ -53,10 +53,10 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
                 : "border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] hover:border-[rgba(255,255,255,0.28)] hover:text-[rgba(255,255,255,0.72)]",
             ].join(" ")}
           >
-            <span className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] font-[400] tracking-[-0.01em]">
+            <span className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] font-[400] tracking-[-0.01em]">
               {p.name}
             </span>
-            <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
+            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55">
               {p.timing}
             </span>
           </button>
@@ -68,17 +68,17 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         <a
           key={p.name}
           href="/pricing"
-          className="w-full md:w-auto flex flex-col items-center gap-0.5 px-3 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
+          className="w-full md:w-auto flex flex-col items-center gap-0.5 px-3 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.60)] opacity-60 hover:opacity-80 hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
         >
           <span
-            className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[-0.01em]"
+            className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] tracking-[-0.01em]"
             style={{ display: "flex", alignItems: "center" }}
           >
             {p.name}
             <LockIcon />
           </span>
           {p.timing && (
-            <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.14em] uppercase opacity-55">
+            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55">
               {p.timing}
             </span>
           )}
