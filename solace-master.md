@@ -110,6 +110,12 @@ Defined in: `lib/design-tokens.ts`
 - **UI/body:** Jost (sans-serif)
 - **Logo/wordmark:** "SOLACE" in Cormorant Garamond, spaced caps — Direction C (wordmark only, no icon)
 
+### Favicon & App Icons (Implemented)
+- `app/icon.svg` — SVG favicon, S on `#090d14`, Georgia serif, rounded corners (primary)
+- `app/apple-icon.png` — 180x180 PNG for iOS home screen (real PNG, generated via sips)
+- `app/favicon.ico` — ICO fallback
+- `app/layout.tsx` metadata.icons wired correctly
+
 ### Text Standards (from `lib/design-tokens.ts`)
 - **Primary text:** `rgba(255,255,255,1.0)` — headings, key labels
 - **Body text:** `rgba(255,255,255,0.80)` — descriptions, paragraph copy
@@ -118,11 +124,11 @@ Defined in: `lib/design-tokens.ts`
 - **Never below 0.50** for any user-facing functional text
 
 ### Font Size Floors (from `lib/design-tokens.ts`)
-- Functional labels (streak, history, section headings): `12px` minimum
+- Functional labels: `12px` minimum
 - Body/description text: `14px` minimum
 - Eyebrow pills/tags: `11px` minimum
 - Button labels: `13px` minimum
-- Metadata (dates, read time): `12px` minimum
+- Metadata: `12px` minimum
 - **Never use `text-[9px]` or `text-[10px]` for functional content**
 
 ### Components
@@ -135,7 +141,7 @@ Defined in: `lib/design-tokens.ts`
 - ALL background effects and animations: `position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;`
 - Always full-screen, never constrained to a section or container
 - **SiteHeader.tsx and SiteFooter.tsx locked — never modify layout or structure**
-- FooterAuthLink.tsx handles auth-aware sign in/sign out in footer — do not replace with static link
+- FooterAuthLink.tsx handles auth-aware sign in/sign out in footer
 
 ---
 
@@ -157,9 +163,79 @@ Single source of truth for all design values. Exports:
 - **Status:** 10 SEO-optimised articles completed
 - **SEO metadata:** 400+ words of copy per article, JSON-LD schema
 - **Linking rule:** Every Lab article links to one specific tool (no orphan content)
-- **Category colours:** Fixed — Lab categories now map to same token system as tools
+- **Category colours:** Fixed — Lab categories map to same token system as tools
 - **Post-launch strategy:** 1–2 articles/week, long-tail high-intent tool-adjacent keywords only
-- **Homepage teaser:** Currently hardcoded; future task: make dynamic (pull latest MDX title + slug)
+- **Homepage teaser:** Currently hardcoded; future task: make dynamic
+
+---
+
+## Tool Build Status (Current — April 2026)
+
+### Breathing (Blueprint — most complete)
+- ✅ POST API — saves session to DB
+- ✅ GET /history API — 7-day cutoff free, full for paid
+- ✅ isPaid check via lib/auth-plan.ts
+- ✅ hasOlderSessions flag
+- ✅ History section UI
+- ✅ BreathingUpgradePrompt component
+- ✅ Pattern gating — Calm + Double Exhale locked → /pricing with lock icon
+- ✅ SessionComplete drawer (logged-out CTA)
+- ✅ Mobile layout — fits 390x844px without scrolling
+- ❌ SessionComplete — no upsell for free logged-in users (needs fix)
+- ❌ Export — paid feature, not built
+- ❌ Pattern analysis UI — paid feature, not built
+
+### Focus Timer
+- ✅ POST API — saves session
+- ✅ SessionComplete drawer exists
+- ❌ GET /history API — not built
+- ❌ 7-day cutoff — not built
+- ❌ Upgrade prompt — not built
+- ❌ Free/paid gating — not built
+- ❌ Mobile layout — not audited
+
+### Sleep Wind-Down, Thought Reframer, Mood Tracker, Gratitude Log
+- ⚠️ Unknown — full audit needed
+- ❌ History API — not built for any
+- ❌ Free/paid gating — not built for any
+- ❌ Upgrade prompt — not built for any
+
+### Choose (AI)
+- ⚠️ Partial — rate limiting unclear
+- ❌ 1 session/day enforcement for free — not verified
+- ❌ Unlimited for paid — not verified
+
+### Clear Your Mind, Break It Down (AI)
+- ⚠️ Unknown — full audit needed
+- ❌ Paid-only gate — not verified
+
+---
+
+## Critical Build Order (Non-negotiable)
+**NEVER connect Stripe before all paid features work.**
+
+1. **Shared infrastructure** — `useToolHistory` hook + `ToolUpgradePrompt` shared component
+2. **Focus Timer** — history API + 7-day cutoff + upgrade prompt
+3. **Sleep Wind-Down** — same
+4. **Thought Reframer** — same
+5. **Mood Tracker** — same (highest value — pattern analysis is THE paid feature)
+6. **Gratitude Log** — same
+7. **Choose** — verify/enforce 1/day free + unlimited paid
+8. **Clear Your Mind** — verify paid gate
+9. **Break It Down** — verify paid gate
+10. **Breathing SessionComplete** — add free-user upsell
+11. **Stripe webhook** — LAST, only when all paid features confirmed working
+
+---
+
+## Shared Infrastructure Needed (Build First)
+- `useToolHistory` hook — reusable across all 6 client tools
+  - Takes: toolSlug, userId
+  - Returns: sessions, isPaid, hasOlderSessions, currentStreakDays, streakFraming
+  - Handles: 7-day cutoff for free, full history for paid
+- `ToolUpgradePrompt` shared component — takes tool colour + copy as props
+  - Blueprint: `components/breathing/BreathingUpgradePrompt.tsx`
+- Shared history API pattern — replicate `app/api/breathing/history/route.ts` for each tool
 
 ---
 
@@ -167,195 +243,75 @@ Single source of truth for all design values. Exports:
 
 ### Infrastructure
 - Production domain `try-solace.app` live on Vercel + Cloudflare
-- Clerk Production instance: domain verified, Google OAuth with real credentials, 5 DNS CNAME records in Cloudflare
-- FooterAuthLink.tsx — auth-aware sign in/out in footer (client component, minimal)
-- Breathing layout.tsx stale boilerplate fixed (was rendering own html/body)
+- Clerk Production: domain verified, Google OAuth with real credentials, 5 DNS CNAMEs
+- Favicon system: SVG (browser tabs) + PNG (iOS home screen) + ICO fallback
+- FooterAuthLink.tsx — auth-aware sign in/out
+- Breathing layout.tsx stale boilerplate fixed
 
 ### Design System
-- `lib/design-tokens.ts` — complete token system (colours, text, font sizes, glass helpers)
-- Global text contrast fixed — 11 opacity values corrected, 25 font size instances fixed
-- All tool + Lab colours wired to token system — no more scattered inline rgba values
-- Logo direction locked: Direction C — wordmark only, Cormorant Garamond spaced caps, S as favicon
+- `lib/design-tokens.ts` — complete token system
+- Global text contrast: 11 opacity values + 25 font sizes fixed
+- All tool + Lab colours wired to token system
+- Logo locked: Direction C — wordmark only
 
 ### Pages & Components
-- All 9 tool pages built (6 client + 3 AI)
-- SEO copy completed & locked (universal audience, no identity gatekeeping)
-- Tool page SEO metadata with HowTo schema (Breathing) and WebApplication schema (others)
-- Shared `components/ToolSeoContent.tsx`
+- All 9 tool pages built
+- SEO copy completed & locked (universal audience)
 - Glassmorphism SiteHeader.tsx and SiteFooter.tsx (locked)
-- HeroSection.tsx with h-screen, CSS radial gradient, GSAP curtain reveal
 - Privacy and Terms pages
 - Pricing page (A$9/month copy locked)
 
 ### Database
 - 4-table schema with RLS enabled
-- Clerk auth integration with `isPaidUser()` and `requirePaidPlan()` helpers in `lib/auth.ts`
-
-### Breathing Tool — Gating (partially implemented)
-- History API: 7-day cutoff for free users, full history for paid — EXISTS
-- `hasOlderSessions` flag — EXISTS
-- `BreathingUpgradePrompt` component — EXISTS (needs visual polish)
-- Locked patterns (Calm, Double Exhale) — UI dead, no upgrade path — NEEDS SPEC
-- SessionComplete post-session drawer — no upsell for free users — NEEDS SPEC
-- Pattern lock spec: Option A — lock icon on button, click goes to `/pricing` (approved)
-
----
-
-## Launch Checklist
-
-### Pre-Launch (Must complete before Vercel deploy)
-- [x] Domain purchased and connected (`try-solace.app`)
-- [x] Clerk Production instance configured
-- [x] Design token system created
-- [x] Global text contrast fixed
-- [x] Footer auth-aware sign in/out
-- [ ] Free/paid gating on 6 client tools — Breathing pattern lock + SessionComplete upsell NEXT
-- [ ] Verify Choose gives one free AI session/day
-- [ ] Choose animation implemented and tested on mobile
-- [ ] Fix 4 bugs:
-  - [ ] Duplicate footer on /pricing and /dashboard
-  - [ ] Ghost header on homepage
-  - [ ] White band on /tools page
-  - [ ] "Everything above is free" single line formatting
-- [ ] Visual consistency pass — tinted glass cards, arrow hover animation, homepage tool hierarchy
-- [ ] Stripe + Clerk webhook payment flow complete
-- [ ] Cormorant Garamond font fix
-- [ ] Homepage OGL shader background (if proceeding)
-- [ ] GSAP curtain animation confirmed
-- [ ] Favicon — implement S in Cormorant Garamond as favicon/app icon
-
-### Immediately After Vercel Deploy
-- [ ] Activate Google Search Console
-- [ ] Activate PostHog analytics
-- [ ] Submit sitemap to Search Console
-
-### Post-Launch Week 1
-- [ ] List on Product Hunt, AlternativeTo, Wellfound, wellness newsletters
-- [ ] First Reddit posts: r/Anxiety, r/Meditation, r/productivity, r/mentalhealth
-- [ ] Breathing tool featured in first Reddit post
-
-### Post-Launch (2 weeks)
-- Build content calendar only after 2 weeks of real traffic data
-- 1–2 articles/week targeting long-tail, high-intent tool-adjacent keywords
-- Every article links to one specific tool
-
-### Post-Launch (~30 days)
-- Build Solace Weekly Intelligence Report (Claude agent)
-  - Pulls: GSC (traffic), PostHog (sessions/tool usage), Stripe (MRR/churn), Clerk (signups/free vs paid)
-  - Outputs: 6-section Monday report — Traffic, Revenue, Content, Product, Security, Opportunity
-  - Requires paid Ahrefs/SEMrush for competitor gap
-  - ~2–3hr build session
-  - **Calendar reminder set for May 4, 2026 — adjust once real launch date confirmed**
-
----
-
-## Current Session Status
-- **Completed this session:** Domain, Clerk Production, design tokens, text contrast, colour system, footer auth fix
-- **Next session starts with:** Breathing tool — pattern lock (Option A) + SessionComplete upsell spec → then remaining 5 tools
-
----
-
-## Tool-by-Tool Free/Paid Strategy (Locked)
-
-### Breathing Tool (NEXT — audit complete, pattern lock approved)
-**Free features:** Unlimited sessions, Box + 4-7-8 patterns, 7-day history, basic stats
-**Paid features:** Full history, Calm + Double Exhale patterns, export, pattern analysis, streak tracking
-**Conversion triggers:**
-1. Day 8 history cutoff (user sees they can't access older sessions)
-2. Locked pattern — lock icon on Calm + Double Exhale buttons, click → `/pricing`
-3. Post-session — SessionComplete drawer needs free-user upsell copy
-**Pattern lock UI:** Option A — lock icon on button, direct to `/pricing` on click, more visible styling than current disabled state
-**Existing gating:** History cutoff + `BreathingUpgradePrompt` exist but need visual polish
-
-### Focus Timer (AFTER BREATHING)
-**Free features:** Timer, basic stats, 7-day history
-**Paid features:** Productivity insights, weekly reports, focus streaks
-**Conversion trigger:** User notices trend — unlock with paid
-**Positioning:** "See your productivity patterns"
-
-### Sleep Wind-Down (AFTER FOCUS)
-**Free features:** Sessions, 7-day history
-**Paid features:** Sleep quality tracking, personalized routines, export
-**Conversion trigger:** User realizes they can't track sleep patterns long-term
-**Positioning:** "Track your sleep over time"
-
-### Thought Reframer (AFTER SLEEP)
-**Free features:** Reframe sessions, 7-day history
-**Paid features:** Pattern detection, AI insights, export
-**Conversion trigger:** User reframes same thought twice
-**Positioning:** "See your thinking patterns"
-
-### Mood Tracker (HIGHEST VALUE — AFTER REFRAMER)
-**Free features:** Daily check-in, 7-day history
-**Paid features:** Pattern analysis — correlations, triggers, trends, export
-**Conversion trigger:** User realizes "I'm always low on Mondays"
-**Positioning:** "Understand what affects your mood"
-
-### Gratitude Log (LAST)
-**Free features:** Daily entries, 7-day history
-**Paid features:** Export, reflection prompts by mood, archive search
-**Conversion trigger:** User wants to revisit past gratitudes (beyond 7 days)
-**Positioning:** "Build your gratitude practice"
+- Clerk auth: `isPaidUser()` and `requirePaidPlan()` in `lib/auth.ts`
 
 ---
 
 ## Key Rules (Never Break)
-- SiteHeader.tsx and SiteFooter.tsx locked — never modify layout or structure
+- SiteHeader.tsx and SiteFooter.tsx locked — never modify
 - Background always fixed, full-screen
 - Never duplicate footer
 - Specs always written to file via bash_tool, presented with present_files
 - One spec per task — short and focused
-- Every Claude Code instruction ends with: "After implementing, start dev server, take screenshot of localhost:3001, review against spec. Fix and screenshot again until it matches."
-- Design decisions locked in mockup before implementation begins
-- **Stress-test all specs before handing to Claude Code**
-- Never define tool/category colours inline — always import from `lib/design-tokens.ts`
-- Never use `text-[9px]` or `text-[10px]` for functional content
+- Every Claude Code instruction ends with: screenshot at localhost:3001, review, fix until matches
+- Never define colours inline — always import from `lib/design-tokens.ts`
 - Never use opacity below 0.50 for user-facing functional text
-- Always use Claude Code (claude CLI) for implementation — never ask Juan to run terminal commands
+- Always use Claude Code for implementation — never ask Juan to run terminal commands
+- **Never connect Stripe before all paid features are working**
 
 ---
 
-## Post-Launch Future Tasks (Deferred)
-- Email sequences in Brevo (Welcome, Free-to-Paid Nudge, Re-engagement, Post-Upgrade Onboarding)
-- Email stack upgrade: alfred_ or Superhuman when support exceeds ~20 emails/week
+## Post-Launch Tasks (Real — Not Deferred)
+- Email sequences in Brevo (4 sequences, 12 emails total)
 - Make Lab homepage teaser dynamic
-- Build Solace Weekly Intelligence Report (~day 30 post-launch)
-- Enable Cloudflare bot fight mode + AI Labyrinth post-launch when real traffic arrives
-- Update Cloudflare account type from Personal to Business + add ABN once Pty Ltd formed (~A$20K MRR)
+- Build Solace Weekly Intelligence Report (~day 30)
+- Enable Cloudflare bot fight mode + AI Labyrinth when real traffic arrives
+- Update Cloudflare account type to Business + add ABN once Pty Ltd formed (~A$20K MRR)
 
 ---
 
-Master Files & Workflow (Locked)
-GitHub raw URL: https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md
+## Master Files & Workflow (Locked)
 
-Session Start
-When starting any session (new chat or continuation):
+**GitHub raw URL:** `https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md`
+
+### Session Start
+```
 Load solace-master. Working on: [specific task]. Go.
+```
 I fetch it via web_fetch from the URL above — no browser MCP, no pasting.
-Why This Works
-
-No re-pasting files every session
-Token-efficient — only loads when needed
-Live GitHub version always current
-Clear Git audit trail
 
 ### Updating Master Files
-When new information needs documenting:
 1. I say: "Should I update solace-master?"
 2. You approve: "Yes"
-3. I present: Updated file (copy/paste ready)
-4. You: Copy → paste into VS Code → save locally
-5. Terminal: Run the Git commit prompt I provide
-
-### Git Commit Prompt
-After updating in VS Code, run in Claude Code:
+3. I present the updated file
+4. You copy → paste into VS Code → save
+5. Run in Claude Code:
 ```bash
 cd /Users/angelamanzano/Documents/Solace/solace-clean && git add solace-master.md && git commit -m "Update: [describe what changed]" && git push
 ```
 
 ### Why This Works
 - No re-pasting files every session
-- No token waste re-reading
+- Token-efficient — only loads when needed
 - Live GitHub version always current
 - Clear Git audit trail
-- Scalable across new chats
