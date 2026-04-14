@@ -136,7 +136,7 @@ export default function BreathingSession({ userId }: Props) {
   // ── Responsive orb size ─────────────────────────────────────────────────────
   const [orbSize, setOrbSize] = useState<number>(240);
   useEffect(() => {
-    const update = () => setOrbSize(window.innerWidth < 768 ? 140 : 240);
+    const update = () => setOrbSize(window.innerWidth < 768 ? 130 : 240);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -166,10 +166,10 @@ export default function BreathingSession({ userId }: Props) {
         disabled={!canSwitch}
       />
 
-      {/* ── Orb ─────────────────────────────────────────────────────────── */}
-      {/* Mobile: orb centred, Begin button below it in normal flow             */}
-      {/* Desktop: Begin button ABOVE orb (rendered first via md:flex-col-reverse) */}
-      <div className="flex flex-col items-center gap-3 mb-3 md:flex-col-reverse md:gap-8 md:mb-16">
+      {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
+      {/* Mobile: flex-col → orb on top, button below (DOM order)               */}
+      {/* Desktop: button has md:order-first → floats above orb visually        */}
+      <div className="flex flex-col items-center gap-3 mb-3 md:gap-8 md:mb-16">
 
         {/* Orb — always centred */}
         <div className="flex justify-center w-full">
@@ -183,18 +183,18 @@ export default function BreathingSession({ userId }: Props) {
         </div>
 
         {/* Begin / Stop button — below orb on mobile, above on desktop */}
-        <div className="flex justify-center">
+        <div className="flex justify-center md:order-first">
           {!isRunning ? (
             <button
               onClick={handleStart}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.25)] px-5 py-1.5 rounded-full md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3 md:rounded-[2px] md:border-[rgba(80,200,218,0.22)] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.45)] transition-all duration-300"
+              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.25)] px-6 py-1.5 rounded-full md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3 md:rounded-[2px] md:border-[rgba(80,200,218,0.22)] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.45)] transition-all duration-300"
             >
               {sessionComplete ? "Begin again" : "Begin"}
             </button>
           ) : (
             <button
               onClick={handleStop}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-5 py-1.5 md:text-[11px] md:px-6 md:py-3"
+              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(140,175,190,0.38)] hover:text-[rgba(180,200,215,0.6)] transition-colors duration-200 px-6 py-1.5 md:text-[11px] md:px-6 md:py-3"
             >
               Stop
             </button>

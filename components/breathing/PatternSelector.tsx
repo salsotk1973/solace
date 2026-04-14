@@ -53,10 +53,10 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
                 : "border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.55)] hover:border-[rgba(255,255,255,0.28)] hover:text-[rgba(255,255,255,0.72)]",
             ].join(" ")}
           >
-            <span className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] font-[400] tracking-[-0.01em]">
+            <span className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] font-[400] tracking-[-0.01em] leading-none">
               {p.name}
             </span>
-            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55">
+            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55 leading-none">
               {p.timing}
             </span>
           </button>
@@ -71,14 +71,14 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
           className="w-full md:w-auto flex flex-col items-center gap-0.5 px-3 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.60)] opacity-60 hover:opacity-80 hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
         >
           <span
-            className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] tracking-[-0.01em]"
+            className="[font-family:var(--font-jost)] text-[13px] md:text-[12px] tracking-[-0.01em] leading-none"
             style={{ display: "flex", alignItems: "center" }}
           >
             {p.name}
             <LockIcon />
           </span>
           {p.timing && (
-            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55">
+            <span className="[font-family:var(--font-jost)] text-[10px] md:text-[9px] tracking-[0.14em] uppercase opacity-55 leading-none">
               {p.timing}
             </span>
           )}
