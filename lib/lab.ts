@@ -10,7 +10,7 @@ export interface LabArticle {
   readingTime: number
   publishedAt: string
   featured: boolean
-  toolCta: { label: string; href: string }
+  toolCta?: { label: string; href: string }
   content: string
 }
 

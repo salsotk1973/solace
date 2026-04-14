@@ -91,10 +91,13 @@ export default async function ArticlePage(
     .filter(a => a.slug !== slug)
     .slice(0, 2)
 
-  // Category accent colour — derived from design tokens, fixes 'clear-your-mind' key mismatch
+  // Category accent colour — derived from design tokens
   const _rgb     = getLabCategoryRgb(article.category).replace(/, /g, ',')
   const accent   = `rgba(${_rgb},1)`
   const accentBg = `rgba(${_rgb},0.08)`
+
+  // Determine whether a specific tool CTA should show
+  const hasTool = !!article.toolCta && article.toolCta.href !== '/tools'
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', {
     day:   'numeric',
@@ -237,12 +240,14 @@ export default async function ArticlePage(
             {/* Paragraphs 1–3 */}
             <div>{beforeContent}</div>
 
-            {/* Mid-article tool CTA */}
-            <LabToolCta
-              label={article.toolCta.label}
-              href={article.toolCta.href}
-              category={article.category}
-            />
+            {/* Mid-article tool CTA — hidden when no specific tool linked */}
+            {hasTool && (
+              <LabToolCta
+                label={article.toolCta!.label}
+                href={article.toolCta!.href}
+                category={article.category}
+              />
+            )}
 
             {/* Remaining paragraphs */}
             {afterSource.length > 0 && (
@@ -250,48 +255,50 @@ export default async function ArticlePage(
             )}
           </div>
 
-          {/* ── 4. End of article ─────────────────────────────────────────── */}
-          <div
-            style={{
-              marginTop:    '56px',
-              paddingTop:   '40px',
-              borderTop:    '0.5px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            <p
+          {/* ── 4. End of article — only when a specific tool is linked ──── */}
+          {hasTool && (
+            <div
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontStyle:  'italic',
-                fontSize:   '20px',
-                lineHeight: 1.5,
-                color:      'rgba(255,255,255,0.72)',
-                margin:     '0 0 20px',
+                marginTop:    '56px',
+                paddingTop:   '40px',
+                borderTop:    '0.5px solid rgba(255,255,255,0.06)',
               }}
             >
-              This is what {article.toolCta.label.replace(/^Try\s+/i, '')} was built for.
-            </p>
-            <Link
-              href={article.toolCta.href}
-              style={{
-                display:        'inline-flex',
-                alignItems:     'center',
-                padding:        '10px 24px',
-                borderRadius:   '4px',
-                border:         `0.5px solid ${accent.replace('1)', '0.28)')}`,
-                background:     accentBg,
-                fontFamily:     "'Jost', sans-serif",
-                fontWeight:     400,
-                fontSize:       '12px',
-                letterSpacing:  '0.12em',
-                textTransform:  'uppercase',
-                color:          accent,
-                textDecoration: 'none',
-              }}
-            >
-              {article.toolCta.label} →
-            </Link>
-          </div>
+              <p
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontWeight: 300,
+                  fontStyle:  'italic',
+                  fontSize:   '20px',
+                  lineHeight: 1.5,
+                  color:      'rgba(255,255,255,0.72)',
+                  margin:     '0 0 20px',
+                }}
+              >
+                This is what {article.toolCta!.label.replace(/^Try\s+/i, '')} was built for.
+              </p>
+              <Link
+                href={article.toolCta!.href}
+                style={{
+                  display:        'inline-flex',
+                  alignItems:     'center',
+                  padding:        '10px 24px',
+                  borderRadius:   '4px',
+                  border:         `0.5px solid ${accent.replace('1)', '0.28)')}`,
+                  background:     accentBg,
+                  fontFamily:     "'Jost', sans-serif",
+                  fontWeight:     400,
+                  fontSize:       '12px',
+                  letterSpacing:  '0.12em',
+                  textTransform:  'uppercase',
+                  color:          accent,
+                  textDecoration: 'none',
+                }}
+              >
+                {article.toolCta!.label} →
+              </Link>
+            </div>
+          )}
 
           {/* ── 5. Related articles ───────────────────────────────────────── */}
           <RelatedArticles articles={related} />

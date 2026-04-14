@@ -1,15 +1,40 @@
 import Link from 'next/link'
 import type { LabArticle } from '@/lib/lab'
-import { getLabCategoryRgb } from '@/lib/design-tokens'
+import { getLabCategoryRgb, getToolRgb, TOOL_CATEGORY } from '@/lib/design-tokens'
 
 interface Props {
-  label:    string
-  href:     string
-  category: LabArticle['category']
+  label:     string
+  href:      string
+  category:  LabArticle['category']
+  toolSlug?: string   // when present, drives colour from tool token instead of category
 }
 
-export default function LabToolCta({ label, href, category }: Props) {
-  const _rgb   = getLabCategoryRgb(category).replace(/, /g, ',')
+// Map URL path segments to TOOL_CATEGORY slugs
+const PATH_TO_SLUG: Record<string, string> = {
+  'clear-your-mind': 'clear',
+  'choose':          'choose',
+  'break-it-down':   'breakdown',
+  'breathing':       'breathing',
+  'sleep':           'sleep',
+  'focus':           'focus',
+  'mood':            'mood',
+  'reframe':         'reframe',
+  'gratitude':       'gratitude',
+}
+
+function resolveSlug(href: string): string | null {
+  const segment = href.replace(/^\/tools\//, '').replace(/^\//, '')
+  return PATH_TO_SLUG[segment] ?? null
+}
+
+export default function LabToolCta({ label, href, category, toolSlug }: Props) {
+  // Resolve tool slug from href if not explicitly passed
+  const slug = toolSlug ?? resolveSlug(href)
+
+  // Hide card when no specific tool is linked (e.g. href="/tools")
+  if (!slug || !(slug in TOOL_CATEGORY)) return null
+
+  const _rgb   = getToolRgb(slug).replace(/, /g, ',')
   const accent = `rgba(${_rgb},1)`
   const accentDim    = accent.replace('1)', '0.45)')
   const accentBorder = accent.replace('1)', '0.18)')
