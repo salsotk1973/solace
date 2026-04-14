@@ -1,11 +1,13 @@
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { addBrevoContact, sendBrevoTemplate } from "@/lib/brevo";
 
 type ClerkUserEvent = {
   type: "user.created" | "user.updated";
   data: {
     id: string;
+    first_name: string | null;
     email_addresses: { email_address: string; primary: boolean }[];
   };
 };
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
   }
 
   if (event.type === "user.created" || event.type === "user.updated") {
-    const { id: clerkUserId, email_addresses } = event.data;
+    const { id: clerkUserId, email_addresses, first_name } = event.data;
     const email =
       email_addresses.find((e) => e.primary)?.email_address ??
       email_addresses[0]?.email_address;
@@ -48,6 +50,8 @@ export async function POST(req: Request) {
     if (!email) {
       return new Response("No email found on user", { status: 400 });
     }
+
+    const firstName = first_name ?? null;
 
     const { error } = await supabaseAdmin.from("users").upsert(
       {
@@ -62,6 +66,25 @@ export async function POST(req: Request) {
     if (error) {
       console.error("Supabase upsert error:", error);
       return new Response("Database error", { status: 500 });
+    }
+
+    // Only send welcome email + add to Brevo on new user creation
+    if (event.type === "user.created") {
+      try {
+        await addBrevoContact({
+          email,
+          firstName: firstName ?? undefined,
+          listIds: [3], // Solace Users list
+        });
+        await sendBrevoTemplate({
+          to: email,
+          templateId: 1, // Welcome email
+          params: { FIRSTNAME: firstName ?? "there" },
+        });
+      } catch (err) {
+        console.error("[Brevo] Failed to add contact or send welcome email:", err);
+        // Never block the webhook response — Brevo failure is non-fatal
+      }
     }
   }
 
