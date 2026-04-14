@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import {
   CHOOSE_SYSTEM_PROMPT,
   getChooseUserPrompt,
@@ -12,6 +13,8 @@ import {
   applySlidingWindowRateLimit,
   getClientIdentifierFromHeaders,
 } from "@/lib/solace/rate-limit";
+import { isPaidUser } from "@/lib/auth-plan";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   buildSharedCrisisTextPayload,
   isSharedSolaceRedFlagText,
@@ -454,6 +457,36 @@ export async function POST(req: Request) {
       return buildRateLimitResponse(rateLimit.resetAt);
     }
 
+    const { userId } = await auth();
+
+    if (userId) {
+      const paid = await isPaidUser();
+
+      if (!paid) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const { count } = await supabaseAdmin
+          .from("tool_sessions")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("tool", "choose")
+          .gte("created_at", today.toISOString());
+
+        if ((count ?? 0) >= 1) {
+          return NextResponse.json(
+            {
+              error: "daily_limit_reached",
+              message:
+                "You've used your free session for today. Come back tomorrow or unlock unlimited sessions.",
+              upgradeUrl: "/pricing",
+            },
+            { status: 429 },
+          );
+        }
+      }
+    }
+
     const rawBodyText = await req.text();
 
     let parsedBody: unknown = null;
@@ -563,6 +596,17 @@ export async function POST(req: Request) {
       );
 
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
+    }
+
+    if (userId) {
+      void supabaseAdmin
+        .from("tool_sessions")
+        .insert({
+          user_id: userId,
+          tool: "choose",
+          session_data: { input: input.substring(0, 100) },
+          completed: true,
+        });
     }
 
     const response = NextResponse.json({

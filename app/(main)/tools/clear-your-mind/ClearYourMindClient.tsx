@@ -2,6 +2,7 @@
 
 // /app/tools/clear-your-mind/page.tsx
 
+import Link from "next/link";
 import {
   type CSSProperties,
   FormEvent,
@@ -634,6 +635,7 @@ export default function ClearYourMindPage() {
   const [isUnavailable, setIsUnavailable] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
+  const [accessError, setAccessError] = useState<"auth_required" | "upgrade_required" | null>(null);
   const [bubbleMode, setBubbleMode] = useState<BubbleMode>("float");
   const [fieldHeight, setFieldHeight] = useState(DEFAULT_FIELD_HEIGHT);
 
@@ -651,8 +653,8 @@ export default function ClearYourMindPage() {
   const hasRealBubbleContent = realBubbles.length > 0;
   const canSubmit = hasRealBubbleContent && !isLoading;
   const inputLocked = realBubbles.length >= MAX_THOUGHTS && !isLoading;
-  const canRemoveThoughts = !isLoading && !responseText && !error;
-  const showInitialForm = !responseText && !error && !isLoading;
+  const canRemoveThoughts = !isLoading && !responseText && !error && !accessError;
+  const showInitialForm = !responseText && !error && !isLoading && !accessError;
   const showHelperOverlay = draft.length === 0;
 
   useEffect(() => {
@@ -959,6 +961,7 @@ export default function ClearYourMindPage() {
     setError("");
     setResponseText("");
     setIsUnavailable(false);
+    setAccessError(null);
     setIsCrisisFallback(false);
     setIsClarityFallback(false);
     setIsButtonReady(false);
@@ -987,6 +990,10 @@ export default function ClearYourMindPage() {
           setIsUnavailable(true);
           return;
         }
+        if (result.error === "upgrade_required" || result.error === "auth_required") {
+          setAccessError(result.error);
+          return;
+        }
         setError(result.error);
         return;
       }
@@ -1010,6 +1017,7 @@ export default function ClearYourMindPage() {
     setResponseText("");
     setError("");
     setIsUnavailable(false);
+    setAccessError(null);
     setIsLoading(false);
     setIsCrisisFallback(false);
     setIsClarityFallback(false);
@@ -1207,6 +1215,36 @@ export default function ClearYourMindPage() {
                   <span className="button-glass-sheen" />
                   <span className="button-glass-tint" />
                   <span className="button-label">Try again →</span>
+                </button>
+              </div>
+            </>
+          ) : accessError ? (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">
+                  {accessError === "auth_required" ? "Members only" : "Solace Pro"}
+                </div>
+                <div className="response-copy">
+                  <p className="response-text">
+                    {accessError === "auth_required"
+                      ? "Clear Your Mind is available to Solace members. Sign in to continue."
+                      : "Clear Your Mind is a Solace Pro feature. Upgrade to access unlimited sessions."}
+                  </p>
+                </div>
+                <div style={{ marginTop: "20px", textAlign: "center" }}>
+                  <Link
+                    href={accessError === "auth_required" ? "/sign-in" : "/pricing"}
+                    className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(96,192,168,0.80)] border border-[rgba(96,192,168,0.28)] px-5 py-2 rounded-full hover:border-[rgba(96,192,168,0.52)] hover:text-[rgba(96,192,168,1)] transition-all duration-300 inline-block"
+                  >
+                    {accessError === "auth_required" ? "Sign in →" : "Unlock Solace Pro →"}
+                  </Link>
+                </div>
+              </div>
+              <div className="actions actions-followup">
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Clear another thought</span>
                 </button>
               </div>
             </>

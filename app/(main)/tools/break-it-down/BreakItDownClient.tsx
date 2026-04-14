@@ -167,6 +167,7 @@ export default function BreakItDownPage() {
   const [redirectTitle, setRedirectTitle] = useState("");
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(false);
+  const [accessError, setAccessError] = useState<"auth_required" | "upgrade_required" | null>(null);
   const [showNudge, setShowNudge] = useState(false);
   const [idleOrbiters, setIdleOrbiters] = useState<IdleOrbiter[]>(() => buildInitialIdleOrbiters());
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -287,6 +288,7 @@ export default function BreakItDownPage() {
     setIsLoading(true);
     setHasResult(false);
     setIsUnavailable(false);
+    setAccessError(null);
     clearResultState();
     setIsButtonReady(false);
     setOrbPhase("active");
@@ -309,6 +311,13 @@ export default function BreakItDownPage() {
       if (!res.ok) {
         if ((data as { error?: string } | null)?.error === SOLACE_UNAVAILABLE_ERROR) {
           setIsUnavailable(true);
+          setHasResult(true);
+          setOrbPhase("settled");
+          return;
+        }
+        const errorCode = (data as { error?: string } | null)?.error;
+        if (errorCode === "upgrade_required" || errorCode === "auth_required") {
+          setAccessError(errorCode);
           setHasResult(true);
           setOrbPhase("settled");
           return;
@@ -420,6 +429,7 @@ export default function BreakItDownPage() {
     clearResultState();
     setHasResult(false);
     setIsUnavailable(false);
+    setAccessError(null);
     setIsLoading(false);
     setIsButtonReady(false);
     setOrbPhase("idle");
@@ -591,6 +601,36 @@ export default function BreakItDownPage() {
                   <span className="button-glass-sheen" />
                   <span className="button-glass-tint" />
                   <span className="button-label">Try again →</span>
+                </button>
+              </div>
+            </>
+          ) : accessError ? (
+            <>
+              <div className="response-card">
+                <div className="response-card-label">
+                  {accessError === "auth_required" ? "Members only" : "Solace Pro"}
+                </div>
+                <div className="response-copy">
+                  <p className="response-text">
+                    {accessError === "auth_required"
+                      ? "Break It Down is available to Solace members. Sign in to continue."
+                      : "Break It Down is a Solace Pro feature. Upgrade to access unlimited sessions."}
+                  </p>
+                </div>
+                <div style={{ marginTop: "20px", textAlign: "center" }}>
+                  <Link
+                    href={accessError === "auth_required" ? "/sign-in" : "/pricing"}
+                    className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(124,111,205,0.80)] border border-[rgba(124,111,205,0.28)] px-5 py-2 rounded-full hover:border-[rgba(124,111,205,0.52)] hover:text-[rgba(124,111,205,1)] transition-all duration-300 inline-block"
+                  >
+                    {accessError === "auth_required" ? "Sign in →" : "Unlock Solace Pro →"}
+                  </Link>
+                </div>
+              </div>
+              <div className="actions actions-followup">
+                <button type="button" onClick={handleReset} className="secondary-button">
+                  <span className="button-glass-sheen" />
+                  <span className="button-glass-tint" />
+                  <span className="button-label">Break down something else</span>
                 </button>
               </div>
             </>

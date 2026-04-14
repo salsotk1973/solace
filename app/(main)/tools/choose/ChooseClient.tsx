@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Lock } from "lucide-react";
 import PageShell from "@/components/PageShell";
@@ -319,6 +320,7 @@ export default function ChoosePage() {
   const [redirectTitle, setRedirectTitle] = useState("");
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(false);
+  const [isDailyLimitReached, setIsDailyLimitReached] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -411,6 +413,7 @@ export default function ChoosePage() {
     setRedirectTitle("");
     setIsButtonReady(false);
     setIsUnavailable(false);
+    setIsDailyLimitReached(false);
     setOrbState("converging");
 
     const startedAt = Date.now();
@@ -434,6 +437,13 @@ export default function ChoosePage() {
       if (!res.ok) {
         if (data?.error === SOLACE_UNAVAILABLE_ERROR) {
           setIsUnavailable(true);
+          setHasResult(true);
+          setOrbState("settled");
+          return;
+        }
+
+        if (data?.error === "daily_limit_reached") {
+          setIsDailyLimitReached(true);
           setHasResult(true);
           setOrbState("settled");
           return;
@@ -520,6 +530,7 @@ export default function ChoosePage() {
     setRedirectTitle("");
     setIsButtonReady(false);
     setIsUnavailable(false);
+    setIsDailyLimitReached(false);
     setOrbState("idle");
 
     requestAnimationFrame(() => {
@@ -612,6 +623,36 @@ export default function ChoosePage() {
                     <span className="button-glass-sheen" />
                     <span className="button-glass-tint" />
                     <span className="button-label">Try again →</span>
+                  </button>
+                </div>
+              </>
+            ) : isDailyLimitReached ? (
+              <>
+                <div className="response-card">
+                  <div className="response-card-label">Daily session used</div>
+                  <div className="response-copy">
+                    <p className="response-text">
+                      You&apos;ve used your free session for today. Come back tomorrow, or unlock unlimited sessions with Solace Pro.
+                    </p>
+                  </div>
+                  <div style={{ marginTop: "20px", textAlign: "center" }}>
+                    <Link
+                      href="/pricing"
+                      className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(124,111,205,0.80)] border border-[rgba(124,111,205,0.28)] px-5 py-2 rounded-full hover:border-[rgba(124,111,205,0.52)] hover:text-[rgba(124,111,205,1)] transition-all duration-300 inline-block"
+                    >
+                      Unlock unlimited sessions →
+                    </Link>
+                  </div>
+                </div>
+                <div className="actions actions-followup">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="secondary-button"
+                  >
+                    <span className="button-glass-sheen" />
+                    <span className="button-glass-tint" />
+                    <span className="button-label">Try another decision</span>
                   </button>
                 </div>
               </>

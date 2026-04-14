@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import {
   applySlidingWindowRateLimit,
   getClientIdentifierFromHeaders,
 } from "@/lib/solace/rate-limit";
+import { isPaidUser } from "@/lib/auth-plan";
 import {
   buildSharedClarityPayload,
   classifySharedSolaceThoughts,
@@ -1059,6 +1061,31 @@ export async function POST(req: Request) {
 
     if (!rateLimit.allowed) {
       return buildRateLimitResponse(rateLimit.resetAt);
+    }
+
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          error: "auth_required",
+          message: "Break It Down is available to Solace members. Sign in to continue.",
+          upgradeUrl: "/sign-in",
+        },
+        { status: 401 },
+      );
+    }
+
+    const paid = await isPaidUser();
+    if (!paid) {
+      return NextResponse.json(
+        {
+          error: "upgrade_required",
+          message: "Break It Down is a Solace Pro feature. Upgrade to access unlimited sessions.",
+          upgradeUrl: "/pricing",
+        },
+        { status: 403 },
+      );
     }
 
     const rawBodyText = await req.text();

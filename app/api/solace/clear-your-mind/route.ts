@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { evaluateClearYourMind } from "@/lib/solace/clear-your-mind/engine";
 import {
   type ClearYourMindResponse,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/solace/clear-your-mind/types";
 import { classifySafetyThoughts } from "@/lib/solace/safety/classify";
 import { applySlidingWindowRateLimit } from "@/lib/solace/rate-limit";
+import { isPaidUser } from "@/lib/auth-plan";
 import {
   isAiUnavailableError,
   SOLACE_UNAVAILABLE_ERROR,
@@ -207,6 +209,33 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return buildRateLimitResponse(rateLimit.resetAt);
+    }
+
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "auth_required",
+          message: "Clear Your Mind is available to Solace members. Sign in to continue.",
+          upgradeUrl: "/sign-in",
+        },
+        { status: 401 },
+      );
+    }
+
+    const paid = await isPaidUser();
+    if (!paid) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "upgrade_required",
+          message: "Clear Your Mind is a Solace Pro feature. Upgrade to access unlimited sessions.",
+          upgradeUrl: "/pricing",
+        },
+        { status: 403 },
+      );
     }
 
     let body: (Partial<ClearYourMindInput> & {
