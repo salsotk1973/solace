@@ -1,6 +1,7 @@
 import Stripe from "stripe";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-03-25.dahlia",
@@ -10,6 +11,23 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Ensure a users row exists — OAuth sign-ins may skip the user.created webhook
+  const { data: existingUser } = await supabaseAdmin
+    .from("users")
+    .select("clerk_user_id")
+    .eq("clerk_user_id", userId)
+    .single();
+
+  if (!existingUser) {
+    const clerkUser = await currentUser();
+    const email = clerkUser?.emailAddresses?.[0]?.emailAddress ?? null;
+    await supabaseAdmin.from("users").insert({
+      clerk_user_id: userId,
+      email,
+      plan: "free",
+    });
   }
 
   const { priceId } = (await req.json()) as { priceId: string };
