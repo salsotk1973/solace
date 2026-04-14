@@ -598,7 +598,7 @@ export default function PricingPage() {
                     boxSizing:     "border-box" as const,
                   }}
                 >
-                  Start free trial
+                  Upgrade to Pro
                 </CheckoutButton>
 
                 <p
@@ -611,7 +611,7 @@ export default function PricingPage() {
                     margin:     0,
                   }}
                 >
-                  No credit card required to start
+                  Cancel anytime. Billed annually.
                 </p>
               </div>
             </div>
