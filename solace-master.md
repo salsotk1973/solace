@@ -7,12 +7,8 @@
 
 **Hero copy (locked):**
 ```
-You know something needs to change.
-You just can't see it clearly yet.
-
-Solace gives you the space to think it through —
-privately, gently, without judgement.
-
+You know something needs to change. You just can't see it clearly yet.
+Solace gives you the space to think it through — privately, gently, without judgement.
 [Find some clarity →]
 ```
 
@@ -88,7 +84,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ## Design System (Locked)
 
 ### Colours
-- **Background:** `#090d14` dark navy
+- **Background:** `#090d14` (dark navy)
 - **Category colours:** import from `lib/design-tokens.ts` — never hardcode
 
 ### Typography
@@ -151,22 +147,39 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - `app/api/_template/history/route.ts` — blueprint for history APIs
 
 ### Stripe ✅
-- `app/api/stripe/checkout/route.ts` — creates checkout session
+- `app/api/stripe/checkout/route.ts` — creates checkout session + auto-creates users row if missing
 - `app/api/stripe/portal/route.ts` — billing portal
 - `app/api/webhooks/stripe/route.ts` — handles 4 events, updates users.plan
 - `components/pricing/CheckoutButton.tsx` — client checkout button
-- Pricing page wired up with correct prices
+- Pricing page wired up with correct prices, CTA copy: "Upgrade to Pro" / "Cancel anytime. Billed annually."
 - Supabase `users` table: `stripe_customer_id`, `stripe_subscription_id`, `subscription_status` columns added
 - All env vars in Vercel (Production)
+- **End-to-end sandbox test PASSED** — checkout → webhook → users.plan='paid' confirmed ✅
+
+### Dashboard ✅
+- `app/(main)/dashboard/page.tsx` — server component, shows plan status, streak, sessions
+- `components/dashboard/BillingPortalButton.tsx` — redirects to Stripe Customer Portal
+- `components/dashboard/UpgradeBanner.tsx` — auto-dismisses after 5s on ?upgraded=true
+- Dashboard shows PRO badge for paid users ✅
+
+### Clerk Webhook ✅
+- `app/api/webhooks/clerk/route.ts` — handles user.created + user.updated, upserts Supabase users row
+- Clerk webhook endpoint registered: `https://www.try-solace.app/api/webhooks/clerk`
+- Events subscribed: `user.created`, `user.updated`
+- `CLERK_WEBHOOK_SECRET` in Vercel ✅
+- Note: webhook fires on new sign-ups; checkout route self-heals (creates row if missing)
+
+### Middleware ✅
+- `/api/stripe/(.*)` added to public routes — no longer blocked by Clerk middleware
 
 ### Still Needed
-- [ ] Verify Stripe checkout flow end-to-end (test with sandbox card 4242 4242 4242 4242)
-- [ ] Enable Stripe Customer Portal in dashboard
+- [ ] Enable Stripe Customer Portal in Stripe sandbox dashboard (Settings → Billing → Customer portal)
+- [ ] Verify Clerk webhook fires for brand new users (test with fresh Google account)
+- [ ] Dashboard tool card readability fix (cards too dark/low contrast)
 - [ ] Switch Stripe from sandbox to live mode when ready
-- [ ] Export feature — not built for any tool
-- [ ] Dashboard page — show plan status + billing portal link
 - [ ] Activate Google Search Console
 - [ ] Activate PostHog analytics
+- [ ] Export feature — not built for any tool
 
 ---
 
@@ -176,7 +189,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Never define colours inline — always import from `lib/design-tokens.ts`
 - Never use opacity below 0.50 for functional text
 - Always use Claude Code for implementation
-- **Never connect Stripe live keys before end-to-end test passes**
+- **Never connect Stripe live keys before end-to-end test passes** ← TEST PASSED ✅
 - Specs always written to file via bash_tool, presented with present_files
 
 ---
@@ -191,7 +204,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## Master Files & Workflow (Locked)
-
 **GitHub raw URL:** `https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md`
 
 ### Session Start
