@@ -22,6 +22,7 @@
     "next-mdx-remote": "^6.0.0",
     "ogl": "^1.0.11",
     "openai": "^6.27.0",
+    "posthog-js": "^1.369.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "stripe": "^22.0.1",
