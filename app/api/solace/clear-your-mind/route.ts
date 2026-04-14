@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { evaluateClearYourMind } from "@/lib/solace/clear-your-mind/engine";
+import {
+  type ClearYourMindResponse,
+  type ClearYourMindInput,
+  type SafetyAssessment,
+} from "@/lib/solace/clear-your-mind/types";
 import { classifySafetyThoughts } from "@/lib/solace/safety/classify";
-import { ClearYourMindInput } from "@/lib/solace/clear-your-mind/types";
 import { applySlidingWindowRateLimit } from "@/lib/solace/rate-limit";
 import {
   isAiUnavailableError,
   SOLACE_UNAVAILABLE_ERROR,
   SOLACE_UNAVAILABLE_MESSAGE,
 } from "@/lib/solace/runtime";
+import { isSolaceCrisisInput, SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
 const CYM_RATE_LIMIT = 5;
 const CYM_RATE_WINDOW_MS = 60_000;
@@ -90,16 +95,6 @@ function normalizeThoughts(value: unknown): NormalizedThought[] {
     .slice(0, 7);
 }
 
-function buildCrisisFallback(message: string) {
-  return {
-    ok: true,
-    isCrisisFallback: true,
-    clarityFallback: false,
-    title: "Take a moment",
-    message,
-  };
-}
-
 function isEmergencyBreathingRisk(thoughts: string[]): boolean {
   const text = thoughts.join(" ").toLowerCase();
 
@@ -120,7 +115,77 @@ function isEmergencyBreathingRisk(thoughts: string[]): boolean {
   );
 }
 
+function buildSafetyAssessment(thoughts: string[], options?: { urgentMedical?: boolean }): SafetyAssessment {
+  const classification = classifySafetyThoughts(thoughts.map((text) => ({ text })));
+  const directIntent =
+    options?.urgentMedical === true || thoughts.some((text) => isSolaceCrisisInput(text));
+
+  return {
+    riskScore: options?.urgentMedical ? Math.max(classification.totalScore, 100) : classification.totalScore,
+    isCrisis: directIntent || classification.mode === "support",
+    clarityFallback: false,
+    signals: {
+      directIntent,
+      indirectIntent:
+        !directIntent &&
+        classification.categories.some((category) =>
+          [
+            "desire_to_disappear_or_not_exist",
+            "life_worth_collapse",
+            "hopelessness_no_point",
+            "cant_go_on_language",
+            "burden_language",
+            "self_worth_collapse",
+            "emotional_exhaustion_done",
+            "ambiguous_high_risk",
+          ].includes(category),
+        ),
+      existentialLanguage: classification.categories.some((category) =>
+        [
+          "desire_to_die_or_not_live",
+          "desire_to_disappear_or_not_exist",
+          "life_worth_collapse",
+          "hopelessness_no_point",
+          "passive_death_wishes",
+        ].includes(category),
+      ),
+      burdenLanguage: classification.categories.includes("burden_language"),
+      selfWorthCollapse: classification.categories.some((category) =>
+        ["life_worth_collapse", "self_worth_collapse"].includes(category),
+      ),
+      gibberish: false,
+    },
+    matchedRules: classification.assessments.flatMap((assessment) => assessment.matchedGroupIds),
+  };
+}
+
+function buildDeterministicCrisisResponse(thoughts: string[]): ClearYourMindResponse {
+  return {
+    ok: true,
+    isCrisisFallback: true,
+    clarityFallback: false,
+    title: "Take a moment",
+    message: SOLACE_CRISIS_FALLBACK,
+    safetyAssessment: buildSafetyAssessment(thoughts),
+  };
+}
+
+function buildEmergencySupportResponse(thoughts: string[]): ClearYourMindResponse {
+  return {
+    ok: true,
+    isCrisisFallback: true,
+    clarityFallback: false,
+    title: "Take a moment",
+    message:
+      "This sounds urgent and needs real-world help right now. Please contact emergency services or immediate local support right now.",
+    safetyAssessment: buildSafetyAssessment(thoughts, { urgentMedical: true }),
+  };
+}
+
 export async function POST(request: Request) {
+  let thoughtTexts: string[] = [];
+  let rateLimitHeaders: { remaining: number; resetAt: number } | null = null;
+
   try {
     if (request.headers.get("X-Solace-Age-Confirmed") !== "1") {
       return NextResponse.json(
@@ -134,6 +199,11 @@ export async function POST(request: Request) {
       CYM_RATE_LIMIT,
       CYM_RATE_WINDOW_MS,
     );
+
+    rateLimitHeaders = {
+      remaining: rateLimit.remaining,
+      resetAt: rateLimit.resetAt,
+    };
 
     if (!rateLimit.allowed) {
       return buildRateLimitResponse(rateLimit.resetAt);
@@ -158,11 +228,7 @@ export async function POST(request: Request) {
     }
 
     const normalizedThoughts = normalizeThoughts(body?.thoughts);
-    const thoughtTexts = normalizedThoughts.map((item) => item.text);
-
-    const input: ClearYourMindInput = {
-      thoughts: normalizedThoughts,
-    };
+    thoughtTexts = normalizedThoughts.map((item) => item.text);
 
     if (normalizedThoughts.length === 0) {
       return NextResponse.json(
@@ -174,29 +240,37 @@ export async function POST(request: Request) {
       );
     }
 
-    if (isEmergencyBreathingRisk(thoughtTexts)) {
-      return NextResponse.json(
-        buildCrisisFallback(
-          "This sounds urgent and needs real-world help right now. Please contact emergency services or immediate local support right now.",
-        ),
-        { status: 200 },
-      );
+    const input: ClearYourMindInput = {
+      thoughts: normalizedThoughts,
+    };
+
+    // Deterministic server short-circuit for direct crisis language.
+    if (thoughtTexts.some((text) => isSolaceCrisisInput(text))) {
+      const response = NextResponse.json(buildDeterministicCrisisResponse(thoughtTexts), {
+        status: 200,
+      });
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
-    const safety = classifySafetyThoughts(
-      thoughtTexts.map((text) => ({ text })),
-    );
+    if (isEmergencyBreathingRisk(thoughtTexts)) {
+      const response = NextResponse.json(buildEmergencySupportResponse(thoughtTexts), {
+        status: 200,
+      });
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
+    }
+
+    const safety = classifySafetyThoughts(thoughtTexts.map((text) => ({ text })));
 
     if (safety.mode === "support") {
-      return NextResponse.json(
-        buildCrisisFallback(
-          "It sounds like you may be going through something very difficult.\n\nSolace is not equipped for crisis support.\n\nPlease reach out to a trusted person or a qualified professional who can support you right now.",
-        ),
-        { status: 200 },
-      );
+      const response = NextResponse.json(buildDeterministicCrisisResponse(thoughtTexts), {
+        status: 200,
+      });
+
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
-    // IMPORTANT: evaluateClearYourMind is async, so this must be awaited
     const result = await evaluateClearYourMind(input);
 
     return applyRateLimitHeaders(
@@ -205,6 +279,20 @@ export async function POST(request: Request) {
       rateLimit.resetAt,
     );
   } catch (error) {
+    const isDirectCrisis = thoughtTexts.some((text) => isSolaceCrisisInput(text));
+
+    if (isDirectCrisis) {
+      const response = NextResponse.json(buildDeterministicCrisisResponse(thoughtTexts), {
+        status: 200,
+      });
+
+      if (rateLimitHeaders) {
+        return applyRateLimitHeaders(response, rateLimitHeaders.remaining, rateLimitHeaders.resetAt);
+      }
+
+      return response;
+    }
+
     if (isAiUnavailableError(error)) {
       return NextResponse.json(
         { ok: false, error: SOLACE_UNAVAILABLE_ERROR, message: SOLACE_UNAVAILABLE_MESSAGE },
