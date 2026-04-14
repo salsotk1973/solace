@@ -33,8 +33,9 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    // Mobile: strict 2×2 grid. Desktop: flex-wrap with natural pill widths.
-    <div className="grid grid-cols-2 gap-2 mb-2 md:flex md:flex-wrap md:justify-center md:gap-3 md:mb-14">
+    // Mobile: strict 2×2 CSS grid, max-width constrained so cells are ~156px each.
+    // Desktop: flex-wrap with natural pill widths, no max-width.
+    <div className="grid grid-cols-2 gap-2 w-full max-w-[320px] mx-auto mb-2 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
 
       {/* ── Free patterns ────────────────────────────────────────────────── */}
       {FREE_PATTERNS.map((p) => {
@@ -45,7 +46,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
             onClick={() => !disabled && onChange(p.id)}
             disabled={disabled}
             className={[
-              "flex flex-col items-center gap-0.5 px-4 py-2 md:px-7 md:py-3 rounded-full border transition-all duration-300",
+              "w-full md:w-auto flex flex-col items-center gap-0.5 px-3 py-2 md:px-7 md:py-3 rounded-full border transition-all duration-300",
               "disabled:cursor-not-allowed",
               active
                 ? "border-[rgba(45,212,191,0.6)] bg-[rgba(45,212,191,0.1)] text-[rgba(45,212,191,0.95)]"
@@ -67,7 +68,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
         <a
           key={p.name}
           href="/pricing"
-          className="flex flex-col items-center gap-0.5 px-4 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
+          className="w-full md:w-auto flex flex-col items-center gap-0.5 px-3 py-2 md:px-7 md:py-3 rounded-full border border-[rgba(255,255,255,0.18)] bg-transparent text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.85)] hover:border-[rgba(255,255,255,0.28)] transition-all duration-200"
         >
           <span
             className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[-0.01em]"
