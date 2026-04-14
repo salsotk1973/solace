@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import BillingPortalButton from "@/components/dashboard/BillingPortalButton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -739,24 +740,11 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
                 Upgrade to Pro →
               </Link>
             ) : (
-              // TODO: Replace with Stripe customer portal link when Stripe is live
-              <Link
-                href="/pricing"
+              <BillingPortalButton
+                hovered={manageHov}
                 onMouseEnter={() => setManageHov(true)}
                 onMouseLeave={() => setManageHov(false)}
-                style={{
-                  fontFamily:    "'Jost', sans-serif",
-                  fontWeight:    400,
-                  fontSize:      "12px",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color:         manageHov ? "rgba(215,200,255,0.7)" : "rgba(140,130,185,0.45)",
-                  textDecoration: "none",
-                  transition:    "color 0.3s ease",
-                }}
-              >
-                Manage subscription →
-              </Link>
+              />
             )}
 
             <SignOutButton />
