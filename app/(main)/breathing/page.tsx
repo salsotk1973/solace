@@ -4,6 +4,7 @@ import { getCurrentUserId } from "@/lib/auth-user";
 import { SOLACE_ROUTES }    from "@/lib/solace/routes";
 import PageShell from "@/components/PageShell";
 import { ToolSeoContent, SeoH2, SeoDisclaimer } from "@/components/ToolSeoContent";
+import { glassBackground, getToolRgb } from "@/lib/design-tokens";
 
 export const metadata = {
   title: "Guided Breathing for Anxiety | Calm Your Nervous System — Solace",
@@ -51,24 +52,28 @@ export default async function BreathingPage() {
             <Link
               href={SOLACE_ROUTES.clearYourMind}
               prefetch={false}
-              className="group rounded-[14px] p-7 border border-[rgba(68,200,110,0.1)] bg-[linear-gradient(145deg,#0a1a12,#0d2018,#081610)] hover:border-[rgba(68,200,110,0.26)] transition-all duration-500"
+              className="group rounded-[14px] p-7 border border-[rgba(232,168,62,0.1)] hover:border-[rgba(232,168,62,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('clear') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(68,200,110,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('clear').replace(/, /g, ',')},0.42)` }}>
                 When my mind won&apos;t stop
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(225,245,228,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(245,232,210,0.85)]">
                 Clear Your Mind
               </p>
             </Link>
             <Link
               href={SOLACE_ROUTES.breakItDown}
               prefetch={false}
-              className="group rounded-[14px] p-7 border border-[rgba(218,148,48,0.1)] bg-[linear-gradient(145deg,#1a1008,#281808,#180e04)] hover:border-[rgba(218,148,48,0.26)] transition-all duration-500"
+              className="group rounded-[14px] p-7 border border-[rgba(124,111,205,0.1)] hover:border-[rgba(124,111,205,0.26)] transition-all duration-500"
+              style={{ background: glassBackground('breakdown') }}
             >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(218,148,48,0.42)] mb-2.5">
+              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase mb-2.5"
+                 style={{ color: `rgba(${getToolRgb('breakdown').replace(/, /g, ',')},0.42)` }}>
                 When I feel overwhelmed
               </p>
-              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(245,232,215,0.85)]">
+              <p className="[font-family:var(--font-display)] font-light text-[21px] text-[rgba(230,225,250,0.85)]">
                 Break It Down
               </p>
             </Link>
