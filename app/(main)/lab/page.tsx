@@ -4,6 +4,7 @@ import NewsletterForm from '@/components/lab/NewsletterForm'
 import LabCtaButton   from '@/components/lab/LabCtaButton'
 import PageShell      from '@/components/PageShell'
 import BgFlat         from '@/components/backgrounds/BgFlat'
+import { TEXT_COLOURS, FONT_SIZE, CATEGORY_COLOURS } from '@/lib/design-tokens'
 
 export default function LabPage() {
   const featured    = getFeaturedArticle()
@@ -32,10 +33,10 @@ export default function LabPage() {
             style={{
               fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
-              fontSize:      '10px',
+              fontSize:      `${FONT_SIZE.eyebrow}px`,
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              color:         'rgba(130,112,200,0.42)',
+              color:         CATEGORY_COLOURS.decide.hex,
               margin:        '0 0 24px',
             }}
           >
@@ -64,9 +65,9 @@ export default function LabPage() {
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize:   '15px',
+              fontSize:   `${FONT_SIZE.body}px`,
               lineHeight: 1.8,
-              color:      'rgba(175,168,215,0.75)',
+              color:      TEXT_COLOURS.body,
               margin:     0,
               maxWidth:   '440px',
             }}
@@ -107,10 +108,10 @@ export default function LabPage() {
               style={{
                 fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
-                fontSize:      '10px',
+                fontSize:      `${FONT_SIZE.eyebrow}px`,
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
-                color:         'rgba(68,138,228,0.50)',
+                color:         CATEGORY_COLOURS.calm.hex,
                 margin:        '0 0 28px',
               }}
             >
@@ -137,9 +138,9 @@ export default function LabPage() {
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
-                fontSize:   '15px',
+                fontSize:   `${FONT_SIZE.body}px`,
                 lineHeight: 1.85,
-                color:      'rgba(140,180,225,0.50)',
+                color:      TEXT_COLOURS.body,
                 margin:     '0 0 48px',
                 maxWidth:   '480px',
                 marginLeft: 'auto',
@@ -172,10 +173,10 @@ export default function LabPage() {
             style={{
               fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
-              fontSize:      '10px',
+              fontSize:      `${FONT_SIZE.eyebrow}px`,
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              color:         'rgba(200,168,80,0.48)',
+              color:         CATEGORY_COLOURS.clarity.hex,
               margin:        '0 0 20px',
             }}
           >
@@ -203,9 +204,9 @@ export default function LabPage() {
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize:   '14px',
+              fontSize:   `${FONT_SIZE.body}px`,
               lineHeight: 1.85,
-              color:      'rgba(185,172,140,0.58)',
+              color:      TEXT_COLOURS.body,
               margin:     '0 0 36px',
               maxWidth:   '380px',
             }}

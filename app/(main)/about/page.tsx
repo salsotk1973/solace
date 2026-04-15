@@ -1,11 +1,36 @@
 import { Metadata } from 'next'
 import PageShell from '@/components/PageShell'
-import { TEXT_COLOURS, FONT_SIZE } from '@/lib/design-tokens'
+import {
+  TEXT_COLOURS,
+  FONT_SIZE,
+  CATEGORY_COLOURS,
+  getToolColour,
+  glassBackground,
+  glassBorder,
+} from '@/lib/design-tokens'
 
 export const metadata: Metadata = {
   title: 'About Solace — A calmer way to think clearly',
   description: 'Solace is a private digital space to help you think more clearly, make decisions with less noise, and check in with yourself — without judgment.',
 }
+
+const cards = [
+  {
+    slug: 'breathing',
+    heading: 'Private by design',
+    body: 'Nothing you write in Solace is shared, sold, or used to train anything. Your sessions are yours. They stay with you, or they disappear when you close the tab.',
+  },
+  {
+    slug: 'choose',
+    heading: 'Not a replacement for support',
+    body: "Solace is a thinking tool — not a substitute for therapy, medical care, or talking to someone you trust. If you're going through something serious, please reach out to a professional.",
+  },
+  {
+    slug: 'focus',
+    heading: 'Built without noise',
+    body: 'No notifications. No streaks that guilt you. No leaderboards. Just a few simple tools designed to slow things down, not speed them up.',
+  },
+]
 
 export default function AboutPage() {
   return (
@@ -18,18 +43,23 @@ export default function AboutPage() {
         boxSizing: 'border-box',
       }}>
 
-        {/* Eyebrow */}
-        <p style={{
+        {/* Eyebrow pill */}
+        <div style={{
+          display: 'inline-flex',
+          padding: '6px 16px',
+          borderRadius: 999,
+          border: `0.5px solid rgba(${CATEGORY_COLOURS.clarity.rgb}, 0.25)`,
+          background: `rgba(${CATEGORY_COLOURS.clarity.rgb}, 0.08)`,
           fontFamily: "'Jost', sans-serif",
           fontWeight: 400,
           fontSize: `${FONT_SIZE.eyebrow}px`,
           letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color: TEXT_COLOURS.secondary,
+          textTransform: 'uppercase' as const,
+          color: CATEGORY_COLOURS.clarity.hex,
           margin: '0 0 24px',
         }}>
           About Solace
-        </p>
+        </div>
 
         {/* Headline */}
         <h1 style={{
@@ -59,32 +89,20 @@ export default function AboutPage() {
           Solace exists for the moments when your mind won&apos;t settle — when you have a decision to make, a feeling you can&apos;t name, or a thought that keeps circling. It&apos;s not a therapy app. It&apos;s not a productivity dashboard. It&apos;s a private space to think more clearly, at your own pace, without judgment.
         </p>
 
-        {/* Section: What it is */}
+        {/* 3 info cards */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: 16,
           marginBottom: 64,
         }}>
-          {[
-            {
-              heading: 'Private by design',
-              body: 'Nothing you write in Solace is shared, sold, or used to train anything. Your sessions are yours. They stay with you, or they disappear when you close the tab.',
-            },
-            {
-              heading: 'Not a replacement for support',
-              body: "Solace is a thinking tool — not a substitute for therapy, medical care, or talking to someone you trust. If you're going through something serious, please reach out to a professional.",
-            },
-            {
-              heading: 'Built without noise',
-              body: 'No notifications. No streaks that guilt you. No leaderboards. Just a few simple tools designed to slow things down, not speed them up.',
-            },
-          ].map(card => (
+          {cards.map(card => (
             <div key={card.heading} style={{
               borderRadius: 14,
               padding: '28px 28px 24px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '0.5px solid rgba(255,255,255,0.08)',
+              background: glassBackground(card.slug, 0.07),
+              border: `0.5px solid ${glassBorder(card.slug, 0.18)}`,
+              borderTop: `2px solid ${getToolColour(card.slug)}`,
               boxSizing: 'border-box',
             }}>
               <h2 style={{
@@ -111,13 +129,14 @@ export default function AboutPage() {
           ))}
         </div>
 
-        {/* Section: Who it's for */}
+        {/* Who is Solace for? */}
         <div style={{
           maxWidth: 640,
           borderRadius: 14,
           padding: '32px 36px',
-          background: 'rgba(255,255,255,0.03)',
-          border: '0.5px solid rgba(255,255,255,0.08)',
+          background: glassBackground('choose', 0.05),
+          border: `0.5px solid ${glassBorder('choose', 0.15)}`,
+          borderTop: `2px solid ${CATEGORY_COLOURS.decide.hex}`,
           marginBottom: 64,
         }}>
           <h2 style={{

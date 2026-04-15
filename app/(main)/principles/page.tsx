@@ -109,8 +109,10 @@ export default function PrinciplesPage() {
               display: 'grid',
               gridTemplateColumns: '64px 1fr',
               gap: 32,
-              padding: '36px 0',
+              padding: '36px 0 36px 24px',
               borderTop: '0.5px solid rgba(255,255,255,0.07)',
+              borderLeft: `2px solid ${p.colour}`,
+              marginLeft: -24,
               alignItems: 'start',
             }}>
               {/* Number */}
@@ -121,7 +123,7 @@ export default function PrinciplesPage() {
                 lineHeight: 1,
                 color: p.colour,
                 margin: '4px 0 0',
-                opacity: 0.7,
+                opacity: 0.9,
               }}>
                 {p.number}
               </p>
@@ -153,17 +155,19 @@ export default function PrinciplesPage() {
           ))}
         </div>
 
-        {/* Bottom rule */}
+        {/* Bottom disclaimer */}
         <div style={{
-          borderTop: '0.5px solid rgba(255,255,255,0.07)',
-          paddingTop: 48,
           marginTop: 4,
+          padding: '32px 28px',
+          borderRadius: 14,
+          background: 'rgba(255,255,255,0.02)',
+          border: '0.5px solid rgba(255,255,255,0.06)',
         }}>
           <p style={{
             fontFamily: "'Jost', sans-serif",
             fontWeight: 300,
-            fontSize: `${FONT_SIZE.body}px`,
-            lineHeight: 1.8,
+            fontSize: `${FONT_SIZE.metadata}px`,
+            lineHeight: 1.7,
             color: TEXT_COLOURS.secondary,
             margin: 0,
             maxWidth: 560,
