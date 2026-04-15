@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import PageShell from '@/components/PageShell'
+import { TEXT_COLOURS, FONT_SIZE } from '@/lib/design-tokens'
 
 export const metadata: Metadata = {
   title: 'Terms of Use | Solace',
@@ -10,15 +11,19 @@ export const metadata: Metadata = {
 
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
-    <section style={{ marginBottom: '48px' }}>
+    <section style={{
+      marginBottom: '48px',
+      paddingLeft:  '20px',
+      borderLeft:   '2px solid rgba(124, 111, 205, 0.35)',
+    }}>
       <p
         style={{
           fontFamily:    "'Jost', sans-serif",
           fontWeight:    400,
-          fontSize:      '10px',
+          fontSize:      `${FONT_SIZE.eyebrow}px`,
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
-          color:         'rgba(185,175,220,0.5)',
+          color:         TEXT_COLOURS.secondary,
           margin:        '0 0 10px',
         }}
       >
@@ -40,9 +45,9 @@ function Section({ number, title, children }: { number: string; title: string; c
         style={{
           fontFamily: "'Jost', sans-serif",
           fontWeight: 300,
-          fontSize:   '15px',
+          fontSize:   `${FONT_SIZE.body}px`,
           lineHeight: 1.85,
-          color:      'rgba(195,188,230,0.82)',
+          color:      TEXT_COLOURS.body,
         }}
       >
         {children}
@@ -70,10 +75,10 @@ export default function TermsPage() {
             style={{
               fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
-              fontSize:      '10px',
+              fontSize:      `${FONT_SIZE.eyebrow}px`,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color:         'rgba(155,145,200,0.5)',
+              color:         TEXT_COLOURS.secondary,
               margin:        '0 0 20px',
             }}
           >
@@ -95,9 +100,9 @@ export default function TermsPage() {
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
-              fontSize:   '15px',
+              fontSize:   `${FONT_SIZE.body}px`,
               lineHeight: 1.8,
-              color:      'rgba(175,168,215,0.75)',
+              color:      TEXT_COLOURS.body,
               margin:     0,
             }}
           >

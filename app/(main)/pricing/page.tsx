@@ -5,6 +5,7 @@ import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import CheckoutButton from "@/components/pricing/CheckoutButton";
 import BgSubtle from "@/components/backgrounds/BgSubtle";
+import { TEXT_COLOURS, FONT_SIZE, CATEGORY_COLOURS } from "@/lib/design-tokens";
 
 const FREE_FEATURES = [
   "Access to all 6 tools",
@@ -96,7 +97,7 @@ export default function PricingPage() {
           <section
             style={{
               width:          "100%",
-              padding:        "160px 40px 80px",
+              padding:        "clamp(100px, 12vw, 160px) clamp(20px, 5vw, 40px) 80px",
               boxSizing:      "border-box",
               textAlign:      "center",
             }}
@@ -105,10 +106,10 @@ export default function PricingPage() {
               style={{
                 fontFamily:    "'Jost', sans-serif",
                 fontWeight:    400,
-                fontSize:      "10px",
+                fontSize:      `${FONT_SIZE.eyebrow}px`,
                 letterSpacing: "0.24em",
                 textTransform: "uppercase",
-                color:         "rgba(155,145,198,0.45)",
+                color:         CATEGORY_COLOURS.decide.hex,
                 margin:        "0 0 20px",
               }}
             >
@@ -135,8 +136,8 @@ export default function PricingPage() {
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
-                fontSize:   "15px",
-                color:      "rgba(148,140,188,0.62)",
+                fontSize:   `${FONT_SIZE.body}px`,
+                color:      TEXT_COLOURS.body,
                 lineHeight: 1.7,
                 margin:     0,
               }}
@@ -151,7 +152,7 @@ export default function PricingPage() {
           <section
             style={{
               width:     "100%",
-              padding:   "0 40px 100px",
+              padding:   "0 clamp(20px, 5vw, 40px) 100px",
               boxSizing: "border-box",
             }}
           >
@@ -251,7 +252,7 @@ export default function PricingPage() {
             <div
               style={{
                 display:             "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                 gap:                 "14px",
                 maxWidth:            "820px",
                 margin:              "0 auto",
@@ -264,7 +265,7 @@ export default function PricingPage() {
                 style={{
                   position:      "relative",
                   borderRadius:  "20px",
-                  padding:       "40px 36px",
+                  padding:       "clamp(24px, 5vw, 40px) clamp(20px, 4vw, 36px)",
                   background:    "linear-gradient(145deg, #0c0a1e, #08091a, #0a0818)",
                   border:        `0.5px solid ${cardHovered === "free" ? "rgba(100,92,148,0.28)" : "rgba(80,72,128,0.14)"}`,
                   boxShadow:     cardHovered === "free" ? "0 12px 50px rgba(20,15,50,0.4)" : "none",
@@ -296,10 +297,10 @@ export default function PricingPage() {
                   style={{
                     fontFamily:    "'Jost', sans-serif",
                     fontWeight:    400,
-                    fontSize:      "10px",
+                    fontSize:      `${FONT_SIZE.eyebrow}px`,
                     letterSpacing: "0.20em",
                     textTransform: "uppercase",
-                    color:         "rgba(148,140,188,0.45)",
+                    color:         TEXT_COLOURS.secondary,
                     margin:        "0 0 24px",
                   }}
                 >
@@ -324,7 +325,7 @@ export default function PricingPage() {
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
                       fontSize:   "12px",
-                      color:      "rgba(120,112,165,0.5)",
+                      color:      TEXT_COLOURS.secondary,
                       margin:     0,
                     }}
                   >
@@ -354,13 +355,13 @@ export default function PricingPage() {
                         fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
-                        color:      "rgba(148,140,188,0.72)",
+                        color:      TEXT_COLOURS.body,
                         lineHeight: 1.55,
                       }}
                     >
                       <span
                         style={{
-                          color:      "rgba(148,140,188,0.4)",
+                          color:      TEXT_COLOURS.secondary,
                           flexShrink: 0,
                           marginTop:  "1px",
                           fontSize:   "14px",
@@ -412,7 +413,7 @@ export default function PricingPage() {
                 style={{
                   position:      "relative",
                   borderRadius:  "20px",
-                  padding:       "40px 36px",
+                  padding:       "clamp(24px, 5vw, 40px) clamp(20px, 4vw, 36px)",
                   background:    "linear-gradient(145deg, #0e0c22, #0a0818, #100d24)",
                   border:        `0.5px solid ${cardHovered === "pro" ? "rgba(140,120,210,0.45)" : "rgba(123,111,160,0.28)"}`,
                   boxShadow:     cardHovered === "pro"
@@ -455,10 +456,10 @@ export default function PricingPage() {
                     style={{
                       fontFamily:    "'Jost', sans-serif",
                       fontWeight:    400,
-                      fontSize:      "10px",
+                      fontSize:      `${FONT_SIZE.eyebrow}px`,
                       letterSpacing: "0.20em",
                       textTransform: "uppercase",
-                      color:         "rgba(168,148,225,0.72)",
+                      color:         CATEGORY_COLOURS.decide.hex,
                       margin:        0,
                     }}
                   >
@@ -503,7 +504,7 @@ export default function PricingPage() {
                         fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
-                        color:      "rgba(148,140,188,0.55)",
+                        color:      TEXT_COLOURS.secondary,
                         margin:     0,
                       }}
                     >
@@ -515,7 +516,7 @@ export default function PricingPage() {
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
                       fontSize:   "12px",
-                      color:      "rgba(120,112,165,0.55)",
+                      color:      TEXT_COLOURS.secondary,
                       margin:     "6px 0 0",
                       transition: "opacity 0.25s ease",
                     }}
@@ -546,7 +547,7 @@ export default function PricingPage() {
                         fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
-                        color:      "rgba(195,188,238,0.78)",
+                        color:      TEXT_COLOURS.body,
                         lineHeight: 1.55,
                       }}
                     >
@@ -605,8 +606,8 @@ export default function PricingPage() {
                   style={{
                     fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
-                    fontSize:   "11px",
-                    color:      "rgba(120,112,165,0.42)",
+                    fontSize:   `${FONT_SIZE.eyebrow}px`,
+                    color:      TEXT_COLOURS.secondary,
                     textAlign:  "center",
                     margin:     0,
                   }}
@@ -623,24 +624,26 @@ export default function PricingPage() {
           <section
             style={{
               width:     "100%",
-              padding:   "0 40px 100px",
+              padding:   "0 clamp(20px, 5vw, 40px) 100px",
               boxSizing: "border-box",
             }}
           >
             <div
               style={{
-                maxWidth: "820px",
-                margin:   "0 auto",
+                maxWidth:  "820px",
+                margin:    "0 auto",
+                width:     "100%",
+                boxSizing: "border-box",
               }}
             >
               <p
                 style={{
                   fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
-                  fontSize:      "10px",
+                  fontSize:      `${FONT_SIZE.eyebrow}px`,
                   letterSpacing: "0.24em",
                   textTransform: "uppercase",
-                  color:         "rgba(155,145,198,0.38)",
+                  color:         TEXT_COLOURS.secondary,
                   margin:        "0 0 32px",
                   textAlign:     "center",
                 }}
@@ -660,15 +663,15 @@ export default function PricingPage() {
                 <div
                   style={{
                     display:             "grid",
-                    gridTemplateColumns: "1fr 100px 100px",
-                    padding:             "16px 28px",
+                    gridTemplateColumns: "1fr 72px 72px",
+                    padding:             "16px clamp(12px, 3vw, 28px)",
                     borderBottom:        "0.5px solid rgba(100,92,148,0.12)",
                   }}
                 >
-                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)" }}>
+                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: `${FONT_SIZE.eyebrow}px`, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_COLOURS.secondary }}>
                     Feature
                   </span>
-                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(120,112,165,0.4)", textAlign: "center" }}>
+                  <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: `${FONT_SIZE.eyebrow}px`, letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT_COLOURS.secondary, textAlign: "center" }}>
                     Free
                   </span>
                   <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(168,148,225,0.6)", textAlign: "center" }}>
@@ -682,8 +685,8 @@ export default function PricingPage() {
                     key={row.feature}
                     style={{
                       display:             "grid",
-                      gridTemplateColumns: "1fr 100px 100px",
-                      padding:             "14px 28px",
+                      gridTemplateColumns: "1fr 72px 72px",
+                      padding:             "14px clamp(12px, 3vw, 28px)",
                       borderBottom:        i < COMPARISON_ROWS.length - 1
                         ? "0.5px solid rgba(100,92,148,0.08)"
                         : "none",
@@ -695,7 +698,7 @@ export default function PricingPage() {
                         fontFamily: "'Jost', sans-serif",
                         fontWeight: 300,
                         fontSize:   "13px",
-                        color:      "rgba(168,160,215,0.7)",
+                        color:      TEXT_COLOURS.body,
                       }}
                     >
                       {row.feature}
@@ -724,24 +727,26 @@ export default function PricingPage() {
           <section
             style={{
               width:     "100%",
-              padding:   "0 40px 100px",
+              padding:   "0 clamp(20px, 5vw, 40px) 100px",
               boxSizing: "border-box",
             }}
           >
             <div
               style={{
-                maxWidth: "640px",
-                margin:   "0 auto",
+                maxWidth:  "640px",
+                margin:    "0 auto",
+                width:     "100%",
+                boxSizing: "border-box",
               }}
             >
               <p
                 style={{
                   fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
-                  fontSize:      "10px",
+                  fontSize:      `${FONT_SIZE.eyebrow}px`,
                   letterSpacing: "0.24em",
                   textTransform: "uppercase",
-                  color:         "rgba(155,145,198,0.38)",
+                  color:         TEXT_COLOURS.secondary,
                   margin:        "0 0 32px",
                   textAlign:     "center",
                 }}
@@ -789,8 +794,8 @@ export default function PricingPage() {
                             fontWeight: 400,
                             fontSize:   "14px",
                             color:      isOpen
-                              ? "rgba(215,208,248,0.9)"
-                              : "rgba(185,178,225,0.72)",
+                              ? TEXT_COLOURS.primary
+                              : TEXT_COLOURS.body,
                             lineHeight: 1.5,
                             transition: "color 0.3s ease",
                           }}
@@ -818,8 +823,8 @@ export default function PricingPage() {
                             style={{
                               fontFamily: "'Jost', sans-serif",
                               fontWeight: 300,
-                              fontSize:   "13px",
-                              color:      "rgba(148,140,188,0.65)",
+                              fontSize:   `${FONT_SIZE.body}px`,
+                              color:      TEXT_COLOURS.body,
                               lineHeight: 1.75,
                               margin:     0,
                             }}
@@ -856,7 +861,7 @@ export default function PricingPage() {
                 fontWeight: 300,
                 fontStyle:  "italic",
                 fontSize:   "clamp(20px, 2.5vw, 28px)",
-                color:      "rgba(195,185,240,0.55)",
+                color:      TEXT_COLOURS.secondary,
                 margin:     0,
               }}
             >
