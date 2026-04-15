@@ -10,10 +10,7 @@ export const metadata: Metadata = {
   title: "Solace",
   description: "A calm digital space to step out of noise and regain clarity.",
   icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', type: 'image/x-icon' },
-    ],
+    icon: '/icon.svg',
     apple: '/apple-icon.png',
   },
 };
