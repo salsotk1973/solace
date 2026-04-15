@@ -41,11 +41,14 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Pricing (Locked)
-- **Free tier:** Choose (1 AI session/day) + all 6 client tools unlimited + 7-day history
+- **Free tier:**
+  - All 6 client tools — unlimited sessions
+  - Choose (AI) — 1 session/day free
+  - 7-day session history
 - **Paid tier:** A$9/month or A$79/year (A$6.58/month)
   - Unlimited Choose, Clear Your Mind, Break It Down
   - Full history (no cutoff)
-  - Patterns + export + streaks + Lab digest email
+  - Mood patterns + gratitude archive + export + early access
 
 **Key insight:** 7-day history cutoff is the conversion trigger — day 8 is the natural upgrade moment.
 
@@ -94,26 +97,34 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - **Logo:** "SOLACE" wordmark only, Cormorant Garamond spaced caps (Direction C)
 
 ### Favicon & App Icons
-- `app/icon.svg` — SVG favicon, S on `#090d14`
+- `app/icon.svg` — SVG favicon, S on `#090d14` ✅ live
 - `app/apple-icon.png` — 180x180 PNG for iOS home screen
-- `app/favicon.ico` — ICO fallback
+- `app/favicon.ico` — removed (was showing Vercel icon) ✅
 
-### Text Standards
-- Primary: `rgba(255,255,255,1.0)`
-- Body: `rgba(255,255,255,0.80)`
-- Secondary: `rgba(255,255,255,0.65)`
-- Never below 0.50 for functional text
+### Text Standards — ALL pages must follow this
+- Primary: `TEXT_COLOURS.primary` = `rgba(255,255,255,1.0)`
+- Body: `TEXT_COLOURS.body` = `rgba(255,255,255,0.80)`
+- Secondary: `TEXT_COLOURS.secondary` = `rgba(255,255,255,0.65)`
+- **Never below 0.65 for functional text**
+- Always import from `lib/design-tokens.ts` — never write raw rgba values
 
-### Font Size Floors
-- Functional labels: 12px minimum
-- Body text: 14px minimum
-- Eyebrows/pills: 11px minimum
+### Font Size Floors — ALL pages must follow this
+- Functional labels: `FONT_SIZE.functionalLabel` = 12px minimum
+- Body text: `FONT_SIZE.body` = 14px minimum
+- Eyebrows/pills: `FONT_SIZE.eyebrow` = 11px minimum
 - Never use `text-[9px]` or `text-[10px]` for functional content
+- Always import from `lib/design-tokens.ts`
 
 ### Components
 - Ghost pill buttons, tinted glass cards
 - SiteHeader.tsx and SiteFooter.tsx — LOCKED, never modify layout
 - FooterAuthLink.tsx — auth-aware sign in/out
+- **Particles:** disabled globally via `PageShell` default `particles={false}` ✅
+
+### Card Colour Pattern (dashboard-first, applies to all pages)
+- Use `glassBackground(slug, 0.07)` + `glassBorder(slug, 0.18)` from design-tokens
+- Add `2px solid` top or left border in tool/category colour for accent
+- Never define colours inline — always import from `lib/design-tokens.ts`
 
 ---
 
@@ -155,38 +166,38 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Pricing page wired up with correct prices, CTA copy: "Upgrade to Pro" / "Cancel anytime. Billed annually."
 - Supabase `users` table: `stripe_customer_id`, `stripe_subscription_id`, `subscription_status` columns added
 - All env vars in Vercel (Production)
-- **End-to-end sandbox test PASSED** — checkout → webhook → users.plan='paid' confirmed ✅
-- **Stripe Customer Portal activated** in sandbox ✅
+- **End-to-end sandbox test PASSED** ✅
+- **Stripe Customer Portal activated in sandbox** ✅
 
 ### Dashboard ✅
 - `app/(main)/dashboard/page.tsx` — server component, shows plan status, streak, sessions
-- `app/(main)/dashboard/DashboardContent.tsx` — all 9 tool cards using canonical colours from `design-tokens.ts`
+- `app/(main)/dashboard/DashboardContent.tsx` — all 9 tool cards using canonical colours from `design-tokens.ts`, all text using `TEXT_COLOURS` + `FONT_SIZE`
 - `components/dashboard/BillingPortalButton.tsx` — redirects to Stripe Customer Portal
 - `components/dashboard/UpgradeBanner.tsx` — auto-dismisses after 5s on ?upgraded=true
 - Dashboard shows PRO badge for paid users ✅
-- All text readability fixed — `TEXT_COLOURS` and `FONT_SIZE` from design-tokens.ts ✅
 
 ### Clerk Webhook ✅
 - `app/api/webhooks/clerk/route.ts` — handles user.created + user.updated, upserts Supabase users row + adds to Brevo + sends welcome email
-- Clerk webhook endpoint registered: `https://www.try-solace.app/api/webhooks/clerk`
-- Events subscribed: `user.created`, `user.updated`
+- Clerk webhook endpoint: `https://www.try-solace.app/api/webhooks/clerk`
 - `CLERK_WEBHOOK_SECRET` in Vercel ✅
-- Note: webhook fires on new sign-ups; checkout route self-heals (creates row if missing)
 
 ### Middleware ✅
-- `/api/stripe/(.*)` added to public routes — no longer blocked by Clerk middleware
-- `/sitemap.xml` and `/robots.txt` added to public routes ✅
+- `/api/stripe/(.*)` added to public routes
+- `/sitemap.xml` and `/robots.txt` added to public routes
+- Unauthenticated users hitting `/dashboard` redirect to `/sign-in?redirect_url=/dashboard` ✅
 
 ### SEO ✅
 - `app/sitemap.ts` — generates `/sitemap.xml` with all 9 tool pages + core pages
 - Google Search Console verified — domain `try-solace.app` ✅
 - Sitemap submitted to Search Console ✅
+- All pages have `title` + `description` metadata
 
 ### Analytics ✅
 - PostHog installed — `components/PostHogProvider.tsx` + `components/PostHogPageView.tsx`
 - Pageview tracking live on all routes ✅
 - `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` in Vercel ✅
 - PostHog project: `us.posthog.com/project/382430`
+- Set up saved insights after 7 days of traffic data (post-launch task)
 
 ### Email System — Brevo ✅ (Phase 1)
 - **Brevo account:** active, `try-solace.app` domain authenticated + DKIM + DMARC ✅
@@ -211,33 +222,51 @@ Full sequence planned (requires Supabase login tracking + Stripe webhook trigger
 3. Re-engagement — Day 14, 21, 30 with no login (requires last_login tracking)
 4. Post-upgrade onboarding — Day 0, 3, 30 (requires Stripe webhook trigger)
 
+### Pages — All Complete ✅
+All pages use `TEXT_COLOURS` + `FONT_SIZE` from `design-tokens.ts`. No hardcoded rgba values or font sizes.
+
+| Page | Status | Notes |
+|---|---|---|
+| Home | ✅ | — |
+| Tools | ✅ | — |
+| Pricing | ✅ | Mobile responsive, correct free/paid features, 6 FAQs |
+| Lab | ✅ | Eyebrows + body text readability fixed |
+| About | ✅ | Full rewrite — 3 tinted cards, coloured eyebrow pill |
+| Principles | ✅ | Full rewrite — 6 principles with left accent bars |
+| Privacy | ✅ | Left teal accent bars on sections |
+| Terms | ✅ | Left violet accent bars on sections |
+| Dashboard | ✅ | All 9 tool cards, design-tokens colours |
+
 ### Still Needed
-- [ ] Dashboard tool card fix — spec written (v3), not yet run in Claude Code
 - [ ] Switch Stripe from sandbox to live mode
 - [ ] Newsletter opt-in — wire `Solace Newsletter` list (ID 5) to signup flow
 - [ ] Export feature — not built for any tool
 - [ ] Phase 2 email sequences
+- [ ] PostHog saved insights (after 7 days of traffic)
 
 ---
 
 ## Key Rules (Never Break)
-- SiteHeader.tsx and SiteFooter.tsx locked
-- Background always fixed, full-screen
+- **Read solace-master before any work begins — non-negotiable**
+- SiteHeader.tsx and SiteFooter.tsx locked — never modify
+- Background always fixed, full-screen `#090d14`
 - Never define colours inline — always import from `lib/design-tokens.ts`
-- Never use opacity below 0.50 for functional text
+- Never use opacity below 0.65 for functional text
+- Never use font size below 11px for visible text
 - Always use Claude Code for implementation
 - **Never connect Stripe live keys before end-to-end test passes** ← TEST PASSED ✅
 - Specs always written to file via bash_tool, presented with present_files
+- Particles disabled globally — `PageShell` default is `particles={false}`
 
 ---
 
 ## Post-Launch Tasks
-- Phase 2 email sequences (4 sequences — see Email System above)
+- Phase 2 email sequences (4 sequences)
 - Make Lab homepage teaser dynamic
 - Solace Weekly Intelligence Report (~day 30)
 - Enable Cloudflare bot fight mode + AI Labyrinth post-launch
 - Update Cloudflare account to Business + ABN at ~A$20K MRR
-- Set up PostHog saved insights after 7 days of traffic data
+- PostHog saved insights after 7 days of traffic data
 
 ---
 
@@ -248,7 +277,7 @@ Full sequence planned (requires Supabase login tracking + Stripe webhook trigger
 ```
 Load solace-master. Working on: [specific task]. Go.
 ```
-I fetch via Chrome MCP navigate + get_page_text from the URL above.
+Fetch via Chrome MCP: navigate to raw URL → get_page_text.
 
 ### Updating Master Files
 1. I present updated file
@@ -257,19 +286,3 @@ I fetch via Chrome MCP navigate + get_page_text from the URL above.
 ```bash
 cd /Users/angelamanzano/Documents/Solace/solace-clean && git add solace-master.md && git commit -m "Update: [what changed]" && git push
 ```
-
----
-
-## Session Apr 15 — Additional Updates (post-master commit)
-
-### Middleware ✅ Fixed
-- Unauthenticated users hitting `/dashboard` now redirect to `/sign-in?redirect_url=/dashboard`
-- After sign-in they land back on dashboard
-- Removed blank dark page fallback for page routes (kept for API routes → 401)
-- Commit: `8b160be`
-
-### Dashboard Cards ✅ Final
-- `DashboardContent.tsx` fully refactored to use `lib/design-tokens.ts`
-- No hardcoded colours anywhere in the file
-- All 9 tool cards render canonical category colours
-- All text uses `TEXT_COLOURS` and `FONT_SIZE` constants
