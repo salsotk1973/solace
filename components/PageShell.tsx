@@ -13,7 +13,7 @@ type PageShellProps = {
 
 export default function PageShell({
   children,
-  particles = true,
+  particles = false,
   contentContainer = true,
   contentClassName,
   contentStyle,
