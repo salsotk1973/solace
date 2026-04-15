@@ -257,3 +257,19 @@ I fetch via Chrome MCP navigate + get_page_text from the URL above.
 ```bash
 cd /Users/angelamanzano/Documents/Solace/solace-clean && git add solace-master.md && git commit -m "Update: [what changed]" && git push
 ```
+
+---
+
+## Session Apr 15 — Additional Updates (post-master commit)
+
+### Middleware ✅ Fixed
+- Unauthenticated users hitting `/dashboard` now redirect to `/sign-in?redirect_url=/dashboard`
+- After sign-in they land back on dashboard
+- Removed blank dark page fallback for page routes (kept for API routes → 401)
+- Commit: `8b160be`
+
+### Dashboard Cards ✅ Final
+- `DashboardContent.tsx` fully refactored to use `lib/design-tokens.ts`
+- No hardcoded colours anywhere in the file
+- All 9 tool cards render canonical category colours
+- All text uses `TEXT_COLOURS` and `FONT_SIZE` constants
