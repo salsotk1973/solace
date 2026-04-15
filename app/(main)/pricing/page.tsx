@@ -8,47 +8,58 @@ import BgSubtle from "@/components/backgrounds/BgSubtle";
 import { TEXT_COLOURS, FONT_SIZE, CATEGORY_COLOURS } from "@/lib/design-tokens";
 
 const FREE_FEATURES = [
-  "Access to all 6 tools",
-  "One full session per tool",
-  "No account required",
+  "All 6 wellness tools — unlimited sessions",
+  "Choose (AI) — one free session per day",
+  "7-day session history",
+  "No account required to try",
 ];
 
 const PRO_FEATURES = [
   "Everything in Free",
-  "Unlimited sessions across all tools",
-  "Session history and patterns",
-  "AI-powered tools (Clear Your Mind, Choose, Break It Down)",
-  "Export your data",
+  "Unlimited Choose, Clear Your Mind, Break It Down",
+  "Full session history — no 7-day cutoff",
+  "Mood patterns and trends",
+  "Gratitude archive",
+  "Export your sessions",
   "Early access to new tools",
 ];
 
 const COMPARISON_ROWS = [
-  { feature: "All 6 wellness tools",   free: true,  pro: true  },
-  { feature: "One session per tool",   free: true,  pro: true  },
-  { feature: "Unlimited sessions",     free: false, pro: true  },
-  { feature: "Session history",        free: false, pro: true  },
-  { feature: "AI-powered tools",       free: false, pro: true  },
-  { feature: "Mood patterns & trends", free: false, pro: true  },
-  { feature: "Gratitude archive",      free: false, pro: true  },
-  { feature: "Export data",            free: false, pro: true  },
+  { feature: "All 6 wellness tools",            free: true,  pro: true  },
+  { feature: "Unlimited client tool sessions",  free: true,  pro: true  },
+  { feature: "Choose (AI) — 1 session/day",     free: true,  pro: true  },
+  { feature: "7-day session history",           free: true,  pro: true  },
+  { feature: "Unlimited AI tool sessions",      free: false, pro: true  },
+  { feature: "Full session history",            free: false, pro: true  },
+  { feature: "Mood patterns & trends",          free: false, pro: true  },
+  { feature: "Gratitude archive",               free: false, pro: true  },
+  { feature: "Export sessions",                 free: false, pro: true  },
 ];
 
 const FAQS = [
   {
+    q: "Which tools are completely free?",
+    a: "All 6 wellness tools — Breathing, Focus Timer, Sleep Wind-Down, Thought Reframer, Mood Tracker, and Gratitude Log — are free with unlimited sessions. You also get one free AI session per day with Choose.",
+  },
+  {
+    q: "What do I get with Pro?",
+    a: "Unlimited sessions with all three AI tools (Choose, Clear Your Mind, Break It Down), full session history with no 7-day cutoff, mood patterns, gratitude archive, and data export.",
+  },
+  {
     q: "Can I really use Solace for free?",
-    a: "Yes. Every tool has a full free session with no account needed. You only need to sign up when you want to save your history or access unlimited sessions.",
+    a: "Yes. All 6 client tools are free with no session limits. Choose gives you one AI session per day free. No credit card required.",
   },
   {
     q: "What happens to my data if I cancel?",
     a: "Your data stays in your account. You can export everything before you cancel, and we never delete your history.",
   },
   {
-    q: "Is there a free trial for Pro?",
-    a: "Yes — you can start free and upgrade when you're ready. No credit card required to create an account.",
+    q: "Do you offer refunds?",
+    a: "If you upgrade and change your mind within 7 days, contact us and we'll refund in full. No questions asked.",
   },
   {
-    q: "Do you offer refunds?",
-    a: "If you upgrade and change your mind within 7 days, contact us and we'll refund in full, no questions asked.",
+    q: "Is my data private?",
+    a: "Yes. Nothing you write in Solace is shared, sold, or used to train AI models. Your sessions belong to you.",
   },
 ];
 
