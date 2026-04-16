@@ -12,6 +12,7 @@ import {
   glassBorder,
   TEXT_COLOURS,
   FONT_SIZE,
+  CATEGORY_COLOURS,
 } from "@/lib/design-tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -175,6 +176,25 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
   const [hoveredSession, setHoveredSession] = useState<string | null>(null);
   const [upgradeHov, setUpgradeHov]         = useState(false);
   const [manageHov, setManageHov]           = useState(false);
+  const [newsletterChecked, setNewsletterChecked] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterDone, setNewsletterDone]       = useState(false);
+
+  async function handleNewsletterToggle() {
+    if (newsletterChecked || newsletterDone) return;
+    setNewsletterLoading(true);
+    try {
+      const res = await fetch('/api/newsletter/subscribe', { method: 'POST' });
+      if (res.ok) {
+        setNewsletterChecked(true);
+        setNewsletterDone(true);
+      }
+    } catch {
+      // fail silently — don't break dashboard
+    } finally {
+      setNewsletterLoading(false);
+    }
+  }
 
   const recentSessions = sessions.slice(0, 7);
   const hasSessions    = totalSessions > 0;
@@ -648,6 +668,69 @@ export default function DashboardContent({ data }: { data: DashboardData }) {
             >
               {isPro ? "Pro" : "Free"}
             </span>
+          </div>
+
+          {/* Newsletter opt-in */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', paddingTop: '4px' }}>
+            <button
+              type="button"
+              onClick={handleNewsletterToggle}
+              disabled={newsletterLoading || newsletterDone}
+              style={{
+                width:        '16px',
+                height:       '16px',
+                minWidth:     '16px',
+                borderRadius: '3px',
+                border:       newsletterChecked
+                  ? `1.5px solid ${CATEGORY_COLOURS.clarity.hex}`
+                  : '1.5px solid rgba(255,255,255,0.25)',
+                background:   newsletterChecked
+                  ? `rgba(${CATEGORY_COLOURS.clarity.rgb}, 0.15)`
+                  : 'transparent',
+                cursor:         newsletterDone ? 'default' : 'pointer',
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'center',
+                padding:        0,
+                marginTop:      '2px',
+                transition:     'border-color 0.2s ease, background 0.2s ease',
+                flexShrink:     0,
+              }}
+              aria-label="Subscribe to newsletter"
+            >
+              {newsletterChecked && (
+                <span style={{ color: CATEGORY_COLOURS.clarity.hex, fontSize: '10px', lineHeight: 1 }}>✓</span>
+              )}
+              {newsletterLoading && (
+                <span style={{ color: TEXT_COLOURS.secondary, fontSize: '9px', lineHeight: 1 }}>···</span>
+              )}
+            </button>
+            <div>
+              <p style={{
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 300,
+                fontSize:   `${FONT_SIZE.body}px`,
+                color:      newsletterDone ? CATEGORY_COLOURS.clarity.hex : TEXT_COLOURS.body,
+                margin:     0,
+                lineHeight: 1.5,
+                transition: 'color 0.3s ease',
+              }}>
+                {newsletterDone
+                  ? "You're on the list. One piece a month, nothing more."
+                  : 'Send me occasional writing about clarity and decision-making'}
+              </p>
+              {!newsletterDone && (
+                <p style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize:   `${FONT_SIZE.metadata}px`,
+                  color:      TEXT_COLOURS.secondary,
+                  margin:     '2px 0 0',
+                }}>
+                  Monthly. No noise. Unsubscribe anytime.
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Upgrade / Manage */}
