@@ -130,10 +130,10 @@ export default function TermsPage() {
           <p style={{ margin: 0 }}>
             If you suspect unauthorised access to your account, contact us immediately at{' '}
             <a
-              href="mailto:legal@solace.com"
+              href="mailto:legal@try-solace.app"
               style={{ color: 'rgba(185,175,225,0.85)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
-              legal@solace.com
+              legal@try-solace.app
             </a>.
           </p>
         </Section>
@@ -186,10 +186,10 @@ export default function TermsPage() {
           <p style={{ margin: 0 }}>
             Legal questions?{' '}
             <a
-              href="mailto:legal@solace.com"
+              href="mailto:legal@try-solace.app"
               style={{ color: 'rgba(185,175,225,0.85)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
-              legal@solace.com
+              legal@try-solace.app
             </a>
             {' '}— we&apos;ll get back to you.
           </p>

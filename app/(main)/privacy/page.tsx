@@ -195,10 +195,10 @@ export default function PrivacyPage() {
           <p style={{ margin: 0 }}>
             Questions about your privacy?{' '}
             <a
-              href="mailto:privacy@solace.com"
+              href="mailto:privacy@try-solace.app"
               style={{ color: 'rgba(185,175,225,0.85)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
-              privacy@solace.com
+              privacy@try-solace.app
             </a>
             {' '}— we read every email.
           </p>

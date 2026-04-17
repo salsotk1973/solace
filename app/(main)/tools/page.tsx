@@ -82,6 +82,30 @@ const faqSchema = {
         text: "Cognitive reframing is the practice of looking at a thought from a different angle — not to dismiss it, but to see it more clearly. Solace's Thought Reframer guides you through four gentle questions. It works best for everyday thinking patterns rather than clinical conditions.",
       },
     },
+    {
+      "@type": "Question",
+      name: "What's the difference between free and paid?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "All nine tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is my data private?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Your sessions are stored only for you — we don't read them, sell them, or use them to train AI. AI tool sessions are processed in real time and not retained after your session ends. You can delete your account and all data at any time.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do the AI tools work?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Choose, Clear Your Mind, and Break It Down are powered by a language model. You type — the tool responds. Nothing is stored after your session. Free accounts get one Choose session per day. Clear Your Mind and Break It Down are available on a paid plan.",
+      },
+    },
   ],
 };
 
@@ -293,7 +317,7 @@ export default function ToolsPage() {
             >
               A Solace account
             </Link>{" "}
-            adds history, patterns, and streaks — A$14/month or A$119/year.
+            adds history, patterns, and streaks — A$9/month or A$79/year.
           </p>
 
         </div>
