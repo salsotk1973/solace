@@ -105,12 +105,12 @@ export default function ToolCard({
         style={{
           fontFamily:    "var(--font-jost, 'Jost', sans-serif)",
           fontWeight:    400,
-          fontSize:      "10px",
+          fontSize:      "11px",
           letterSpacing: "0.18em",
           textTransform: "uppercase",
           color:         tagCol,
           margin:        "0 0 14px",
-          opacity:       hovered ? 0.7 : 0.42,
+          opacity:       hovered ? 1.0 : 0.85,
           transition:    "opacity 0.4s ease",
         }}
       >
@@ -137,9 +137,9 @@ export default function ToolCard({
         style={{
           fontFamily: "var(--font-jost, 'Jost', sans-serif)",
           fontWeight: 300,
-          fontSize:   "13px",
+          fontSize:   "14px",
           lineHeight: 1.72,
-          color:      hovered ? "rgba(185,175,220,0.85)" : "rgba(172,165,210,0.68)",
+          color:      hovered ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.80)",
           margin:     0,
           flex:       1,
           transition: "color 0.4s ease",
@@ -164,7 +164,7 @@ export default function ToolCard({
           style={{
             fontFamily:    "var(--font-jost, 'Jost', sans-serif)",
             fontWeight:    400,
-            fontSize:      "10px",
+            fontSize:      "11px",
             letterSpacing: "0.16em",
             textTransform: "uppercase",
             color:         accent,
