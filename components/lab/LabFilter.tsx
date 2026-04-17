@@ -8,15 +8,6 @@ import { getLabCategoryRgb } from '@/lib/design-tokens'
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
-type Category = 'all' | LabArticle['category']
-
-const CATEGORIES: { id: Category; label: string }[] = [
-  { id: 'all',               label: 'All' },
-  { id: 'calm-your-state',   label: 'Calm your state' },
-  { id: 'think-clearly',     label: 'Think clearly' },
-  { id: 'notice-whats-good', label: "Notice what's good" },
-]
-
 // Derive accent colours from design tokens — single source of truth
 function labAccent(category: LabArticle['category'] | string): string {
   return `rgba(${getLabCategoryRgb(category).replace(/, /g, ',')},1)`
@@ -39,8 +30,6 @@ const CATEGORY_LABEL: Record<string, string> = {
   'think-clearly':     'Think clearly',
   'notice-whats-good': "Notice what's good",
 }
-
-const FEATURED_BG = '#090d14'
 
 // ─── Shared pill style ────────────────────────────────────────────────────────
 
@@ -140,27 +129,10 @@ const RESPONSIVE_CSS = `
     display: none;
   }
 
-  .lab-filter-pills {
+  .lab-browse-all {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     justify-content: center;
-    align-items: center;
-    margin-bottom: 48px;
-    width: 100%;
-  }
-
-  /* Fit all 4 pills on one row at small screens */
-  @media (max-width: 479px) {
-    .lab-filter-pills {
-      gap: 6px;
-      justify-content: center;
-    }
-    .lab-filter-pills button {
-      padding: 6px 10px !important;
-      font-size: 10px !important;
-      letter-spacing: 0.04em !important;
-    }
+    margin-top: 48px;
   }
 `
 
@@ -492,73 +464,46 @@ export default function LabFilter({
   featured: LabArticle | null
   articles: LabArticle[]
 }) {
-  const [active, setActive] = useState<Category>('all')
-
-  const filtered = active === 'all'
-    ? articles
-    : articles.filter(a => a.category === active)
-
   return (
     <>
       <style>{RESPONSIVE_CSS}</style>
 
       <div>
-        {/* ── Filter pills ─────────────────────────────────────────────── */}
-        <div className="lab-filter-pills">
-          {CATEGORIES.map(cat => {
-            const isActive    = active === cat.id
-            const accentColor = cat.id === 'all'
-              ? 'rgba(148,130,210,1)'
-              : CATEGORY_ACCENT[cat.id as LabArticle['category']]
-
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActive(cat.id)}
-                style={{
-                  padding:       '8px 20px',
-                  borderRadius:  '100px',
-                  border:        `0.5px solid ${isActive ? accentColor.replace('1)', '0.35)') : 'rgba(130,115,190,0.28)'}`,
-                  background:    isActive ? accentColor.replace('1)', '0.1)') : 'transparent',
-                  fontFamily:    "'Jost', sans-serif",
-                  fontWeight:    400,
-                  fontSize:      '12px',
-                  letterSpacing: '0.08em',
-                  color:         isActive ? accentColor : 'rgba(170,158,220,0.70)',
-                  cursor:        'pointer',
-                  transition:    'all 0.3s ease',
-                  whiteSpace:    'nowrap',
-                }}
-              >
-                {cat.label}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* ── Featured article ─────────────────────────────────────────── */}
+        {/* ── Featured article ───────────────────────────────────────── */}
         {featured && <FeaturedCard article={featured} />}
 
-        {/* ── Article grid ─────────────────────────────────────────────── */}
+        {/* ── Article grid (max 5, most recent) ─────────────────────── */}
         <div className="lab-article-grid">
-          {filtered.map(article => (
+          {articles.map(article => (
             <ArticleCard key={article.slug ?? article.title} article={article} />
           ))}
-          {filtered.length === 0 && (
-            <p
-              style={{
-                gridColumn: '1 / -1',
-                textAlign:  'center',
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize:   '13px',
-                color:      'rgba(110,102,158,0.4)',
-                padding:    '48px 0',
-              }}
-            >
-              No articles in this category yet.
-            </p>
-          )}
+        </div>
+
+        {/* ── Browse all link ────────────────────────────────────────── */}
+        {/* TODO: update href to /lab/archive once archive page is built */}
+        <div className="lab-browse-all">
+          <Link
+            href="/lab/archive"
+            style={{
+              fontFamily:     "'Jost', sans-serif",
+              fontWeight:     400,
+              fontSize:       '12px',
+              letterSpacing:  '0.14em',
+              textTransform:  'uppercase' as const,
+              color:          'rgba(170,158,220,0.65)',
+              textDecoration: 'none',
+              display:        'inline-flex',
+              alignItems:     'center',
+              gap:            '8px',
+              transition:     'color 0.3s ease',
+            }}
+          >
+            Browse all articles
+            <span style={{
+              fontSize:   '14px',
+              transition: 'transform 0.3s ease',
+            }}>→</span>
+          </Link>
         </div>
       </div>
     </>

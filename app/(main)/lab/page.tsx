@@ -9,7 +9,7 @@ import { TEXT_COLOURS, FONT_SIZE, CATEGORY_COLOURS } from '@/lib/design-tokens'
 export default function LabPage() {
   const featured    = getFeaturedArticle()
   const allArticles = getAllArticles()
-  const nonFeatured = allArticles.filter(a => !a.featured)
+  const nonFeatured = allArticles.filter(a => !a.featured).slice(0, 5)
 
   return (
     <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
