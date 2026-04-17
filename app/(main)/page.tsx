@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/HeroSection";
 import FeaturedLabCard, { type FeaturedLabArticle } from "@/components/home/FeaturedLabCard";
-import { CATEGORY_COLOURS } from "@/lib/design-tokens";
+import { CATEGORY_COLOURS, TEXT_COLOURS, FONT_SIZE } from "@/lib/design-tokens";
 
 // ─── Colour helpers derived from design tokens ────────────────────────────────
 // Tailwind className strings must be static — values below mirror CATEGORY_COLOURS exactly.
@@ -31,8 +31,8 @@ const AI_TOOLS: AiTool[] = [
     themeClass:
       "border-[rgba(232,168,62,0.20)] bg-[rgba(232,168,62,0.06)] hover:border-[rgba(232,168,62,0.35)] hover:bg-[rgba(232,168,62,0.09)] hover:shadow-[0_12px_36px_rgba(232,168,62,0.10)]",
     borderLeftColor: `rgba(${clarity.rgb},0.5)`,
-    eyebrowColor:    `rgba(${clarity.rgb},0.7)`,
-    ctaColor:        `rgba(${clarity.rgb},0.78)`,
+    eyebrowColor:    `rgba(${clarity.rgb},1.0)`,
+    ctaColor:        `rgba(${clarity.rgb},0.9)`,
   },
   {
     eyebrow: "WHEN I CAN'T DECIDE",
@@ -43,8 +43,8 @@ const AI_TOOLS: AiTool[] = [
     themeClass:
       "border-[rgba(124,111,205,0.20)] bg-[rgba(124,111,205,0.06)] hover:border-[rgba(124,111,205,0.35)] hover:bg-[rgba(124,111,205,0.09)] hover:shadow-[0_12px_36px_rgba(124,111,205,0.10)]",
     borderLeftColor: `rgba(${decide.rgb},0.5)`,
-    eyebrowColor:    `rgba(${decide.rgb},0.7)`,
-    ctaColor:        `rgba(${decide.rgb},0.78)`,
+    eyebrowColor:    `rgba(${decide.rgb},1.0)`,
+    ctaColor:        `rgba(${decide.rgb},0.9)`,
   },
   {
     eyebrow: "WHEN I FEEL OVERWHELMED",
@@ -55,8 +55,8 @@ const AI_TOOLS: AiTool[] = [
     themeClass:
       "border-[rgba(124,111,205,0.20)] bg-[rgba(124,111,205,0.06)] hover:border-[rgba(124,111,205,0.35)] hover:bg-[rgba(124,111,205,0.09)] hover:shadow-[0_12px_36px_rgba(124,111,205,0.10)]",
     borderLeftColor: `rgba(${decide.rgb},0.5)`,
-    eyebrowColor:    `rgba(${decide.rgb},0.7)`,
-    ctaColor:        `rgba(${decide.rgb},0.78)`,
+    eyebrowColor:    `rgba(${decide.rgb},1.0)`,
+    ctaColor:        `rgba(${decide.rgb},0.9)`,
   },
 ];
 
@@ -139,15 +139,15 @@ export default function HomePage() {
         <section id="tools" className="ai-tools-section pt-12 pb-10 md:pt-16 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
+              className="text-[11px] tracking-[0.24em] uppercase"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
             >
               WHEN YOU NEED CLARITY
             </p>
 
             <h3
-              className="ai-section-headline mt-5 text-4xl md:text-5xl font-light leading-[1.15] text-[rgba(236,232,248,0.92)]"
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              className="ai-section-headline mt-5 text-4xl md:text-5xl font-light leading-[1.15]"
+              style={{ fontFamily: "'Cormorant Garamond', serif", color: TEXT_COLOURS.primary }}
             >
               Start from <em className="italic">how it feels</em> — not what it is.
             </h3>
@@ -161,7 +161,7 @@ export default function HomePage() {
                   style={{ borderLeftColor: tool.borderLeftColor }}
                 >
                   <p
-                    className="text-[10px] tracking-[0.16em] uppercase"
+                    className="text-[11px] tracking-[0.16em] uppercase"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
@@ -180,16 +180,17 @@ export default function HomePage() {
                     {tool.title}
                   </p>
                   <p
-                    className="mt-4 text-[14px] leading-[1.85] text-[rgba(203,197,228,0.76)]"
+                    className="mt-4 text-[14px] leading-[1.85]"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
+                      color: TEXT_COLOURS.body,
                     }}
                   >
                     {tool.body}
                   </p>
                   <span
-                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-50 group-hover:opacity-90 group-hover:translate-x-1"
+                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-75 group-hover:opacity-100 group-hover:translate-x-1"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
@@ -207,8 +208,8 @@ export default function HomePage() {
         <section id="free-tools" className="free-tools-section pb-16 md:pb-24">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="text-[10px] tracking-[0.2em] uppercase text-[rgba(174,168,205,0.5)]"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
+              className="text-[11px] tracking-[0.2em] uppercase"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
             >
               FREE — START HERE
             </p>
@@ -218,17 +219,18 @@ export default function HomePage() {
                 <a
                   key={tool.href}
                   href={tool.href}
-                  className={`free-tool-card group relative overflow-hidden rounded-xl border px-5 py-4 text-[rgba(217,211,238,0.88)] transition-all duration-200 ease-out hover:-translate-y-0.5 flex items-center justify-between gap-4 ${FREE_TOOL_THEME[tool.tone].className}`}
+                  className={`free-tool-card group relative overflow-hidden rounded-xl border px-5 py-4 transition-all duration-200 ease-out hover:-translate-y-0.5 flex items-center justify-between gap-4 ${FREE_TOOL_THEME[tool.tone].className}`}
                   style={{
                     fontFamily: "'Jost', sans-serif",
                     fontWeight: 300,
                     fontSize: "14px",
+                    color: TEXT_COLOURS.body,
                   }}
                 >
                   <span>{tool.name}</span>
                   <span
                     aria-hidden="true"
-                    className="transition-all duration-200 opacity-45 group-hover:opacity-80 group-hover:translate-x-1"
+                    className="transition-all duration-200 opacity-70 group-hover:opacity-100 group-hover:translate-x-1"
                     style={{ color: FREE_TOOL_THEME[tool.tone].arrow }}
                   >
                     →
@@ -247,8 +249,8 @@ export default function HomePage() {
         <section id="lab-teaser" className="py-8 md:py-10">
           <div className="max-w-[860px] mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="mb-4 text-[10px] tracking-[0.24em] uppercase text-[rgba(174,168,205,0.62)]"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
+              className="mb-4 text-[11px] tracking-[0.24em] uppercase"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
             >
               From the Lab
             </p>
