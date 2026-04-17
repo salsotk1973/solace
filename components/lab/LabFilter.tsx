@@ -34,6 +34,12 @@ const CATEGORY_BG: Record<LabArticle['category'], string> = {
   'notice-whats-good': labAccent('notice-whats-good').replace('1)', '0.08)'),
 }
 
+const CATEGORY_LABEL: Record<string, string> = {
+  'calm-your-state':   'Calm your state',
+  'think-clearly':     'Think clearly',
+  'notice-whats-good': "Notice what's good",
+}
+
 const FEATURED_BG = '#090d14'
 
 // ─── Shared pill style ────────────────────────────────────────────────────────
@@ -95,7 +101,8 @@ const RESPONSIVE_CSS = `
       flex-direction: column;
       flex: 1;
       min-width: 0;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 8px;
     }
     .lab-card-excerpt {
       display: none !important;
@@ -197,7 +204,7 @@ function ArticleCard({ article }: { article: LabArticle }) {
               color:      accent,
             }}
           >
-            {article.category.replace(/-/g, ' ')}
+            {CATEGORY_LABEL[article.category] ?? article.category.replace(/-/g, ' ')}
           </span>
         </div>
 
@@ -258,7 +265,7 @@ function ArticleCard({ article }: { article: LabArticle }) {
               fontSize:      '10px',
               letterSpacing: '0.16em',
               textTransform: 'uppercase' as const,
-              color:         hovered ? accent.replace('1)', '0.72)') : accent.replace('1)', '0.45)'),
+              color:         hovered ? accent.replace('1)', '0.85)') : accent.replace('1)', '0.65)'),
               transition:    'color 0.4s ease',
             }}
           >
