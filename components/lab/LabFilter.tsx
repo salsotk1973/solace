@@ -107,6 +107,23 @@ const RESPONSIVE_CSS = `
     .lab-card-excerpt {
       display: none !important;
     }
+    .lab-card-bottom-row {
+      display: none !important;
+    }
+    .lab-card-pill-row {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 10px !important;
+      gap: 8px;
+    }
+    .lab-card-reading-time {
+      display: inline !important;
+      order: 2;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
     .lab-featured-card-link {
       padding: 28px 24px !important;
     }
@@ -116,6 +133,11 @@ const RESPONSIVE_CSS = `
     .lab-featured-title {
       font-size: 26px !important;
     }
+  }
+
+  /* Desktop/tablet: reading time in pill row is hidden — shown in bottom row */
+  .lab-card-reading-time {
+    display: none;
   }
 
   .lab-filter-pills {
@@ -194,8 +216,8 @@ function ArticleCard({ article }: { article: LabArticle }) {
 
       {/* Left column (mobile) / normal flow (desktop) */}
       <div className="lab-card-left">
-        {/* Category pill */}
-        <div style={{ marginBottom: '14px' }}>
+        {/* Category pill + reading time on same row (mobile: space-between) */}
+        <div className="lab-card-pill-row" style={{ marginBottom: '14px' }}>
           <span
             style={{
               ...PILL_BASE,
@@ -205,6 +227,21 @@ function ArticleCard({ article }: { article: LabArticle }) {
             }}
           >
             {CATEGORY_LABEL[article.category] ?? article.category.replace(/-/g, ' ')}
+          </span>
+          {/* Reading time — mobile only (hidden on desktop via CSS, shown in bottom row instead) */}
+          <span
+            className="lab-card-reading-time"
+            style={{
+              fontFamily:    "'Jost', sans-serif",
+              fontWeight:    400,
+              fontSize:      '10px',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase' as const,
+              color:         hovered ? accent.replace('1)', '0.85)') : accent.replace('1)', '0.65)'),
+              transition:    'color 0.4s ease',
+            }}
+          >
+            {article.readingTime} min read
           </span>
         </div>
 
@@ -246,8 +283,9 @@ function ArticleCard({ article }: { article: LabArticle }) {
           {article.excerpt}
         </p>
 
-        {/* Bottom row — animated arrow on hover */}
+        {/* Bottom row — animated arrow on hover (desktop/tablet only) */}
         <div
+          className="lab-card-bottom-row"
           style={{
             paddingTop:  '14px',
             borderTop:   `0.5px solid ${hovered ? accent.replace('1)', '0.12)') : accent.replace('1)', '0.08)')}`,
