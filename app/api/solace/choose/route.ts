@@ -604,7 +604,6 @@ export async function POST(req: Request) {
         .insert({
           user_id: userId,
           tool: "choose",
-          session_data: { input: input.substring(0, 100) },
           completed: true,
         });
     }
