@@ -97,6 +97,18 @@ const RESPONSIVE_CSS = `
       min-width: 0;
       justify-content: space-between;
     }
+    .lab-card-excerpt {
+      display: none !important;
+    }
+    .lab-featured-card-link {
+      padding: 28px 24px !important;
+    }
+    .lab-featured-card-root {
+      margin-bottom: 28px !important;
+    }
+    .lab-featured-title {
+      font-size: 26px !important;
+    }
   }
 
   .lab-filter-pills {
@@ -209,6 +221,7 @@ function ArticleCard({ article }: { article: LabArticle }) {
       <div className="lab-card-right" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Excerpt */}
         <p
+          className="lab-card-excerpt"
           style={{
             fontFamily:      "'Jost', sans-serif",
             fontWeight:      300,
@@ -286,6 +299,7 @@ export function FeaturedCard({
 
   return (
     <div
+      className="lab-featured-card-root"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -302,6 +316,7 @@ export function FeaturedCard({
     >
     <Link
       href={`/lab/${article.slug}`}
+      className="lab-featured-card-link"
       style={{
         display:        'block',
         borderRadius:   '22px',
@@ -343,10 +358,11 @@ export function FeaturedCard({
 
         {/* Title */}
         <h2
+          className="lab-featured-title"
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
-            fontSize:   isCompact ? 'clamp(28px, 3.1vw, 42px)' : 'clamp(32px, 3.8vw, 52px)',
+            fontSize:   isCompact ? 'clamp(28px, 3.1vw, 42px)' : 'clamp(26px, 3.8vw, 52px)',
             lineHeight: 1.15,
             color:      hovered ? 'rgba(250,246,255,0.98)' : 'rgba(240,234,255,0.92)',
             margin:     isCompact ? '0 0 16px' : '0 0 20px',
@@ -457,13 +473,13 @@ export default function LabFilter({
                 style={{
                   padding:       '8px 20px',
                   borderRadius:  '100px',
-                  border:        `0.5px solid ${isActive ? accentColor.replace('1)', '0.35)') : 'rgba(110,95,180,0.14)'}`,
+                  border:        `0.5px solid ${isActive ? accentColor.replace('1)', '0.35)') : 'rgba(130,115,190,0.28)'}`,
                   background:    isActive ? accentColor.replace('1)', '0.1)') : 'transparent',
                   fontFamily:    "'Jost', sans-serif",
                   fontWeight:    400,
                   fontSize:      '12px',
                   letterSpacing: '0.08em',
-                  color:         isActive ? accentColor : 'rgba(130,118,185,0.45)',
+                  color:         isActive ? accentColor : 'rgba(170,158,220,0.70)',
                   cursor:        'pointer',
                   transition:    'all 0.3s ease',
                   whiteSpace:    'nowrap',
