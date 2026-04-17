@@ -155,26 +155,6 @@ export default function PrinciplesPage() {
           ))}
         </div>
 
-        {/* Bottom disclaimer */}
-        <div style={{
-          marginTop: 4,
-          padding: '32px 28px',
-          borderRadius: 14,
-          background: 'rgba(255,255,255,0.02)',
-          border: '0.5px solid rgba(255,255,255,0.06)',
-        }}>
-          <p style={{
-            fontFamily: "'Jost', sans-serif",
-            fontWeight: 300,
-            fontSize: `${FONT_SIZE.metadata}px`,
-            lineHeight: 1.7,
-            color: TEXT_COLOURS.secondary,
-            margin: 0,
-            maxWidth: 560,
-          }}>
-            Solace is not a medical product. It provides reflective support only. If you are going through something serious, please reach out to a qualified professional.
-          </p>
-        </div>
 
       </div>
     </PageShell>
