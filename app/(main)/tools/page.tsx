@@ -4,7 +4,7 @@ import FamilyGroup  from "@/components/tools/FamilyGroup";
 import FaqAccordion from "@/components/tools/FaqAccordion";
 import PageShell from "@/components/PageShell";
 import BgSubtle from "@/components/backgrounds/BgSubtle";
-import { CATEGORY_COLOURS, glassBackground } from "@/lib/design-tokens";
+import { CATEGORY_COLOURS, TEXT_COLOURS, FONT_SIZE, glassBackground } from "@/lib/design-tokens";
 
 // ─── Colour helpers — no-space rgb strings for ToolCard's glass() function ────
 const cRgb = CATEGORY_COLOURS.calm.rgb.replace(/, /g, ',')     // '60,192,212'
@@ -125,24 +125,24 @@ const CALM_YOUR_STATE = [
     name:      "Breathing",
     line:      "Box breathing and 4-7-8. Calm your nervous system in minutes.",
     href:      "/breathing",
-    colour:    `rgba(${cRgb},0.6)`,  // calm / teal
-    tagColour: `rgba(${cRgb},0.5)`,
+    colour:    `rgba(${cRgb},0.85)`,  // calm / teal
+    tagColour: `rgba(${cRgb},0.75)`,
   },
   {
     tag:       "Focus",
     name:      "Focus Timer",
     line:      "25 minutes of work, 5 of rest. Four sessions and a long break.",
     href:      "/focus",
-    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
-    tagColour: `rgba(${xRgb},0.5)`,
+    colour:    `rgba(${xRgb},0.85)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.75)`,
   },
   {
     tag:       "Sleep",
     name:      "Sleep Wind-Down",
     line:      "4-8 breathing for the end of the day. Let the day go.",
     href:      "/sleep",
-    colour:    `rgba(${cRgb},0.6)`,  // calm / teal
-    tagColour: `rgba(${cRgb},0.5)`,
+    colour:    `rgba(${cRgb},0.85)`,  // calm / teal
+    tagColour: `rgba(${cRgb},0.75)`,
   },
 ];
 
@@ -152,8 +152,8 @@ const CLEAR_YOUR_MIND = [
     name:      "Thought Reframer",
     line:      "Four gentle questions that shift the angle on a thought that's stuck.",
     href:      "/reframe",
-    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
-    tagColour: `rgba(${xRgb},0.5)`,
+    colour:    `rgba(${xRgb},0.85)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.75)`,
   },
 ];
 
@@ -163,16 +163,16 @@ const NOTICE_WHATS_GOOD = [
     name:      "Mood Tracker",
     line:      "Check in once a day. Notice patterns over time.",
     href:      "/mood",
-    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
-    tagColour: `rgba(${xRgb},0.5)`,
+    colour:    `rgba(${xRgb},0.85)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.75)`,
   },
   {
     tag:       "Gratitude",
     name:      "Gratitude Log",
     line:      "Three things. Every day. Nothing more, nothing less.",
     href:      "/gratitude",
-    colour:    `rgba(${xRgb},0.6)`,  // clarity / gold
-    tagColour: `rgba(${xRgb},0.5)`,
+    colour:    `rgba(${xRgb},0.85)`,  // clarity / gold
+    tagColour: `rgba(${xRgb},0.75)`,
   },
 ];
 
@@ -192,16 +192,25 @@ export default function ToolsPage() {
 
           {/* ── Hero ──────────────────────────────────────────────────────── */}
           <header className="text-center pt-[180px] pb-[48px]">
-            <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(200,210,220,0.65)] mb-4">
+            <p
+              className="text-[11px] tracking-[0.26em] uppercase mb-4"
+              style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.secondary }}
+            >
               Human Behaviour Lab
             </p>
-            <h1 className="[font-family:var(--font-display)] font-light text-[clamp(38px,4.5vw,52px)] text-[rgba(210,220,230,0.88)] leading-tight mb-6">
+            <h1
+              className="font-light text-[clamp(38px,4.5vw,52px)] leading-tight mb-6"
+              style={{ fontFamily: "var(--font-display)", color: TEXT_COLOURS.primary }}
+            >
               Nine tools for the moments{" "}
-              <em className="italic font-light text-[rgba(200,215,225,0.55)]">
+              <em className="italic font-light" style={{ color: TEXT_COLOURS.secondary }}>
                 that matter.
               </em>
             </h1>
-            <p className="[font-family:var(--font-jost)] font-[300] text-[14px] text-[rgba(200,210,220,0.75)] max-w-[480px] mx-auto leading-relaxed">
+            <p
+              className="font-[300] text-[14px] max-w-[480px] mx-auto leading-relaxed"
+              style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.body }}
+            >
               Each tool is designed around a single moment — the anxious breath,
               the scattered mind, the end of a hard day. Start anywhere.
               Everything is free to try.
@@ -231,13 +240,19 @@ export default function ToolsPage() {
 
           {/* ── SEO content ───────────────────────────────────────────────── */}
           <section className="max-w-[680px] mx-auto mb-24">
-            <h2 className="[font-family:var(--font-display)] font-light text-[32px] text-[rgba(200,215,225,0.7)] leading-snug mb-8">
+            <h2
+              className="font-light text-[32px] leading-snug mb-8"
+              style={{ fontFamily: "var(--font-display)", color: TEXT_COLOURS.body }}
+            >
               Nine mental wellness tools, designed around real moments.
             </h2>
-            <div className="[font-family:var(--font-jost)] text-[14px] font-[300] text-[rgba(200,210,220,0.75)] leading-[1.9] space-y-5">
+            <div
+              className="text-[14px] font-[300] leading-[1.9] space-y-5"
+              style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.body }}
+            >
               <p>
                 Solace is a{" "}
-                <strong className="font-[400] text-[rgba(200,210,220,0.92)]">
+                <strong className="font-[400]" style={{ color: TEXT_COLOURS.primary }}>
                   Human Behaviour Lab
                 </strong>{" "}
                 — a set of tools built around the specific moments when people
@@ -257,18 +272,24 @@ export default function ToolsPage() {
 
           {/* ── FAQ ───────────────────────────────────────────────────────── */}
           <section className="max-w-[680px] mx-auto mb-24">
-            <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.24em] uppercase text-[rgba(200,210,220,0.65)] mb-8">
+            <p
+              className="text-[11px] tracking-[0.24em] uppercase mb-8"
+              style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.secondary }}
+            >
               Common questions
             </p>
             <FaqAccordion />
           </section>
 
           {/* ── Upgrade strip ─────────────────────────────────────────────── */}
-          <p className="text-center [font-family:var(--font-jost)] text-[13px] font-[300] text-[rgba(200,210,220,0.72)] mb-24 max-w-[800px] mx-auto leading-relaxed whitespace-nowrap">
+          <p
+            className="text-center text-[13px] font-[300] mb-24 max-w-[800px] mx-auto leading-relaxed whitespace-nowrap"
+            style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.body }}
+          >
             The free tools above are always free.{" "}
             <Link
               href="/pricing"
-              className="text-[rgba(200,210,220,0.85)] underline underline-offset-2 hover:text-[rgba(200,210,220,1)] transition-colors duration-200"
+              className="underline underline-offset-2 transition-colors duration-200 text-white/80 hover:text-white"
             >
               A Solace account
             </Link>{" "}
