@@ -463,6 +463,10 @@ export async function POST(req: Request) {
     if (userId) {
       const paid = await isPaidUser();
 
+      if (paid) {
+        console.log('[choose-paid] user is paid, skipping daily limit check');
+      }
+
       if (!paid) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -475,6 +479,7 @@ export async function POST(req: Request) {
           .gte("created_at", today.toISOString());
 
         if ((count ?? 0) >= 1) {
+          console.log('[choose-limit] sessions today:', count, 'limit reached, returning early');
           return NextResponse.json(
             {
               error: "daily_limit_reached",
