@@ -138,7 +138,7 @@ const RESPONSIVE_CSS = `
 
 // ─── Article grid card ────────────────────────────────────────────────────────
 
-function ArticleCard({ article }: { article: LabArticle }) {
+export function ArticleCard({ article }: { article: LabArticle }) {
   const [hovered, setHovered] = useState(false)
   const accent  = CATEGORY_ACCENT[article.category] ?? 'rgba(148,130,210,1)'
   const catBg   = CATEGORY_BG[article.category]     ?? 'rgba(148,130,210,0.08)'
