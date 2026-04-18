@@ -38,7 +38,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 - **Vercel project:** `solace` — auto-deploys on push to `main`
 - **Clerk:** Production instance active, domain verified, Google OAuth with real credentials
 - **Google Cloud project:** `solace-493201` — OAuth credentials in `Solace Private` Google Drive folder
-- **Stripe:** Sandbox tested and PASSED ✅ — next step: switch to live mode
+- **Stripe:** Live mode active ✅ — webhook configured, 6 events, 0% error rate
 
 ---
 
@@ -176,6 +176,9 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - 2px solid top or left border in tool/category colour for accent
 - Never define colours inline
 
+### Next.js 15 App Router — Critical Pattern
+- **Never use React Fragment `<>...</>` as the root return of a `'use client'` component.** This causes SSR hydration to double-mount the component. Always wrap in a `<div>` instead.
+
 ---
 
 ## Design Token File (`lib/design-tokens.ts`)
@@ -204,12 +207,20 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 | Clear Your Mind (AI) | — | — | ✅ paid gate | ✅ |
 | Break It Down (AI) | — | — | ✅ paid gate | ✅ |
 
-### Stripe
+### Stripe ✅ LIVE MODE ACTIVE
 - Full checkout + webhook + portal flow working ✅
 - End-to-end sandbox test PASSED ✅
-- Stripe Customer Portal activated in sandbox ✅
-- Webhook: `https://www.try-solace.app/api/webhooks/stripe`
-- **Next:** switch to live mode
+- **Live mode active** — `pk_live_` + `sk_live_` in Vercel ✅
+- **Live webhook:** "Solace Live Webhook" — Active, 0% error rate ✅
+- **6 webhook events:** `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.deleted`, `customer.subscription.updated`, `invoice.payment_failed`, `invoice.payment_succeeded` ✅
+- Webhook endpoint: `https://www.try-solace.app/api/webhooks/stripe`
+- **Pending:** live end-to-end test with real card (A$9, verify webhook fires, refund)
+
+### Supabase ✅
+- Status: **Healthy** — not paused
+- Region: Oceania (Sydney) — ap-southeast-2
+- Plan: NANO (Free) — upgrade to Pro at launch for daily backups + no pause risk
+- Advisor: no security or performance errors
 
 ### Dashboard ✅
 - All 9 tool cards with canonical colours from `design-tokens.ts`
@@ -224,6 +235,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Sitemap at `/sitemap.xml` — all 9 tool pages + core pages
 - Google Search Console verified ✅
 - All pages have title + description metadata
+- **Note:** Lab article URLs not yet in sitemap — add post-launch
 
 ### Analytics ✅
 - PostHog firing on all routes ✅
@@ -237,14 +249,14 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 | Page | Status |
 |---|---|
 | Home | ✅ |
-| Tools | ✅ Pricing fixed A$9/A$79, FAQ expanded to 8 questions |
-| Pricing | ✅ Mobile responsive, correct features, A$9/A$79 |
-| Lab | ✅ Editor's Pick + 5 most recent, no filter pills, "Browse all" link |
-| Lab Archive | ⏳ Not built yet — build when article count hits ~14+ (currently 15, ready now) |
-| About | ✅ Full rewrite, tinted cards, disclaimer paragraph kept |
-| Principles | ✅ Full rewrite, 6 principles, bottom disclaimer box removed |
+| Tools | ✅ Pricing A$9/A$79, FAQ 8 questions |
+| Pricing | ✅ Mobile responsive, A$9/A$79 |
+| Lab | ✅ Editor's Pick + 6 most recent, no filter pills, "Browse all" with hover |
+| Lab Archive | ✅ All 15 articles, filter pills, article count |
+| About | ✅ Full rewrite, tinted cards, disclaimer kept |
+| Principles | ✅ 6 principles, coloured border mobile fix (no negative marginLeft) |
 | Privacy | ✅ `privacy@try-solace.app` |
-| Terms | ✅ `legal@try-solace.app`, payments/refunds section correct |
+| Terms | ✅ `legal@try-solace.app`, payments/refunds correct |
 | Dashboard | ✅ All 9 tools, design-tokens |
 
 ---
@@ -252,30 +264,25 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ## Lab — Human Behaviour Lab
 
 ### Architecture (Locked)
-- **Lab landing (`/lab`):** Editor's Pick + 5 most recent articles (no filter pills) + "Browse all articles →" link
-- **Lab archive (`/lab/archive`):** All articles, filter pills (All / Calm your state / Think clearly / Notice what's good), 3-col grid → 2-col tablet → 1-col mobile. Build trigger: ✅ ready now (15 articles)
-- **Article cap:** `nonFeatured.slice(0, 5)` in `app/(main)/lab/page.tsx`
-- **"Browse all" link:** points to `/lab/archive` — 404 until archive is built
+- **Lab landing (`/lab`):** Editor's Pick + 6 most recent non-featured articles + "Browse all articles →" link (hover: brightens, underline, arrow slides 4px right)
+- **Lab archive (`/lab/archive`):** All 15 articles, filter pills (All / Calm your state / Think clearly / Notice what's good), article count, 3-col → 2-col → 1-col
+- **Article cap:** `nonFeatured.filter(...).slice(0, 6)` in `app/(main)/lab/page.tsx`
+- **Sorting:** `publishedAt` desc — 6 most recent always shown
 
 ### Article Count: 15 total
 
-**Original 10:**
-| Slug | Category |
-|---|---|
-| `why-you-cant-stop-overthinking` | think-clearly (featured ✅) |
-| `how-to-feel-less-overwhelmed` | think-clearly |
-| `how-box-breathing-actually-works` | calm-your-state |
-| `why-you-cant-focus` | calm-your-state |
-| `how-to-wind-down-before-sleep` | calm-your-state |
-| `what-is-cognitive-reframing` | think-clearly |
-| `how-to-track-your-mood` | think-clearly |
-| `does-gratitude-journalling-work` | notice-whats-good |
-| `how-to-make-a-hard-decision` | think-clearly |
-| `what-is-the-human-behaviour-lab` | think-clearly |
-
-**New 5 (added Apr 18 2026):**
 | Slug | Category | Published |
 |---|---|---|
+| `why-you-cant-stop-overthinking` | think-clearly | Mar 28 (featured ✅) |
+| `how-to-feel-less-overwhelmed` | think-clearly | Mar 2026 |
+| `how-box-breathing-actually-works` | calm-your-state | Mar 2026 |
+| `why-you-cant-focus` | calm-your-state | Mar 2026 |
+| `how-to-wind-down-before-sleep` | calm-your-state | Mar 2026 |
+| `what-is-cognitive-reframing` | think-clearly | Mar 2026 |
+| `how-to-track-your-mood` | think-clearly | Mar 2026 |
+| `does-gratitude-journalling-work` | notice-whats-good | Mar 2026 |
+| `how-to-make-a-hard-decision` | think-clearly | Mar 2026 |
+| `what-is-the-human-behaviour-lab` | think-clearly | Mar 2026 |
 | `why-you-feel-anxious-for-no-reason` | calm-your-state | Apr 21 |
 | `how-to-stop-worrying-about-things-you-cant-control` | calm-your-state | Apr 23 |
 | `what-is-decision-fatigue` | think-clearly | Apr 25 |
@@ -286,35 +293,33 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Calm your state: 5 articles
 - Think clearly: 6 articles
 - Notice what's good: 2 articles ← thinnest, prioritise next batch
-- What is the Lab: 1 article
 
-### Lab Mobile Fixes (done Apr 2026)
-- Filter pill contrast: unselected opacity 0.45 → 0.70 ✅
-- Featured card padding reduced on mobile ✅
-- Article excerpts hidden on mobile (`display:none` < 640px) ✅
-- Reading time moved inline with category pill on mobile (pill left, time right) ✅
-- Bottom border line removed on mobile cards ✅
-- Category label apostrophe fixed: `CATEGORY_LABEL` map replaces `.replace(/-/g, ' ')` ✅
+### Lab Component Notes (`components/lab/LabFilter.tsx`)
+- `ArticleCard` — exported (`export function ArticleCard`) so archive can reuse it
+- `BrowseAllLink` — separate component with hover state (colour, underline, arrow animation)
+- `CATEGORY_LABEL` map — single source of truth for display labels (preserves apostrophes)
+- Mobile card layout: pill + reading time inline (same row), no excerpt, no bottom border
+- **Root return must be `<div>`, not `<>` fragment** — fragment causes Next.js 15 SSR double-mount
 
-### Lab Card Component Notes (`components/lab/LabFilter.tsx`)
-- `CATEGORY_LABEL` map: single source of truth for display labels (includes apostrophes)
-- Mobile layout: `lab-card-left` (44%) = pill row + title; `lab-card-right` (56%) = excerpt (hidden) + bottom row (hidden)
-- Reading time duplicate: one instance in `lab-card-pill-row` (mobile only), one in `lab-card-bottom-row` (desktop only)
-- CSS classes: `lab-card-reading-time`, `lab-card-pill-row`, `lab-card-bottom-row`, `lab-card-excerpt`, `lab-featured-card-root`, `lab-featured-card-link`, `lab-featured-title`
+### Lab Archive (`components/lab/LabArchiveFilter.tsx`)
+- `ARCHIVE_CSS` exported and injected via `dangerouslySetInnerHTML` in `page.tsx` (server component) — not inside the client component, to prevent double-render
+- Filter state: `useState<Category>('all')`
+- Article count shown below pills
+- **Root return must be `<div>`, not `<>` fragment**
 
 ---
 
 ## Still Needed (priority order)
 
-- [ ] **Verify Supabase is not paused** ← check before Stripe live
-- [ ] **Switch Stripe to live mode** ← next task
-- [ ] **Build `/lab/archive` page** ← ready now, 15 articles in overflow
+- [ ] **Live Stripe end-to-end test** — real card, A$9, verify webhook fires in Stripe dashboard, check Supabase user plan updated, refund immediately
+- [ ] **Upgrade Supabase to Pro** — at launch (daily backups, no pause risk, $25/month)
 - [ ] Newsletter opt-in UI (checkbox on dashboard → Brevo list 5)
 - [ ] Brevo Phase 2 email sequences (post-launch)
 - [ ] Export feature (not built for any tool)
 - [ ] PostHog saved insights (after 7 days traffic)
 - [ ] Google Postmaster Tools — register `try-solace.app`
 - [ ] Sitemap update — add Lab article URLs
+- [ ] notice-whats-good category: needs more articles (only 2 currently)
 
 ---
 
@@ -327,7 +332,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Never below 0.65 opacity for functional text
 - Never below 11px for visible text
 - Always use Claude Code for implementation
-- **Never connect Stripe live keys before end-to-end test passes** ← PASSED ✅
+- **`'use client'` components must return a `<div>` root, never `<>` fragment**
 - Specs always written via bash_tool, presented with present_files
 
 ---
@@ -339,7 +344,8 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Cloudflare bot fight mode + AI Labyrinth post-launch
 - Update Cloudflare to Business + ABN at ~A$20K MRR
 - PostHog saved insights after 7 days traffic
-- Lab archive page (ready to build now)
+- Lab archive pagination (when articles exceed ~24)
+- Next article batch — prioritise notice-whats-good category
 
 ---
 
