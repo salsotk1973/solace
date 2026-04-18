@@ -109,10 +109,9 @@ export default function PrinciplesPage() {
               display: 'grid',
               gridTemplateColumns: '64px 1fr',
               gap: 32,
-              padding: '36px 0 36px 24px',
+              padding: '36px 0 36px 20px',
               borderTop: '0.5px solid rgba(255,255,255,0.07)',
               borderLeft: `2px solid ${p.colour}`,
-              marginLeft: -24,
               alignItems: 'start',
             }}>
               {/* Number */}
