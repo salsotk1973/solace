@@ -455,6 +455,42 @@ export function FeaturedCard({
   )
 }
 
+// ─── Browse all link ──────────────────────────────────────────────────────────
+
+function BrowseAllLink() {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <Link
+      href="/lab/archive"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        fontFamily:     "'Jost', sans-serif",
+        fontWeight:     400,
+        fontSize:       '12px',
+        letterSpacing:  '0.14em',
+        textTransform:  'uppercase' as const,
+        color:          hovered ? 'rgba(200,185,255,0.90)' : 'rgba(170,158,220,0.65)',
+        textDecoration: 'none',
+        display:        'inline-flex',
+        alignItems:     'center',
+        gap:            '8px',
+        transition:     'color 0.3s ease',
+        paddingBottom:  '2px',
+        borderBottom:   `1px solid ${hovered ? 'rgba(200,185,255,0.35)' : 'transparent'}`,
+      }}
+    >
+      Browse all articles
+      <span style={{
+        fontSize:   '14px',
+        display:    'inline-block',
+        transform:  hovered ? 'translateX(4px)' : 'translateX(0)',
+        transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1)',
+      }}>→</span>
+    </Link>
+  )
+}
+
 // ─── LabFilter ─────────────────────────────────────────────────────────────────
 
 export default function LabFilter({
@@ -482,28 +518,7 @@ export default function LabFilter({
         {/* ── Browse all link ────────────────────────────────────────── */}
         {/* TODO: update href to /lab/archive once archive page is built */}
         <div className="lab-browse-all">
-          <Link
-            href="/lab/archive"
-            style={{
-              fontFamily:     "'Jost', sans-serif",
-              fontWeight:     400,
-              fontSize:       '12px',
-              letterSpacing:  '0.14em',
-              textTransform:  'uppercase' as const,
-              color:          'rgba(170,158,220,0.65)',
-              textDecoration: 'none',
-              display:        'inline-flex',
-              alignItems:     'center',
-              gap:            '8px',
-              transition:     'color 0.3s ease',
-            }}
-          >
-            Browse all articles
-            <span style={{
-              fontSize:   '14px',
-              transition: 'transform 0.3s ease',
-            }}>→</span>
-          </Link>
+          <BrowseAllLink />
         </div>
       </div>
     </div>
