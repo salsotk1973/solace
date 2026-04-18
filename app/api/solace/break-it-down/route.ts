@@ -33,6 +33,7 @@ type ResponseType =
     }
   | {
       type: "redirect";
+      isToolRedirect: true;
       lead: string;
       steps: string[];
       redirectTarget?: "choose" | "clear-your-mind" | "break-it-down";
@@ -936,6 +937,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
   if (isUnrealisticGoal(lower)) {
     return {
       type: "redirect",
+      isToolRedirect: true,
       lead:
         "If you mean this seriously, the first move is turning a huge idea into the next real step you can take here.",
       steps: [],
@@ -957,6 +959,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
   ) {
     return {
       type: "redirect",
+      isToolRedirect: true,
       lead: routing.message,
       steps: [],
       redirectTarget: routing.redirectTarget,
@@ -967,6 +970,7 @@ async function buildResponse(rawInput: string): Promise<ResponseType> {
   if (looksLikeDecision(lower)) {
     return {
       type: "redirect",
+      isToolRedirect: true,
       lead: "This sounds more like a decision than something to break into steps.",
       steps: [],
       redirectTarget: "choose",

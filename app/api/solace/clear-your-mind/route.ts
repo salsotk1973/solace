@@ -15,6 +15,7 @@ import {
   SOLACE_UNAVAILABLE_MESSAGE,
 } from "@/lib/solace/runtime";
 import { isSolaceCrisisInput, SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
+import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
 
 const CYM_RATE_LIMIT = 5;
 const CYM_RATE_WINDOW_MS = 60_000;
@@ -297,6 +298,31 @@ export async function POST(request: Request) {
         status: 200,
       });
 
+      return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
+    }
+
+    // Cross-tool routing — redirect if input clearly belongs to another tool
+    const routing = classifySolaceToolIntent({
+      currentTool: 'clear-your-mind',
+      text: thoughtTexts.join(' '),
+      thoughts: thoughtTexts,
+    });
+
+    if (
+      routing.shouldRedirect &&
+      routing.redirectTarget &&
+      routing.title &&
+      routing.message &&
+      routing.ctaLabel
+    ) {
+      const response = NextResponse.json({
+        ok: true,
+        isCrisisFallback: false,
+        isToolRedirect: true,
+        redirectTarget: routing.redirectTarget,
+        redirectTitle: routing.title,
+        text: `${routing.message}\n\n${routing.ctaLabel}`,
+      }, { status: 200 });
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 

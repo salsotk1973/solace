@@ -518,6 +518,7 @@ export async function POST(req: Request) {
     const routing = classifySolaceToolIntent({
       currentTool: "choose",
       text: input,
+      thoughts: [input],
     });
 
     if (

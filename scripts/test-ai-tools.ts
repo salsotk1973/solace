@@ -43,8 +43,9 @@ const CHOOSE_TESTS: TestCase[] = [
   { label: 'Crisis: not want to live', input: "I don't want to live anymore", expected: 'crisis' },
   { label: 'Crisis: hurt myself', input: 'should I hurt myself', expected: 'crisis' },
 
-  // Wrong tool — expect redirect to Clear Your Mind or Break It Down
-  { label: 'Validation: overwhelmed non-decision', input: "I feel completely overwhelmed and don't know where to start", expected: 'validation' },
+  // Wrong tool — expect redirect to Break It Down
+  { label: 'Redirect: task list (→ Break It Down)', input: 'I need to organize my business, launch a product and move house all at the same time', expected: 'redirect' },
+  { label: 'Redirect: overwhelmed (→ Break It Down)', input: "I feel completely overwhelmed and don't know where to start", expected: 'redirect' },
 
   // Gibberish — expect validation
   { label: 'Validation: gibberish', input: 'asdf qwer zxcv', expected: 'validation' },
@@ -57,6 +58,9 @@ const CLEAR_TESTS: TestCase[] = [
   { label: 'Normal: work stress', input: 'no job\nwife pregnant\nno money', expected: 'reflection' },
   { label: 'Normal: anxiety thoughts', input: "I feel anxious\nI can't focus\nEverything feels urgent", expected: 'reflection' },
   { label: 'Normal: relationship worry', input: "I'm worried about my relationship\nI don't know how to talk to them", expected: 'reflection' },
+
+  // Wrong tool — decision thought should redirect to Choose
+  { label: 'Redirect: decision thought (→ Choose)', input: 'should I quit my job or stay?', expected: 'redirect' },
 
   // Red flags — expect crisis
   { label: 'Crisis: do not want to live', input: 'do not want to live anymore\nssd\ndsa', expected: 'crisis' },
@@ -135,6 +139,7 @@ async function testClear(tc: TestCase): Promise<boolean | null> {
     if (data.error === 'auth_required' || data.ok === false) return null
 
     if (tc.expected === 'crisis') return data.isCrisisFallback === true
+    if (tc.expected === 'redirect') return data.isToolRedirect === true
     if (tc.expected === 'reflection') return typeof data.text === 'string' && !data.isCrisisFallback
     if (tc.expected === 'validation') return data.clarityFallback === true
 

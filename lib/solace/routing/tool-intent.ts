@@ -84,6 +84,17 @@ function looksLikeBreakItDownInput(text: string, thoughts: string[]): boolean {
     /\bwhere do i even start\b/i,
     /\bhow do i start\b/i,
     /\bhow do i even begin\b/i,
+    /\bi need to (organize|sort|plan|handle|manage|fix|deal with|get through)\b/i,
+    /\bi have to (organize|sort|plan|handle|manage|fix|deal with|get through)\b/i,
+    /\bi need to do (so much|everything|all of this|all this)\b/i,
+    /\btoo many things\b/i,
+    /\bso many things\b/i,
+    /\bso much to do\b/i,
+    /\btoo much to do\b/i,
+    /\bi don't know how to (start|begin|tackle|approach)\b/i,
+    /\bi do not know how to (start|begin|tackle|approach)\b/i,
+    /\bdon't know where to (start|begin)\b/i,
+    /\bdo not know where to (start|begin)\b/i,
   ];
 
   if (thoughtCount === 1 && singleHeavyThingPatterns.some((pattern) => pattern.test(combined))) {
@@ -96,6 +107,12 @@ function looksLikeBreakItDownInput(text: string, thoughts: string[]): boolean {
       combined,
     )
   ) {
+    return true;
+  }
+
+  // Detect task-list input: "I need to X, Y and Z"
+  const taskListPattern = /\b(i need to|i have to|i must|i should)\b.{0,200}\b(and|also|plus)\b/i;
+  if (thoughtCount === 1 && taskListPattern.test(combined) && !looksLikeDecisionLanguage(combined)) {
     return true;
   }
 
