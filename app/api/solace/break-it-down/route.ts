@@ -1118,15 +1118,17 @@ export async function POST(req: Request) {
 
     const result = await buildResponse(input);
 
-    // Log session to dashboard (fire-and-forget — never block the response)
+    // Log session to dashboard
     if (userId && result.type === 'normal') {
-      void supabaseAdmin
+      const { error: insertError } = await supabaseAdmin
         .from('tool_sessions')
         .insert({
           user_id: userId,
           tool: 'break-it-down',
           completed: true,
         })
+      if (insertError) console.error('[bid-insert-error]', insertError.message, insertError.code)
+      else console.log('[bid-insert-ok] row inserted for', userId)
     }
 
     const response = NextResponse.json(result, { status: 200 });

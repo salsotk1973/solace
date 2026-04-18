@@ -605,7 +605,7 @@ export async function POST(req: Request) {
     }
 
     if (userId) {
-      supabaseAdmin
+      await supabaseAdmin
         .from("tool_sessions")
         .insert({ user_id: userId, tool: "choose", completed: true })
         .then(({ error }) => {

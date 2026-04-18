@@ -329,15 +329,17 @@ export async function POST(request: Request) {
 
     const result = await evaluateClearYourMind(input);
 
-    // Log session to dashboard (fire-and-forget — never block the response)
+    // Log session to dashboard
     if (userId && result.ok && !result.isCrisisFallback) {
-      void supabaseAdmin
+      const { error: insertError } = await supabaseAdmin
         .from('tool_sessions')
         .insert({
           user_id: userId,
           tool: 'clear-your-mind',
           completed: true,
         })
+      if (insertError) console.error('[cym-insert-error]', insertError.message, insertError.code)
+      else console.log('[cym-insert-ok] row inserted for', userId)
     }
 
     return applyRateLimitHeaders(
