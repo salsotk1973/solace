@@ -127,7 +127,7 @@ export default function LabArchiveFilter({ articles }: { articles: LabArticle[] 
     : articles.filter(a => a.category === active)
 
   return (
-    <>
+    <div>
       {/* Filter pills */}
       <div className="archive-filter-pills">
         {CATEGORIES.map(cat => {
@@ -193,6 +193,6 @@ export default function LabArchiveFilter({ articles }: { articles: LabArticle[] 
           </p>
         )}
       </div>
-    </>
+    </div>
   )
 }

@@ -465,7 +465,7 @@ export default function LabFilter({
   articles: LabArticle[]
 }) {
   return (
-    <>
+    <div>
       <style>{RESPONSIVE_CSS}</style>
 
       <div>
@@ -506,6 +506,6 @@ export default function LabFilter({
           </Link>
         </div>
       </div>
-    </>
+    </div>
   )
 }
