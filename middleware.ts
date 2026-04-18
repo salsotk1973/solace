@@ -21,6 +21,8 @@ const isPublicRoute = createRouteMatcher([
   "/mood(.*)",
   "/gratitude(.*)",
   "/api/solace/clear-your-mind(.*)",
+  "/api/solace/choose(.*)",
+  "/api/solace/break-it-down(.*)",
   "/api/webhooks(.*)",
   "/api/stripe/(.*)",
   "/sitemap.xml",

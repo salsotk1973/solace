@@ -106,6 +106,12 @@ export const HIGH_RISK_BIGRAMS = new Set<string>([
   "give up",
   "not live",
   "stop breathing",
+  "stop living",
+  "stop existing",
+  "hurt myself",
+  "harm myself",
+  "not wake",
+  "stop waking",
   "no point",
   "worthless life",
   "better off",
@@ -125,7 +131,7 @@ export const HIGH_RISK_TRIGRAMS = new Set<string>([
 
 export function isShortHighRiskForm(input: string): boolean {
   const tokens = tokenizeSafetyText(input);
-  if (tokens.length === 0 || tokens.length > 4) return false;
+  if (tokens.length === 0 || tokens.length > 8) return false;
 
   if (tokens.some((token) => HIGH_RISK_SINGLE_TOKENS.has(token))) {
     return true;
@@ -168,6 +174,12 @@ export const RED_FLAG_GROUPS: RedFlagPatternGroup[] = [
       /\bshould i kill myself\b/i,
       /\bsuicide\b/i,
       /\bkys\b/i,
+      /\bshould i hurt myself\b/i,
+      /\bshould i harm myself\b/i,
+      /\bi want to hurt myself\b/i,
+      /\bi want to harm myself\b/i,
+      /\bshould i cut myself\b/i,
+      /\bi want to cut myself\b/i,
     ],
   },
   {
@@ -197,6 +209,16 @@ export const RED_FLAG_GROUPS: RedFlagPatternGroup[] = [
       /\bi don't feel like living\b/i,
       /\bi dont feel like living\b/i,
       /\bi do not feel like living\b/i,
+      /\bshould i stop breathing\b/i,
+      /\bshould i stop breathing or not\b/i,
+      /\bi want to stop breathing\b/i,
+      /\bi want to stop existing\b/i,
+      /\bshould i just stop breathing\b/i,
+      /\bshould i stop living\b/i,
+      /\bshould i just stop living\b/i,
+      /\bi want to stop living\b/i,
+      /\bshould i stop waking up\b/i,
+      /\bshould i not wake up\b/i,
     ],
   },
   {
