@@ -458,6 +458,7 @@ export async function POST(req: Request) {
     }
 
     const { userId } = await auth();
+    console.log('[choose-debug] userId:', userId);
 
     if (userId) {
       const paid = await isPaidUser();
