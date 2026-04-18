@@ -331,15 +331,13 @@ export async function POST(request: Request) {
 
     // Log session to dashboard
     if (userId && result.ok && !result.isCrisisFallback) {
-      const { error: insertError } = await supabaseAdmin
+      await supabaseAdmin
         .from('tool_sessions')
         .insert({
           user_id: userId,
           tool: 'clear-your-mind',
           completed: true,
         })
-      if (insertError) console.error('[cym-insert-error]', insertError.message, insertError.code)
-      else console.log('[cym-insert-ok] row inserted for', userId)
     }
 
     return applyRateLimitHeaders(

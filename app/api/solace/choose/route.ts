@@ -459,12 +459,9 @@ export async function POST(req: Request) {
 
     const { userId } = await auth();
     const paid = await isPaidUser();
-    console.log('[choose-debug] userId:', userId, 'isPaid:', paid);
 
     if (userId) {
       if (paid) {
-        console.log('[choose-paid] user is paid, skipping daily limit check');
-      }
 
       if (!paid) {
         const today = new Date();
@@ -604,15 +601,10 @@ export async function POST(req: Request) {
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
-    console.log('[choose-pre-insert] userId at insert point:', userId)
     if (userId) {
       await supabaseAdmin
         .from("tool_sessions")
         .insert({ user_id: userId, tool: "choose", completed: true })
-        .then(({ error }) => {
-          if (error) console.error('[choose-insert-error]', error.message, error.code)
-          else console.log('[choose-insert-ok] row inserted for', userId)
-        })
     }
 
     const response = NextResponse.json({
