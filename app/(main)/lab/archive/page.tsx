@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllArticles } from '@/lib/lab'
-import LabArchiveFilter from '@/components/lab/LabArchiveFilter'
+import LabArchiveFilter, { ARCHIVE_CSS } from '@/components/lab/LabArchiveFilter'
 import PageShell from '@/components/PageShell'
 import BgFlat from '@/components/backgrounds/BgFlat'
 import { TEXT_COLOURS, FONT_SIZE, CATEGORY_COLOURS } from '@/lib/design-tokens'
@@ -17,6 +17,7 @@ export default function LabArchivePage() {
   return (
     <PageShell particles={false}>
       <BgFlat>
+        <style dangerouslySetInnerHTML={{ __html: ARCHIVE_CSS }} />
         {/* Hero */}
         <section style={{
           width:         '100%',

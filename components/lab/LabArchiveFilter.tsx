@@ -24,7 +24,7 @@ const CATEGORY_ACCENT: Record<string, string> = {
   'notice-whats-good': labAccent('notice-whats-good'),
 }
 
-const ARCHIVE_CSS = `
+export const ARCHIVE_CSS = `
   .archive-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -128,8 +128,6 @@ export default function LabArchiveFilter({ articles }: { articles: LabArticle[] 
 
   return (
     <>
-      <style>{ARCHIVE_CSS}</style>
-
       {/* Filter pills */}
       <div className="archive-filter-pills">
         {CATEGORIES.map(cat => {
