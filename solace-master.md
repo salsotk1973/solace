@@ -1,7 +1,6 @@
 # Solace Master Reference
 
 ## Product Definition
-
 **Solace** is a wellness SaaS focused on **decision clarity and mental uncluttering** for people overwhelmed by life — career crossroads, relationship strain, feeling lost. NOT a meditation app. NOT a journal. A thinking partner.
 
 **Positioning (locked):** "Clarity and decisions for people overwhelmed by life"
@@ -16,7 +15,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Tech Stack
-
 - **Frontend:** Next.js 15, TypeScript, Tailwind CSS
 - **Auth:** Clerk
 - **Database:** Supabase (with RLS enabled)
@@ -32,7 +30,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Domain & Infrastructure
-
 - **Production domain:** `try-solace.app` (Cloudflare Registrar)
 - **Canonical URL:** `https://www.try-solace.app`
 - **Vercel project:** `solace` — auto-deploys on push to `main`
@@ -86,7 +83,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Pricing (Locked)
-
 - **Free tier:**
   - All 6 client tools — unlimited sessions
   - Choose (AI) — 1 session/day free
@@ -101,7 +97,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Category System (Locked — Single Source of Truth)
-
 All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/design-tokens.ts`
 
 | Category | Colour | Hex | Tools |
@@ -113,7 +108,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## The 6 Client-Side Tools
-
 1. **Breathing** — Calm (teal)
 2. **Sleep Wind-Down** — Calm (teal)
 3. **Focus Timer** — Clarity (gold)
@@ -122,7 +116,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 6. **Gratitude Log** — Clarity (gold)
 
 ## The 3 AI Tools
-
 - **Choose** — Decide (violet) — 1 session/day free, unlimited paid
 - **Clear Your Mind** — Clarity (gold) — paid only
 - **Break It Down** — Decide (violet) — paid only
@@ -130,9 +123,8 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## Privacy & Data (Locked)
-
 - **Choose route:** `session_data` field removed from `tool_sessions` insert ✅ — only `user_id`, `tool`, `completed` stored. No user input retained.
-- **Clear Your Mind + Break It Down:** No Supabase writes at all — confirmed clean ✅
+- **Clear Your Mind + Break It Down:** No user input stored — only `user_id`, `tool`, `completed` in `tool_sessions` ✅
 - **FAQ claim "Nothing is stored after your session"** — accurate as of Apr 2026 ✅
 - **"Private by design"** positioning is technically accurate and legally defensible
 
@@ -182,7 +174,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## Design Token File (`lib/design-tokens.ts`)
-
 - `CATEGORY_COLOURS` — 3 categories with hex, rgb, tool slugs
 - `TOOL_CATEGORY` — all 9 tool slugs → category
 - `getToolColour/Rgb/Category` helpers
@@ -194,7 +185,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ## Tool Build Status
 
 ### Free/Paid Gating — ALL 9 TOOLS DONE ✅
-
 | Tool | History API | 7-day cutoff | Upgrade prompt | SessionComplete upsell |
 |---|---|---|---|---|
 | Breathing | ✅ | ✅ | ✅ | ✅ |
@@ -207,25 +197,71 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 | Clear Your Mind (AI) | — | — | ✅ paid gate | ✅ |
 | Break It Down (AI) | — | — | ✅ paid gate | ✅ |
 
+### AI Tools — Safety & Routing (ALL FIXED ✅ — Apr 19 2026)
+
+**Safety (red flag detection):**
+- `lib/solace/safety/red-flags.ts` — extended patterns committed `ae91e0b`
+- Added 10 patterns to `desire-to-die-or-not-live`: "should I stop breathing", "should I stop living", "I want to stop existing", etc.
+- Added 6 patterns to `direct-self-harm-intent`: "should I hurt myself", "I want to cut myself", etc.
+- `isShortHighRiskForm` token limit raised 4→8 words
+- Added bigrams: "stop living", "stop existing", "hurt myself", "harm myself", "not wake up", "stop waking"
+- **Test suite:** `scripts/test-ai-tools.ts` — run with `npx tsx scripts/test-ai-tools.ts` or `TEST_BASE_URL=https://www.try-solace.app npx tsx scripts/test-ai-tools.ts`
+- 15/15 Choose tests passing on production ✅
+
+**Cross-tool routing (fixed `bd9c19f`):**
+- Break It Down: `isToolRedirect: true` now present in all redirect responses
+- Choose: task-list detection added to `looksLikeBreakItDownInput` — 11 new patterns + task-list `and/also/plus` pattern
+- Clear Your Mind: `classifySolaceToolIntent` added before `evaluateClearYourMind` call
+- Root cause: `thoughts: [input]` was never passed to `classifySolaceToolIntent` in Choose — `thoughtCount` was always 0, silently disabling all routing guards
+
+**Verified on production:**
+- Break It Down ← decision → redirects to Choose ✅
+- Choose ← task list → redirects to Break It Down ✅
+- Crisis detection all inputs ✅
+
+### Dashboard AI Session Logging (FIXED ✅ — Apr 19 2026)
+
+**Root causes (3 compounding bugs):**
+1. AI routes listed as public in `middleware.ts` → Clerk returned `userId: null` → `if (userId)` guard silently failed. Fixed: removed `/api/solace/choose`, `/api/solace/clear-your-mind`, `/api/solace/break-it-down` from `isPublicRoute` (`00abfbc`)
+2. `isPaidUser()` called twice in Choose route → second call returned inconsistent result → daily limit gate blocked insert. Fixed: single `isPaidUser()` call, result stored in `paid` variable (`6c913ba`)
+3. `void` promises dropped by Vercel on function exit → inserts never completed. Fixed: changed all 3 route inserts from `void` to `await` (`9945e82`)
+
+**Insert guards (correct):**
+- Choose: `if (userId)` after AI response + `paid` check passes — `await` insert
+- Clear Your Mind: `userId && result.ok && !result.isCrisisFallback` — `await` insert
+- Break It Down: `userId && result.type === 'normal'` — `await` insert (skips redirect, gibberish, crisis)
+
+**Verified:** 5 `choose` sessions in `tool_sessions` table ✅
+
 ### Stripe ✅ LIVE MODE ACTIVE
 - Full checkout + webhook + portal flow working ✅
-- End-to-end sandbox test PASSED ✅
+- End-to-end test PASSED ✅ (A$9 real payment → Stripe 200 → Supabase user.plan=paid → refunded)
 - **Live mode active** — `pk_live_` + `sk_live_` in Vercel ✅
 - **Live webhook:** "Solace Live Webhook" — Active, 0% error rate ✅
 - **6 webhook events:** `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.deleted`, `customer.subscription.updated`, `invoice.payment_failed`, `invoice.payment_succeeded` ✅
 - Webhook endpoint: `https://www.try-solace.app/api/webhooks/stripe`
-- **Pending:** live end-to-end test with real card (A$9, verify webhook fires, refund)
+- Stripe branding: brand colour `#090d14`, accent `#7C6FCD`, logo + icon uploaded
+- Stripe support email: `hello@try-solace.app`
 
 ### Supabase ✅
 - Status: **Healthy** — not paused
 - Region: Oceania (Sydney) — ap-southeast-2
 - Plan: NANO (Free) — upgrade to Pro at launch for daily backups + no pause risk
-- Advisor: no security or performance errors
+- FK constraint on `tool_sessions.user_id` → `users.clerk_user_id` (enforced even with admin client)
+- 3 users in DB: `tt4962984@gmail.com` (free), `salsotk1973@gmail.com` (paid), `salsotk1973+test1@gmail.com` (paid)
 
 ### Dashboard ✅
 - All 9 tool cards with canonical colours from `design-tokens.ts`
 - All text using `TEXT_COLOURS` + `FONT_SIZE`
 - Unauthenticated redirect to `/sign-in?redirect_url=/dashboard` ✅
+- Recent sessions: shows all 9 tools including AI tools (Choose, Clear Your Mind, Break It Down) ✅
+
+### PostHog ✅
+- Firing on all routes ✅
+- Project: `us.posthog.com/project/382430`
+- "Filter out internal and test users" — both toggles ON ✅
+- Internal/Test users cohort exists — email filter pending (needs user to sign in first to capture email property)
+- 2 organic Google visitors from Melbourne confirmed Apr 18
 
 ### Clerk Webhook ✅
 - `user.created` → Supabase upsert + Brevo contact + welcome email
@@ -233,19 +269,13 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 
 ### SEO ✅
 - Sitemap at `/sitemap.xml` — all 9 tool pages + core pages
-- Google Search Console verified ✅
+- Google Search Console verified ✅ — 17 pages submitted Apr 15
 - All pages have title + description metadata
 - **Note:** Lab article URLs not yet in sitemap — add post-launch
-
-### Analytics ✅
-- PostHog firing on all routes ✅
-- `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` in Vercel ✅
-- PostHog project: `us.posthog.com/project/382430`
 
 ---
 
 ## Pages Status
-
 | Page | Status |
 |---|---|
 | Home | ✅ |
@@ -257,7 +287,7 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 | Principles | ✅ 6 principles, coloured border mobile fix (no negative marginLeft) |
 | Privacy | ✅ `privacy@try-solace.app` |
 | Terms | ✅ `legal@try-solace.app`, payments/refunds correct |
-| Dashboard | ✅ All 9 tools, design-tokens |
+| Dashboard | ✅ All 9 tools, design-tokens, AI sessions logging ✅ |
 
 ---
 
@@ -270,7 +300,6 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - **Sorting:** `publishedAt` desc — 6 most recent always shown
 
 ### Article Count: 15 total
-
 | Slug | Category | Published |
 |---|---|---|
 | `why-you-cant-stop-overthinking` | think-clearly | Mar 28 (featured ✅) |
@@ -310,21 +339,24 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 ---
 
 ## Still Needed (priority order)
-
+- [ ] **Thought Reframer** — too scripted, response feels mechanical — redesign response logic
+- [ ] **Sleep Wind-Down** — background glow fix (doesn't match Breathing layout)
+- [ ] **Global tool polish** — canonical colours, text readability, mobile no-scroll layout for ALL tools
 - [ ] **Live Stripe end-to-end test** — real card, A$9, verify webhook fires in Stripe dashboard, check Supabase user plan updated, refund immediately
 - [ ] **Upgrade Supabase to Pro** — at launch (daily backups, no pause risk, $25/month)
 - [ ] Newsletter opt-in UI (checkbox on dashboard → Brevo list 5)
 - [ ] Brevo Phase 2 email sequences (post-launch)
 - [ ] Export feature (not built for any tool)
 - [ ] PostHog saved insights (after 7 days traffic)
+- [ ] PostHog internal user filter — add email after sign-in captures it
 - [ ] Google Postmaster Tools — register `try-solace.app`
 - [ ] Sitemap update — add Lab article URLs
 - [ ] notice-whats-good category: needs more articles (only 2 currently)
+- [ ] Reddit account creation + first post (r/Anxiety, r/Meditation, r/productivity, r/mentalhealth)
 
 ---
 
 ## Key Rules (Never Break)
-
 - **Read solace-master before any work — non-negotiable**
 - SiteHeader.tsx and SiteFooter.tsx locked
 - Background always `#090d14`
@@ -334,11 +366,12 @@ All 9 tools belong to one of 3 categories. Colour = category. Defined in: `lib/d
 - Always use Claude Code for implementation
 - **`'use client'` components must return a `<div>` root, never `<>` fragment**
 - Specs always written via bash_tool, presented with present_files
+- **Always `await` Supabase inserts in Vercel serverless functions — `void` promises are dropped on function exit**
+- **AI tool routes must NOT be in `isPublicRoute` in middleware.ts** — Clerk won't inject userId for public routes
 
 ---
 
 ## Post-Launch Tasks
-
 - Brevo Phase 2 email sequences
 - Solace Weekly Intelligence Report (~day 30)
 - Cloudflare bot fight mode + AI Labyrinth post-launch
