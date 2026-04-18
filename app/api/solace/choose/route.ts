@@ -604,6 +604,7 @@ export async function POST(req: Request) {
       return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);
     }
 
+    console.log('[choose-pre-insert] userId at insert point:', userId)
     if (userId) {
       await supabaseAdmin
         .from("tool_sessions")
