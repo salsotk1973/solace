@@ -458,11 +458,10 @@ export async function POST(req: Request) {
     }
 
     const { userId } = await auth();
-    console.log('[choose-debug] userId:', userId, 'isPaid:', await isPaidUser());
+    const paid = await isPaidUser();
+    console.log('[choose-debug] userId:', userId, 'isPaid:', paid);
 
     if (userId) {
-      const paid = await isPaidUser();
-
       if (paid) {
         console.log('[choose-paid] user is paid, skipping daily limit check');
       }
