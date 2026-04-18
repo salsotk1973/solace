@@ -10,6 +10,7 @@ import {
   classifySharedSolaceThoughts,
 } from "@/lib/solace/safety/shared";
 import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import { buildContextLead } from "@/lib/solace/break-it-down/context";
 import { getOpenAIClient } from "@/lib/server/openai";
 import {
@@ -1116,6 +1117,18 @@ export async function POST(req: Request) {
     }
 
     const result = await buildResponse(input);
+
+    // Log session to dashboard (fire-and-forget — never block the response)
+    if (userId && result.type === 'normal') {
+      void supabaseAdmin
+        .from('tool_sessions')
+        .insert({
+          user_id: userId,
+          tool: 'break-it-down',
+          completed: true,
+        })
+    }
+
     const response = NextResponse.json(result, { status: 200 });
 
     return applyRateLimitHeaders(response, rateLimit.remaining, rateLimit.resetAt);

@@ -16,6 +16,7 @@ import {
 } from "@/lib/solace/runtime";
 import { isSolaceCrisisInput, SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 import { classifySolaceToolIntent } from "@/lib/solace/routing/tool-intent";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 const CYM_RATE_LIMIT = 5;
 const CYM_RATE_WINDOW_MS = 60_000;
@@ -327,6 +328,17 @@ export async function POST(request: Request) {
     }
 
     const result = await evaluateClearYourMind(input);
+
+    // Log session to dashboard (fire-and-forget — never block the response)
+    if (userId && result.ok && !result.isCrisisFallback) {
+      void supabaseAdmin
+        .from('tool_sessions')
+        .insert({
+          user_id: userId,
+          tool: 'clear-your-mind',
+          completed: true,
+        })
+    }
 
     return applyRateLimitHeaders(
       NextResponse.json(result, { status: 200 }),
