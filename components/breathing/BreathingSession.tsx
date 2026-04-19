@@ -169,7 +169,7 @@ export default function BreathingSession({ userId }: Props) {
       {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
       {/* Mobile: flex-col → orb on top, button below (DOM order)               */}
       {/* Desktop: button has md:order-first → floats above orb visually        */}
-      <div className="flex flex-col items-center gap-2 mb-2 md:gap-8 md:mb-16">
+      <div className="flex flex-col items-center gap-2 mb-2 mt-2 md:mt-0 md:gap-8 md:mb-16">
 
         {/* Orb — always centred */}
         <div className="flex justify-center w-full">
@@ -187,7 +187,7 @@ export default function BreathingSession({ userId }: Props) {
           {!isRunning ? (
             <button
               onClick={handleStart}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(120,215,232,0.65)] border border-[rgba(80,200,218,0.25)] px-6 py-1.5 rounded-full md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3 md:rounded-[2px] md:border-[rgba(80,200,218,0.22)] hover:text-[rgba(160,235,248,0.9)] hover:border-[rgba(80,200,218,0.45)] transition-all duration-300"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase text-[rgba(10,30,36,0.95)] bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.9)] px-8 py-2 rounded-full hover:bg-[rgba(60,192,212,1)] transition-all duration-300 md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3 md:rounded-[2px] md:bg-transparent md:text-[rgba(120,215,232,0.65)] md:border-[rgba(80,200,218,0.22)] md:hover:text-[rgba(160,235,248,0.9)] md:hover:bg-transparent md:hover:border-[rgba(80,200,218,0.45)]"
             >
               {sessionComplete ? "Begin again" : "Begin"}
             </button>
@@ -226,11 +226,11 @@ export default function BreathingSession({ userId }: Props) {
 
       {userId && history && (
         <section className="max-w-[520px] mx-auto mb-20">
-          <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase text-[rgba(130,155,168,0.32)] mb-4 text-center">
+          <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.24em] uppercase text-[rgba(130,155,168,0.32)] mb-3 md:mb-4 text-center">
             {historyLabel}
           </p>
-          <div className="rounded-[14px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.025)] px-5 py-4">
-            <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
+          <div className="rounded-[14px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.025)] px-3 py-3 md:px-5 md:py-4">
+            <p className="[font-family:var(--font-jost)] text-[11px] md:text-[13px] font-light text-[rgba(255,255,255,0.75)] leading-relaxed text-center">
               {!history.isPaid
                 ? "Free users keep 7 days of breathing history. Your older sessions are still there."
                 : history.sessions.length > 0
@@ -254,7 +254,7 @@ export default function BreathingSession({ userId }: Props) {
                 <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] text-center mb-1.5">
                   Current streak
                 </p>
-                <p className="[font-family:var(--font-display)] font-light text-[24px] text-[rgba(180,230,240,0.78)] text-center leading-none">
+                <p className="[font-family:var(--font-display)] font-light text-[18px] md:text-[24px] text-[rgba(180,230,240,0.78)] text-center leading-none">
                   {history.currentStreakDays} day{history.currentStreakDays === 1 ? "" : "s"}
                 </p>
                 <p className="[font-family:var(--font-jost)] text-[12px] font-light text-[rgba(120,180,200,0.52)] leading-relaxed text-center mt-3">
@@ -266,23 +266,23 @@ export default function BreathingSession({ userId }: Props) {
             )}
             {history.isPaid && history.insights && (
               <div className="mt-5 rounded-[12px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.025)] px-4 py-4">
-                <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] text-center mb-4">
+                <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] text-center mb-3 md:mb-4">
                   Your breathing patterns over time
                 </p>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-3 py-3 text-center">
-                    <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1.5">
+                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-2 py-2 md:px-3 md:py-3 text-center">
+                    <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1">
                       Most used pace
                     </p>
-                    <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
+                    <p className="[font-family:var(--font-display)] font-light text-[15px] md:text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
                       {formatPace(history.insights.mostUsedPace)}
                     </p>
                   </div>
-                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-3 py-3 text-center">
-                    <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1.5">
+                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-2 py-2 md:px-3 md:py-3 text-center">
+                    <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1">
                       This week vs last
                     </p>
-                    <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
+                    <p className="[font-family:var(--font-display)] font-light text-[15px] md:text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
                       {history.insights.sessionsThisWeek} /{" "}
                       {history.insights.sessionsLastWeek}
                     </p>
@@ -292,11 +292,11 @@ export default function BreathingSession({ userId }: Props) {
                       )}
                     </p>
                   </div>
-                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-3 py-3 text-center">
-                    <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1.5">
+                  <div className="rounded-[10px] border border-[rgba(80,200,218,0.06)] bg-[rgba(6,18,24,0.18)] px-2 py-2 md:px-3 md:py-3 text-center">
+                    <p className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] tracking-[0.18em] uppercase text-[rgba(130,190,205,0.42)] mb-1">
                       Your best streak
                     </p>
-                    <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
+                    <p className="[font-family:var(--font-display)] font-light text-[15px] md:text-[18px] text-[rgba(180,230,240,0.78)] leading-snug">
                       {history.insights.bestStreakDays} day
                       {history.insights.bestStreakDays === 1 ? "" : "s"}
                     </p>
