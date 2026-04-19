@@ -169,7 +169,7 @@ export default function BreathingSession({ userId }: Props) {
       {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
       {/* Mobile: flex-col → orb on top, button below (DOM order)               */}
       {/* Desktop: button has md:order-first → floats above orb visually        */}
-      <div className="flex flex-col items-center gap-3 mb-3 md:gap-8 md:mb-16">
+      <div className="flex flex-col items-center gap-2 mb-2 md:gap-8 md:mb-16">
 
         {/* Orb — always centred */}
         <div className="flex justify-center w-full">
@@ -204,7 +204,7 @@ export default function BreathingSession({ userId }: Props) {
       </div>
 
       {/* ── Info cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-1.5 md:gap-3 max-w-[520px] mx-auto mb-4 md:mb-20">
+      <div className="grid grid-cols-3 gap-1 md:gap-3 max-w-[520px] mx-auto mb-4 md:mb-20">
         {[
           { label: "Duration", value: info.duration },
           { label: "Pattern",  value: info.pattern  },
@@ -212,7 +212,7 @@ export default function BreathingSession({ userId }: Props) {
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-0.5 md:gap-1.5 p-2 md:px-4 md:py-4 rounded-[10px] md:rounded-[12px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.03)]"
+            className="flex flex-col items-center gap-0.5 md:gap-1.5 p-1.5 md:px-4 md:py-4 rounded-[10px] md:rounded-[12px] border border-[rgba(80,200,218,0.08)] bg-[rgba(80,200,218,0.03)]"
           >
             <p className="[font-family:var(--font-jost)] text-[9px] md:text-[12px] tracking-[0.18em] uppercase text-[rgba(100,190,210,0.38)]">
               {label}
