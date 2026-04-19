@@ -41,9 +41,9 @@ const SESSION_C  = 2 * Math.PI * SESSION_R; // ~741.4
 type ActivePhase = PhaseType | "idle";
 
 const GLOW_MIN_SCALE   = 1.05;
-const GLOW_MAX_SCALE   = 1.35;
-const GLOW_MIN_OPACITY = 0.45;
-const GLOW_MAX_OPACITY = 0.75;
+const GLOW_MAX_SCALE   = 1.30;
+const GLOW_MIN_OPACITY = 0.28;
+const GLOW_MAX_OPACITY = 0.55;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -215,7 +215,7 @@ export default function BreathingOrb({
   // ── JSX ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-5 md:gap-8">
 
       {/* ── Orb stage ──────────────────────────────────────────────────── */}
       <div className="relative" style={{ width: size, height: size, overflow: "visible" }}>
@@ -229,7 +229,7 @@ export default function BreathingOrb({
             height:         `${innerPx}px`,
             left:           `${offsetPx}px`,
             top:            `${offsetPx}px`,
-            background:     "rgba(45, 212, 191, 0.85)",
+            background:     "rgba(45, 212, 191, 0.65)",
             filter:         "blur(32px)",
             opacity:        glowOpacity,
             transform:      `scale(${glowScale})`,
