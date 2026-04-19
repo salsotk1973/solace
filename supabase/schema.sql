@@ -16,7 +16,7 @@ CREATE TABLE public.users (
 CREATE TABLE public.tool_sessions (
   id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id      text REFERENCES public.users(clerk_user_id),
-  tool         text NOT NULL CHECK (tool IN ('clear-your-mind', 'choose', 'break-it-down', 'breathing', 'focus-timer', 'reframe', 'mood', 'gratitude', 'sleep')),
+  tool         text NOT NULL CHECK (tool IN ('clear-your-mind', 'choose', 'break-it-down', 'breathing', 'focus-timer', 'mood', 'gratitude', 'sleep')),
   session_data jsonb DEFAULT '{}',
   completed    boolean DEFAULT false,
   created_at   timestamptz DEFAULT now()
