@@ -138,15 +138,10 @@ export default function BreathingSession({ userId }: Props) {
       {/* ══════════════════════════════════════════════════════
           TOOL ZONE — interactive area
           Mobile: subtle teal surface container
-          Desktop: transparent (md: overrides inline style)
+          Desktop: transparent (md: Tailwind overrides)
           ══════════════════════════════════════════════════════ */}
-      <div
-        className="rounded-[24px] mb-6 md:mb-0 px-4 py-5 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-0"
-        style={{
-          background: T(0.03),
-          border: `1px solid ${T(0.08)}`,
-        }}
-      >
+      <div className="bg-[rgba(60,192,212,0.03)] border border-[rgba(60,192,212,0.08)] rounded-[24px] mb-6 px-4 py-5 md:mb-0 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-transparent">
+
         {/* ── Pattern selector ──────────────────────────────── */}
         <PatternSelector
           selected={pattern}
@@ -167,35 +162,28 @@ export default function BreathingSession({ userId }: Props) {
             />
           </div>
 
-          {/* Begin / Stop — below orb mobile, above on desktop */}
+          {/* Begin / Stop — below orb on mobile, above on desktop */}
           <div className="flex justify-center md:order-first">
             {!isRunning ? (
               <button
                 onClick={handleStart}
-                className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
+                className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)]
+                           [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
                            px-8 py-3 rounded-full transition-all duration-300
-                           md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3 md:rounded-[2px]
-                           md:bg-transparent md:border-[rgba(80,200,218,0.22)]
-                           md:hover:text-[rgba(160,235,248,0.9)] md:hover:bg-transparent md:hover:border-[rgba(80,200,218,0.45)]"
-                style={{
-                  color:      "rgba(10,30,36,0.95)",
-                  background: T(0.85),
-                  border:     `1px solid ${T(0.90)}`,
-                }}
+                           md:bg-transparent md:border-[rgba(80,200,218,0.22)] md:text-[rgba(140,220,235,0.85)]
+                           md:hover:text-[rgba(160,235,248,0.9)] md:hover:bg-transparent md:hover:border-[rgba(80,200,218,0.45)]
+                           md:rounded-[2px] md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3"
               >
                 {sessionComplete ? "Begin again" : "Begin"}
               </button>
             ) : (
               <button
                 onClick={handleStop}
-                className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
+                className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)]
+                           [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
                            px-8 py-3 rounded-full transition-all duration-300
-                           md:text-[11px] md:px-6 md:py-3 md:rounded-none md:bg-transparent md:border-none"
-                style={{
-                  color:      "rgba(10,30,36,0.95)",
-                  background: T(0.85),
-                  border:     `1px solid ${T(0.90)}`,
-                }}
+                           md:bg-transparent md:border-none md:text-[rgba(140,220,235,0.85)]
+                           md:rounded-none md:px-6 md:py-3"
               >
                 Stop
               </button>
@@ -204,24 +192,24 @@ export default function BreathingSession({ userId }: Props) {
         </div>
 
         {/* ── Info cards — Duration + Best For ──────────────── */}
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3 max-w-[400px] md:max-w-[520px] mx-auto mb-2 md:mb-20">
+        <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto mb-2 md:grid-cols-3 md:gap-3 md:max-w-[520px] md:mb-20">
           {[
             { label: "Duration", value: info.duration },
             { label: "Best for", value: info.bestFor  },
           ].map(({ label, value }) => (
             <div
               key={label}
-              className="flex flex-col items-center gap-1 md:gap-1.5 p-2.5 md:px-4 md:py-4 rounded-[12px]"
+              className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
               style={{ border: `1px solid ${T(0.15)}`, background: T(0.04) }}
             >
               <p
-                className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[0.18em] uppercase"
+                className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]"
                 style={{ color: T(0.65) }}
               >
                 {label}
               </p>
               <p
-                className="[font-family:var(--font-display)] font-light text-[14px] md:text-[15px] text-center leading-snug"
+                className="[font-family:var(--font-display)] font-light text-[13px] text-center leading-snug md:text-[15px]"
                 style={{ color: T(0.92) }}
               >
                 {value}
@@ -241,21 +229,31 @@ export default function BreathingSession({ userId }: Props) {
 
           {/* Mobile toggle */}
           <button
-            className="w-full flex items-center justify-between mb-3 md:hidden cursor-pointer"
+            className="w-full flex items-center justify-between md:hidden cursor-pointer rounded-[14px] px-4 py-3"
+            style={{
+              background:                 T(0.05),
+              border:                     `1px solid ${T(0.14)}`,
+              borderBottomLeftRadius:     historyOpen ? 0 : undefined,
+              borderBottomRightRadius:    historyOpen ? 0 : undefined,
+              marginBottom:               historyOpen ? 0 : undefined,
+            }}
             onClick={() => setHistoryOpen(o => !o)}
             aria-expanded={historyOpen}
           >
             <p
               className="[font-family:var(--font-jost)] text-[11px] tracking-[0.24em] uppercase"
-              style={{ color: T(0.65) }}
+              style={{ color: T(0.70) }}
             >
               {historyLabel}
             </p>
             <span
-              className="[font-family:var(--font-jost)] text-[18px] transition-transform duration-300"
+              className="w-6 h-6 flex items-center justify-center rounded-full text-[16px] transition-transform duration-300"
               style={{
-                color:     T(0.65),
-                transform: historyOpen ? "rotate(45deg)" : "rotate(0deg)",
+                color:      T(0.80),
+                background: T(0.10),
+                border:     `1px solid ${T(0.25)}`,
+                transform:  historyOpen ? "rotate(45deg)" : "rotate(0deg)",
+                lineHeight: 1,
               }}
               aria-hidden="true"
             >
@@ -272,10 +270,15 @@ export default function BreathingSession({ userId }: Props) {
           </p>
 
           {/* History content */}
-          <div className={`${historyOpen ? "block" : "hidden"} md:block`}>
+          <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
             <div
-              className="rounded-[14px] px-3 py-3 md:px-5 md:py-4"
-              style={{ border: `1px solid ${T(0.12)}`, background: T(0.03) }}
+              className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
+              style={{
+                border:                     `1px solid ${T(0.12)}`,
+                background:                 T(0.03),
+                borderTop:                  historyOpen ? "none" : undefined,
+                borderRadius:               historyOpen ? "0 0 14px 14px" : undefined,
+              }}
             >
               <p
                 className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center"
