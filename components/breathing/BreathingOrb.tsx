@@ -247,7 +247,7 @@ export default function BreathingOrb({
             top:            `${offsetPx}px`,
             left:           `${offsetPx}px`,
             animation:      "none",
-            filter:         displayPhase === "exhale" ? "blur(0px)" : "none",
+            filter:         "blur(0px)",
             transform:      `scale(${orbScale})`,
             transition:     orbTransition,
           }}
