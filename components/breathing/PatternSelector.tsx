@@ -36,7 +36,7 @@ function LockIcon() {
 
 export default function PatternSelector({ selected, onChange, disabled }: PatternSelectorProps) {
   return (
-    <div className="grid grid-cols-2 gap-1.5 w-full max-w-[260px] mx-auto mb-3 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
+    <div className="grid grid-cols-2 gap-1.5 w-full max-w-[260px] mx-auto mb-1 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
 
       {/* ── Free patterns: always bright, selected gets glowing border ── */}
       {FREE_PATTERNS.map((p) => {
@@ -46,7 +46,7 @@ export default function PatternSelector({ selected, onChange, disabled }: Patter
             key={p.id}
             onClick={() => !disabled && onChange(p.id)}
             disabled={disabled}
-            className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-300 disabled:cursor-not-allowed"
+            className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-300 cursor-pointer disabled:cursor-not-allowed"
             style={{
               background: active ? "rgba(60,192,212,0.22)" : "rgba(60,192,212,0.10)",
               border: active

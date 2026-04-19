@@ -169,7 +169,7 @@ export default function BreathingSession({ userId }: Props) {
       {/* ── Orb + Begin/Stop ─────────────────────────────────────────────── */}
       {/* Mobile: flex-col → orb on top, button below (DOM order)               */}
       {/* Desktop: button has md:order-first → floats above orb visually        */}
-      <div className="flex flex-col items-center gap-3 my-4 md:my-0 md:gap-8 md:mb-16">
+      <div className="flex flex-col items-center gap-3 mt-6 mb-3 md:mt-0 md:mb-16 md:gap-8">
 
         {/* Orb — always centred */}
         <div className="flex justify-center w-full">
