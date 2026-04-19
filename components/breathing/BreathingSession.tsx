@@ -140,7 +140,7 @@ export default function BreathingSession({ userId }: Props) {
           Mobile: subtle teal surface container
           Desktop: transparent (md: Tailwind overrides)
           ══════════════════════════════════════════════════════ */}
-      <div className="bg-[rgba(60,192,212,0.03)] border border-[rgba(60,192,212,0.08)] rounded-[24px] mb-6 px-4 py-5 md:mb-0 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-transparent">
+      <div className="bg-[rgba(60,192,212,0.03)] border border-[rgba(60,192,212,0.08)] rounded-[24px] mb-6 px-4 py-5 md:mb-0 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-transparent md:w-full">
 
         {/* ── Pattern selector ──────────────────────────────── */}
         <PatternSelector
@@ -170,9 +170,7 @@ export default function BreathingSession({ userId }: Props) {
                 className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)]
                            [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
                            px-8 py-3 rounded-full transition-all duration-300
-                           md:bg-transparent md:border-[rgba(80,200,218,0.22)] md:text-[rgba(140,220,235,0.85)]
-                           md:hover:text-[rgba(160,235,248,0.9)] md:hover:bg-transparent md:hover:border-[rgba(80,200,218,0.45)]
-                           md:rounded-[2px] md:text-[11px] md:tracking-[0.18em] md:px-8 md:py-3"
+                           hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
               >
                 {sessionComplete ? "Begin again" : "Begin"}
               </button>
@@ -182,8 +180,7 @@ export default function BreathingSession({ userId }: Props) {
                 className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)]
                            [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer
                            px-8 py-3 rounded-full transition-all duration-300
-                           md:bg-transparent md:border-none md:text-[rgba(140,220,235,0.85)]
-                           md:rounded-none md:px-6 md:py-3"
+                           hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
               >
                 Stop
               </button>
@@ -192,7 +189,7 @@ export default function BreathingSession({ userId }: Props) {
         </div>
 
         {/* ── Info cards — Duration + Best For ──────────────── */}
-        <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto mb-2 md:grid-cols-3 md:gap-3 md:max-w-[520px] md:mb-20">
+        <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20">
           {[
             { label: "Duration", value: info.duration },
             { label: "Best for", value: info.bestFor  },

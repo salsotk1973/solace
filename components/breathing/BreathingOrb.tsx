@@ -230,7 +230,7 @@ export default function BreathingOrb({
             left:           `${offsetPx}px`,
             top:            `${offsetPx}px`,
             background:     "rgba(45, 212, 191, 0.85)",
-            filter:         "blur(36px)",
+            filter:         "blur(32px)",
             opacity:        glowOpacity,
             transform:      `scale(${glowScale})`,
             transformOrigin:"center",
@@ -240,7 +240,7 @@ export default function BreathingOrb({
 
         {/* Orb sphere */}
         <div
-          className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(148,248,239,0.36)_0%,rgba(92,222,211,0.22)_38%,rgba(45,150,150,0.14)_72%,rgba(22,82,96,0.12)_100%)]"
+          className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(100,210,200,0.18)_0%,rgba(55,170,165,0.14)_38%,rgba(22,100,110,0.12)_72%,rgba(10,50,65,0.10)_100%)]"
           style={{
             width:          `${innerPx}px`,
             height:         `${innerPx}px`,
@@ -318,7 +318,7 @@ export default function BreathingOrb({
       </div>
 
       {/* ── Cycle counter ──────────────────────────────────────────────── */}
-      <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4">
+      <p className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4">
         {displayCycleLabel}
       </p>
     </div>

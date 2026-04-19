@@ -96,16 +96,15 @@ export default function SessionComplete({
           <button
             onClick={onDismiss}
             aria-label="Dismiss"
-            className="text-[22px] w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer"
+            className="text-[28px] leading-none flex items-center justify-center transition-all duration-200 cursor-pointer hover:opacity-70"
             style={{
-              color:      T(0.80),
-              background: T(0.08),
-              border:     `1px solid ${T(0.30)}`,
-              transform:  "rotate(45deg)",
-              lineHeight: 1,
+              color:      "rgba(255,255,255,0.75)",
+              background: "none",
+              border:     "none",
+              padding:    "4px 8px",
             }}
           >
-            +
+            ×
           </button>
         </div>
 
