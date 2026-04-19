@@ -9,11 +9,18 @@ interface SessionCompleteProps {
   onDismiss: () => void;
 }
 
-export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: SessionCompleteProps) {
+// Canonical teal
+const T = (a: number) => `rgba(60,192,212,${a})`;
+
+export default function SessionComplete({
+  isLoggedIn,
+  isPaid,
+  onDismiss,
+}: SessionCompleteProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 600);
+    const t = setTimeout(() => setVisible(true), 400);
     return () => clearTimeout(t);
   }, []);
 
@@ -21,28 +28,53 @@ export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: Sessi
     <div
       className={[
         "fixed bottom-0 left-0 right-0 z-50",
-        "border-t border-[rgba(80,200,218,0.1)] bg-[rgba(9,13,20,0.96)] backdrop-blur-xl",
         "transition-transform duration-500 ease-out",
         visible ? "translate-y-0" : "translate-y-full",
       ].join(" ")}
+      style={{
+        background: "rgba(6,16,22,0.97)",
+        borderTop:  `2px solid ${T(0.55)}`,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
-      <div className="max-w-[720px] mx-auto px-6 py-5 flex items-center justify-between gap-6">
+      <div className="max-w-[720px] mx-auto px-6 py-5 flex items-start justify-between gap-6">
+
+        {/* ── Content ─────────────────────────────────────────── */}
         <div className="min-w-0">
-          <p className="[font-family:var(--font-display)] italic font-light text-[21px] text-[rgba(200,240,248,0.9)] mb-0.5">
-            Session complete.
+          <p
+            className="[font-family:var(--font-jost)] text-[10px] tracking-[0.24em] uppercase mb-1"
+            style={{ color: T(0.70) }}
+          >
+            Session complete
           </p>
-          <p className="[font-family:var(--font-jost)] text-[12px] text-[rgba(120,180,200,0.52)] leading-snug">
+          <p
+            className="[font-family:var(--font-display)] italic font-light text-[24px] md:text-[28px] mb-1"
+            style={{ color: "rgba(255,255,255,0.95)" }}
+          >
+            Well done.
+          </p>
+          <p
+            className="[font-family:var(--font-jost)] text-[13px] font-light leading-snug"
+            style={{ color: "rgba(255,255,255,0.75)" }}
+          >
             {isLoggedIn
-              ? "Great session. Your history has been saved."
-              : "Save history & track streaks with a free account"}
+              ? "Your session has been saved."
+              : "Save history and track streaks with a free account."}
           </p>
         </div>
 
-        <div className="flex items-center gap-4 flex-shrink-0">
+        {/* ── Actions ─────────────────────────────────────────── */}
+        <div className="flex items-center gap-3 flex-shrink-0 pt-1">
           {!isLoggedIn && (
             <Link
               href="/sign-up"
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(120,215,232,0.8)] border border-[rgba(80,200,218,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(80,200,218,0.52)] hover:text-[rgba(160,235,248,0.95)] transition-all duration-300"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase px-4 py-2.5 rounded-full transition-all duration-300"
+              style={{
+                color:      T(0.90),
+                border:     `1px solid ${T(0.40)}`,
+                background: T(0.08),
+              }}
             >
               Start free →
             </Link>
@@ -50,19 +82,31 @@ export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: Sessi
           {isLoggedIn && !isPaid && (
             <Link
               href="/pricing"
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(80,200,218,0.80)] border border-[rgba(80,200,218,0.28)] px-5 py-2.5 rounded-[2px] hover:border-[rgba(80,200,218,0.52)] hover:text-[rgba(120,230,245,0.95)] transition-all duration-300"
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase px-4 py-2.5 rounded-full transition-all duration-300"
+              style={{
+                color:      T(0.90),
+                border:     `1px solid ${T(0.40)}`,
+                background: T(0.08),
+              }}
             >
               Unlock full history →
             </Link>
           )}
+
           <button
             onClick={onDismiss}
             aria-label="Dismiss"
-            className="[font-family:var(--font-jost)] text-[18px] text-[rgba(140,170,185,0.38)] hover:text-[rgba(180,210,220,0.7)] transition-colors duration-200 w-8 h-8 flex items-center justify-center"
+            className="[font-family:var(--font-jost)] text-[20px] w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer"
+            style={{
+              color:      "rgba(255,255,255,0.70)",
+              background: "rgba(255,255,255,0.06)",
+              border:     "1px solid rgba(255,255,255,0.10)",
+            }}
           >
             ×
           </button>
         </div>
+
       </div>
     </div>
   );
