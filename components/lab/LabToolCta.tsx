@@ -18,7 +18,6 @@ const PATH_TO_SLUG: Record<string, string> = {
   'sleep':           'sleep',
   'focus':           'focus',
   'mood':            'mood',
-  'reframe':         'reframe',
   'gratitude':       'gratitude',
 }
 

@@ -64,7 +64,6 @@ const FREE_TOOLS = [
   { name: "Breathing",        href: "/tools/breathing",        tone: "calm"    as const },
   { name: "Focus Timer",      href: "/tools/focus-timer",      tone: "clarity" as const },
   { name: "Sleep Wind-Down",  href: "/tools/sleep-wind-down",  tone: "calm"    as const },
-  { name: "Thought Reframer", href: "/tools/thought-reframer", tone: "clarity" as const },
   { name: "Mood Tracker",     href: "/tools/mood-tracker",     tone: "clarity" as const },
   { name: "Gratitude Log",    href: "/tools/gratitude-log",    tone: "clarity" as const },
 ];

@@ -6,7 +6,7 @@
 
 // ------------------------------------------------------------
 // CATEGORY SYSTEM
-// 3 categories, 3 colours, maps to all 9 tools + Lab articles
+// 3 categories, 3 colours, maps to all 8 tools + Lab articles
 // ------------------------------------------------------------
 
 export const CATEGORY_COLOURS = {
@@ -22,7 +22,7 @@ export const CATEGORY_COLOURS = {
     name: 'Clarity',
     hex: '#E8A83E',
     rgb: '232, 168, 62',
-    tools: ['focus', 'mood', 'reframe', 'gratitude', 'clear'],
+    tools: ['focus', 'mood', 'gratitude', 'clear'],
     labCategory: 'think-clearly',
     description: 'Understand what\'s happening inside',
   },
@@ -48,7 +48,6 @@ export const TOOL_CATEGORY: Record<string, CategoryKey> = {
   sleep: 'calm',
   focus: 'clarity',
   mood: 'clarity',
-  reframe: 'clarity',
   gratitude: 'clarity',
   clear: 'clarity',
   choose: 'decide',

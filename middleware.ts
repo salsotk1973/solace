@@ -17,7 +17,6 @@ const isPublicRoute = createRouteMatcher([
   "/breathing(.*)",
   "/focus(.*)",
   "/sleep(.*)",
-  "/reframe(.*)",
   "/mood(.*)",
   "/gratitude(.*)",
   "/api/webhooks(.*)",

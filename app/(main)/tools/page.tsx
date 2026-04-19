@@ -16,13 +16,12 @@ const dRgb = CATEGORY_COLOURS.decide.rgb.replace(/, /g, ',')   // '124,111,205'
 export const metadata = {
   title: "Mental Wellness Tools | Solace",
   description:
-    "Nine tools for breathing, focus, sleep, thought reframing, mood tracking, gratitude, and AI-powered reflection. No account needed. Start anywhere.",
+    "Eight tools for breathing, focus, sleep, mood tracking, gratitude, and AI-powered reflection. No account needed. Start anywhere.",
   keywords: [
     "free breathing exercise online",
     "pomodoro timer",
     "mood tracker",
     "gratitude journal online",
-    "thought reframing",
     "sleep wind down",
     "mental wellness tools free",
     "clear your mind",
@@ -31,7 +30,7 @@ export const metadata = {
   openGraph: {
     title: "Mental Wellness Tools | Solace",
     description:
-      "Nine tools for the moments that matter. Free to try, no account needed.",
+      "Eight tools for the moments that matter. Free to try, no account needed.",
     url: "https://solace.app/tools",
   },
 };
@@ -76,18 +75,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "What is cognitive reframing and is it safe?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Cognitive reframing is the practice of looking at a thought from a different angle — not to dismiss it, but to see it more clearly. Solace's Thought Reframer guides you through four gentle questions. It works best for everyday thinking patterns rather than clinical conditions.",
-      },
-    },
-    {
-      "@type": "Question",
       name: "What's the difference between free and paid?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "All nine tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
+        text: "All eight tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
       },
     },
     {
@@ -170,17 +161,6 @@ const CALM_YOUR_STATE = [
   },
 ];
 
-const CLEAR_YOUR_MIND = [
-  {
-    tag:       "Thought Reframing",
-    name:      "Thought Reframer",
-    line:      "Four gentle questions that shift the angle on a thought that's stuck.",
-    href:      "/reframe",
-    colour:    `rgba(${xRgb},0.85)`,  // clarity / gold
-    tagColour: `rgba(${xRgb},0.75)`,
-  },
-];
-
 const NOTICE_WHATS_GOOD = [
   {
     tag:       "Mood",
@@ -226,7 +206,7 @@ export default function ToolsPage() {
               className="font-light text-[clamp(38px,4.5vw,52px)] leading-tight mb-6"
               style={{ fontFamily: "var(--font-display)", color: TEXT_COLOURS.primary }}
             >
-              Nine tools for the moments{" "}
+              Eight tools for the moments{" "}
               <em className="italic font-light" style={{ color: TEXT_COLOURS.secondary }}>
                 that matter.
               </em>
@@ -252,10 +232,6 @@ export default function ToolsPage() {
               {CALM_YOUR_STATE.map((t) => <ToolCard key={t.href} {...t} />)}
             </FamilyGroup>
 
-            <FamilyGroup label="Clear your mind" cols={1}>
-              {CLEAR_YOUR_MIND.map((t) => <ToolCard key={t.href} {...t} />)}
-            </FamilyGroup>
-
             <FamilyGroup label="Notice what's good" cols={2}>
               {NOTICE_WHATS_GOOD.map((t) => <ToolCard key={t.href} {...t} />)}
             </FamilyGroup>
@@ -268,7 +244,7 @@ export default function ToolsPage() {
               className="font-light text-[32px] leading-snug mb-8"
               style={{ fontFamily: "var(--font-display)", color: TEXT_COLOURS.body }}
             >
-              Nine mental wellness tools, designed around real moments.
+              Eight mental wellness tools, designed around real moments.
             </h2>
             <div
               className="text-[14px] font-[300] leading-[1.9] space-y-5"
@@ -287,8 +263,7 @@ export default function ToolsPage() {
               </p>
               <p>
                 Each tool is free to use. No account needed to start. The core
-                experience — the breathing rhythm, the focus timer, the thought
-                reframe — is always available. An account unlocks history,
+                experience — the breathing rhythm, the focus timer, the mood check-in — is always available. An account unlocks history,
                 patterns, and streaks for the tools that benefit from them.
               </p>
             </div>
