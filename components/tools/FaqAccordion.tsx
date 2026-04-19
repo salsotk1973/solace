@@ -22,12 +22,8 @@ const FAQS = [
     a: "No. Every tool is free to use without an account. An account lets you save your history, track streaks, and see patterns over time — but the core experience is always available.",
   },
   {
-    q: "What is cognitive reframing and is it safe?",
-    a: "Cognitive reframing is the practice of looking at a thought from a different angle — not to dismiss it, but to see it more clearly. Solace's Thought Reframer guides you through four gentle questions. It works best for everyday thinking patterns rather than clinical conditions.",
-  },
-  {
     q: "What's the difference between free and paid?",
-    a: "All nine tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
+    a: "All eight tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
   },
   {
     q: "Is my data private?",
