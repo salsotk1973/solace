@@ -140,7 +140,7 @@ export default function BreathingSession({ userId }: Props) {
           Mobile: subtle teal surface container
           Desktop: transparent (md: Tailwind overrides)
           ══════════════════════════════════════════════════════ */}
-      <div className="bg-[rgba(60,192,212,0.03)] border border-[rgba(60,192,212,0.08)] rounded-[24px] mb-6 px-4 py-5 overflow-visible md:mb-0 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-transparent md:w-full">
+      <div className="bg-transparent border border-[rgba(60,192,212,0.10)] rounded-[24px] mb-6 px-4 py-5 overflow-visible md:mb-0 md:px-0 md:py-0 md:rounded-none md:bg-transparent md:border-transparent md:w-full">
 
         {/* ── Pattern selector ──────────────────────────────── */}
         <PatternSelector
