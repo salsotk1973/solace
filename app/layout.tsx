@@ -7,6 +7,7 @@ import "./globals.css";
 import "../styles/tokens.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.try-solace.app"),
   title: "Solace",
   description: "A calm digital space to step out of noise and regain clarity.",
   icons: {
