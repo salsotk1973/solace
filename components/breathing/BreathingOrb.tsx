@@ -225,8 +225,6 @@ export default function BreathingOrb({
             background:      "rgba(45,212,191,0.55)",
             filter:          `blur(${blurPx}px)`,
             transformOrigin: "center",
-            opacity:         0.28,
-            transform:       "scale(1.0)",
           }}
         />
 
@@ -240,7 +238,6 @@ export default function BreathingOrb({
             top:             offsetPx,
             left:            offsetPx,
             transformOrigin: "center",
-            transform:       "scale(1.0)",
           }}
         />
 
