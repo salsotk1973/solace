@@ -11,7 +11,7 @@ async function gotoClearYourMind(page: Page) {
   await page.waitForLoadState("networkidle");
   // The input may not exist if user is not signed in (paid tool)
   // Just verify the page loads correctly
-  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.locator("h1").first()).toBeVisible();
 }
 
 test.describe("Clear Your Mind — Safety & Behaviour", () => {
