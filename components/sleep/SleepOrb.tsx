@@ -8,28 +8,28 @@ import { glassBackground, glassBorder, getToolRgb } from "@/lib/design-tokens";
 import { useToolHistory } from "@/hooks/useToolHistory";
 import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 type PhaseType = "inhale" | "hold-in" | "exhale";
 interface Phase { label: string; type: PhaseType; duration: number; }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const PATTERNS: Record<SleepPattern, Phase[]> = {
   "48":    [{ label: "Inhale", type: "inhale", duration: 4 }, { label: "Exhale", type: "exhale", duration: 8 }],
-  "478":   [{ label: "Inhale", type: "inhale", duration: 4 }, { label: "Hold",   type: "hold-in", duration: 7 }, { label: "Exhale", type: "exhale", duration: 8 }],
+  "478":   [{ label: "Inhale", type: "inhale", duration: 4 }, { label: "Hold", type: "hold-in", duration: 7 }, { label: "Exhale", type: "exhale", duration: 8 }],
   "relax": [{ label: "Inhale", type: "inhale", duration: 5 }, { label: "Exhale", type: "exhale", duration: 10 }],
 };
 const CYCLES: Record<SleepPattern, number> = { "48": 8, "478": 6, "relax": 6 };
-const PATTERN_INFO: Record<SleepPattern, { duration: string; bestFor: string }> = {
-  "48":    { duration: "~4 min", bestFor: "Sleep onset" },
+
+// EXACT same INFO shape as Breathing
+const INFO: Record<SleepPattern, { duration: string; bestFor: string }> = {
+  "48":    { duration: "~4 min", bestFor: "Sleep onset"     },
   "478":   { duration: "~5 min", bestFor: "Anxiety · Sleep" },
-  "relax": { duration: "~5 min", bestFor: "Deep relaxation" },
+  "relax": { duration: "~5 min", bestFor: "Deep rest"       },
 };
 
 const ORB_MIN      = 1.0;
-const ORB_MAX      = 1.18;
+const ORB_MAX      = 1.15;
 const DIM_DELAY_MS = 4000;
 
-// Canonical teal token — Calm category
+// EXACT same T() helper as Breathing
 const T = (a: number) => `rgba(60,192,212,${a})`;
 
 function easeInOut(t: number): number {
@@ -42,16 +42,32 @@ export default function SleepOrb({ userId }: Props) {
   const [pattern, setPattern]         = useState<SleepPattern>("48");
   const [isRunning, setIsRunning]     = useState(false);
   const [started, setStarted]         = useState(false);
+  // EXACT same history toggle state as Breathing
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  // ── Orb / ring refs ────────────────────────────────────────────────────
-  const orbRef   = useRef<HTMLDivElement>(null);
-  const glowRef  = useRef<HTMLDivElement>(null);
-  const labelRef = useRef<HTMLParagraphElement>(null);
-  const cycleRef = useRef<HTMLParagraphElement>(null);
-  const ringRef  = useRef<SVGCircleElement>(null);
+  // Responsive orb size — exact same pattern as BreathingSession.tsx
+  const [orbSize, setOrbSize] = useState<number>(228);
+  useEffect(() => {
+    const update = () => setOrbSize(window.innerWidth < 768 ? 130 : 228);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
-  // ── Dimming refs ───────────────────────────────────────────────────────
+  // Derived — scale factor for orb internals
+  const sc       = orbSize / 228;
+  const innerPx  = Math.round(160 * sc); // orb sphere size
+  const offsetPx = Math.round(34  * sc); // orb offset
+
+  // Orb refs
+  const orbRef   = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const cycleRef = useRef<HTMLParagraphElement>(null);
+
+  // Progress ring: [0] = fill circle, [1] = bead group
+  const ringRefsRef = useRef<(SVGCircleElement | SVGGElement | null)[]>([null, null]);
+
+  // Dimming refs — Sleep-only
   const vignetteRef    = useRef<HTMLDivElement>(null);
   const headerRef      = useRef<HTMLElement>(null);
   const patternAreaRef = useRef<HTMLDivElement>(null);
@@ -59,7 +75,7 @@ export default function SleepOrb({ userId }: Props) {
   const humanLineRef   = useRef<HTMLParagraphElement>(null);
   const crossLinksRef  = useRef<HTMLElement>(null);
 
-  // ── RAF / loop state refs ──────────────────────────────────────────────
+  // RAF state refs
   const rafRef          = useRef<number>(0);
   const isRunningRef    = useRef(false);
   const patternKeyRef   = useRef(pattern);
@@ -73,7 +89,7 @@ export default function SleepOrb({ userId }: Props) {
 
   useEffect(() => { patternKeyRef.current = pattern; }, [pattern]);
 
-  // ── Dimming helpers ────────────────────────────────────────────────────
+  // Dimming — Sleep-only feature
   const applyDimming = useCallback(() => {
     [headerRef, patternAreaRef, cardsRef, humanLineRef, crossLinksRef].forEach((r) => {
       if (r.current) r.current.style.opacity = "0.1";
@@ -88,22 +104,17 @@ export default function SleepOrb({ userId }: Props) {
         r.current.style.transition = "opacity 0s";
         r.current.style.opacity = "";
         requestAnimationFrame(() => { if (r.current) r.current.style.transition = ""; });
-      } else {
-        r.current.style.opacity = "";
-      }
+      } else { r.current.style.opacity = ""; }
     });
     if (vignetteRef.current) {
       if (instant) {
         vignetteRef.current.style.transition = "opacity 0s";
         vignetteRef.current.style.opacity = "0";
         requestAnimationFrame(() => { if (vignetteRef.current) vignetteRef.current.style.transition = ""; });
-      } else {
-        vignetteRef.current.style.opacity = "0";
-      }
+      } else { vignetteRef.current.style.opacity = "0"; }
     }
   }, []);
 
-  // ── Silent reset ───────────────────────────────────────────────────────
   const doSilentReset = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
     if (dimTimerRef.current)   clearTimeout(dimTimerRef.current);
@@ -113,22 +124,22 @@ export default function SleepOrb({ userId }: Props) {
     setIsRunning(false);
     setStarted(false);
     removeDimming(true);
-    if (orbRef.current)  { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = ""; }
-    if (glowRef.current) { glowRef.current.style.transform = "scale(1.1)"; glowRef.current.style.opacity = ""; }
+    if (orbRef.current)   { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = ""; }
     if (labelRef.current) { labelRef.current.textContent = ""; labelRef.current.style.opacity = "0"; }
     if (cycleRef.current)  cycleRef.current.textContent = "";
-    if (ringRef.current)  { ringRef.current.style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; ringRef.current.style.opacity = ""; }
+    const [ring, bead] = ringRefsRef.current;
+    if (ring) { (ring as SVGCircleElement).style.transition = "none"; (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; (ring as SVGCircleElement).style.opacity = ""; }
+    if (bead) { (bead as SVGGElement).style.transition = "none"; (bead as SVGGElement).style.opacity = "0"; (bead as SVGGElement).style.transform = "rotate(0deg)"; }
   }, [removeDimming]);
 
   const doSilentResetRef = useRef(doSilentReset);
   useEffect(() => { doSilentResetRef.current = doSilentReset; }, [doSilentReset]);
 
-  // ── History ────────────────────────────────────────────────────────────
   const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("sleep", userId);
   const loadHistoryRef = useRef(loadHistory);
   useEffect(() => { loadHistoryRef.current = loadHistory; }, [loadHistory]);
 
-  // ── RAF loop ───────────────────────────────────────────────────────────
+  // RAF loop
   const loop = useCallback(function loopFrame(ts: number) {
     if (!isRunningRef.current) return;
     const pat         = patternKeyRef.current;
@@ -142,16 +153,13 @@ export default function SleepOrb({ userId }: Props) {
 
     let scale = ORB_MIN;
     let blur  = 0;
-    if (phase.type === "inhale")   { scale = ORB_MIN + (ORB_MAX - ORB_MIN) * t; }
+    if (phase.type === "inhale")       { scale = ORB_MIN + (ORB_MAX - ORB_MIN) * t; }
     else if (phase.type === "hold-in") { scale = ORB_MAX; }
-    else if (phase.type === "exhale")  { scale = ORB_MAX - (ORB_MAX - ORB_MIN) * t; blur = 2 * raw; }
+    else if (phase.type === "exhale")  { scale = ORB_MAX - (ORB_MAX - ORB_MIN) * t; blur = 1.5 * raw; }
 
     if (orbRef.current) {
       orbRef.current.style.transform = `scale(${scale.toFixed(4)})`;
-      orbRef.current.style.filter    = blur > 0.01 ? `blur(${blur.toFixed(3)}px)` : "";
-    }
-    if (glowRef.current) {
-      glowRef.current.style.transform = `scale(${(scale * 1.1).toFixed(4)})`;
+      orbRef.current.style.filter    = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : "";
     }
 
     const totalPhaseDur = phases.reduce((s, p) => s + p.duration, 0);
@@ -159,17 +167,16 @@ export default function SleepOrb({ userId }: Props) {
     const cycleElapsed  = cycleIdxRef.current * totalPhaseDur + donePhaseDur + Math.min(elapsed, phase.duration);
     const sessionProg   = Math.min(cycleElapsed / (totalPhaseDur * totalCycles), 1);
 
-    if (ringRef.current) {
-      ringRef.current.style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - sessionProg)}`;
-      ringRef.current.style.opacity = `${Math.max(1 - sessionProg * 0.5, 0.5)}`;
+    const [ring] = ringRefsRef.current;
+    if (ring) {
+      (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - sessionProg)}`;
+      (ring as SVGCircleElement).style.opacity = `${Math.max(1 - sessionProg * 0.5, 0.5)}`;
     }
 
-    const orbOpacity  = Math.max(1 - sessionProg * 0.4, 0.6);
-    const glowOpacity = Math.max(1 - sessionProg * 0.6, 0.4);
-    const labelDim    = Math.max(1 - sessionProg * 0.5, 0.5);
+    const orbOpacity = Math.max(1 - sessionProg * 0.4, 0.6);
+    const labelDim   = Math.max(1 - sessionProg * 0.5, 0.5);
     labelDimRef.current = labelDim;
-    if (orbRef.current)  orbRef.current.style.opacity  = `${orbOpacity}`;
-    if (glowRef.current) glowRef.current.style.opacity = `${glowOpacity}`;
+    if (orbRef.current) orbRef.current.style.opacity = `${orbOpacity}`;
     if (labelVisibleRef.current && labelRef.current) {
       labelRef.current.style.opacity = `${labelDim}`;
     }
@@ -183,15 +190,14 @@ export default function SleepOrb({ userId }: Props) {
         const newCycle = cycleIdxRef.current + 1;
         if (newCycle >= totalCycles) {
           isRunningRef.current = false;
-          if (ringRef.current) ringRef.current.style.strokeDashoffset = "0";
+          if (ring) (ring as SVGCircleElement).style.strokeDashoffset = "0";
           if (userId) {
-            const totalPhaseDur2  = phases.reduce((s, p) => s + p.duration, 0);
-            const durationSeconds = totalPhaseDur2 * totalCycles;
-            const patternLabel    = pat === "48" ? "4-8" : pat === "478" ? "4-7-8" : "5-10";
+            const totalPhaseDur2 = phases.reduce((s, p) => s + p.duration, 0);
+            const patternLabel   = pat === "48" ? "4-8" : pat === "478" ? "4-7-8" : "5-10";
             fetch("/api/sleep", {
-              method:  "POST",
+              method: "POST",
               headers: { "Content-Type": "application/json" },
-              body:    JSON.stringify({ pattern: patternLabel, cycles: totalCycles, duration_seconds: durationSeconds }),
+              body: JSON.stringify({ pattern: patternLabel, cycles: totalCycles, duration_seconds: totalPhaseDur2 * totalCycles }),
             }).then(() => loadHistoryRef.current()).catch(() => {});
           }
           if (orbRef.current) {
@@ -200,14 +206,11 @@ export default function SleepOrb({ userId }: Props) {
             orbRef.current.style.transform  = "scale(1)";
             orbRef.current.style.filter     = "";
           }
-          if (glowRef.current) glowRef.current.style.opacity = "0";
           resetTimerRef.current = setTimeout(() => doSilentResetRef.current(), 5000);
           return;
         }
         cycleIdxRef.current = newCycle;
-        if (cycleRef.current) {
-          cycleRef.current.textContent = `Cycle ${newCycle + 1} of ${totalCycles}`;
-        }
+        if (cycleRef.current) cycleRef.current.textContent = `Cycle ${newCycle + 1} of ${totalCycles}`;
       }
 
       phaseIdxRef.current   = nextPi;
@@ -225,21 +228,46 @@ export default function SleepOrb({ userId }: Props) {
     rafRef.current = requestAnimationFrame(loopFrame);
   }, [userId]);
 
-  // ── Start / stop ───────────────────────────────────────────────────────
+  // Start / stop
   useEffect(() => {
     isRunningRef.current = isRunning;
+    const [ring, bead] = ringRefsRef.current;
+
     if (isRunning) {
       const phases      = PATTERNS[patternKeyRef.current];
       const totalCycles = CYCLES[patternKeyRef.current];
+      const sessionDur  = phases.reduce((s, p) => s + p.duration, 0) * totalCycles;
+
       phaseIdxRef.current     = 0;
       cycleIdxRef.current     = 0;
       phaseStartRef.current   = performance.now();
       labelVisibleRef.current = true;
-      if (orbRef.current)  { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = "1"; }
-      if (glowRef.current) { glowRef.current.style.transform = "scale(1.1)"; glowRef.current.style.opacity = "1"; }
+
+      if (orbRef.current)   { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = "1"; }
       if (labelRef.current) { labelRef.current.textContent = phases[0].label; labelRef.current.style.opacity = "1"; }
       if (cycleRef.current)  cycleRef.current.textContent = `Cycle 1 of ${totalCycles}`;
-      if (ringRef.current)  { ringRef.current.style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; ringRef.current.style.opacity = "1"; }
+
+      if (ring) {
+        (ring as SVGCircleElement).style.transition = "none";
+        (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`;
+        (ring as SVGCircleElement).style.opacity = "0.7";
+        requestAnimationFrame(() => {
+          if (!ring || !isRunningRef.current) return;
+          (ring as SVGCircleElement).style.transition = `stroke-dashoffset ${sessionDur}s linear`;
+          (ring as SVGCircleElement).style.strokeDashoffset = "0";
+        });
+      }
+      if (bead) {
+        (bead as SVGGElement).style.transition = "none";
+        (bead as SVGGElement).style.opacity    = "0.9";
+        (bead as SVGGElement).style.transform  = "rotate(0deg)";
+        requestAnimationFrame(() => {
+          if (!bead || !isRunningRef.current) return;
+          (bead as SVGGElement).style.transition = `transform ${sessionDur}s linear`;
+          (bead as SVGGElement).style.transform  = "rotate(360deg)";
+        });
+      }
+
       dimTimerRef.current = setTimeout(applyDimming, DIM_DELAY_MS);
       rafRef.current = requestAnimationFrame(loop);
     } else {
@@ -256,27 +284,29 @@ export default function SleepOrb({ userId }: Props) {
     };
   }, [isRunning, loop, applyDimming, removeDimming]);
 
-  function handleStart() { patternKeyRef.current = pattern; setStarted(true); setIsRunning(true); }
+  function handleStart() { patternKeyRef.current = pattern; setStarted(true);  setIsRunning(true);  }
   function handleStop()  { if (resetTimerRef.current) clearTimeout(resetTimerRef.current); setIsRunning(false); setStarted(false); }
 
-  const info         = PATTERN_INFO[pattern];
+  const info         = INFO[pattern];
+  // EXACT same historyLabel logic as Breathing
   const historyLabel = history?.isPaid ? "Full history" : "7-day history";
   const rgbBreathing = getToolRgb("breathing").replace(/, /g, ",");
   const rgbChoose    = getToolRgb("choose").replace(/, /g, ",");
 
   return (
+    // EXACT same root div as Breathing — not a fragment
     <div>
-      {/* Vignette — sleep-only dimming effect */}
+      {/* Vignette — Sleep-only. Dims UI after 4s of session. */}
       <div
         ref={vignetteRef}
         className="fixed inset-0 z-[90] pointer-events-none opacity-0 transition-opacity duration-[3000ms]"
         style={{ background: "radial-gradient(ellipse at center, transparent 20%, rgba(5,7,12,0.85) 100%)" }}
       />
 
-      {/* Page content */}
-      <div className="max-w-[780px] mx-auto px-6 pt-[96px] md:pt-[140px] pb-28">
+      {/* EXACT same outer wrapper as Breathing page.tsx */}
+      <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[96px] md:pt-[140px] pb-28">
 
-        {/* Tool header — dimmable */}
+        {/* Tool header — dimmable — EXACT same structure as Breathing */}
         <header ref={headerRef} className="text-center mb-2 md:mb-14 transition-opacity duration-[3000ms]">
           <p
             className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase mb-2 md:mb-3"
@@ -285,156 +315,159 @@ export default function SleepOrb({ userId }: Props) {
             Calm your state
           </p>
           <h1
-            className="[font-family:var(--font-display)] font-light text-[22px] md:text-[clamp(36px,5vw,56px)] leading-tight"
-            style={{ color: "rgba(255,255,255,0.92)" }}
+            className="[font-family:var(--font-display)] font-light text-[22px] md:text-[clamp(36px,5vw,56px)] text-[rgba(225,242,248,0.92)] leading-tight"
           >
             Let the day go.
           </h1>
         </header>
 
-        {/* Pattern selector — dimmable */}
-        <div ref={patternAreaRef} className="transition-opacity duration-[3000ms]">
-          <PatternSelector selected={pattern} onChange={setPattern} disabled={isRunning} />
-        </div>
+        {/* Tool zone — EXACT same wrapper as Breathing BreathingSession */}
+        <div className="mb-6 md:mb-0">
 
-        {/* Orb section — z-[100], above vignette */}
-        <div className="flex flex-col items-center relative z-[100] mb-4 md:mb-0">
-
-          {/* Phase label */}
-          <p
-            ref={labelRef}
-            className="[font-family:var(--font-display)] italic font-light text-[38px] leading-none mb-8 text-center select-none transition-opacity duration-[220ms] ease-in-out opacity-0"
-            aria-live="polite"
-            style={{ color: "rgba(180,165,235,0.88)" }}
-          />
-
-          {/* Orb stage */}
-          <div className="relative w-[228px] h-[228px]">
-            <ProgressRing ref={ringRef} />
-
-            {/* Glow — indigo/violet, sleep personality */}
-            <div
-              ref={glowRef}
-              className="absolute w-[160px] h-[160px] rounded-full top-[34px] left-[34px]"
-              style={{
-                background: "rgba(100,80,210,0.20)",
-                filter:     "blur(28px)",
-                transform:  "scale(1.1)",
-              }}
-            />
-
-            {/* Orb sphere — deep indigo gradient, sleep personality */}
-            <div
-              ref={orbRef}
-              className="absolute w-[160px] h-[160px] rounded-full top-[34px] left-[34px] z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(140,115,235,0.28)_0%,rgba(90,70,190,0.16)_38%,rgba(50,35,140,0.10)_72%,rgba(25,15,80,0.08)_100%)]"
-              style={{
-                border:    "0.5px solid rgba(100,80,210,0.22)",
-                transform: "scale(1)",
-              }}
-            />
+          {/* Pattern selector — dimmable */}
+          <div ref={patternAreaRef} className="transition-opacity duration-[3000ms]">
+            <PatternSelector selected={pattern} onChange={setPattern} disabled={isRunning} />
           </div>
 
-          {/* Cycle counter */}
+          {/* Orb + Begin/Stop — EXACT same flex structure as Breathing */}
+          <div className="flex flex-col items-center gap-3 mt-6 mb-3 md:mt-0 md:mb-16 md:gap-8 relative z-[100]">
+
+            {/* Orb stage — responsive size */}
+            <div className="flex justify-center w-full">
+              <div className="relative" style={{ width: orbSize, height: orbSize, overflow: "visible" }}>
+
+                {/* Progress ring + bead */}
+                <ProgressRing ref={ringRefsRef as any} size={orbSize} />
+
+                {/* Orb — teal, soft dissolving gradient (Sleep personality)
+                    Sleep: softer, wider fade — dissolves into dark */}
+                <div
+                  ref={orbRef}
+                  className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(60,192,212,0.16)_0%,rgba(38,155,175,0.12)_40%,rgba(18,90,110,0.09)_72%,rgba(8,42,55,0.07)_100%)]"
+                  style={{
+                    width:           `${innerPx}px`,
+                    height:          `${innerPx}px`,
+                    top:             `${offsetPx}px`,
+                    left:            `${offsetPx}px`,
+                    border:          `0.5px solid ${T(0.16)}`,
+                    transformOrigin: "center",
+                    transform:       "scale(1)",
+                  }}
+                />
+
+                {/* Phase label — INSIDE the orb, centred, like Breathing */}
+                <span
+                  ref={labelRef}
+                  className="absolute inset-0 z-20 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none"
+                  style={{ opacity: 0, transition: "opacity 220ms ease-in-out" }}
+                />
+              </div>
+            </div>
+
+            {/* Begin / Stop — EXACT same classes as Breathing */}
+            <div className="flex justify-center md:order-first">
+              {!isRunning ? (
+                <button
+                  onClick={handleStart}
+                  className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)] [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
+                >
+                  {started ? "Begin again" : "Begin"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleStop}
+                  className="bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)] [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
+                >
+                  Stop
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Cycle counter — EXACT same as Breathing */}
           <p
             ref={cycleRef}
-            className="[font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase h-4 mt-5 text-center w-full"
-            style={{ color: T(0.38) }}
+            className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4 mb-3"
           />
 
-          {/* Begin / Stop — solid teal pill on all viewports */}
-          <div className="mt-6 mb-10 md:mb-16 flex justify-center">
-            {!isRunning ? (
-              <button
-                onClick={handleStart}
-                className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)] hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
+          {/* Info cards — EXACT same classes as Breathing */}
+          <div
+            ref={cardsRef}
+            className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20 transition-opacity duration-[3000ms]"
+          >
+            {[
+              { label: "Duration", value: info.duration },
+              { label: "Best for", value: info.bestFor  },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
+                style={{ border: `1px solid ${T(0.15)}`, background: T(0.04) }}
               >
-                {started ? "Begin again" : "Begin"}
-              </button>
-            ) : (
-              <button
-                onClick={handleStop}
-                className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)] hover:bg-[rgba(60,192,212,1)] hover:border-[rgba(60,192,212,1)]"
-              >
-                Stop
-              </button>
-            )}
+                <p
+                  className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]"
+                  style={{ color: T(0.65) }}
+                >
+                  {label}
+                </p>
+                <p
+                  className="[font-family:var(--font-display)] font-light text-[13px] text-center leading-snug md:text-[15px]"
+                  style={{ color: T(0.92) }}
+                >
+                  {value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Info cards — dimmable, Duration + Best For only */}
-        <div
-          ref={cardsRef}
-          className="grid grid-cols-2 gap-2 max-w-[320px] md:max-w-[420px] mx-auto mb-4 md:mb-20 transition-opacity duration-[3000ms]"
-        >
-          {[
-            { label: "Duration", value: info.duration },
-            { label: "Best for", value: info.bestFor  },
-          ].map(({ label, value }) => (
-            <div
-              key={label}
-              className="flex flex-col items-center gap-0.5 p-2 md:px-4 md:py-4 rounded-[10px] md:rounded-[12px]"
-              style={{ border: `1px solid ${T(0.15)}`, background: T(0.04) }}
-            >
-              <p
-                className="[font-family:var(--font-jost)] text-[10px] md:text-[11px] tracking-[0.18em] uppercase"
-                style={{ color: T(0.65) }}
-              >
-                {label}
-              </p>
-              <p
-                className="[font-family:var(--font-display)] font-light text-[13px] md:text-[14px] text-center leading-snug"
-                style={{ color: T(0.92) }}
-              >
-                {value}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Human line — dimmable */}
+        {/* Human line — dimmable — EXACT same classes as Breathing */}
         <p
           ref={humanLineRef}
-          className="text-center [font-family:var(--font-display)] italic font-light text-[clamp(16px,2.2vw,22px)] mb-16 max-w-[440px] mx-auto leading-relaxed transition-opacity duration-[3000ms]"
-          style={{ color: "rgba(255,255,255,0.65)" }}
+          className="text-center [font-family:var(--font-display)] italic font-light text-[clamp(16px,2.2vw,22px)] text-[rgba(255,255,255,0.65)] mt-4 mb-20 max-w-[440px] mx-auto leading-relaxed transition-opacity duration-[3000ms]"
         >
           The day is done. Your body already knows what to do.
         </p>
 
-        {/* History — mobile toggle */}
+        {/* History — EXACT same structure as BreathingSession.tsx */}
         {userId && history && (
-          <section className={`max-w-[520px] mx-auto ${historyOpen ? "mb-6" : "mb-4"} md:mb-20`}>
+          <section className="max-w-[520px] mx-auto mb-20">
 
-            {/* Mobile toggle */}
+            {/* Mobile toggle — EXACT same as Breathing */}
             <button
-              className="w-full md:hidden cursor-pointer rounded-[14px] px-4 py-3 flex items-center justify-between transition-all duration-300"
+              className="w-full flex items-center justify-between md:hidden cursor-pointer rounded-[14px] px-4 py-3"
               style={{
-                background:              T(0.03),
-                border:                  `1px solid ${T(0.12)}`,
-                borderBottomLeftRadius:  historyOpen ? "0" : "14px",
-                borderBottomRightRadius: historyOpen ? "0" : "14px",
+                background:              T(0.05),
+                border:                  `1px solid ${T(0.14)}`,
+                borderBottomLeftRadius:  historyOpen ? 0 : undefined,
+                borderBottomRightRadius: historyOpen ? 0 : undefined,
+                marginBottom:            historyOpen ? 0 : undefined,
               }}
               onClick={() => setHistoryOpen(o => !o)}
               aria-expanded={historyOpen}
             >
               <p
                 className="[font-family:var(--font-jost)] text-[11px] tracking-[0.24em] uppercase"
-                style={{ color: T(0.65) }}
+                style={{ color: T(0.70) }}
               >
                 {historyLabel}
               </p>
               <span
-                className="text-[20px] leading-none transition-transform duration-300 flex items-center justify-center w-8 h-8 rounded-full"
+                className="w-6 h-6 flex items-center justify-center rounded-full text-[16px] transition-transform duration-300"
                 style={{
-                  color:      T(0.65),
-                  background: T(0.06),
+                  color:      T(0.80),
+                  background: T(0.10),
+                  border:     `1px solid ${T(0.25)}`,
                   transform:  historyOpen ? "rotate(45deg)" : "rotate(0deg)",
+                  lineHeight: 1,
                 }}
+                aria-hidden="true"
               >
                 +
               </span>
             </button>
 
-            {/* Desktop label */}
+            {/* Desktop label — EXACT same as Breathing */}
             <p
               className="hidden md:block [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center"
               style={{ color: T(0.65) }}
@@ -442,14 +475,15 @@ export default function SleepOrb({ userId }: Props) {
               {historyLabel}
             </p>
 
-            {/* History content */}
-            <div className={`${historyOpen ? "block" : "hidden"} md:block`}>
+            {/* History content — EXACT same structure as Breathing */}
+            <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
               <div
-                className="rounded-b-[14px] md:rounded-[14px] px-3 py-3 md:px-5 md:py-4"
+                className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
                 style={{
-                  border:     `1px solid ${T(0.12)}`,
-                  borderTop:  historyOpen ? `1px solid ${T(0.06)}` : `1px solid ${T(0.12)}`,
-                  background: T(0.03),
+                  border:       `1px solid ${T(0.12)}`,
+                  background:   T(0.03),
+                  borderTop:    historyOpen ? "none" : undefined,
+                  borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
                 }}
               >
                 <p
@@ -457,10 +491,10 @@ export default function SleepOrb({ userId }: Props) {
                   style={{ color: "rgba(255,255,255,0.80)" }}
                 >
                   {!history.isPaid
-                    ? "Free users keep 7 days of history. Your older sessions are still there."
+                    ? "Free users keep 7 days of sleep history. Your older sessions are still there."
                     : history.sessions.length > 0
-                    ? `${history.sessions.length} session${history.sessions.length === 1 ? "" : "s"} saved.`
-                    : "No sessions saved yet."}
+                    ? `${history.sessions.length} sleep ${history.sessions.length === 1 ? "session" : "sessions"} saved.`
+                    : "No sleep sessions saved yet."}
                 </p>
 
                 {history.hasStreak && (
@@ -492,14 +526,18 @@ export default function SleepOrb({ userId }: Props) {
                 )}
 
                 {shouldShowUpgradePrompt && (
-                  <ToolUpgradePrompt hasOlderSessions={history.hasOlderSessions} toolColour="60,192,212" toolName="Sleep Wind-Down" />
+                  <ToolUpgradePrompt
+                    hasOlderSessions={history.hasOlderSessions}
+                    toolColour="60,192,212"
+                    toolName="Sleep Wind-Down"
+                  />
                 )}
               </div>
             </div>
           </section>
         )}
 
-        {/* Cross-links — desktop only */}
+        {/* Cross-links — EXACT same as Breathing page.tsx, desktop only */}
         <section ref={crossLinksRef} className="hidden md:block transition-opacity duration-[3000ms]">
           <p
             className="text-center [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-6"
@@ -510,7 +548,8 @@ export default function SleepOrb({ userId }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <Link
               href="/breathing"
-              className="group rounded-[14px] p-6 transition-all duration-500"
+              prefetch={false}
+              className="group rounded-[14px] p-6 border transition-all duration-500"
               style={{
                 background: glassBackground("breathing"),
                 border:     `1px solid ${glassBorder("breathing", 0.12)}`,
@@ -531,7 +570,8 @@ export default function SleepOrb({ userId }: Props) {
             </Link>
             <Link
               href="/tools/choose"
-              className="group rounded-[14px] p-6 transition-all duration-500"
+              prefetch={false}
+              className="group rounded-[14px] p-6 border transition-all duration-500"
               style={{
                 background: glassBackground("choose"),
                 border:     `1px solid ${glassBorder("choose", 0.12)}`,
