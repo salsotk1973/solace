@@ -81,48 +81,7 @@ export default function BreathingOrb({
     onPhaseChangeRef.current = onPhaseChange;
   }, [onCycleChange, onComplete, onPhaseChange]);
 
-  // ── Direct DOM animation — no React re-render on phase change ──────────
-  function applyPhase(phase: Phase) {
-    const active = phase.type === "inhale" || phase.type === "hold-in";
-    const dur    = phase.duration;
-
-    // Glow
-    if (glowRef.current) {
-      glowRef.current.style.transition =
-        `opacity ${dur}s ease-in-out, transform ${dur}s ease-in-out`;
-      glowRef.current.style.opacity   = active ? String(GLOW_MAX_OPACITY) : String(GLOW_MIN_OPACITY);
-      glowRef.current.style.transform = active
-        ? `scale(${GLOW_MAX_SCALE})`
-        : `scale(${GLOW_MIN_SCALE})`;
-    }
-
-    // Orb scale
-    if (orbRef.current) {
-      orbRef.current.style.transition = `transform ${dur}s ease-in-out`;
-      orbRef.current.style.transform  = `scale(${active ? ORB_MAX : ORB_MIN})`;
-    }
-
-    // Phase label
-    if (labelRef.current) {
-      labelRef.current.textContent = phase.label;
-    }
-  }
-
-  function resetAnimation() {
-    if (glowRef.current) {
-      glowRef.current.style.transition = "none";
-      glowRef.current.style.opacity    = String(GLOW_MIN_OPACITY);
-      glowRef.current.style.transform  = `scale(${GLOW_MIN_SCALE})`;
-    }
-    if (orbRef.current) {
-      orbRef.current.style.transition = "none";
-      orbRef.current.style.transform  = "scale(1)";
-    }
-    if (labelRef.current)  labelRef.current.textContent  = "";
-    if (cycleRef.current)  cycleRef.current.textContent  = "";
-  }
-
-  // ── Session ring + bead ────────────────────────────────────────────────
+  // ── Session ring + bead initialisation ───────────────────────────────
   useEffect(() => {
     if (sessionRingRef.current) {
       sessionRingRef.current.style.opacity          = "0";
@@ -142,7 +101,21 @@ export default function BreathingOrb({
     if (!isRunning) {
       onPhaseChangeRef.current?.("idle", 0);
       setRunning(false);
-      resetAnimation();
+
+      // Reset glow
+      if (glowRef.current) {
+        glowRef.current.style.transition = "none";
+        glowRef.current.style.opacity    = String(GLOW_MIN_OPACITY);
+        glowRef.current.style.transform  = `scale(${GLOW_MIN_SCALE})`;
+      }
+      // Reset orb
+      if (orbRef.current) {
+        orbRef.current.style.transition = "none";
+        orbRef.current.style.transform  = "scale(1)";
+      }
+      // Clear text refs
+      if (labelRef.current) labelRef.current.textContent = "";
+      if (cycleRef.current) cycleRef.current.textContent = "";
 
       if (sessionRingRef.current) {
         sessionRingRef.current.style.transition       = "none";
@@ -168,8 +141,7 @@ export default function BreathingOrb({
       sessionRingRef.current.style.opacity          = "0.7";
       window.requestAnimationFrame(() => {
         if (!sessionRingRef.current || !isRunningRef.current) return;
-        sessionRingRef.current.style.transition       =
-          `stroke-dashoffset ${sessionDuration}s linear`;
+        sessionRingRef.current.style.transition       = `stroke-dashoffset ${sessionDuration}s linear`;
         sessionRingRef.current.style.strokeDashoffset = "0";
       });
     }
@@ -180,18 +152,36 @@ export default function BreathingOrb({
       progressBeadRef.current.style.transform  = "rotate(0deg)";
       window.requestAnimationFrame(() => {
         if (!progressBeadRef.current || !isRunningRef.current) return;
-        progressBeadRef.current.style.transition =
-          `transform ${sessionDuration}s linear`;
-        progressBeadRef.current.style.transform = "rotate(360deg)";
+        progressBeadRef.current.style.transition = `transform ${sessionDuration}s linear`;
+        progressBeadRef.current.style.transform  = "rotate(360deg)";
       });
+    }
+
+    // applyPhase defined INSIDE the effect so it reads refs fresh every call
+    function applyPhase(phase: Phase) {
+      const active = phase.type === "inhale" || phase.type === "hold-in";
+      const dur    = phase.duration;
+
+      if (glowRef.current) {
+        glowRef.current.style.transition = `opacity ${dur}s ease-in-out, transform ${dur}s ease-in-out`;
+        glowRef.current.style.opacity    = active ? String(GLOW_MAX_OPACITY) : String(GLOW_MIN_OPACITY);
+        glowRef.current.style.transform  = `scale(${active ? GLOW_MAX_SCALE : GLOW_MIN_SCALE})`;
+      }
+      if (orbRef.current) {
+        orbRef.current.style.transition = `transform ${dur}s ease-in-out`;
+        orbRef.current.style.transform  = `scale(${active ? ORB_MAX : ORB_MIN})`;
+      }
+      if (labelRef.current) {
+        labelRef.current.textContent = phase.label;
+      }
     }
 
     const runPhase = (cycleIndex: number, phaseIndex: number) => {
       if (!isRunningRef.current) return;
       const phase = phases[phaseIndex];
 
-      // Direct DOM update — NO React state change — no re-render — no flicker
       applyPhase(phase);
+
       if (cycleRef.current) {
         cycleRef.current.textContent = `Cycle ${cycleIndex + 1} of ${TOTAL_CYCLES}`;
       }
