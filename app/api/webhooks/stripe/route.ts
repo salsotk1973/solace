@@ -2,9 +2,11 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-03-25.dahlia",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("Missing env: STRIPE_SECRET_KEY");
+  return new Stripe(key, { apiVersion: "2026-03-25.dahlia" });
+}
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -17,7 +19,7 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!,
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
         const clerkUserId = session.metadata?.clerkUserId;
         if (!clerkUserId) break;
 
-        const subscription = await stripe.subscriptions.retrieve(
+        const subscription = await getStripe().subscriptions.retrieve(
           session.subscription as string,
         );
 

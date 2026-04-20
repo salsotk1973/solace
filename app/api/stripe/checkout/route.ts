@@ -3,9 +3,11 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-03-25.dahlia",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("Missing env: STRIPE_SECRET_KEY");
+  return new Stripe(key, { apiVersion: "2026-03-25.dahlia" });
+}
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -35,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "priceId is required" }, { status: 400 });
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
