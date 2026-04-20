@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import PatternSelector, { type SleepPattern } from "./PatternSelector";
 import ProgressRing, { RING_CIRCUMFERENCE } from "./ProgressRing";
@@ -25,9 +25,8 @@ const INFO: Record<SleepPattern, { duration: string; bestFor: string }> = {
   "relax": { duration: "~5 min", bestFor: "Deep rest"       },
 };
 
-const ORB_MIN      = 1.0;
-const ORB_MAX      = 1.15;
-const DIM_DELAY_MS = 4000;
+const ORB_MIN = 1.0;
+const ORB_MAX = 1.15;
 
 // EXACT same T() helper as Breathing
 const T = (a: number) => `rgba(60,192,212,${a})`;
@@ -67,14 +66,6 @@ export default function SleepOrb({ userId }: Props) {
   // Progress ring: [0] = fill circle, [1] = bead group
   const ringRefsRef = useRef<(SVGCircleElement | SVGGElement | null)[]>([null, null]);
 
-  // Dimming refs — Sleep-only
-  const vignetteRef    = useRef<HTMLDivElement>(null);
-  const headerRef      = useRef<HTMLElement>(null);
-  const patternAreaRef = useRef<HTMLDivElement>(null);
-  const cardsRef       = useRef<HTMLDivElement>(null);
-  const humanLineRef   = useRef<HTMLParagraphElement>(null);
-  const crossLinksRef  = useRef<HTMLElement>(null);
-
   // RAF state refs
   const rafRef          = useRef<number>(0);
   const isRunningRef    = useRef(false);
@@ -83,64 +74,34 @@ export default function SleepOrb({ userId }: Props) {
   const cycleIdxRef     = useRef(0);
   const phaseStartRef   = useRef(0);
   const labelVisibleRef = useRef(false);
-  const labelDimRef     = useRef(1);
-  const dimTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const labelDimRef   = useRef(1);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { patternKeyRef.current = pattern; }, [pattern]);
 
-  // Dimming — Sleep-only feature
-  const applyDimming = useCallback(() => {
-    [headerRef, patternAreaRef, cardsRef, humanLineRef, crossLinksRef].forEach((r) => {
-      if (r.current) r.current.style.opacity = "0.1";
-    });
-    if (vignetteRef.current) vignetteRef.current.style.opacity = "1";
-  }, []);
-
-  const removeDimming = useCallback((instant = false) => {
-    [headerRef, patternAreaRef, cardsRef, humanLineRef, crossLinksRef].forEach((r) => {
-      if (!r.current) return;
-      if (instant) {
-        r.current.style.transition = "opacity 0s";
-        r.current.style.opacity = "";
-        requestAnimationFrame(() => { if (r.current) r.current.style.transition = ""; });
-      } else { r.current.style.opacity = ""; }
-    });
-    if (vignetteRef.current) {
-      if (instant) {
-        vignetteRef.current.style.transition = "opacity 0s";
-        vignetteRef.current.style.opacity = "0";
-        requestAnimationFrame(() => { if (vignetteRef.current) vignetteRef.current.style.transition = ""; });
-      } else { vignetteRef.current.style.opacity = "0"; }
-    }
-  }, []);
-
-  const doSilentReset = useCallback(() => {
+  function doSilentReset() {
     cancelAnimationFrame(rafRef.current);
-    if (dimTimerRef.current)   clearTimeout(dimTimerRef.current);
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     isRunningRef.current = false;
     labelVisibleRef.current = false;
     setIsRunning(false);
     setStarted(false);
-    removeDimming(true);
     if (orbRef.current)   { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = ""; }
     if (labelRef.current) { labelRef.current.textContent = ""; labelRef.current.style.opacity = "0"; }
     if (cycleRef.current)  cycleRef.current.textContent = "";
     const [ring, bead] = ringRefsRef.current;
     if (ring) { (ring as SVGCircleElement).style.transition = "none"; (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; (ring as SVGCircleElement).style.opacity = ""; }
     if (bead) { (bead as SVGGElement).style.transition = "none"; (bead as SVGGElement).style.opacity = "0"; (bead as SVGGElement).style.transform = "rotate(0deg)"; }
-  }, [removeDimming]);
+  }
 
   const doSilentResetRef = useRef(doSilentReset);
-  useEffect(() => { doSilentResetRef.current = doSilentReset; }, [doSilentReset]);
 
   const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("sleep", userId);
   const loadHistoryRef = useRef(loadHistory);
   useEffect(() => { loadHistoryRef.current = loadHistory; }, [loadHistory]);
 
   // RAF loop
-  const loop = useCallback(function loopFrame(ts: number) {
+  function loop(ts: number) {
     if (!isRunningRef.current) return;
     const pat         = patternKeyRef.current;
     const phases      = PATTERNS[pat];
@@ -225,8 +186,8 @@ export default function SleepOrb({ userId }: Props) {
       }, 200);
     }
 
-    rafRef.current = requestAnimationFrame(loopFrame);
-  }, [userId]);
+    rafRef.current = requestAnimationFrame(loop);
+  }
 
   // Start / stop
   useEffect(() => {
@@ -268,21 +229,17 @@ export default function SleepOrb({ userId }: Props) {
         });
       }
 
-      dimTimerRef.current = setTimeout(applyDimming, DIM_DELAY_MS);
       rafRef.current = requestAnimationFrame(loop);
     } else {
       cancelAnimationFrame(rafRef.current);
-      if (dimTimerRef.current) clearTimeout(dimTimerRef.current);
       labelVisibleRef.current = false;
       if (labelRef.current) labelRef.current.style.opacity = "0";
-      removeDimming(true);
     }
     return () => {
       cancelAnimationFrame(rafRef.current);
-      if (dimTimerRef.current)   clearTimeout(dimTimerRef.current);
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     };
-  }, [isRunning, loop, applyDimming, removeDimming]);
+  }, [isRunning]);
 
   function handleStart() { patternKeyRef.current = pattern; setStarted(true);  setIsRunning(true);  }
   function handleStop()  { if (resetTimerRef.current) clearTimeout(resetTimerRef.current); setIsRunning(false); setStarted(false); }
@@ -294,20 +251,11 @@ export default function SleepOrb({ userId }: Props) {
   const rgbChoose    = getToolRgb("choose").replace(/, /g, ",");
 
   return (
-    // EXACT same root div as Breathing — not a fragment
     <div>
-      {/* Vignette — Sleep-only. Dims UI after 4s of session. */}
-      <div
-        ref={vignetteRef}
-        className="fixed inset-0 z-[90] pointer-events-none opacity-0 transition-opacity duration-[3000ms]"
-        style={{ background: "radial-gradient(ellipse at center, transparent 20%, rgba(5,7,12,0.85) 100%)" }}
-      />
-
       {/* EXACT same outer wrapper as Breathing page.tsx */}
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[96px] md:pt-[140px] pb-28">
 
-        {/* Tool header — dimmable — EXACT same structure as Breathing */}
-        <header ref={headerRef} className="text-center mb-2 md:mb-14 transition-opacity duration-[3000ms]">
+        <header className="text-center mb-2 md:mb-14">
           <p
             className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase mb-2 md:mb-3"
             style={{ color: T(0.80) }}
@@ -324,8 +272,7 @@ export default function SleepOrb({ userId }: Props) {
         {/* Tool zone — EXACT same wrapper as Breathing BreathingSession */}
         <div className="mb-6 md:mb-0">
 
-          {/* Pattern selector — dimmable */}
-          <div ref={patternAreaRef} className="transition-opacity duration-[3000ms]">
+          <div>
             <PatternSelector selected={pattern} onChange={setPattern} disabled={isRunning} />
           </div>
 
@@ -392,8 +339,7 @@ export default function SleepOrb({ userId }: Props) {
 
           {/* Info cards — EXACT same classes as Breathing */}
           <div
-            ref={cardsRef}
-            className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20 transition-opacity duration-[3000ms]"
+            className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20"
           >
             {[
               { label: "Duration", value: info.duration },
@@ -421,10 +367,8 @@ export default function SleepOrb({ userId }: Props) {
           </div>
         </div>
 
-        {/* Human line — dimmable — EXACT same classes as Breathing */}
         <p
-          ref={humanLineRef}
-          className="text-center [font-family:var(--font-display)] italic font-light text-[clamp(16px,2.2vw,22px)] text-[rgba(255,255,255,0.65)] mt-4 mb-20 max-w-[440px] mx-auto leading-relaxed transition-opacity duration-[3000ms]"
+          className="text-center [font-family:var(--font-display)] italic font-light text-[clamp(16px,2.2vw,22px)] text-[rgba(255,255,255,0.65)] mt-4 mb-20 max-w-[440px] mx-auto leading-relaxed"
         >
           The day is done. Your body already knows what to do.
         </p>
@@ -537,8 +481,8 @@ export default function SleepOrb({ userId }: Props) {
           </section>
         )}
 
-        {/* Cross-links — EXACT same as Breathing page.tsx, desktop only */}
-        <section ref={crossLinksRef} className="hidden md:block transition-opacity duration-[3000ms]">
+        {/* Cross-links — desktop only */}
+        <section className="hidden md:block">
           <p
             className="text-center [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-6"
             style={{ color: T(0.55) }}

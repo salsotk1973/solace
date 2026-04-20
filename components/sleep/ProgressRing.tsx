@@ -53,7 +53,7 @@ const ProgressRing = forwardRef<(SVGCircleElement | SVGGElement | null)[], Progr
         {/* Bead — exact same as Breathing */}
         <g
           ref={setBeadRef}
-          style={{ opacity: 0, transformOrigin: "114px 114px" }}
+          style={{ opacity: 0, transformOrigin: "50% 50%" }}
         >
           <circle
             cx={114 + 108} cy={114} r={2.35}
