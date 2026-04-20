@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import PatternSelector, { type SleepPattern } from "./PatternSelector";
 import ProgressRing, { RING_CIRCUMFERENCE } from "./ProgressRing";
 import { glassBackground, glassBorder, getToolRgb } from "@/lib/design-tokens";
 import { useToolHistory } from "@/hooks/useToolHistory";
 import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
+
+const SessionComplete = dynamic(() => import("./SessionComplete"), { ssr: false });
 
 type PhaseType = "inhale" | "hold-in" | "exhale";
 interface Phase { label: string; type: PhaseType; duration: number; }
@@ -41,6 +44,8 @@ export default function SleepOrb({ userId }: Props) {
   const [pattern, setPattern]         = useState<SleepPattern>("48");
   const [isRunning, setIsRunning]     = useState(false);
   const [started, setStarted]         = useState(false);
+  const [sessionComplete, setSessionComplete] = useState(false);
+  const [dismissed, setDismissed]             = useState(false);
   // EXACT same history toggle state as Breathing
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -86,6 +91,8 @@ export default function SleepOrb({ userId }: Props) {
     labelVisibleRef.current = false;
     setIsRunning(false);
     setStarted(false);
+    setSessionComplete(false);
+    setDismissed(false);
     if (orbRef.current)   { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = ""; }
     if (labelRef.current) { labelRef.current.textContent = ""; labelRef.current.style.opacity = "0"; }
     if (cycleRef.current)  cycleRef.current.textContent = "";
@@ -170,6 +177,7 @@ export default function SleepOrb({ userId }: Props) {
             orbRef.current.style.transform  = "scale(1)";
             orbRef.current.style.filter     = "";
           }
+          setSessionComplete(true);
           resetTimerRef.current = setTimeout(() => doSilentResetRef.current(), 5000);
           return;
         }
@@ -251,8 +259,20 @@ export default function SleepOrb({ userId }: Props) {
     };
   }, [isRunning]);
 
-  function handleStart() { patternKeyRef.current = pattern; setStarted(true);  setIsRunning(true);  }
-  function handleStop()  { if (resetTimerRef.current) clearTimeout(resetTimerRef.current); setIsRunning(false); setStarted(false); }
+  function handleStart() {
+    patternKeyRef.current = pattern;
+    setStarted(true);
+    setIsRunning(true);
+    setSessionComplete(false);
+    setDismissed(false);
+  }
+  function handleStop() {
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    setIsRunning(false);
+    setStarted(false);
+    setSessionComplete(false);
+    setDismissed(false);
+  }
 
   const info         = INFO[pattern];
   // EXACT same historyLabel logic as Breathing
@@ -548,6 +568,15 @@ export default function SleepOrb({ userId }: Props) {
         </section>
 
       </div>
+
+      {/* Session complete — same as Breathing */}
+      {sessionComplete && !dismissed && (
+        <SessionComplete
+          isLoggedIn={!!userId}
+          isPaid={history?.isPaid}
+          onDismiss={() => setDismissed(true)}
+        />
+      )}
     </div>
   );
 }
