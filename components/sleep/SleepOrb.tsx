@@ -91,7 +91,6 @@ export default function SleepOrb({ userId }: Props) {
     labelVisibleRef.current = false;
     setIsRunning(false);
     setStarted(false);
-    setSessionComplete(false);
     setDismissed(false);
     if (orbRef.current)   { orbRef.current.style.transition = ""; orbRef.current.style.transform = "scale(1)"; orbRef.current.style.filter = ""; orbRef.current.style.opacity = ""; }
     if (labelRef.current) { labelRef.current.textContent = ""; labelRef.current.style.opacity = "0"; }
@@ -364,7 +363,7 @@ export default function SleepOrb({ userId }: Props) {
           {/* Cycle counter — EXACT same as Breathing */}
           <p
             ref={cycleRef}
-            className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4 mb-3"
+            className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4"
           />
 
           {/* Info cards — EXACT same classes as Breathing */}
@@ -405,7 +404,7 @@ export default function SleepOrb({ userId }: Props) {
 
         {/* History — EXACT same structure as BreathingSession.tsx */}
         {userId && history && (
-          <section className="max-w-[520px] mx-auto mb-20">
+          <section className={`max-w-[520px] mx-auto ${historyOpen ? "mb-6" : "mb-4"} md:mb-20`}>
 
             {/* Mobile toggle — EXACT same as Breathing */}
             <button
