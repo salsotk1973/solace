@@ -1,21 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type PhaseType = "inhale" | "hold-in" | "exhale" | "hold-out";
 
 interface Phase {
   label: string;
-  type:  PhaseType;
-  duration: number;
+  type: PhaseType;
+  duration: number; // seconds
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const PATTERNS: Record<string, Phase[]> = {
   box: [
-    { label: "Inhale", type: "inhale",   duration: 4 },
-    { label: "Hold",   type: "hold-in",  duration: 4 },
-    { label: "Exhale", type: "exhale",   duration: 4 },
-    { label: "Hold",   type: "hold-out", duration: 4 },
+    { label: "Inhale", type: "inhale",    duration: 4 },
+    { label: "Hold",   type: "hold-in",   duration: 4 },
+    { label: "Exhale", type: "exhale",    duration: 4 },
+    { label: "Hold",   type: "hold-out",  duration: 4 },
   ],
   "478": [
     { label: "Inhale", type: "inhale",   duration: 4 },
@@ -25,18 +29,31 @@ const PATTERNS: Record<string, Phase[]> = {
 };
 
 const TOTAL_CYCLES = 5;
-const SVG_SIZE     = 240;
-const SVG_CENTER   = 120;
-const SESSION_R    = 128;
-const SESSION_C    = 2 * Math.PI * SESSION_R;
+const ORB_MIN      = 1.0;
+const ORB_MAX      = 1.18;
+
+// SVG geometry (all internal coords are in 240×240 space — viewBox handles scaling)
+const SVG_SIZE   = 240;
+const SVG_CENTER = 120;
+const SESSION_R  = 128;
+const SESSION_C  = 2 * Math.PI * SESSION_R; // ~741.4
+
+type ActivePhase = PhaseType | "idle";
+
+const GLOW_MIN_SCALE   = 1.05;
+const GLOW_MAX_SCALE   = 1.30;
+const GLOW_MIN_OPACITY = 0.28;
+const GLOW_MAX_OPACITY = 0.55;
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
-  pattern:       string;
-  isRunning:     boolean;
+  pattern: string;
+  isRunning: boolean;
   onCycleChange: (cycle: number) => void;
-  onComplete:    () => void;
+  onComplete: () => void;
   onPhaseChange?: (phase: PhaseType | "idle", duration: number) => void;
-  size?:         number;
+  size?: number; // rendered px size, default 240
 }
 
 export default function BreathingOrb({
@@ -47,203 +64,196 @@ export default function BreathingOrb({
   onPhaseChange,
   size = 240,
 }: Props) {
-  const sc = size / 240;
+  const sc = size / 240; // scale factor relative to canonical 240px
 
-  // Refs for direct DOM control — React never animates these
-  const stageRef        = useRef<HTMLDivElement>(null);
-  const glowRef         = useRef<HTMLDivElement>(null);
-  const orbRef          = useRef<HTMLDivElement>(null);
-  const labelRef        = useRef<HTMLSpanElement>(null);
-  const cycleRef        = useRef<HTMLParagraphElement>(null);
   const sessionRingRef  = useRef<SVGCircleElement>(null);
+  const phaseRingRef    = useRef<SVGCircleElement>(null);
   const progressBeadRef = useRef<SVGGElement>(null);
-
-  // Non-state refs for session control
-  const isRunningRef     = useRef(false);
-  const timeoutsRef      = useRef<number[]>([]);
-  const onCycleChangeRef = useRef(onCycleChange);
-  const onCompleteRef    = useRef(onComplete);
-  const onPhaseChangeRef = useRef(onPhaseChange);
+  const isRunningRef    = useRef(false);
+  const timeoutsRef     = useRef<number[]>([]);
+  const onCycleChangeRef  = useRef(onCycleChange);
+  const onCompleteRef     = useRef(onComplete);
+  const onPhaseChangeRef  = useRef(onPhaseChange);
+  const [activePhase,    setActivePhase]    = useState<ActivePhase>("idle");
+  const [phaseDuration,  setPhaseDuration]  = useState(1.5);
+  const [label,          setLabel]          = useState("");
+  const [cycleLabel,     setCycleLabel]     = useState("");
 
   useEffect(() => {
-    onCycleChangeRef.current = onCycleChange;
-    onCompleteRef.current    = onComplete;
-    onPhaseChangeRef.current = onPhaseChange;
+    onCycleChangeRef.current   = onCycleChange;
+    onCompleteRef.current      = onComplete;
+    onPhaseChangeRef.current   = onPhaseChange;
   }, [onCycleChange, onComplete, onPhaseChange]);
 
-  const innerPx  = Math.round(192 * sc);
-  const offsetPx = Math.round(24 * sc);
-  const blurPx   = Math.round(38 * sc);
+  useEffect(() => {
+    if (sessionRingRef.current) {
+      sessionRingRef.current.style.stroke          = "rgba(190,250,255,0.5)";
+      sessionRingRef.current.style.opacity         = "0";
+      sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+    }
+    if (phaseRingRef.current) {
+      phaseRingRef.current.style.stroke          = "none";
+      phaseRingRef.current.style.opacity         = "0";
+      phaseRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+    }
+    if (progressBeadRef.current) {
+      progressBeadRef.current.style.opacity   = "0";
+      progressBeadRef.current.style.transform = "rotate(0deg)";
+    }
+  }, []);
 
   useEffect(() => {
     isRunningRef.current = isRunning;
-    for (const t of timeoutsRef.current) window.clearTimeout(t);
+    for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
     timeoutsRef.current = [];
-
-    const glow  = glowRef.current;
-    const orb   = orbRef.current;
-    const label = labelRef.current;
-    const cycle = cycleRef.current;
-    const ring  = sessionRingRef.current;
-    const bead  = progressBeadRef.current;
-
-    if (!glow || !orb) return;
 
     if (!isRunning) {
       onPhaseChangeRef.current?.("idle", 0);
-
-      // Instant reset — no transition
-      glow.style.transition  = "none";
-      glow.style.opacity     = "0.28";
-      glow.style.transform   = "scale(1.0)";
-      orb.style.transition   = "none";
-      orb.style.transform    = "scale(1.0)";
-      if (label) { label.style.opacity = "0"; label.textContent = ""; }
-      if (cycle) cycle.textContent = "";
-
-      if (ring) {
-        ring.style.transition       = "none";
-        ring.style.opacity          = "0";
-        ring.style.strokeDashoffset = String(SESSION_C);
+      if (sessionRingRef.current) {
+        sessionRingRef.current.style.transition       = "none";
+        sessionRingRef.current.style.opacity          = "0";
+        sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
       }
-      if (bead) {
-        bead.style.transition = "none";
-        bead.style.opacity    = "0";
-        bead.style.transform  = "rotate(0deg)";
+      if (progressBeadRef.current) {
+        progressBeadRef.current.style.transition = "none";
+        progressBeadRef.current.style.opacity    = "0";
+        progressBeadRef.current.style.transform  = "rotate(0deg)";
       }
       return;
     }
 
-    // ── Session started ──────────────────────────────────────────────
     const phases          = PATTERNS[pattern];
-    const sessionDuration = phases.reduce((t, p) => t + p.duration, 0) * TOTAL_CYCLES;
+    const sessionDuration = phases.reduce(
+      (total, phase) => total + phase.duration, 0,
+    ) * TOTAL_CYCLES;
 
-    // Session ring
-    if (ring) {
-      ring.style.transition       = "none";
-      ring.style.strokeDashoffset = String(SESSION_C);
-      ring.style.opacity          = "0.7";
-      requestAnimationFrame(() => {
-        if (!ring || !isRunningRef.current) return;
-        ring.style.transition       = `stroke-dashoffset ${sessionDuration}s linear`;
-        ring.style.strokeDashoffset = "0";
+    if (sessionRingRef.current) {
+      sessionRingRef.current.style.transition       = "none";
+      sessionRingRef.current.style.strokeDashoffset = `${SESSION_C}`;
+      sessionRingRef.current.style.opacity          = "0.7";
+
+      window.requestAnimationFrame(() => {
+        if (!sessionRingRef.current || !isRunningRef.current) return;
+        sessionRingRef.current.style.transition       = `stroke-dashoffset ${sessionDuration}s linear`;
+        sessionRingRef.current.style.strokeDashoffset = "0";
       });
     }
 
-    // Progress bead
-    if (bead) {
-      bead.style.transition = "none";
-      bead.style.opacity    = "0.9";
-      bead.style.transform  = "rotate(0deg)";
-      requestAnimationFrame(() => {
-        if (!bead || !isRunningRef.current) return;
-        bead.style.transition = `transform ${sessionDuration}s linear`;
-        bead.style.transform  = "rotate(360deg)";
+    if (progressBeadRef.current) {
+      progressBeadRef.current.style.transition = "none";
+      progressBeadRef.current.style.opacity    = "0.9";
+      progressBeadRef.current.style.transform  = "rotate(0deg)";
+
+      window.requestAnimationFrame(() => {
+        if (!progressBeadRef.current || !isRunningRef.current) return;
+        progressBeadRef.current.style.transition = `transform ${sessionDuration}s linear`;
+        progressBeadRef.current.style.transform  = "rotate(360deg)";
       });
     }
 
-    function applyPhase(phase: Phase) {
-      if (!glow || !orb) return;
-      const active = phase.type === "inhale" || phase.type === "hold-in";
-      const dur    = phase.duration;
-
-      // Glow
-      glow.style.transition = `opacity ${dur}s ease-in-out, transform ${dur}s ease-in-out`;
-      glow.style.opacity    = active ? "0.55" : "0.28";
-      glow.style.transform  = active ? "scale(1.22)" : "scale(1.0)";
-
-      // Orb
-      orb.style.transition = `transform ${dur}s ease-in-out`;
-      orb.style.transform  = active ? "scale(1.18)" : "scale(1.0)";
-
-      // Label
-      if (label) {
-        label.textContent      = phase.label;
-        label.style.opacity    = "0.88";
-        label.style.transition = "opacity 220ms ease-in-out";
-      }
-    }
-
-    function runPhase(cycleIndex: number, phaseIndex: number) {
+    const runPhase = (cycleIndex: number, phaseIndex: number) => {
       if (!isRunningRef.current) return;
-      const phase = phases[phaseIndex];
 
-      applyPhase(phase);
-      if (cycle) cycle.textContent = `Cycle ${cycleIndex + 1} of ${TOTAL_CYCLES}`;
+      const phase = phases[phaseIndex];
+      setActivePhase(phase.type);
+      setPhaseDuration(phase.duration);
+      setLabel(phase.label);
+      setCycleLabel(`Cycle ${cycleIndex + 1} of ${TOTAL_CYCLES}`);
       onPhaseChangeRef.current?.(phase.type, phase.duration);
 
       const timeout = window.setTimeout(() => {
         if (!isRunningRef.current) return;
-        const nextPhase = phaseIndex + 1;
-        if (nextPhase < phases.length) {
-          runPhase(cycleIndex, nextPhase);
+
+        const nextPhaseIndex = phaseIndex + 1;
+        if (nextPhaseIndex < phases.length) {
+          runPhase(cycleIndex, nextPhaseIndex);
           return;
         }
+
         const nextCycle = cycleIndex + 1;
         if (nextCycle < TOTAL_CYCLES) {
           onCycleChangeRef.current(nextCycle);
           runPhase(nextCycle, 0);
           return;
         }
-        // Session complete
+
         isRunningRef.current = false;
-        if (label) { label.style.opacity = "0"; label.textContent = ""; }
+        setLabel("");
         onPhaseChangeRef.current?.("idle", 0);
         onCompleteRef.current();
       }, phase.duration * 1000);
 
       timeoutsRef.current.push(timeout);
-    }
+    };
 
     onCycleChangeRef.current(0);
     runPhase(0, 0);
 
     return () => {
       isRunningRef.current = false;
-      for (const t of timeoutsRef.current) window.clearTimeout(t);
+      for (const timeout of timeoutsRef.current) window.clearTimeout(timeout);
       timeoutsRef.current = [];
       onPhaseChangeRef.current?.("idle", 0);
     };
   }, [isRunning, pattern]);
 
+  const displayPhase     = isRunning ? activePhase   : "idle"  as ActivePhase;
+  const displayLabel     = isRunning ? label         : "";
+  const displayCycleLabel = isRunning ? cycleLabel   : "";
+  const displayDuration  = isRunning ? phaseDuration : 1.5;
+  const orbScale         = displayPhase === "inhale" || displayPhase === "hold-in" ? ORB_MAX : ORB_MIN;
+  const glowActive       = displayPhase === "inhale" || displayPhase === "hold-in";
+  const running          = isRunning && displayPhase !== "idle";
+  const orbTransition    = `transform ${displayDuration}s ease-in-out, filter ${displayDuration}s ease-in-out`;
+  const glowScale        = glowActive ? GLOW_MAX_SCALE   : GLOW_MIN_SCALE;
+  const glowOpacity      = glowActive ? GLOW_MAX_OPACITY : GLOW_MIN_OPACITY;
+
+  // Derived pixel sizes
+  const innerPx  = Math.round(192 * sc); // orb sphere + glow size
+  const offsetPx = Math.round(24  * sc); // top/left offset
+
+  // ── JSX ───────────────────────────────────────────────────────────────────
+
   return (
     <div className="flex flex-col items-center gap-5 md:gap-8">
-      <div
-        ref={stageRef}
-        className="relative"
-        style={{ width: size, height: size, overflow: "visible" }}
-      >
-        {/* Glow — desktop only */}
-        {size >= 240 && (
-          <div
-            ref={glowRef}
-            className="absolute z-0 rounded-full pointer-events-none"
-            style={{
-              width:           size,
-              height:          size,
-              left:            0,
-              top:             0,
-              background:      "rgba(45,212,191,0.55)",
-              filter:          `blur(${blurPx}px)`,
-              transformOrigin: "center",
-            }}
-          />
-        )}
 
-        {/* Orb sphere — no animated props in JSX */}
+      {/* ── Orb stage ──────────────────────────────────────────────────── */}
+      <div className="relative" style={{ width: size, height: size, overflow: "visible" }}>
+
+        {/* Base glow layer */}
         <div
-          ref={orbRef}
-          className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(80,190,185,0.22)_0%,rgba(42,140,140,0.16)_38%,rgba(18,82,90,0.13)_72%,rgba(8,40,52,0.11)_100%)]"
+          className="absolute z-0 rounded-full pointer-events-none"
           style={{
-            width:           innerPx,
-            height:          innerPx,
-            top:             offsetPx,
-            left:            offsetPx,
-            transformOrigin: "center",
+            animation:      "none",
+            width:          `${innerPx}px`,
+            height:         `${innerPx}px`,
+            left:           `${offsetPx}px`,
+            top:            `${offsetPx}px`,
+            background:     "rgba(45, 212, 191, 0.65)",
+            filter:         "blur(32px)",
+            opacity:        glowOpacity,
+            transform:      `scale(${glowScale})`,
+            transformOrigin:"center",
+            transition:     `opacity ${displayDuration}s ease-in-out, transform ${displayDuration}s ease-in-out`,
           }}
         />
 
-        {/* Session ring */}
+        {/* Orb sphere */}
+        <div
+          className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(100,210,200,0.18)_0%,rgba(55,170,165,0.14)_38%,rgba(22,100,110,0.12)_72%,rgba(10,50,65,0.10)_100%)]"
+          style={{
+            width:          `${innerPx}px`,
+            height:         `${innerPx}px`,
+            top:            `${offsetPx}px`,
+            left:           `${offsetPx}px`,
+            animation:      "none",
+            filter:         "blur(0px)",
+            transform:      `scale(${orbScale})`,
+            transition:     orbTransition,
+          }}
+        />
+
+        {/* Session progress ring — viewBox 0 0 240 240 so internal coords scale via width/height */}
         <svg
           className="absolute inset-0 z-20 -rotate-90 pointer-events-none"
           width={size}
@@ -253,23 +263,45 @@ export default function BreathingOrb({
         >
           <circle
             cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
-            fill="none" stroke="rgba(180,245,250,0.16)"
-            strokeWidth={1.25} strokeLinecap="round" opacity={0.9}
+            fill="none"
+            stroke="rgba(180,245,250,0.16)"
+            strokeWidth={1.25}
+            strokeLinecap="round"
+            opacity={0.9}
           />
           <circle
             ref={sessionRingRef}
             cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
-            fill="none" stroke="rgba(190,250,255,0.5)"
-            strokeWidth={1.75} strokeLinecap="round"
-            strokeDasharray={SESSION_C} strokeDashoffset={SESSION_C}
+            fill="none"
+            stroke="rgba(190,250,255,0.5)"
+            strokeWidth={1.75}
+            strokeLinecap="round"
+            strokeDasharray={SESSION_C}
+            strokeDashoffset={SESSION_C}
+            opacity={0}
+          />
+          <circle
+            ref={phaseRingRef}
+            cx={SVG_CENTER} cy={SVG_CENTER} r={SESSION_R}
+            fill="none"
+            stroke="none"
+            strokeWidth={1}
+            strokeLinecap="round"
+            strokeDasharray={SESSION_C}
+            strokeDashoffset={SESSION_C}
             opacity={0}
           />
           <g
             ref={progressBeadRef}
-            style={{ opacity: 0, transformOrigin: `${SVG_CENTER}px ${SVG_CENTER}px` }}
+            style={{
+              opacity:         0,
+              transformOrigin: `${SVG_CENTER}px ${SVG_CENTER}px`,
+            }}
           >
             <circle
-              cx={SVG_CENTER + SESSION_R} cy={SVG_CENTER} r={2.35}
+              cx={SVG_CENTER + SESSION_R}
+              cy={SVG_CENTER}
+              r={2.35}
               fill="rgba(210,252,255,0.96)"
               style={{ filter: "drop-shadow(0 0 4px rgba(190,250,255,0.52))" }}
             />
@@ -278,17 +310,17 @@ export default function BreathingOrb({
 
         {/* Phase label */}
         <span
-          ref={labelRef}
-          className="absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none"
-          style={{ opacity: 0 }}
-        />
+          className="absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out"
+          style={{ opacity: running ? 0.88 : 0 }}
+        >
+          {displayLabel}
+        </span>
       </div>
 
-      {/* Cycle counter */}
-      <p
-        ref={cycleRef}
-        className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4"
-      />
+      {/* ── Cycle counter ──────────────────────────────────────────────── */}
+      <p className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4">
+        {displayCycleLabel}
+      </p>
     </div>
   );
 }
