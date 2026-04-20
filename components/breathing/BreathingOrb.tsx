@@ -81,6 +81,19 @@ export default function BreathingOrb({
     onPhaseChangeRef.current = onPhaseChange;
   }, [onCycleChange, onComplete, onPhaseChange]);
 
+  // ── Mount: set initial animated values imperatively (React must not own these) ──
+  useEffect(() => {
+    if (glowRef.current) {
+      glowRef.current.style.opacity         = String(GLOW_MIN_OPACITY);
+      glowRef.current.style.transform       = `scale(${GLOW_MIN_SCALE})`;
+      glowRef.current.style.transition      = "none";
+    }
+    if (orbRef.current) {
+      orbRef.current.style.transform       = "scale(1)";
+      orbRef.current.style.transition      = "none";
+    }
+  }, []);
+
   // ── Session ring + bead initialisation ───────────────────────────────
   useEffect(() => {
     if (sessionRingRef.current) {
@@ -240,10 +253,7 @@ export default function BreathingOrb({
             top:             "0px",
             background:      "rgba(45, 212, 191, 0.55)",
             filter:          `blur(${Math.round(38 * sc)}px)`,
-            opacity:         GLOW_MIN_OPACITY,
-            transform:       `scale(${GLOW_MIN_SCALE})`,
             transformOrigin: "center",
-            transition:      "none",
           }}
         />
 
@@ -256,9 +266,7 @@ export default function BreathingOrb({
             height:          `${innerPx}px`,
             top:             `${offsetPx}px`,
             left:            `${offsetPx}px`,
-            transform:       "scale(1)",
             transformOrigin: "center",
-            transition:      "none",
           }}
         />
 
