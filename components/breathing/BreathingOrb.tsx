@@ -213,20 +213,22 @@ export default function BreathingOrb({
         className="relative"
         style={{ width: size, height: size, overflow: "visible" }}
       >
-        {/* Glow — full stage size, no animated props in JSX */}
-        <div
-          ref={glowRef}
-          className="absolute z-0 rounded-full pointer-events-none"
-          style={{
-            width:           size,
-            height:          size,
-            left:            0,
-            top:             0,
-            background:      "rgba(45,212,191,0.55)",
-            filter:          `blur(${blurPx}px)`,
-            transformOrigin: "center",
-          }}
-        />
+        {/* Glow — desktop only */}
+        {size >= 240 && (
+          <div
+            ref={glowRef}
+            className="absolute z-0 rounded-full pointer-events-none"
+            style={{
+              width:           size,
+              height:          size,
+              left:            0,
+              top:             0,
+              background:      "rgba(45,212,191,0.55)",
+              filter:          `blur(${blurPx}px)`,
+              transformOrigin: "center",
+            }}
+          />
+        )}
 
         {/* Orb sphere — no animated props in JSX */}
         <div
