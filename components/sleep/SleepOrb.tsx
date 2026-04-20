@@ -90,7 +90,7 @@ export default function SleepOrb({ userId }: Props) {
     if (labelRef.current) { labelRef.current.textContent = ""; labelRef.current.style.opacity = "0"; }
     if (cycleRef.current)  cycleRef.current.textContent = "";
     const [ring, bead] = ringRefsRef.current;
-    if (ring) { (ring as SVGCircleElement).style.transition = "none"; (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; (ring as SVGCircleElement).style.opacity = ""; }
+    if (ring) { (ring as SVGCircleElement).style.transition = "none"; (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`; (ring as SVGCircleElement).style.opacity = "0"; }
     if (bead) { (bead as SVGGElement).style.transition = "none"; (bead as SVGGElement).style.opacity = "0"; (bead as SVGGElement).style.transform = "rotate(0deg)"; }
   }
 
@@ -128,10 +128,13 @@ export default function SleepOrb({ userId }: Props) {
     const cycleElapsed  = cycleIdxRef.current * totalPhaseDur + donePhaseDur + Math.min(elapsed, phase.duration);
     const sessionProg   = Math.min(cycleElapsed / (totalPhaseDur * totalCycles), 1);
 
-    const [ring] = ringRefsRef.current;
+    const [ring, bead] = ringRefsRef.current;
     if (ring) {
       (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - sessionProg)}`;
       (ring as SVGCircleElement).style.opacity = `${Math.max(1 - sessionProg * 0.5, 0.5)}`;
+    }
+    if (bead) {
+      (bead as SVGGElement).style.transform = `rotate(${sessionProg * 360}deg)`;
     }
 
     const orbOpacity = Math.max(1 - sessionProg * 0.4, 0.6);
@@ -197,7 +200,6 @@ export default function SleepOrb({ userId }: Props) {
     if (isRunning) {
       const phases      = PATTERNS[patternKeyRef.current];
       const totalCycles = CYCLES[patternKeyRef.current];
-      const sessionDur  = phases.reduce((s, p) => s + p.duration, 0) * totalCycles;
 
       phaseIdxRef.current     = 0;
       cycleIdxRef.current     = 0;
@@ -212,21 +214,11 @@ export default function SleepOrb({ userId }: Props) {
         (ring as SVGCircleElement).style.transition = "none";
         (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`;
         (ring as SVGCircleElement).style.opacity = "0.7";
-        requestAnimationFrame(() => {
-          if (!ring || !isRunningRef.current) return;
-          (ring as SVGCircleElement).style.transition = `stroke-dashoffset ${sessionDur}s linear`;
-          (ring as SVGCircleElement).style.strokeDashoffset = "0";
-        });
       }
       if (bead) {
         (bead as SVGGElement).style.transition = "none";
         (bead as SVGGElement).style.opacity    = "0.9";
         (bead as SVGGElement).style.transform  = "rotate(0deg)";
-        requestAnimationFrame(() => {
-          if (!bead || !isRunningRef.current) return;
-          (bead as SVGGElement).style.transition = `transform ${sessionDur}s linear`;
-          (bead as SVGGElement).style.transform  = "rotate(360deg)";
-        });
       }
 
       rafRef.current = requestAnimationFrame(loop);
@@ -234,6 +226,24 @@ export default function SleepOrb({ userId }: Props) {
       cancelAnimationFrame(rafRef.current);
       labelVisibleRef.current = false;
       if (labelRef.current) labelRef.current.style.opacity = "0";
+      const [ring, bead] = ringRefsRef.current;
+      if (ring) {
+        (ring as SVGCircleElement).style.transition = "none";
+        (ring as SVGCircleElement).style.strokeDashoffset = `${RING_CIRCUMFERENCE}`;
+        (ring as SVGCircleElement).style.opacity = "0";
+      }
+      if (bead) {
+        (bead as SVGGElement).style.transition = "none";
+        (bead as SVGGElement).style.opacity = "0";
+        (bead as SVGGElement).style.transform = "rotate(0deg)";
+      }
+      if (orbRef.current) {
+        orbRef.current.style.transition = "none";
+        orbRef.current.style.transform = "scale(1)";
+        orbRef.current.style.filter = "";
+        orbRef.current.style.opacity = "";
+      }
+      if (cycleRef.current) cycleRef.current.textContent = "";
     }
     return () => {
       cancelAnimationFrame(rafRef.current);
