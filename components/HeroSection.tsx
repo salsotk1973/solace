@@ -1,7 +1,7 @@
 export function HeroSection() {
   return (
     <section
-      className="relative md:min-h-[55vh] flex items-start md:items-center justify-center overflow-hidden px-6 pt-[12vh] pb-12 md:pt-0 md:pb-0"
+      className="relative flex items-start justify-center overflow-hidden px-6 pt-[12vh] pb-12 md:pt-32 md:pb-16"
     >
       <h1 className="sr-only">
         Mental clarity tools for anxiety, focus, and overwhelm
