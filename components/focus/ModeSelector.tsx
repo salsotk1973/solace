@@ -10,11 +10,11 @@ interface ModeSelectorProps {
 // Locked pills signal paid tier without linking to pricing.
 export default function ModeSelector({ disabled }: ModeSelectorProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-3 mb-12">
+    <div className="flex flex-wrap justify-center gap-3 mb-6">
       {/* Free: active */}
       <button
         disabled={disabled}
-        className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,200,120,0.38)] bg-[rgba(240,170,70,0.06)] text-[rgba(255,200,120,0.9)] disabled:cursor-not-allowed transition-all duration-300"
+        className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,200,120,0.55)] bg-[rgba(240,170,70,0.06)] text-[rgba(255,200,120,0.9)] disabled:cursor-not-allowed transition-all duration-300"
       >
         <span className="[font-family:var(--font-jost)] text-[12px] font-[400] tracking-[-0.01em]">
           Pomodoro 25/5

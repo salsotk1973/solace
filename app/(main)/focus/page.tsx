@@ -44,37 +44,13 @@ export default async function FocusPage() {
           <FocusTimer userId={userId ?? null} />
         </div>
 
-        {/* ── Info cards ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-3 max-w-[520px] mx-auto mb-20">
-          {[
-            { label: "Work",     value: "25 min",  sub: "per session"      },
-            { label: "Rest",     value: "5 min",   sub: "between sessions" },
-            { label: "Sessions", value: "4",        sub: "then long break"  },
-          ].map(({ label, value, sub }) => (
-            <div
-              key={label}
-              className="flex flex-col items-center gap-1.5 px-4 py-4 rounded-[12px] border border-[rgba(240,170,70,0.07)] bg-[rgba(240,170,70,0.025)]"
-            >
-              <p className="[font-family:var(--font-jost)] text-[12px] tracking-[0.2em] uppercase text-[rgba(240,170,70,0.35)]">
-                {label}
-              </p>
-              <p className="[font-family:var(--font-display)] font-light text-[18px] text-[rgba(255,215,150,0.8)] leading-none">
-                {value}
-              </p>
-              <p className="[font-family:var(--font-jost)] text-[12px] text-[rgba(180,170,155,0.35)] tracking-[0.06em]">
-                {sub}
-              </p>
-            </div>
-          ))}
-        </div>
-
         {/* ── Human line ──────────────────────────────────────────────── */}
         <p className="text-center [font-family:var(--font-display)] italic font-light text-[clamp(16px,2.2vw,22px)] text-[rgba(255,255,255,0.65)] mb-20 max-w-[440px] mx-auto leading-relaxed">
           The work doesn&apos;t get easier. But the resistance does.
         </p>
 
-        {/* ── Other tools cross-links ─────────────────────────────────── */}
-        <section>
+        {/* ── Other tools cross-links — desktop only ─────────────────── */}
+        <section className="hidden md:block">
           <p className="text-center [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase text-[rgba(130,145,158,0.3)] mb-6">
             Other tools
           </p>
