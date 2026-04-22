@@ -101,7 +101,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           />
 
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
               <span
                 className="featured-lab-pill-editors-pick"
                 style={{
