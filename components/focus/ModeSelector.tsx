@@ -1,47 +1,83 @@
 "use client";
 
-import { Lock } from "lucide-react";
-
 interface ModeSelectorProps {
   disabled: boolean;
 }
 
-// Free tier — only one mode for now.
-// Locked pills signal paid tier without linking to pricing.
+function LockIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ marginLeft: "4px", flexShrink: 0 }}>
+      <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function ModeSelector({ disabled }: ModeSelectorProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-3 mb-6">
-      {/* Free: active */}
+    <div className="grid grid-cols-2 gap-1.5 w-full max-w-[260px] mx-auto mb-1 md:flex md:flex-wrap md:justify-center md:max-w-none md:gap-3 md:mb-14">
+
+      {/* Active free mode */}
       <button
         disabled={disabled}
-        className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,200,120,0.55)] bg-[rgba(240,170,70,0.06)] text-[rgba(255,200,120,0.9)] disabled:cursor-not-allowed transition-all duration-300"
+        className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-300 cursor-pointer disabled:cursor-not-allowed"
+        style={{
+          background: "rgba(232,168,62,0.22)",
+          border: "1px solid rgba(232,168,62,0.90)",
+          color: "rgba(255,220,140,1.0)",
+          boxShadow: "0 0 12px rgba(232,168,62,0.25)",
+        }}
       >
-        <span className="[font-family:var(--font-jost)] text-[12px] font-[400] tracking-[-0.01em]">
+        <span className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] font-[500] tracking-[0.02em] leading-none">
           Pomodoro 25/5
         </span>
       </button>
 
-      {/* Paid: Custom */}
-      <button
-        disabled
-        className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.04)] text-[rgba(130,140,150,0.28)] cursor-default opacity-30"
+      {/* Locked: Custom */}
+      <a
+        href="/pricing"
+        className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-200 hover:opacity-90"
+        style={{
+          background: "transparent",
+          border: "1px solid rgba(232,168,62,0.45)",
+          color: "rgba(232,168,62,0.80)",
+        }}
       >
-        <span className="[font-family:var(--font-jost)] flex items-center gap-1.5 text-[12px] tracking-[-0.01em]">
-          <Lock size={9} className="opacity-60" />
-          Custom
+        <span className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] font-[400] tracking-[0.02em] leading-none" style={{ display: "flex", alignItems: "center" }}>
+          Custom <LockIcon />
         </span>
-      </button>
+      </a>
 
-      {/* Paid: Deep Work */}
-      <button
-        disabled
-        className="flex flex-col items-center gap-0.5 px-7 py-3 rounded-full border border-[rgba(255,255,255,0.04)] text-[rgba(130,140,150,0.28)] cursor-default opacity-30"
+      {/* Locked: Deep Work */}
+      <a
+        href="/pricing"
+        className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-200 hover:opacity-90"
+        style={{
+          background: "transparent",
+          border: "1px solid rgba(232,168,62,0.45)",
+          color: "rgba(232,168,62,0.80)",
+        }}
       >
-        <span className="[font-family:var(--font-jost)] flex items-center gap-1.5 text-[12px] tracking-[-0.01em]">
-          <Lock size={9} className="opacity-60" />
-          Deep Work
+        <span className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] font-[400] tracking-[0.02em] leading-none" style={{ display: "flex", alignItems: "center" }}>
+          Deep Work <LockIcon />
         </span>
-      </button>
+      </a>
+
+      {/* Locked: Flow — 4th slot, mobile only, keeps 2×2 grid balanced */}
+      <a
+        href="/pricing"
+        className="w-full md:hidden flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-full transition-all duration-200 hover:opacity-90"
+        style={{
+          background: "transparent",
+          border: "1px solid rgba(232,168,62,0.45)",
+          color: "rgba(232,168,62,0.80)",
+        }}
+      >
+        <span className="[font-family:var(--font-jost)] text-[10px] font-[400] tracking-[0.02em] leading-none" style={{ display: "flex", alignItems: "center" }}>
+          Flow <LockIcon />
+        </span>
+      </a>
+
     </div>
   );
 }

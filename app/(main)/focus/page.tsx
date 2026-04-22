@@ -27,13 +27,13 @@ export default async function FocusPage() {
 
         {/* ── Tool header ──────────────────────────────────────────────── */}
         <header className="text-center mb-5">
-          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(240,170,70,0.38)] mb-3">
+          <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(240,170,70,0.80)] mb-3">
             Calm your state
           </p>
           <h1 className="[font-family:var(--font-display)] font-light text-[clamp(36px,5vw,56px)] text-[rgba(250,240,225,0.92)] leading-tight mb-4">
             One thing. Done well.
           </h1>
-          <p className="[font-family:var(--font-jost)] font-[300] text-[14px] text-[rgba(160,170,180,0.48)] max-w-[440px] mx-auto leading-relaxed">
+          <p className="[font-family:var(--font-jost)] font-[300] text-[14px] text-[rgba(255,255,255,0.60)] max-w-[440px] mx-auto leading-relaxed">
             A Pomodoro timer for people who actually want to focus. 25 minutes of
             work, 5 of rest. Repeated until it&apos;s done.
           </p>
