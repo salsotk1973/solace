@@ -32,8 +32,21 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
       <style>{`
         .featured-lab-card-link {
           padding: 34px 38px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+        }
+        .featured-lab-card-link > div:last-of-type {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .featured-lab-card-link > div:last-of-type > div:last-of-type {
+          margin-top: auto;
         }
         .featured-lab-card-wrapper {
+          height: 100%;
           transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
           will-change: transform;
         }
@@ -47,9 +60,6 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
         @media (max-width: 640px) {
           .featured-lab-card-link {
             padding: 22px 22px;
-          }
-          .featured-lab-card-wrapper {
-            margin-bottom: 20px !important;
           }
           .featured-lab-pill-editors-pick {
             display: none !important;
