@@ -182,9 +182,11 @@ Mobile footer structure (top to bottom):
 1. **Row 1 — 5 product/learn links centered:** Tools, Pricing, Lab, Principles, About — `font-size: 13px`, gap `12px 18px`, marginBottom `16px`
 2. **Row 2 — 2 legal links centered:** Privacy, Terms — gap `24px`, sharing vertical axis with row 1's center
 3. **Hairline divider:** `width: 32px, height: 0.5px, background: rgba(255,255,255,0.18), margin: 32px auto 24px` — ceremonial, not structural
-4. **Centered disclaimer:** max-width `320px` (forces 3-line wrap on iPhone), `font-size: 12px, lineHeight: 1.7`
-5. **Copyright + tagline merged:** `© 2026 · Built with care.` on one centered line, `font-size: 11px`
-6. **SOLACE wordmark closing:** Cormorant Garamond, `font-size: 18px, letterSpacing: 0.32em, color: rgba(255,255,255,0.35), paddingLeft: 0.32em` (compensates for letter-spacing right-bias for optical centering)
+4. **Centered disclaimer:** max-width `320px` (forces 3-line wrap on iPhone), `font-size: 12px, lineHeight: 1.7, color: rgba(255,255,255,0.65)` (Spec 04c)
+5. **Copyright + tagline merged:** `© 2026 · Built with care.` on one centered line, `font-size: 11px, color: rgba(255,255,255,0.65)` (Spec 04c — was 0.50, bumped to match disclaimer)
+6. **SOLACE wordmark closing:** Cormorant Garamond, `font-size: 18px, letterSpacing: 0.32em, color: rgba(255,255,255,0.55)` (Spec 04c — was 0.35, bumped so brand anchors the footer), `paddingLeft: 0.32em` (compensates for letter-spacing right-bias for optical centering)
+
+**Hierarchy after Spec 04c:** SOLACE wordmark (0.55) is the visual anchor. Disclaimer + copyright (both 0.65) sit at equal supporting weight. Brand bookends the page; legal/meta is quieter than brand. This is the correct hierarchy for a wellness product.
 
 Mobile footer hides:
 - The 3-column PRODUCT/LEARN/LEGAL grid (`display: none`)
@@ -390,7 +392,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ## Still Needed (priority order)
 
-- [ ] **Desktop homepage audit** — same protocol as mobile audit (next session)
+- [ ] **Desktop homepage audit** — same protocol as mobile audit (next session — see "Desktop Homepage Audit" prompt)
 - [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
@@ -506,6 +508,9 @@ Letter-spaced text always sits slightly right of mathematical center because the
 
 ### 9. Re-read solace-master.md when I think it's missing something
 When specifying changes, if I think "the routine for X isn't documented," check the file first. The routine is probably there and I just haven't internalised it.
+
+### 10. Opacity is the wrong lever for "quiet" — use size, weight, tracking instead
+A brand mark at 0.35 opacity reads as "ghost text," not "quiet." If you want something to feel restrained but present, use small font-size + light font-weight + heavy letter-spacing + serif. Then set opacity at 0.55+ so it's actually visible. Opacity below 0.55 should only be used for true secondary metadata, never for brand or anchor elements. (Spec 04c lesson: wordmark went from 0.35 → 0.55 to become the visible anchor.)
 
 ---
 
