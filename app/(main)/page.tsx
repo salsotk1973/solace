@@ -201,7 +201,7 @@ export default function HomePage() {
             </p>
 
             <h3
-              className="ai-section-headline mt-5 text-4xl md:text-5xl font-light leading-[1.15]"
+              className="ai-section-headline mt-5 text-4xl md:text-4xl font-light leading-[1.15]"
               style={{ fontFamily: "'Cormorant Garamond', serif", color: TEXT_COLOURS.primary }}
             >
               Start from <em className="italic">how it feels</em> — not what it is.
@@ -212,7 +212,7 @@ export default function HomePage() {
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-5 md:p-6 md:min-h-[280px] flex flex-col transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
+                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-5 md:p-6 md:min-h-[320px] flex flex-col transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
                   style={{ borderLeftColor: tool.borderLeftColor }}
                 >
                   <p
@@ -235,7 +235,7 @@ export default function HomePage() {
                     {tool.title}
                   </p>
                   <p
-                    className="hidden md:block mt-3 md:mt-4 text-[14px] leading-[1.7] md:leading-[1.85]"
+                    className="hidden md:block mt-3 md:mt-4 text-[14px] leading-[1.7] md:leading-[1.6]"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
