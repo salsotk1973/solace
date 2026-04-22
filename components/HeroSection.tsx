@@ -10,7 +10,7 @@ export function HeroSection() {
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="overflow-visible md:overflow-hidden pt-1 md:pt-0">
           <div
-            className="h-l1 text-[40px] md:text-[72px] font-light leading-[1.05] md:leading-[0.95] text-white"
+            className="h-l1 text-[36px] md:text-[72px] font-light leading-[1.08] md:leading-[0.95] text-white"
             style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
           >
             When your mind won’t settle,
@@ -19,7 +19,7 @@ export function HeroSection() {
 
         <div className="mt-1 overflow-visible md:overflow-hidden md:mt-2 pt-1 md:pt-0">
           <div
-            className="h-l2 text-[40px] md:text-[72px] italic font-light leading-[1.05] md:leading-[0.95] text-white"
+            className="h-l2 text-[36px] md:text-[72px] italic font-light leading-[1.08] md:leading-[0.95] text-white"
             style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
           >
             it’s hard to think clearly.
