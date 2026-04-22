@@ -66,12 +66,14 @@ const FREE_TOOLS = [
   { name: "Sleep Wind-Down",  href: "/tools/sleep-wind-down",  tone: "calm"    as const },
   { name: "Mood Tracker",     href: "/tools/mood-tracker",     tone: "clarity" as const },
   { name: "Gratitude Log",    href: "/tools/gratitude-log",    tone: "clarity" as const },
-  { name: "All tools",        href: "/tools",                  tone: "decide"  as const },
+  { name: "All tools",        href: "/tools",                  tone: "neutral" as const },
 ];
 
-// Static Tailwind className strings — rgb values match CATEGORY_COLOURS tokens
+// Static Tailwind className strings — rgb values match CATEGORY_COLOURS tokens.
+// `neutral` is a homepage-only tone for meta/wayfinding cards (e.g. "All tools").
+// Slate `rgba(148,163,184)` — visually distinct from all 3 category colours, reads as navigation chrome.
 const FREE_TOOL_THEME: Record<
-  "calm" | "clarity" | "decide",
+  "calm" | "clarity" | "decide" | "neutral",
   { className: string; accent: string; arrow: string }
 > = {
   // calm / teal — rgba(60,192,212)
@@ -94,6 +96,13 @@ const FREE_TOOL_THEME: Record<
       "border-[rgba(124,111,205,0.22)] bg-[rgba(124,111,205,0.045)] hover:border-[rgba(124,111,205,0.34)] hover:bg-[rgba(124,111,205,0.07)]",
     accent: `rgba(${decide.rgb},0.55)`,
     arrow:  `rgba(${decide.rgb},0.72)`,
+  },
+  // neutral / slate — rgba(148,163,184) — wayfinding only, not a category
+  neutral: {
+    className:
+      "border-[rgba(148,163,184,0.22)] bg-[rgba(148,163,184,0.045)] hover:border-[rgba(148,163,184,0.34)] hover:bg-[rgba(148,163,184,0.07)]",
+    accent: "rgba(148,163,184,0.45)",
+    arrow:  "rgba(148,163,184,0.65)",
   },
 };
 
@@ -136,7 +145,7 @@ export default function HomePage() {
       >
         <HeroSection />
 
-        <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-12 md:pb-20">
+        <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-10 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <div
               aria-hidden="true"

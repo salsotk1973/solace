@@ -1,7 +1,7 @@
 export function HeroSection() {
   return (
     <section
-      className="relative md:min-h-[65vh] flex items-start md:items-center justify-center overflow-hidden px-6 pt-[12vh] pb-12 md:pt-0 md:pb-0"
+      className="relative md:min-h-[55vh] flex items-start md:items-center justify-center overflow-hidden px-6 pt-[12vh] pb-12 md:pt-0 md:pb-0"
     >
       <h1 className="sr-only">
         Mental clarity tools for anxiety, focus, and overwhelm
@@ -30,19 +30,6 @@ export function HeroSection() {
           Solace helps you find the next right step —
           through thought, not noise.
         </p>
-        <a
-          href="/tools/breathing"
-          className="hero-cta group mt-10 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.18em] [font-family:var(--font-jost)] font-normal transition-all duration-200 ease-out"
-          style={{ color: "rgba(60,192,212,0.85)" }}
-        >
-          Begin with Breathing
-          <span
-            aria-hidden="true"
-            className="transition-transform duration-200 ease-out group-hover:translate-x-1"
-          >
-            →
-          </span>
-        </a>
       </div>
     </section>
   );
