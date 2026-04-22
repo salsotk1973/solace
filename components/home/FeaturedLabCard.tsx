@@ -74,14 +74,12 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           border: `0.5px solid ${accent.replace("1)", "0.18)")}`,
           boxShadow: `0 0 8px 1px ${accent.replace("1)", "0.12)")}`,
           position: "relative",
-          marginBottom: "28px",
         }}
       >
         <Link
           href={`/lab/${article.slug}`}
           className="featured-lab-card-link"
           style={{
-            display: "block",
             borderRadius: "22px",
             background: "transparent",
             textDecoration: "none",
