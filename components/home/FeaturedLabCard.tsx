@@ -113,24 +113,14 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
               >
                 Editor&apos;s pick
               </span>
-              <span
-                style={{
-                  ...PILL_BASE,
-                  background: catBg,
-                  border: `0.5px solid ${accent.replace("1)", "0.2)")}`,
-                  color: accent,
-                }}
-              >
-                {article.category.replace(/-/g, " ")}
-              </span>
             </div>
 
             <h2
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
-                fontSize: "clamp(26px, 3.1vw, 42px)",
-                lineHeight: 1.15,
+                fontSize: "clamp(20px, 1.9vw, 26px)",
+                lineHeight: 1.2,
                 color: "rgba(240,234,255,0.92)",
                 margin: "0 0 12px",
                 maxWidth: "560px",

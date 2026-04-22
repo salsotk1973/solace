@@ -6,6 +6,7 @@ export type LabSecondaryArticle = {
   slug: string;
   category: "calm-your-state" | "think-clearly" | "notice-whats-good";
   readingTime: number;
+  excerpt: string;
 };
 
 const PILL_BASE = {
@@ -82,6 +83,18 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
           >
             {article.title}
           </h3>
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize: "12px",
+              lineHeight: 1.6,
+              color: "rgba(200,192,230,0.60)",
+              margin: "10px 0 0",
+            }}
+          >
+            {article.excerpt}
+          </p>
         </div>
         <div
           style={{

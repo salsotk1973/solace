@@ -121,12 +121,14 @@ const LAB_SECONDARIES: LabSecondaryArticle[] = [
     slug: "how-to-actually-rest",
     category: "calm-your-state",
     readingTime: 4,
+    excerpt: "Lying on the sofa scrolling isn't rest. Real rest is something your nervous system has to be taught.",
   },
   {
     title: "Does gratitude journalling actually work?",
     slug: "does-gratitude-journalling-work",
     category: "notice-whats-good",
     readingTime: 5,
+    excerpt: "The science is surprisingly strong. But most people are doing it in a way that misses the point entirely.",
   },
 ];
 
