@@ -1,7 +1,6 @@
 # Solace Master Reference
 
 ## Product Definition
-
 **Solace** is a wellness SaaS focused on **decision clarity and mental uncluttering** for people overwhelmed by life — career crossroads, relationship strain, feeling lost. NOT a meditation app. NOT a journal. A thinking partner.
 
 **Positioning (locked):** "Clarity and decisions for people overwhelmed by life"
@@ -16,7 +15,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Tech Stack
-
 - **Frontend:** Next.js 15, TypeScript, Tailwind CSS
 - **Auth:** Clerk
 - **Database:** Supabase (with RLS enabled)
@@ -31,7 +29,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Domain & Infrastructure
-
 - **Production domain:** `try-solace.app` (Cloudflare Registrar)
 - **Canonical URL:** `https://www.try-solace.app`
 - **Vercel projects:** Two projects deploy from the same repo:
@@ -66,7 +63,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Pricing (Locked)
-
 - **Free tier:** All tools with limits, 7-day history, Choose 1/day free
 - **Paid tier:** A$9/month or A$79/year
   - Unlimited Choose, Clear Your Mind, Break It Down
@@ -77,7 +73,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Category System (Locked)
-
 | Category | Colour | Hex | Tools |
 |---|---|---|---|
 | **Calm** | Teal | `#3CC0D4` | Breathing, Sleep Wind-Down |
@@ -101,7 +96,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Thought Reframer — REMOVED ✅ (Apr 2026)
-
 Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard.
 
 ---
@@ -136,8 +130,10 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 ---
 
 ## Breathing Tool — Design Benchmark ✅
-
 **Breathing is the benchmark for ALL tools.** Every tool must match Breathing exactly on all shared elements. Read Breathing source before writing any other tool spec.
+
+### BENCHMARK RULE — NON-NEGOTIABLE
+Before writing any spec that matches a tool to Breathing: take live screenshots of BOTH tools side-by-side first. Visual comparison before any code. Always.
 
 ### 11 decisions locked (apply to ALL tools):
 1. Stop = Begin (solid filled teal pill)
@@ -186,6 +182,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - Session saved to Supabase on completion ✅
 - Cross-links: desktop only, Breathing + Choose ✅
 - Dimming vignette: **removed** — was hiding the UI ✅
+- **Sound decision: NO sound** — silence is part of the tool experience ✅
 
 ### Key technical decisions
 - **Bead transformOrigin:** `"50% 50%"` not `"114px 114px"` — percentage scales with SVG viewBox ✅
@@ -199,6 +196,46 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - `app/api/sleep/history/route.ts` returns `insights`: most used pattern, weekly comparison, best streak ✅
 - Rendered in history card identical to Breathing's patterns section ✅
 - `hooks/useToolHistory.ts` updated with optional `insights` field ✅
+
+---
+
+## Focus Timer — Build Complete ✅ (Apr 2026)
+
+### What's done
+- Benchmark applied: exact Breathing classes for pills, cards, history toggle ✅
+- Amber token helper: `const A = (a: number) => \`rgba(232,168,62,\${a})\`` throughout ✅
+- ModeSelector: 2×2 grid on mobile, flex row on desktop, exact PatternSelector structure ✅
+- Circle: 130px mobile / 220px desktop, dynamic radius + circumference ✅
+- Arc + digits + circle border: amber always (never teal, even during Rest phase) ✅
+- Phase label: amber always, `marginTop: 4px` inline to guarantee gap ✅
+- "Tap to start" pulse: `animate-pulse` + amber glow `textShadow: 0 0 8px rgba(232,168,62,0.60)` ✅
+- Skip: solid amber pill (matches Breathing BEGIN). Reset: ghost amber pill ✅
+- Info cards: exact Breathing classes `p-2 md:px-4 md:py-4`, amber tokens ✅
+- History toggle: exact Breathing structure, amber tokens, mobile collapses ✅
+- History content: full border all sides desktop, top border removed on mobile when open ✅
+- Cross-links: `hidden md:block` ✅
+- SessionDots: fully amber (active, completed, empty states) ✅
+- SessionComplete: slide-up banner on `allDone` ✅
+- Page padding: `pt-[96px] md:pt-[140px]` matching Breathing ✅
+- **Sound toggle**: centred above circle, amber ON/OFF states, UPPERCASE ✅
+- **Sound effects**: real MP3s via Web Audio API, preloaded on mount ✅
+  - Focus start: `public/sounds/focus-start.mp3` (copper bell ding 23, 4s)
+  - Rest start: `public/sounds/rest-start.mp3` (copper bell ding 14, 5s)
+  - Session done: `public/sounds/session-done.mp3` (copper bell ding 1, 7s)
+  - Default: sound ON, preference saved to localStorage `solace_focus_sound`
+- Session history saves to `focus_sessions` table on full completion ✅
+- History API: `app/api/focus/history/route.ts` — 7-day cutoff free, full paid ✅
+
+### Key technical decisions
+- **No Begin/Stop/Resume button** — circle is the only tap target
+- **All amber, no teal** — Rest phase does NOT switch to teal (Focus tool = amber only)
+- **CIRCUMFERENCE removed** — dynamic `radius` and `circumference` derived from `circleSize`
+- **Sound loads on mount** via `fetch` + `decodeAudioData` — not oscillator
+- **iOS audio unlock**: `AudioContext.resume()` called on first tap
+
+### Sound decision: Breathing and Sleep Wind-Down
+- **Breathing: NO sound** — orb animation is the sensory experience; silence is part of it
+- **Sleep Wind-Down: NO sound** — same reasoning; users in bed, partner consideration
 
 ---
 
@@ -222,7 +259,6 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## SEO ✅ (Apr 2026)
-
 - Sitemap: 17 pages, submitted Apr 15, last read Apr 18 ✅
 - `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` — canonical tags auto-generated ✅
 - 11 pages indexed by Google
@@ -237,7 +273,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 |---|---|---|---|---|
 | Breathing | ✅ | ✅ | ✅ | ✅ "Well done." |
 | Sleep Wind-Down | ✅ | ✅ | ✅ | ✅ "Rest well." |
-| Focus Timer | ✅ | ✅ | ✅ | — |
+| Focus Timer | ✅ | ✅ | ✅ | ✅ |
 | Mood Tracker | ✅ | ✅ | ✅ | — |
 | Gratitude Log | ✅ | ✅ | ✅ | — |
 | Choose (AI) | — | — | ✅ daily nudge | ✅ |
@@ -259,12 +295,10 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Still Needed (priority order)
-
 - [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
-- [ ] **Focus Timer** — apply Breathing benchmark (mobile layout, exact classes, history toggle)
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
-- [ ] **SessionComplete** for Focus Timer, Mood Tracker, Gratitude Log
+- [ ] **SessionComplete** for Mood Tracker, Gratitude Log
 - [ ] **Upgrade Supabase to Pro** — at launch ($25/month)
 - [ ] Newsletter opt-in UI (dashboard checkbox → Brevo list 5)
 - [ ] Brevo Phase 2 email sequences (post-launch)
@@ -278,7 +312,6 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Pages Status
-
 | Page | Status |
 |---|---|
 | Home | ✅ |
@@ -320,9 +353,9 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Key Rules (Never Break)
-
 - Read solace-master before any work
-- **Breathing is the benchmark** — read Breathing source before writing any tool spec
+- **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
+- **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first. Always.
 - SiteHeader.tsx and SiteFooter.tsx — **LOCKED**
 - Background always `#090d14`
 - Never define colours inline — always `lib/design-tokens.ts`
@@ -334,13 +367,14 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - Always `await` Supabase inserts in Vercel serverless
 - AI tool routes must NOT be in `isPublicRoute` in middleware.ts
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
+- **Every spec must end with git + Vercel deploy block** — `cd /Users/angelamanzano/Documents/Solace/solace-clean && git add . && git commit -m "..." && git push`
 - **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed**
 - **Never approximate Breathing values — read the actual source and copy exactly**
+- **No sounds on Breathing or Sleep Wind-Down** — silence is intentional
 
 ---
 
 ## Master Files Workflow
-
 **GitHub raw URL:** `https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md`
 
 ### Session Start
