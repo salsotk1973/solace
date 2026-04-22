@@ -173,7 +173,7 @@ export default function FocusTimer({ userId }: Props) {
           height={circleSize}
         >
           {/* Track */}
-          <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(200,210,220,0.07)" strokeWidth={3} />
+          <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(232,168,62,0.10)" strokeWidth={3} />
           {/* Progress arc — always amber */}
           <circle
             cx={circleSize / 2} cy={circleSize / 2} r={radius}
@@ -186,7 +186,7 @@ export default function FocusTimer({ userId }: Props) {
             strokeDashoffset={dashOffset}
           />
         </svg>
-        <div className="absolute inset-0 rounded-full border border-[rgba(200,210,220,0.06)] bg-[rgba(255,255,255,0.015)] flex flex-col items-center justify-center gap-1">
+        <div className="absolute inset-0 rounded-full flex flex-col items-center justify-center gap-1" style={{ border: "1px solid rgba(232,168,62,0.15)", background: "rgba(255,255,255,0.015)" }}>
           {/* Digits — always amber */}
           <span
             className="[font-family:var(--font-jost)] font-[300] tabular-nums leading-none text-[rgba(255,200,120,0.92)]"
@@ -240,7 +240,7 @@ export default function FocusTimer({ userId }: Props) {
           <div
             key={label}
             className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
-            style={{ border: `1px solid ${A(0.15)}`, background: A(0.04) }}
+            style={{ border: `1px solid ${A(0.22)}`, background: A(0.07) }}
           >
             <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]" style={{ color: A(0.65) }}>
               {label}

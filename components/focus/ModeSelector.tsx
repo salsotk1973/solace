@@ -63,17 +63,17 @@ export default function ModeSelector({ disabled }: ModeSelectorProps) {
         </span>
       </a>
 
-      {/* Locked: Flow — 4th slot, mobile only, keeps 2×2 grid balanced */}
+      {/* Locked: Flow */}
       <a
         href="/pricing"
-        className="w-full md:hidden flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-full transition-all duration-200 hover:opacity-90"
+        className="w-full md:w-auto flex flex-col items-center gap-0.5 px-2 py-1.5 md:px-7 md:py-3 rounded-full transition-all duration-200 hover:opacity-90"
         style={{
           background: "transparent",
           border: "1px solid rgba(232,168,62,0.45)",
           color: "rgba(232,168,62,0.80)",
         }}
       >
-        <span className="[font-family:var(--font-jost)] text-[10px] font-[400] tracking-[0.02em] leading-none" style={{ display: "flex", alignItems: "center" }}>
+        <span className="[font-family:var(--font-jost)] text-[10px] md:text-[12px] font-[400] tracking-[0.02em] leading-none" style={{ display: "flex", alignItems: "center" }}>
           Flow <LockIcon />
         </span>
       </a>

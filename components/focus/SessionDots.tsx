@@ -11,7 +11,6 @@ export default function SessionDots({ workDone, phaseIdx, started }: SessionDots
     <div className="flex items-center gap-3">
       {[0, 1, 2, 3].map((i) => {
         const isDone   = workDone > i;
-        // Active = currently in this work session (work phases are even indices: 0,2,4,6)
         const isActive = started && !isDone && phaseIdx === i * 2;
 
         return (
@@ -20,15 +19,25 @@ export default function SessionDots({ workDone, phaseIdx, started }: SessionDots
             className={[
               "w-[6px] h-[6px] rounded-full transition-all duration-[400ms]",
               isDone
-                ? "bg-[rgba(240,170,70,0.7)] border-transparent"
+                ? "border-transparent"
                 : isActive
-                ? "bg-transparent border border-[rgba(240,170,70,0.65)] shadow-[0_0_6px_rgba(240,170,70,0.35)]"
-                : "bg-transparent border border-[rgba(200,210,220,0.15)]",
+                ? "bg-transparent"
+                : "bg-transparent",
             ].join(" ")}
+            style={
+              isDone
+                ? { background: "rgba(232,168,62,0.55)" }
+                : isActive
+                ? { background: "transparent", border: "1px solid rgba(232,168,62,0.90)", boxShadow: "0 0 6px rgba(232,168,62,0.35)" }
+                : { background: "transparent", border: "1px solid rgba(232,168,62,0.18)" }
+            }
           />
         );
       })}
-      <span className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase text-[rgba(160,175,185,0.28)] ml-1">
+      <span
+        className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase ml-1"
+        style={{ color: "rgba(232,168,62,0.45)" }}
+      >
         sessions
       </span>
     </div>
