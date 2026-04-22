@@ -98,6 +98,9 @@ export default function SiteFooter() {
           .footer-desktop-divider {
             display: none !important;
           }
+          .footer-desktop-wordmark {
+            display: none !important;
+          }
         }
       `}</style>
 
@@ -279,6 +282,22 @@ export default function SiteFooter() {
                 Built with care.
               </p>
             </div>
+            <p
+              aria-hidden="true"
+              className="footer-desktop-wordmark"
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontWeight: 300,
+                fontSize: "18px",
+                letterSpacing: "0.32em",
+                color: "rgba(255,255,255,0.12)",
+                margin: "28px 0 0",
+                textAlign: "center",
+                paddingLeft: "0.32em",
+              }}
+            >
+              SOLACE
+            </p>
 
             {/* Mobile-only bottom block — centered disclaimer, copyright on one line, SOLACE wordmark closing */}
             <div className="footer-mobile-bottom" style={{ display: "none", textAlign: "center" }}>
