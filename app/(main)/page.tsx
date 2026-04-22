@@ -135,7 +135,7 @@ export default function HomePage() {
       >
         <HeroSection />
 
-        <section id="tools" className="ai-tools-section pt-16 pb-8 md:pt-16 md:pb-14">
+        <section id="tools" className="ai-tools-section pt-8 pb-8 md:pt-16 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
               className="text-[11px] tracking-[0.24em] uppercase"
@@ -179,7 +179,7 @@ export default function HomePage() {
                     {tool.title}
                   </p>
                   <p
-                    className="mt-3 md:mt-4 text-[14px] leading-[1.7] md:leading-[1.85]"
+                    className="hidden md:block mt-3 md:mt-4 text-[14px] leading-[1.7] md:leading-[1.85]"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
@@ -189,7 +189,7 @@ export default function HomePage() {
                     {tool.body}
                   </p>
                   <span
-                    className="mt-auto pt-4 md:pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-75 group-hover:opacity-100 group-hover:translate-x-1"
+                    className="mt-3 md:mt-auto pt-0 md:pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-75 group-hover:opacity-100 group-hover:translate-x-1"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
