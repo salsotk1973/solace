@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/HeroSection";
 import FeaturedLabCard, { type FeaturedLabArticle } from "@/components/home/FeaturedLabCard";
 import LabSecondaryCard, { type LabSecondaryArticle } from "@/components/home/LabSecondaryCard";
 import { CATEGORY_COLOURS, TEXT_COLOURS, FONT_SIZE } from "@/lib/design-tokens";
+import { getAllArticles } from "@/lib/lab";
 
 // ─── Colour helpers derived from design tokens ────────────────────────────────
 // Tailwind className strings must be static — values below mirror CATEGORY_COLOURS exactly.
@@ -115,22 +116,16 @@ const FEATURED_LAB: FeaturedLabArticle = {
   readingTime: 6,
 };
 
-const LAB_SECONDARIES: LabSecondaryArticle[] = [
-  {
-    title: "How to actually rest (when your brain won't switch off)",
-    slug: "how-to-actually-rest",
-    category: "calm-your-state",
-    readingTime: 4,
-    excerpt: "Lying on the sofa scrolling isn't rest. Real rest is something your nervous system has to be taught.",
-  },
-  {
-    title: "Does gratitude journalling actually work?",
-    slug: "does-gratitude-journalling-work",
-    category: "notice-whats-good",
-    readingTime: 5,
-    excerpt: "The science is surprisingly strong. But most people are doing it in a way that misses the point entirely.",
-  },
-];
+const LAB_SECONDARIES: LabSecondaryArticle[] = getAllArticles()
+  .filter((a) => a.slug !== FEATURED_LAB.slug)
+  .slice(0, 2)
+  .map((a) => ({
+    title: a.title,
+    slug: a.slug,
+    category: a.category,
+    readingTime: a.readingTime,
+    excerpt: a.excerpt,
+  }));
 
 export default function HomePage() {
   return (
