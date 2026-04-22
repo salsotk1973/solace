@@ -285,14 +285,10 @@ export default function HomePage() {
               From the Lab
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-              <div className="md:col-span-2">
-                <FeaturedLabCard article={FEATURED_LAB} />
-              </div>
-              <div className="flex flex-col gap-4 md:gap-6">
-                {LAB_SECONDARIES.map((article) => (
-                  <LabSecondaryCard key={article.slug} article={article} />
-                ))}
-              </div>
+              <FeaturedLabCard article={FEATURED_LAB} />
+              {LAB_SECONDARIES.map((article) => (
+                <LabSecondaryCard key={article.slug} article={article} />
+              ))}
             </div>
           </div>
         </section>
