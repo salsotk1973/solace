@@ -11,18 +11,18 @@ export function HeroSection() {
         <div className="overflow-visible md:overflow-visible pt-1 md:pt-0 md:pb-1">
           <div
             className="h-l1 text-[36px] md:text-[64px] font-light leading-[1.08] md:leading-[1.0] text-white"
-            style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
           >
-            When your mind won’t settle,
+            When your mind won't{" "}settle,
           </div>
         </div>
 
         <div className="mt-1 overflow-visible md:overflow-visible md:mt-2 pt-1 md:pt-0 md:pb-2">
           <div
             className="h-l2 text-[36px] md:text-[64px] italic font-light leading-[1.08] md:leading-[1.0] text-white"
-            style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
           >
-            it’s hard to think clearly.
+            it's hard to think clearly.
           </div>
         </div>
 
