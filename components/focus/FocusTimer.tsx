@@ -195,28 +195,28 @@ export default function FocusTimer({ userId }: Props) {
       <div className="hidden md:flex justify-end w-full mb-2">
         <button
           onClick={() => setSoundEnabled(s => !s)}
-          className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          className="hidden md:flex [font-family:var(--font-jost)] cursor-pointer transition-all duration-200 items-center gap-1.5 px-3 py-2 rounded-full"
           style={{
-            color: soundEnabled ? A(0.70) : A(0.50),
-            border: `1px solid ${soundEnabled ? A(0.25) : A(0.22)}`,
-            background: soundEnabled ? A(0.05) : "transparent",
+            color: soundEnabled ? A(0.80) : A(0.45),
+            border: `1px solid ${soundEnabled ? A(0.30) : A(0.20)}`,
+            background: soundEnabled ? A(0.08) : "transparent",
           }}
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
           {soundEnabled ? (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
             </svg>
           ) : (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <line x1="23" y1="9" x2="17" y2="15"/>
               <line x1="17" y1="9" x2="23" y2="15"/>
             </svg>
           )}
-          {soundEnabled ? "Sound on" : "Sound off"}
+          <span className="text-[9px] tracking-[0.18em]">{soundEnabled ? "Sound on" : "Sound off"}</span>
         </button>
       </div>
 
@@ -240,32 +240,32 @@ export default function FocusTimer({ userId }: Props) {
         {/* Sound toggle — mobile only, absolutely right of circle */}
         <button
           onClick={() => setSoundEnabled(s => !s)}
-          className="absolute md:hidden [font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          className="absolute md:hidden [font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex flex-col items-center gap-1 px-2 py-2 rounded-full"
           style={{
-            left: `calc(100% + 8px)`,
+            left: `calc(100% + 10px)`,
             top: "50%",
             transform: "translateY(-50%)",
-            color: soundEnabled ? A(0.70) : A(0.50),
-            border: `1px solid ${soundEnabled ? A(0.25) : A(0.22)}`,
-            background: soundEnabled ? A(0.05) : "transparent",
+            color: soundEnabled ? A(0.80) : A(0.45),
+            border: `1px solid ${soundEnabled ? A(0.30) : A(0.20)}`,
+            background: soundEnabled ? A(0.08) : "transparent",
             whiteSpace: "nowrap",
+            minWidth: "40px",
           }}
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
           {soundEnabled ? (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
             </svg>
           ) : (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <line x1="23" y1="9" x2="17" y2="15"/>
               <line x1="17" y1="9" x2="23" y2="15"/>
             </svg>
           )}
-          {soundEnabled ? "Sound on" : "Sound off"}
         </button>
 
         {/* Circle — tap to start / pause / resume */}
@@ -308,8 +308,15 @@ export default function FocusTimer({ userId }: Props) {
             </span>
             {/* Tap hint */}
             <span
-              className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase"
-              style={{ fontSize: "9px", color: "rgba(232,168,62,0.65)", letterSpacing: "0.18em" }}
+              className={[
+                "[font-family:var(--font-jost)] tracking-[0.18em] uppercase transition-all duration-500",
+                !started ? "animate-pulse" : "",
+              ].join(" ")}
+              style={{
+                fontSize: "9px",
+                color: !started ? "rgba(232,168,62,0.90)" : "rgba(232,168,62,0.55)",
+                textShadow: !started ? "0 0 8px rgba(232,168,62,0.60)" : "none",
+              }}
             >
               {!started ? "tap to start" : isRunning ? "tap to pause" : "tap to resume"}
             </span>
