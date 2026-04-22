@@ -125,7 +125,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
                 lineHeight: 1.15,
                 color: "rgba(240,234,255,0.92)",
                 margin: "0 0 12px",
-                maxWidth: "520px",
+                maxWidth: "560px",
               }}
             >
               {article.title}
@@ -139,13 +139,13 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
                 lineHeight: 1.65,
                 color: "rgba(200,192,230,0.70)",
                 margin: "0 0 16px",
-                maxWidth: "440px",
+                maxWidth: "540px",
               }}
             >
               {article.excerpt}
             </p>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px" }}>
               <span
                 style={{
                   fontFamily: "'Jost', sans-serif",
