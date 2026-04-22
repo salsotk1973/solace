@@ -1,38 +1,28 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import ModeSelector   from "./ModeSelector";
-import SessionDots    from "./SessionDots";
+import ModeSelector    from "./ModeSelector";
+import SessionDots     from "./SessionDots";
 import SessionComplete from "./SessionComplete";
 import { useToolHistory } from "@/hooks/useToolHistory";
 import ToolUpgradePrompt from "@/components/shared/ToolUpgradePrompt";
 
-// ─── Canonical colour token — rgba(232,168,62,x) ──────────────────────
+// ─── Canonical colour token — rgba(232,168,62,x) ──────────────────────────
 const A = (a: number) => `rgba(232,168,62,${a})`;
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const WORK_SECS    = 25 * 60; // 1500
-const REST_SECS    =  5 * 60; //  300
-const TOTAL_PHASES = 8;       // work rest work rest work rest work rest
+const WORK_SECS    = 25 * 60;
+const REST_SECS    =  5 * 60;
+const TOTAL_PHASES = 8;
 
-function phaseDuration(idx: number): number {
-  return idx % 2 === 0 ? WORK_SECS : REST_SECS;
-}
-
-function isWorkPhase(idx: number): boolean {
-  return idx % 2 === 0;
-}
-
-function pad(n: number): string {
-  return String(n).padStart(2, "0");
-}
+function phaseDuration(idx: number): number { return idx % 2 === 0 ? WORK_SECS : REST_SECS; }
+function isWorkPhase(idx: number): boolean   { return idx % 2 === 0; }
+function pad(n: number): string              { return String(n).padStart(2, "0"); }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-interface Props {
-  userId: string | null;
-}
+interface Props { userId: string | null; }
 
 export default function FocusTimer({ userId }: Props) {
   const [started,     setStarted]     = useState(false);
@@ -45,7 +35,6 @@ export default function FocusTimer({ userId }: Props) {
   const [circleSize,  setCircleSize]  = useState<number>(220);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  // Refs to read latest values inside setInterval without stale closures
   const phaseIdxRef  = useRef(phaseIdx);
   const remainingRef = useRef(remaining);
   const workDoneRef  = useRef(workDone);
@@ -55,7 +44,7 @@ export default function FocusTimer({ userId }: Props) {
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
   useEffect(() => { workDoneRef.current  = workDone;  }, [workDone]);
 
-  // ── Responsive circle size — 130px mobile, 220px desktop ─────────────────
+  // ── 130px mobile / 220px desktop ─────────────────────────────────────────
   useEffect(() => {
     const update = () => setCircleSize(window.innerWidth < 768 ? 130 : 220);
     update();
@@ -64,37 +53,23 @@ export default function FocusTimer({ userId }: Props) {
   }, []);
 
   // ── History ───────────────────────────────────────────────────────────────
-
   const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("focus", userId);
-
-  // ── Save on completion ───────────────────────────────────────────────────
 
   useEffect(() => {
     if (!allDone || !userId) return;
-    fetch("/api/focus", { method: "POST" })
-      .then(() => loadHistory())
-      .catch(() => {});
+    fetch("/api/focus", { method: "POST" }).then(() => loadHistory()).catch(() => {});
   }, [allDone, userId, loadHistory]);
 
   // ── Timer interval ────────────────────────────────────────────────────────
-  // Re-creates when isRunning or phaseIdx changes (phase transitions restart it)
-
   useEffect(() => {
     if (!isRunning) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
-
     intervalRef.current = setInterval(() => {
       const rem = remainingRef.current - 1;
+      if (rem > 0) { remainingRef.current = rem; setRemaining(rem); return; }
 
-      if (rem > 0) {
-        remainingRef.current = rem;
-        setRemaining(rem);
-        return;
-      }
-
-      // Phase complete — stop this interval before state updates
       clearInterval(intervalRef.current!);
       intervalRef.current = null;
 
@@ -102,88 +77,56 @@ export default function FocusTimer({ userId }: Props) {
       const isW    = isWorkPhase(pi);
       const nextPi = pi + 1;
 
-      if (isW) {
-        workDoneRef.current += 1;
-        setWorkDone(workDoneRef.current);
-      }
+      if (isW) { workDoneRef.current += 1; setWorkDone(workDoneRef.current); }
 
       if (nextPi >= TOTAL_PHASES) {
-        setRemaining(0);
-        remainingRef.current = 0;
-        setIsRunning(false);
-        setAllDone(true);
+        setRemaining(0); remainingRef.current = 0;
+        setIsRunning(false); setAllDone(true);
         return;
       }
 
       const nextDur = phaseDuration(nextPi);
-      phaseIdxRef.current  = nextPi;
-      remainingRef.current = nextDur;
-      setPhaseIdx(nextPi);
-      setRemaining(nextDur);
+      phaseIdxRef.current = nextPi; remainingRef.current = nextDur;
+      setPhaseIdx(nextPi); setRemaining(nextDur);
     }, 1000);
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isRunning, phaseIdx]);
 
   // ── Controls ──────────────────────────────────────────────────────────────
-
   function handleTap() {
-    if (allDone) {
-      handleReset();
-      return;
-    }
-    if (!started) {
-      setStarted(true);
-      setIsRunning(true);
-    } else {
-      setIsRunning((r) => !r);
-    }
+    if (allDone) { handleReset(); return; }
+    if (!started) { setStarted(true); setIsRunning(true); }
+    else { setIsRunning((r) => !r); }
   }
 
   const handleSkip = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-
     const pi   = phaseIdxRef.current;
     const isW  = isWorkPhase(pi);
     const next = pi + 1;
-
-    if (isW) {
-      workDoneRef.current += 1;
-      setWorkDone(workDoneRef.current);
-    }
-
+    if (isW) { workDoneRef.current += 1; setWorkDone(workDoneRef.current); }
     if (next >= TOTAL_PHASES) {
-      setIsRunning(false);
-      setAllDone(true);
-      setRemaining(0);
-      remainingRef.current = 0;
+      setIsRunning(false); setAllDone(true);
+      setRemaining(0); remainingRef.current = 0;
       return;
     }
-
     const nextDur = phaseDuration(next);
-    phaseIdxRef.current  = next;
-    remainingRef.current = nextDur;
-    setPhaseIdx(next);
-    setRemaining(nextDur);
+    phaseIdxRef.current = next; remainingRef.current = nextDur;
+    setPhaseIdx(next); setRemaining(nextDur);
   }, []);
 
   function handleReset() {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
-    setStarted(false);
-    setIsRunning(false);
+    setStarted(false); setIsRunning(false);
     setPhaseIdx(0);          phaseIdxRef.current  = 0;
     setRemaining(WORK_SECS); remainingRef.current = WORK_SECS;
     setWorkDone(0);          workDoneRef.current  = 0;
-    setAllDone(false);
-    setDismissed(false);
+    setAllDone(false); setDismissed(false);
   }
 
   // ── Derived values ─────────────────────────────────────────────────────────
-
-  const isWork        = isWorkPhase(phaseIdx);
   const totalPhSecs   = phaseDuration(phaseIdx);
   const radius        = circleSize / 2 - 10;
   const circumference = 2 * Math.PI * radius;
@@ -191,30 +134,29 @@ export default function FocusTimer({ userId }: Props) {
   const minutes       = Math.floor(remaining / 60);
   const seconds       = remaining % 60;
   const timeStr       = `${pad(minutes)}:${pad(seconds)}`;
+  const stateLabel    = allDone ? "Done" : isWorkPhase(phaseIdx) ? "Focus" : "Rest";
 
-  const stateLabel = allDone ? "Done" : isWork ? "Focus" : "Rest";
-
-  // ── JSX ─────────────────────────────────────────────────────────────────────
-
+  // ── JSX ───────────────────────────────────────────────────────────────────
   return (
-    <>
-      {/* ── Mode selector ───────────────────────────────────────────────── */}
+    <div className="flex flex-col items-center w-full">
+
+      {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
-      {/* ── State label ─────────────────────────────────────────────────── */}
+      {/* Phase label — always amber, mt-8 mobile gap from pills */}
       <p
         className={[
-          "[font-family:var(--font-display)] italic font-light text-[28px] md:text-[38px] leading-none mb-3 transition-all duration-500",
+          "[font-family:var(--font-display)] italic font-light leading-none transition-all duration-500 text-center w-full",
+          "text-[28px] md:text-[38px]",
+          "mt-8 mb-3 md:mt-0 md:mb-8",
+          "text-[rgba(255,195,100,0.65)]",
           started ? "opacity-100" : "opacity-0",
-          isWork || allDone
-            ? "text-[rgba(255,195,100,0.65)]"
-            : "text-[rgba(120,200,220,0.65)]",
         ].join(" ")}
       >
         {stateLabel}
       </p>
 
-      {/* ── Arc + timer face ────────────────────────────────────────────── */}
+      {/* Circle — tap to start / pause / resume */}
       <div
         role="button"
         tabIndex={0}
@@ -230,11 +172,14 @@ export default function FocusTimer({ userId }: Props) {
           width={circleSize}
           height={circleSize}
         >
-          <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(200,210,220,0.05)" strokeWidth={3} />
+          {/* Track */}
+          <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(200,210,220,0.07)" strokeWidth={3} />
+          {/* Progress arc — always amber */}
           <circle
             cx={circleSize / 2} cy={circleSize / 2} r={radius}
             fill="none"
-            className={["[transition:stroke_0.8s_ease]", isWork ? "[stroke:rgba(240,170,70,0.40)]" : "[stroke:rgba(60,192,212,0.35)]"].join(" ")}
+            stroke="rgba(240,170,70,0.55)"
+            className="[transition:stroke-dashoffset_1s_linear]"
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -242,57 +187,51 @@ export default function FocusTimer({ userId }: Props) {
           />
         </svg>
         <div className="absolute inset-0 rounded-full border border-[rgba(200,210,220,0.06)] bg-[rgba(255,255,255,0.015)] flex flex-col items-center justify-center gap-1">
+          {/* Digits — always amber */}
           <span
-            className={["[font-family:var(--font-jost)] font-[300] tabular-nums leading-none transition-colors duration-[800ms] ease-in-out", isWork ? "text-[rgba(255,200,120,0.9)]" : "text-[rgba(120,200,220,0.75)]"].join(" ")}
+            className="[font-family:var(--font-jost)] font-[300] tabular-nums leading-none text-[rgba(255,200,120,0.92)]"
             style={{ fontSize: circleSize < 180 ? "28px" : "42px", letterSpacing: "-0.03em" }}
           >
             {timeStr}
           </span>
+          {/* Tap hint */}
           <span
-            className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase transition-colors duration-200"
-            style={{ fontSize: "8px", color: "rgba(180,190,200,0.45)" }}
+            className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase"
+            style={{ fontSize: "8px", color: "rgba(180,190,200,0.50)" }}
           >
             {!started ? "tap to start" : isRunning ? "tap to pause" : "tap to resume"}
           </span>
         </div>
       </div>
 
-      {/* ── Begin / Stop — below circle on mobile ───────────────────────── */}
-      <div className="flex justify-center mb-3 md:mb-8">
-        <button
-          onClick={handleTap}
-          className="bg-[rgba(232,168,62,0.85)] border border-[rgba(232,168,62,0.90)] text-[rgba(10,20,0,0.95)] [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 hover:bg-[rgba(232,168,62,1)] hover:border-[rgba(232,168,62,1)]"
-        >
-          {allDone ? "Begin again" : started && isRunning ? "Stop" : started && !isRunning ? "Resume" : "Begin"}
-        </button>
-      </div>
-
-      {/* ── Session dots ────────────────────────────────────────────────── */}
-      <div className="mb-3">
+      {/* Session dots */}
+      <div className="mb-5 mt-2">
         <SessionDots workDone={workDone} phaseIdx={phaseIdx} started={started} />
       </div>
 
-      {/* ── Skip + Reset controls (hidden until started) ─────────────────── */}
+      {/* Skip + Reset — ghost pill buttons */}
       {started && (
-        <div className="flex items-center gap-6 mb-5">
+        <div className="flex items-center gap-3 mb-8">
           {!allDone && (
             <button
               onClick={handleSkip}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.2em] uppercase text-[rgba(180,190,200,0.35)] hover:text-[rgba(200,210,220,0.7)] transition-colors duration-200 px-4 py-2"
+              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.18em] uppercase px-5 py-2 rounded-full transition-all duration-200"
+              style={{ border: `1px solid ${A(0.40)}`, color: A(0.80), background: A(0.06) }}
             >
               Skip →
             </button>
           )}
           <button
             onClick={handleReset}
-            className="[font-family:var(--font-jost)] text-[10px] tracking-[0.2em] uppercase text-[rgba(150,160,170,0.28)] hover:text-[rgba(180,190,200,0.55)] transition-colors duration-200 px-4 py-2"
+            className="[font-family:var(--font-jost)] text-[10px] tracking-[0.18em] uppercase px-5 py-2 rounded-full transition-all duration-200"
+            style={{ border: "1px solid rgba(180,190,200,0.25)", color: "rgba(180,190,200,0.55)", background: "rgba(180,190,200,0.04)" }}
           >
             Reset
           </button>
         </div>
       )}
 
-      {/* ── Info cards — Duration + Best For ──────────────────────────── */}
+      {/* Info cards — exact Breathing structure, amber tokens */}
       <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20">
         {[
           { label: "Duration", value: "~2 hrs total" },
@@ -303,29 +242,21 @@ export default function FocusTimer({ userId }: Props) {
             className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
             style={{ border: `1px solid ${A(0.15)}`, background: A(0.04) }}
           >
-            <p
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]"
-              style={{ color: A(0.65) }}
-            >
+            <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]" style={{ color: A(0.65) }}>
               {label}
             </p>
-            <p
-              className="[font-family:var(--font-display)] font-light text-[13px] text-center leading-snug md:text-[15px]"
-              style={{ color: A(0.92) }}
-            >
+            <p className="[font-family:var(--font-display)] font-light text-[13px] text-center leading-snug md:text-[15px]" style={{ color: A(0.92) }}>
               {value}
             </p>
           </div>
         ))}
       </div>
 
-      {/* ══════════════════════════════════════════════════════
-          HISTORY ZONE — collapses on mobile behind toggle
-          ══════════════════════════════════════════════════════ */}
+      {/* History — exact Breathing toggle structure, amber tokens */}
       {userId && history && (
-        <section className="max-w-[520px] mx-auto mb-20">
+        <section className="max-w-[520px] w-full mx-auto mb-20">
 
-          {/* Mobile toggle — md:hidden, exact Breathing structure */}
+          {/* Mobile toggle */}
           <button
             className="w-full flex items-center justify-between md:hidden cursor-pointer rounded-[14px] px-4 py-3"
             style={{
@@ -338,60 +269,37 @@ export default function FocusTimer({ userId }: Props) {
             onClick={() => setHistoryOpen(o => !o)}
             aria-expanded={historyOpen}
           >
-            <p
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.24em] uppercase"
-              style={{ color: A(0.70) }}
-            >
+            <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.24em] uppercase" style={{ color: A(0.70) }}>
               {history.isPaid ? "Full history" : "7-day history"}
             </p>
             <span
               className="w-6 h-6 flex items-center justify-center rounded-full text-[16px] transition-transform duration-300"
-              style={{
-                color: A(0.80),
-                background: A(0.10),
-                border: `1px solid ${A(0.25)}`,
-                transform: historyOpen ? "rotate(45deg)" : "rotate(0deg)",
-                lineHeight: 1,
-              }}
+              style={{ color: A(0.80), background: A(0.10), border: `1px solid ${A(0.25)}`, transform: historyOpen ? "rotate(45deg)" : "rotate(0deg)", lineHeight: 1 }}
               aria-hidden="true"
-            >
-              +
-            </span>
+            >+</span>
           </button>
 
-          {/* Desktop label — hidden on mobile */}
-          <p
-            className="hidden md:block [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center"
-            style={{ color: A(0.65) }}
-          >
+          {/* Desktop label */}
+          <p className="hidden md:block [font-family:var(--font-jost)] text-[12px] tracking-[0.24em] uppercase mb-4 text-center" style={{ color: A(0.65) }}>
             {history.isPaid ? "Full history" : "7-day history"}
           </p>
 
-          {/* Content — hidden on mobile until toggled */}
+          {/* Content */}
           <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
             <div
               className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
-              style={{
-                border: `1px solid ${A(0.12)}`,
-                background: A(0.03),
-                borderTop: historyOpen ? "none" : undefined,
-                borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
-              }}
+              style={{ border: `1px solid ${A(0.12)}`, background: A(0.03), borderTop: historyOpen ? "none" : undefined, borderRadius: historyOpen ? "0 0 14px 14px" : undefined }}
             >
-              <p
-                className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center"
-                style={{ color: "rgba(255,255,255,0.80)" }}
-              >
+              <p className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center" style={{ color: "rgba(255,255,255,0.80)" }}>
                 {!history.isPaid
                   ? "Free users keep 7 days of focus history. Your older sessions are still there."
                   : history.sessions.length > 0
                   ? `${history.sessions.length} focus ${history.sessions.length === 1 ? "session" : "sessions"} saved.`
                   : "No focus sessions saved yet."}
               </p>
-
               {history.hasStreak && (
                 <div className="mt-4 rounded-[12px] px-4 py-3" style={{ border: `1px solid ${A(0.12)}`, background: A(0.04) }}>
-                  <p className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-center mb-1.5" style={{ color: A(0.65) }}>
+                  <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase text-center mb-1.5" style={{ color: A(0.65) }}>
                     Current streak
                   </p>
                   <p className="[font-family:var(--font-display)] font-light text-[20px] md:text-[24px] text-center leading-none" style={{ color: A(0.92) }}>
@@ -404,27 +312,19 @@ export default function FocusTimer({ userId }: Props) {
                   </p>
                 </div>
               )}
-
               {shouldShowUpgradePrompt && (
-                <ToolUpgradePrompt
-                  hasOlderSessions={history.hasOlderSessions}
-                  toolColour="232, 168, 62"
-                  toolName="Focus Timer"
-                />
+                <ToolUpgradePrompt hasOlderSessions={history.hasOlderSessions} toolColour="232, 168, 62" toolName="Focus Timer" />
               )}
             </div>
           </div>
         </section>
       )}
 
-      {/* ── Session complete nudge ──────────────────────────────────────── */}
+      {/* Session complete */}
       {allDone && !dismissed && (
-        <SessionComplete
-          isLoggedIn={!!userId}
-          isPaid={history?.isPaid}
-          onDismiss={() => setDismissed(true)}
-        />
+        <SessionComplete isLoggedIn={!!userId} isPaid={history?.isPaid} onDismiss={() => setDismissed(true)} />
       )}
-    </>
+
+    </div>
   );
 }
