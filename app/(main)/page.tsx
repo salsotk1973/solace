@@ -66,6 +66,7 @@ const FREE_TOOLS = [
   { name: "Sleep Wind-Down",  href: "/tools/sleep-wind-down",  tone: "calm"    as const },
   { name: "Mood Tracker",     href: "/tools/mood-tracker",     tone: "clarity" as const },
   { name: "Gratitude Log",    href: "/tools/gratitude-log",    tone: "clarity" as const },
+  { name: "All tools",        href: "/tools",                  tone: "decide"  as const },
 ];
 
 // Static Tailwind className strings — rgb values match CATEGORY_COLOURS tokens
@@ -135,7 +136,53 @@ export default function HomePage() {
       >
         <HeroSection />
 
-        <section id="tools" className="ai-tools-section pt-8 pb-8 md:pt-16 md:pb-14">
+        <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-12 md:pb-20">
+          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
+            <div
+              aria-hidden="true"
+              className="mb-10 md:hidden h-px w-16"
+              style={{ background: "rgba(255,255,255,0.10)" }}
+            />
+            <p
+              className="text-[11px] tracking-[0.2em] uppercase"
+              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
+            >
+              FREE — START HERE
+            </p>
+
+            <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {FREE_TOOLS.map((tool) => (
+                <a
+                  key={tool.href}
+                  href={tool.href}
+                  className={`free-tool-card group relative overflow-hidden rounded-xl border px-5 py-4 transition-all duration-200 ease-out hover:-translate-y-0.5 flex items-center justify-between gap-4 ${FREE_TOOL_THEME[tool.tone].className}`}
+                  style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontWeight: 300,
+                    fontSize: "14px",
+                    color: TEXT_COLOURS.body,
+                  }}
+                >
+                  <span>{tool.name}</span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-all duration-200 opacity-70 group-hover:opacity-100 group-hover:translate-x-1"
+                    style={{ color: FREE_TOOL_THEME[tool.tone].arrow }}
+                  >
+                    →
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-0 left-4 right-4 h-px"
+                    style={{ background: FREE_TOOL_THEME[tool.tone].accent }}
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="tools" className="ai-tools-section pt-8 pb-8 md:pt-12 md:pb-16">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
               className="text-[11px] tracking-[0.24em] uppercase"
@@ -199,52 +246,6 @@ export default function HomePage() {
                     Open tool →
                   </span>
                 </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-0 md:pb-24">
-          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
-            <div
-              aria-hidden="true"
-              className="mb-10 md:hidden h-px w-16"
-              style={{ background: "rgba(255,255,255,0.10)" }}
-            />
-            <p
-              className="text-[11px] tracking-[0.2em] uppercase"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
-            >
-              FREE — START HERE
-            </p>
-
-            <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {FREE_TOOLS.map((tool) => (
-                <a
-                  key={tool.href}
-                  href={tool.href}
-                  className={`free-tool-card group relative overflow-hidden rounded-xl border px-5 py-4 transition-all duration-200 ease-out hover:-translate-y-0.5 flex items-center justify-between gap-4 ${FREE_TOOL_THEME[tool.tone].className}`}
-                  style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontWeight: 300,
-                    fontSize: "14px",
-                    color: TEXT_COLOURS.body,
-                  }}
-                >
-                  <span>{tool.name}</span>
-                  <span
-                    aria-hidden="true"
-                    className="transition-all duration-200 opacity-70 group-hover:opacity-100 group-hover:translate-x-1"
-                    style={{ color: FREE_TOOL_THEME[tool.tone].arrow }}
-                  >
-                    →
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute bottom-0 left-4 right-4 h-px"
-                    style={{ background: FREE_TOOL_THEME[tool.tone].accent }}
-                  />
-                </a>
               ))}
             </div>
           </div>
