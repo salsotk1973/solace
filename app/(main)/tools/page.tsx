@@ -282,7 +282,7 @@ export default function ToolsPage() {
 
           {/* ── Upgrade strip ─────────────────────────────────────────────── */}
           <p
-            className="text-center text-[13px] font-[300] mb-24 max-w-[800px] mx-auto leading-relaxed whitespace-nowrap"
+            className="text-center text-[13px] font-[300] mb-24 max-w-[800px] mx-auto leading-relaxed"
             style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.body }}
           >
             The free tools above are always free.{" "}
