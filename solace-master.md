@@ -1,20 +1,26 @@
 # Solace Master Reference
 
 ## Product Definition
+
 **Solace** is a wellness SaaS focused on **decision clarity and mental uncluttering** for people overwhelmed by life — career crossroads, relationship strain, feeling lost. NOT a meditation app. NOT a journal. A thinking partner.
 
 **Positioning (locked):** "Clarity and decisions for people overwhelmed by life"
 
 **Hero copy (locked):**
 ```
-You know something needs to change. You just can't see it clearly yet.
-Solace gives you the space to think it through — privately, gently, without judgement.
+You know something needs to change.
+You just can't see it clearly yet.
+
+Solace gives you the space to think it through —
+privately, gently, without judgement.
+
 [Find some clarity →]
 ```
 
 ---
 
 ## Tech Stack
+
 - **Frontend:** Next.js 15, TypeScript, Tailwind CSS
 - **Auth:** Clerk
 - **Database:** Supabase (with RLS enabled)
@@ -29,6 +35,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Domain & Infrastructure
+
 - **Production domain:** `try-solace.app` (Cloudflare Registrar)
 - **Canonical URL:** `https://www.try-solace.app`
 - **Vercel projects:** Two projects deploy from the same repo:
@@ -63,6 +70,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Pricing (Locked)
+
 - **Free tier:** All tools with limits, 7-day history, Choose 1/day free
 - **Paid tier:** A$9/month or A$79/year
   - Unlimited Choose, Clear Your Mind, Break It Down
@@ -73,6 +81,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Category System (Locked)
+
 | Category | Colour | Hex | Tools |
 |---|---|---|---|
 | **Calm** | Teal | `#3CC0D4` | Breathing, Sleep Wind-Down |
@@ -96,6 +105,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 ---
 
 ## Thought Reframer — REMOVED ✅ (Apr 2026)
+
 Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard.
 
 ---
@@ -104,7 +114,7 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 
 ### Colours
 - **Background:** `#090d14` (dark navy)
-- **Canonical teal:** `#3CC0D4` = `rgba(60,192,212,a)` — use `T = (a) => \`rgba(60,192,212,\${a})\``
+- **Canonical teal:** `#3CC0D4` = `rgba(60,192,212,a)` — use `T = (a) => \`rgba(60,192,212,${a})\``
 - **Category colours:** import from `lib/design-tokens.ts` — never hardcode
 
 ### Typography
@@ -130,6 +140,7 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 ---
 
 ## Breathing Tool — Design Benchmark ✅
+
 **Breathing is the benchmark for ALL tools.** Every tool must match Breathing exactly on all shared elements. Read Breathing source before writing any other tool spec.
 
 ### BENCHMARK RULE — NON-NEGOTIABLE
@@ -203,7 +214,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ### What's done
 - Benchmark applied: exact Breathing classes for pills, cards, history toggle ✅
-- Amber token helper: `const A = (a: number) => \`rgba(232,168,62,\${a})\`` throughout ✅
+- Amber token helper: `const A = (a: number) => \`rgba(232,168,62,${a})\`` throughout ✅
 - ModeSelector: 2×2 grid on mobile, flex row on desktop, exact PatternSelector structure ✅
 - Circle: 130px mobile / 220px desktop, dynamic radius + circumference ✅
 - Arc + digits + circle border: amber always (never teal, even during Rest phase) ✅
@@ -259,6 +270,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## SEO ✅ (Apr 2026)
+
 - Sitemap: 17 pages, submitted Apr 15, last read Apr 18 ✅
 - `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` — canonical tags auto-generated ✅
 - 11 pages indexed by Google
@@ -269,6 +281,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ## Tool Build Status
 
 ### Free/Paid Gating
+
 | Tool | History API | 7-day cutoff | Upgrade prompt | SessionComplete |
 |---|---|---|---|---|
 | Breathing | ✅ | ✅ | ✅ | ✅ "Well done." |
@@ -295,6 +308,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Still Needed (priority order)
+
 - [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
@@ -312,6 +326,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Pages Status
+
 | Page | Status |
 |---|---|
 | Home | ✅ |
@@ -330,6 +345,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ## Lab — Human Behaviour Lab
 
 ### 15 articles
+
 | Slug | Category |
 |---|---|
 | `why-you-cant-stop-overthinking` | think-clearly (featured) |
@@ -353,6 +369,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Key Rules (Never Break)
+
 - Read solace-master before any work
 - **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
 - **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first. Always.
@@ -368,6 +385,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - AI tool routes must NOT be in `isPublicRoute` in middleware.ts
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
 - **Every spec must end with git + Vercel deploy block** — `cd /Users/angelamanzano/Documents/Solace/solace-clean && git add . && git commit -m "..." && git push`
+- **Every spec must explicitly instruct Claude Code to EXECUTE the git block** — exact wording: *"Execute the git block at the end — do NOT stop at 'ready to commit'. RUN the command. Do NOT preview it, RUN it."* Without this, Claude Code stops one step short and Juan has to commit manually. Missing either the block OR the execute instruction = incomplete spec.
 - **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed**
 - **Never approximate Breathing values — read the actual source and copy exactly**
 - **No sounds on Breathing or Sleep Wind-Down** — silence is intentional
@@ -375,6 +393,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Master Files Workflow
+
 **GitHub raw URL:** `https://raw.githubusercontent.com/salsotk1973/solace/main/solace-master.md`
 
 ### Session Start
