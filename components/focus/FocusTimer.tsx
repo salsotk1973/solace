@@ -191,14 +191,14 @@ export default function FocusTimer({ userId }: Props) {
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
-      {/* Sound toggle — top-right of pill area */}
-      <div className="flex justify-end w-full max-w-[260px] md:max-w-none mb-1">
+      {/* Sound toggle — right-aligned, width constrained to circle diameter */}
+      <div className="flex justify-end w-full mb-1" style={{ maxWidth: circleSize * 2 }}>
         <button
           onClick={() => setSoundEnabled(s => !s)}
           className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
           style={{
-            color: soundEnabled ? A(0.70) : "rgba(180,190,200,0.30)",
-            border: `1px solid ${soundEnabled ? A(0.25) : "rgba(180,190,200,0.12)"}`,
+            color: soundEnabled ? A(0.70) : A(0.45),
+            border: `1px solid ${soundEnabled ? A(0.25) : A(0.20)}`,
             background: soundEnabled ? A(0.05) : "transparent",
           }}
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
