@@ -57,7 +57,9 @@ export default function FocusTimer({ userId }: Props) {
   // ── Sound preference — load + save ────────────────────────────────────────
   useEffect(() => {
     const saved = localStorage.getItem("solace_focus_sound");
+    // Only turn off if user explicitly saved "false" — default is always ON
     if (saved === "false") setSoundEnabled(false);
+    else setSoundEnabled(true); // Clear any stale state
   }, []);
 
   useEffect(() => {
@@ -192,31 +194,32 @@ export default function FocusTimer({ userId }: Props) {
       <ModeSelector disabled={started && !allDone} />
 
       {/* Sound toggle — desktop only, above phase label */}
-      <div className="hidden md:flex justify-end w-full mb-2">
+      <div className="hidden md:flex justify-center w-full mb-4">
         <button
           onClick={() => setSoundEnabled(s => !s)}
-          className="hidden md:flex [font-family:var(--font-jost)] cursor-pointer transition-all duration-200 items-center gap-1.5 px-3 py-2 rounded-full"
+          className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-2 px-6 py-2.5 rounded-full"
           style={{
-            color: soundEnabled ? A(0.80) : A(0.45),
-            border: `1px solid ${soundEnabled ? A(0.30) : A(0.20)}`,
-            background: soundEnabled ? A(0.08) : "transparent",
+            color: soundEnabled ? A(1.0) : A(0.45),
+            border: `1px solid ${soundEnabled ? A(0.70) : A(0.20)}`,
+            background: soundEnabled ? A(0.18) : "transparent",
+            boxShadow: soundEnabled ? `0 0 10px ${A(0.25)}` : "none",
           }}
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
           {soundEnabled ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
             </svg>
           ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <line x1="23" y1="9" x2="17" y2="15"/>
               <line x1="17" y1="9" x2="23" y2="15"/>
             </svg>
           )}
-          <span className="text-[9px] tracking-[0.18em]">{soundEnabled ? "Sound on" : "Sound off"}</span>
+          {soundEnabled ? "Sound on" : "Sound off"}
         </button>
       </div>
 
@@ -245,9 +248,10 @@ export default function FocusTimer({ userId }: Props) {
             left: `calc(100% + 10px)`,
             top: "50%",
             transform: "translateY(-50%)",
-            color: soundEnabled ? A(0.80) : A(0.45),
-            border: `1px solid ${soundEnabled ? A(0.30) : A(0.20)}`,
-            background: soundEnabled ? A(0.08) : "transparent",
+            color: soundEnabled ? A(1.0) : A(0.45),
+            border: `1px solid ${soundEnabled ? A(0.70) : A(0.20)}`,
+            background: soundEnabled ? A(0.18) : "transparent",
+            boxShadow: soundEnabled ? `0 0 8px ${A(0.25)}` : "none",
             whiteSpace: "nowrap",
             minWidth: "40px",
           }}
