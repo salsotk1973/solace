@@ -77,7 +77,15 @@ export default function SiteFooter() {
           .footer-bottom-right { flex: 1; }
         }
         @media (max-width: 640px) {
-          .footer-grid { flex-direction: column; gap: 28px; }
+          .footer-mobile-inline {
+            display: flex !important;
+          }
+          .footer-grid {
+            display: none;
+          }
+          .footer-mobile-padding {
+            padding: 28px 16px 20px !important;
+          }
           .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
           .footer-bottom-disclaimer { flex: unset; width: 100%; }
           .footer-bottom-right { text-align: left; }
@@ -103,11 +111,43 @@ export default function SiteFooter() {
           }}
         >
           <div
+            className="footer-mobile-padding"
             style={{
               padding: "48px 16px 32px",
               boxSizing: "border-box",
             }}
           >
+            {/* Mobile-only inline nav (<=640px). Replaces the 3-column grid below. */}
+            <nav
+              className="footer-mobile-inline"
+              aria-label="Footer navigation"
+              style={{
+                display: "none",
+                flexWrap: "wrap",
+                gap: "8px 14px",
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 300,
+                fontSize: "12px",
+                color: "rgba(255,255,255,0.60)",
+                justifyContent: "flex-start",
+                alignItems: "center",
+              }}
+            >
+              <Link href="/tools" className="footer-nav-link" style={navLinkStyle}>Tools</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/pricing" className="footer-nav-link" style={navLinkStyle}>Pricing</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/lab" className="footer-nav-link" style={navLinkStyle}>Lab</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/principles" className="footer-nav-link" style={navLinkStyle}>Principles</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/about" className="footer-nav-link" style={navLinkStyle}>About</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/privacy" className="footer-nav-link" style={navLinkStyle}>Privacy</Link>
+              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
+              <Link href="/terms" className="footer-nav-link" style={navLinkStyle}>Terms</Link>
+            </nav>
+
             <div className="footer-grid">
               {FOOTER_NAV.map((col) => (
                 <div key={col.heading}>
