@@ -191,14 +191,14 @@ export default function FocusTimer({ userId }: Props) {
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
-      {/* Sound toggle — right-aligned, width constrained to circle diameter */}
-      <div className="flex justify-end w-full mb-1" style={{ maxWidth: circleSize * 2 }}>
+      {/* Sound toggle — desktop only, above phase label */}
+      <div className="hidden md:flex justify-end w-full mb-2">
         <button
           onClick={() => setSoundEnabled(s => !s)}
           className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
           style={{
-            color: soundEnabled ? A(0.70) : A(0.45),
-            border: `1px solid ${soundEnabled ? A(0.25) : A(0.20)}`,
+            color: soundEnabled ? A(0.70) : A(0.50),
+            border: `1px solid ${soundEnabled ? A(0.25) : A(0.22)}`,
             background: soundEnabled ? A(0.05) : "transparent",
           }}
           aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
@@ -220,7 +220,7 @@ export default function FocusTimer({ userId }: Props) {
         </button>
       </div>
 
-      {/* Phase label — always amber, 12px top gap from pills */}
+      {/* Phase label — always amber, 4px top gap from pills */}
       <p
         className={[
           "[font-family:var(--font-display)] italic font-light leading-none transition-all duration-500 text-center w-full",
@@ -229,57 +229,93 @@ export default function FocusTimer({ userId }: Props) {
           "text-[rgba(255,195,100,0.65)]",
           started ? "opacity-100" : "opacity-0",
         ].join(" ")}
-        style={{ marginTop: "12px" }}
+        style={{ marginTop: "4px" }}
       >
         {stateLabel}
       </p>
 
-      {/* Circle — tap to start / pause / resume */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={isRunning ? "Pause timer" : started ? "Resume timer" : "Start timer"}
-        onClick={handleTap}
-        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") ? handleTap() : null}
-        className="relative cursor-pointer select-none mb-4 group"
-        style={{ width: circleSize, height: circleSize }}
-      >
-        <svg
-          className="absolute inset-0 -rotate-90 pointer-events-none"
-          viewBox={`0 0 ${circleSize} ${circleSize}`}
-          width={circleSize}
-          height={circleSize}
+      {/* Circle + mobile sound toggle */}
+      <div className="relative flex items-center justify-center mb-4">
+
+        {/* Sound toggle — mobile only, absolutely right of circle */}
+        <button
+          onClick={() => setSoundEnabled(s => !s)}
+          className="absolute md:hidden [font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{
+            left: `calc(100% + 8px)`,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: soundEnabled ? A(0.70) : A(0.50),
+            border: `1px solid ${soundEnabled ? A(0.25) : A(0.22)}`,
+            background: soundEnabled ? A(0.05) : "transparent",
+            whiteSpace: "nowrap",
+          }}
+          aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
         >
-          {/* Track */}
-          <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(232,168,62,0.10)" strokeWidth={3} />
-          {/* Progress arc — always amber */}
-          <circle
-            cx={circleSize / 2} cy={circleSize / 2} r={radius}
-            fill="none"
-            stroke="rgba(240,170,70,0.55)"
-            className="[transition:stroke-dashoffset_1s_linear]"
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={dashOffset}
-          />
-        </svg>
-        <div className="absolute inset-0 rounded-full flex flex-col items-center justify-center gap-1" style={{ border: "1px solid rgba(232,168,62,0.15)", background: "rgba(255,255,255,0.015)" }}>
-          {/* Digits — always amber */}
-          <span
-            className="[font-family:var(--font-jost)] font-[300] tabular-nums leading-none text-[rgba(255,200,120,0.92)]"
-            style={{ fontSize: circleSize < 180 ? "28px" : "42px", letterSpacing: "-0.03em" }}
+          {soundEnabled ? (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          )}
+          {soundEnabled ? "Sound on" : "Sound off"}
+        </button>
+
+        {/* Circle — tap to start / pause / resume */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={isRunning ? "Pause timer" : started ? "Resume timer" : "Start timer"}
+          onClick={handleTap}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") ? handleTap() : null}
+          className="relative cursor-pointer select-none group"
+          style={{ width: circleSize, height: circleSize }}
+        >
+          <svg
+            className="absolute inset-0 -rotate-90 pointer-events-none"
+            viewBox={`0 0 ${circleSize} ${circleSize}`}
+            width={circleSize}
+            height={circleSize}
           >
-            {timeStr}
-          </span>
-          {/* Tap hint */}
-          <span
-            className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase"
-            style={{ fontSize: "9px", color: "rgba(232,168,62,0.65)", letterSpacing: "0.18em" }}
-          >
-            {!started ? "tap to start" : isRunning ? "tap to pause" : "tap to resume"}
-          </span>
+            {/* Track */}
+            <circle cx={circleSize / 2} cy={circleSize / 2} r={radius} fill="none" stroke="rgba(232,168,62,0.10)" strokeWidth={3} />
+            {/* Progress arc — always amber */}
+            <circle
+              cx={circleSize / 2} cy={circleSize / 2} r={radius}
+              fill="none"
+              stroke="rgba(240,170,70,0.55)"
+              className="[transition:stroke-dashoffset_1s_linear]"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+            />
+          </svg>
+          <div className="absolute inset-0 rounded-full flex flex-col items-center justify-center gap-1" style={{ border: "1px solid rgba(232,168,62,0.15)", background: "rgba(255,255,255,0.015)" }}>
+            {/* Digits — always amber */}
+            <span
+              className="[font-family:var(--font-jost)] font-[300] tabular-nums leading-none text-[rgba(255,200,120,0.92)]"
+              style={{ fontSize: circleSize < 180 ? "28px" : "42px", letterSpacing: "-0.03em" }}
+            >
+              {timeStr}
+            </span>
+            {/* Tap hint */}
+            <span
+              className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase"
+              style={{ fontSize: "9px", color: "rgba(232,168,62,0.65)", letterSpacing: "0.18em" }}
+            >
+              {!started ? "tap to start" : isRunning ? "tap to pause" : "tap to resume"}
+            </span>
+          </div>
         </div>
+
       </div>
 
       {/* Session dots */}
