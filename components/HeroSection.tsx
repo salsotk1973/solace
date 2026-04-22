@@ -1,26 +1,26 @@
 export function HeroSection() {
   return (
     <section
-      className="relative min-h-[62vh] md:min-h-[82vh] flex items-center justify-center overflow-hidden px-6"
+      className="relative min-h-[55vh] md:min-h-[82vh] flex items-start md:items-center justify-center overflow-hidden px-6 pt-[20vh] md:pt-0"
     >
       <h1 className="sr-only">
         Mental clarity tools for anxiety, focus, and overwhelm
       </h1>
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <div className="overflow-hidden">
+        <div className="overflow-visible md:overflow-hidden pt-1 md:pt-0">
           <div
-            className="h-l1 text-[40px] md:text-[72px] font-light leading-[1.0] text-white"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            className="h-l1 text-[40px] md:text-[72px] font-light leading-[1.05] md:leading-[0.95] text-white"
+            style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
           >
             When your mind won’t settle,
           </div>
         </div>
 
-        <div className="mt-1 overflow-hidden md:mt-2">
+        <div className="mt-1 overflow-visible md:overflow-hidden md:mt-2 pt-1 md:pt-0">
           <div
-            className="h-l2 text-[40px] md:text-[72px] italic font-light leading-[1.0] text-white"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            className="h-l2 text-[40px] md:text-[72px] italic font-light leading-[1.05] md:leading-[0.95] text-white"
+            style={{ fontFamily: "’Cormorant Garamond’, Georgia, serif" }}
           >
             it’s hard to think clearly.
           </div>
