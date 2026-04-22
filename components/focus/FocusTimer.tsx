@@ -152,7 +152,7 @@ export default function FocusTimer({ userId }: Props) {
           "text-[rgba(255,195,100,0.65)]",
           started ? "opacity-100" : "opacity-0",
         ].join(" ")}
-        style={{ marginTop: "32px" }}
+        style={{ marginTop: "12px" }}
       >
         {stateLabel}
       </p>

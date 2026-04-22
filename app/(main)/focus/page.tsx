@@ -26,7 +26,7 @@ export default async function FocusPage() {
       <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[96px] md:pt-[140px] pb-28">
 
         {/* ── Tool header ──────────────────────────────────────────────── */}
-        <header className="text-center mb-5">
+        <header className="text-center mb-2">
           <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(240,170,70,0.80)] mb-3">
             Calm your state
           </p>
@@ -40,7 +40,7 @@ export default async function FocusPage() {
         </header>
 
         {/* ── Interactive timer — client component ──────────────────────── */}
-        <div className="flex flex-col items-center mt-12">
+        <div className="flex flex-col items-center mt-4">
           <FocusTimer userId={userId ?? null} />
         </div>
 
