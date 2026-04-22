@@ -11,7 +11,7 @@ export type FeaturedLabArticle = {
 
 const PILL_BASE = {
   display: "inline-block",
-  padding: "4px 12px",
+  padding: "3px 10px",
   borderRadius: "100px",
   fontFamily: "'Jost', sans-serif",
   fontWeight: 400,
