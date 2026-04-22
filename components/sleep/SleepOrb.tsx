@@ -340,6 +340,12 @@ export default function SleepOrb({ userId }: Props) {
               </div>
             </div>
 
+            {/* Cycle counter — inside flex, sits directly below orb */}
+            <p
+              ref={cycleRef}
+              className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4"
+            />
+
             {/* Begin / Stop — EXACT same classes as Breathing */}
             <div className="flex justify-center md:order-first">
               {!isRunning ? (
@@ -359,12 +365,6 @@ export default function SleepOrb({ userId }: Props) {
               )}
             </div>
           </div>
-
-          {/* Cycle counter — EXACT same as Breathing */}
-          <p
-            ref={cycleRef}
-            className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4"
-          />
 
           {/* Info cards — EXACT same classes as Breathing */}
           <div
@@ -453,10 +453,13 @@ export default function SleepOrb({ userId }: Props) {
               <div
                 className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
                 style={{
-                  border:       `1px solid ${T(0.12)}`,
-                  background:   T(0.03),
-                  borderTop:    historyOpen ? "none" : undefined,
-                  borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
+                  border:     `1px solid ${T(0.12)}`,
+                  background: T(0.03),
+                  // Only remove top border/radius when toggle is open — never affects desktop
+                  ...(historyOpen && {
+                    borderTop:    "none",
+                    borderRadius: "0 0 14px 14px",
+                  }),
                 }}
               >
                 <p
@@ -495,6 +498,52 @@ export default function SleepOrb({ userId }: Props) {
                         ? "A quiet record of the nights you chose to wind down."
                         : "Consistency gets easier when you can see the full picture."}
                     </p>
+                  </div>
+                )}
+
+                {/* Insights — paid only */}
+                {history.isPaid && history.insights && (
+                  <div className="mt-4 rounded-[12px] px-3 py-3 md:px-4 md:py-4"
+                       style={{ border: `1px solid ${T(0.12)}`, background: T(0.04) }}>
+                    <p className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[0.22em] uppercase text-center mb-3 md:mb-4"
+                       style={{ color: T(0.65) }}>
+                      Your sleep patterns over time
+                    </p>
+                    <div className="grid gap-2 md:gap-3 md:grid-cols-3">
+                      {[
+                        { label: "Most used pattern", value: history.insights.mostUsedPattern ?? "Not enough yet" },
+                        {
+                          label: "This week vs last",
+                          value: `${history.insights.sessionsThisWeek} / ${history.insights.sessionsLastWeek}`,
+                          sub: history.insights.weeklyChangeDirection === "up" ? "Up from last week"
+                             : history.insights.weeklyChangeDirection === "down" ? "Lower than last week"
+                             : "Steady with last week",
+                        },
+                        {
+                          label: "Best streak",
+                          value: `${history.insights.bestStreakDays} day${history.insights.bestStreakDays === 1 ? "" : "s"}`,
+                        },
+                      ].map(({ label, value, sub }) => (
+                        <div key={label}
+                             className="rounded-[10px] px-2 py-2 md:px-3 md:py-3 text-center"
+                             style={{ border: `1px solid ${T(0.10)}`, background: "rgba(6,18,24,0.20)" }}>
+                          <p className="[font-family:var(--font-jost)] text-[11px] md:text-[12px] tracking-[0.18em] uppercase mb-1"
+                             style={{ color: T(0.65) }}>
+                            {label}
+                          </p>
+                          <p className="[font-family:var(--font-display)] font-light text-[16px] md:text-[18px] leading-snug"
+                             style={{ color: T(0.92) }}>
+                            {value}
+                          </p>
+                          {sub && (
+                            <p className="[font-family:var(--font-jost)] text-[11px] font-light leading-relaxed mt-1"
+                               style={{ color: T(0.70) }}>
+                              {sub}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 

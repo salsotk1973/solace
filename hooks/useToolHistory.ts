@@ -10,6 +10,14 @@ export type ToolHistorySession = {
   sessionData?: Record<string, unknown>
 }
 
+export type SleepInsights = {
+  mostUsedPattern: string | null
+  sessionsThisWeek: number
+  sessionsLastWeek: number
+  weeklyChangeDirection: 'up' | 'down' | 'flat'
+  bestStreakDays: number
+}
+
 export type ToolHistoryResponse = {
   sessions: ToolHistorySession[]
   isPaid: boolean
@@ -19,6 +27,8 @@ export type ToolHistoryResponse = {
   currentStreakDays: number
   hasStreak: boolean
   streakFraming: 'full' | 'teaser'
+  insights?: SleepInsights | null
+  insightsFraming?: 'full' | 'teaser'
 }
 
 export function useToolHistory(toolSlug: string, userId: string | null) {
