@@ -135,7 +135,7 @@ export default function HomePage() {
       >
         <HeroSection />
 
-        <section id="tools" className="ai-tools-section pt-12 pb-10 md:pt-16 md:pb-14">
+        <section id="tools" className="ai-tools-section pt-16 pb-8 md:pt-16 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
               className="text-[11px] tracking-[0.24em] uppercase"
@@ -151,12 +151,12 @@ export default function HomePage() {
               Start from <em className="italic">how it feels</em> — not what it is.
             </h3>
 
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {AI_TOOLS.map((tool) => (
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-6 min-h-[280px] flex flex-col transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
+                  className={`ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-5 md:p-6 md:min-h-[280px] flex flex-col transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 ${tool.themeClass}`}
                   style={{ borderLeftColor: tool.borderLeftColor }}
                 >
                   <p
@@ -170,7 +170,7 @@ export default function HomePage() {
                     {tool.eyebrow}
                   </p>
                   <p
-                    className="mt-4 text-[34px] leading-[1.02] text-[rgba(240,236,252,0.95)]"
+                    className="mt-3 md:mt-4 text-[26px] md:text-[34px] leading-[1.05] md:leading-[1.02] text-[rgba(240,236,252,0.95)]"
                     style={{
                       fontFamily: "'Cormorant Garamond', serif",
                       fontWeight: 300,
@@ -179,7 +179,7 @@ export default function HomePage() {
                     {tool.title}
                   </p>
                   <p
-                    className="mt-4 text-[14px] leading-[1.85]"
+                    className="mt-3 md:mt-4 text-[14px] leading-[1.7] md:leading-[1.85]"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 300,
@@ -189,7 +189,7 @@ export default function HomePage() {
                     {tool.body}
                   </p>
                   <span
-                    className="mt-auto pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-75 group-hover:opacity-100 group-hover:translate-x-1"
+                    className="mt-auto pt-4 md:pt-6 text-[12px] tracking-[0.1em] uppercase transition-all duration-200 opacity-75 group-hover:opacity-100 group-hover:translate-x-1"
                     style={{
                       fontFamily: "'Jost', sans-serif",
                       fontWeight: 400,
@@ -204,8 +204,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="free-tools" className="free-tools-section pb-16 md:pb-24">
+        <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-0 md:pb-24">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
+            <div
+              aria-hidden="true"
+              className="mb-10 md:hidden h-px w-16"
+              style={{ background: "rgba(255,255,255,0.10)" }}
+            />
             <p
               className="text-[11px] tracking-[0.2em] uppercase"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
