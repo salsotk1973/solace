@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/HeroSection";
 import FeaturedLabCard, { type FeaturedLabArticle } from "@/components/home/FeaturedLabCard";
+import LabSecondaryCard, { type LabSecondaryArticle } from "@/components/home/LabSecondaryCard";
 import { CATEGORY_COLOURS, TEXT_COLOURS, FONT_SIZE } from "@/lib/design-tokens";
 
 // ─── Colour helpers derived from design tokens ────────────────────────────────
@@ -113,6 +114,21 @@ const FEATURED_LAB: FeaturedLabArticle = {
   excerpt: "Your brain isn't broken. It's doing exactly what it was designed to do — just at the wrong moment.",
   readingTime: 6,
 };
+
+const LAB_SECONDARIES: LabSecondaryArticle[] = [
+  {
+    title: "How to actually rest (when your brain won't switch off)",
+    slug: "how-to-actually-rest",
+    category: "calm-your-state",
+    readingTime: 4,
+  },
+  {
+    title: "Does gratitude journalling actually work?",
+    slug: "does-gratitude-journalling-work",
+    category: "notice-whats-good",
+    readingTime: 5,
+  },
+];
 
 export default function HomePage() {
   return (
@@ -261,14 +277,23 @@ export default function HomePage() {
         </section>
 
         <section id="lab-teaser" className="py-8 md:py-10">
-          <div className="max-w-[860px] mx-auto px-6 md:px-12 lg:px-24">
+          <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
             <p
-              className="mb-4 text-[11px] tracking-[0.24em] uppercase"
+              className="mb-4 md:mb-6 text-[11px] tracking-[0.24em] uppercase"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
             >
               From the Lab
             </p>
-            <FeaturedLabCard article={FEATURED_LAB} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="md:col-span-2">
+                <FeaturedLabCard article={FEATURED_LAB} />
+              </div>
+              <div className="flex flex-col gap-4 md:gap-6">
+                {LAB_SECONDARIES.map((article) => (
+                  <LabSecondaryCard key={article.slug} article={article} />
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </div>

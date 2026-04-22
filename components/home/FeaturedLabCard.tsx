@@ -33,6 +33,17 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
         .featured-lab-card-link {
           padding: 34px 38px;
         }
+        .featured-lab-card-wrapper {
+          transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
+          will-change: transform;
+        }
+        @media (hover: hover) {
+          .featured-lab-card-wrapper:hover {
+            transform: translateY(-2px);
+            background: rgba(${_rgb},0.08) !important;
+            border-color: ${accent.replace("1)", "0.30)")} !important;
+          }
+        }
         @media (max-width: 640px) {
           .featured-lab-card-link {
             padding: 22px 22px;
