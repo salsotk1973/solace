@@ -6,16 +6,17 @@
 
 **Positioning (locked):** "Clarity and decisions for people overwhelmed by life"
 
-**Hero copy (locked):**
+**Hero copy (locked, mobile + desktop):**
 ```
-You know something needs to change.
-You just can't see it clearly yet.
+When your mind won't settle,
+it's hard to think clearly.
 
-Solace gives you the space to think it through —
-privately, gently, without judgement.
+Solace helps you find the next right step — through thought, not noise.
 
-[Find some clarity →]
+[Begin with Breathing →]
 ```
+
+(CTA links to `/tools/breathing` — strongest internal SEO signal from homepage to highest-polish tool page.)
 
 ---
 
@@ -133,9 +134,88 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 - Values: 14px minimum
 
 ### Components (Locked)
-- SiteHeader.tsx and SiteFooter.tsx — **LOCKED, never modify**
+- SiteHeader.tsx — **LOCKED, never modify**
+- SiteFooter.tsx — **LOCKED, never modify** (mobile restructured Apr 2026 — see "Mobile Homepage" section)
 - `PageShell` default `particles={false}` ✅
 - `glassBackground()`, `glassBorder()`, `getToolRgb()` helpers from design-tokens
+
+---
+
+## Mobile Homepage — LOCKED ✅ (Apr 2026)
+
+**Full mobile audit and redesign session completed. ~1,050px of vertical scroll removed. Free tools surface 2 screens earlier in the funnel. Footer redesigned from text-dump to ceremonial closing with repeated SOLACE wordmark.**
+
+### Hero
+- Section: `min-h-[55vh] md:min-h-[82vh] flex items-start md:items-center justify-center px-6 pt-[12vh] pb-12 md:pt-0 md:pb-0`
+- Headline: `text-[36px] md:text-[72px] font-light leading-[1.08] md:leading-[0.95]`
+- Headline wrapper: `overflow-visible md:overflow-hidden pt-1 md:pt-0` (overflow-visible prevents Cormorant ascender clipping on mobile)
+- CTA: "Begin with Breathing →" → `/tools/breathing` — teal `rgba(60,192,212,0.85)`, `text-[12px]` uppercase, `tracking-[0.18em]`, `mt-10`
+- **Mobile only `min-h` removed**; `pb-12` controls bottom space deterministically (no flex-center void)
+- **`pt-[12vh]` is the calibrated value** — 8vh too tight (clipped against nav), 18vh too low
+
+### AI Tool Cards
+- `<Link>` className: `ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-5 md:p-6 md:min-h-[280px] flex flex-col …`
+- **`min-h-[280px]` desktop only** (mobile cards size to content)
+- Title: `text-[26px] md:text-[34px] leading-[1.05] md:leading-[1.02] mt-3 md:mt-4`
+- **Body paragraph hidden on mobile via `hidden md:block`** (kept in DOM for SEO, removes ~160px per card × 3)
+- CTA: `mt-3 md:mt-auto pt-0 md:pt-6` (with body removed mobile no longer uses mt-auto)
+- Section: `pt-8 pb-8 md:pt-16 md:pb-14`
+- Grid: `mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6`
+- Hairline divider before "FREE — START HERE": 64px-wide, mobile-only via `md:hidden`
+
+### FREE — START HERE (no spec needed — already clean)
+- Single column on mobile, well-sized cards, colour-coded accents work as-is
+
+### FeaturedLabCard
+- Padding via scoped `<style>` block: desktop `34px 38px`, mobile `22px 22px`
+- "Editor's Pick" pill hidden on mobile via `.featured-lab-pill-editors-pick { display: none !important }` — only "THINK CLEARLY" category pill visible
+- Excerpt colour: `rgba(200,192,230,0.70)` (was `rgba(135,128,178,0.48)` — below WCAG AA on dark bg) — applied to desktop too (accessibility fix)
+- Excerpt line-height: `1.65` (was `1.8`)
+- Title margin: `0 0 12px` (was `0 0 16px`)
+- Pill row: `gap: 8px, marginBottom: 14px, flexWrap: wrap`
+- Title minimum: `clamp(26px, 3.1vw, 42px)` (was `clamp(28px, …)`)
+
+### Footer — Designed Mobile Closing
+**Deliberate exception to the "SiteFooter LOCKED" rule. Mobile only. Desktop 3-column layout untouched.**
+
+Mobile footer structure (top to bottom):
+1. **Row 1 — 5 product/learn links centered:** Tools, Pricing, Lab, Principles, About — `font-size: 13px`, gap `12px 18px`, marginBottom `16px`
+2. **Row 2 — 2 legal links centered:** Privacy, Terms — gap `24px`, sharing vertical axis with row 1's center
+3. **Hairline divider:** `width: 32px, height: 0.5px, background: rgba(255,255,255,0.18), margin: 32px auto 24px` — ceremonial, not structural
+4. **Centered disclaimer:** max-width `320px` (forces 3-line wrap on iPhone), `font-size: 12px, lineHeight: 1.7`
+5. **Copyright + tagline merged:** `© 2026 · Built with care.` on one centered line, `font-size: 11px`
+6. **SOLACE wordmark closing:** Cormorant Garamond, `font-size: 18px, letterSpacing: 0.32em, color: rgba(255,255,255,0.35), paddingLeft: 0.32em` (compensates for letter-spacing right-bias for optical centering)
+
+Mobile footer hides:
+- The 3-column PRODUCT/LEARN/LEGAL grid (`display: none`)
+- "Dashboard" link (already in hamburger nav)
+- "Sign in/Sign out" `<FooterAuthLink />` (already in hamburger nav)
+- The desktop full-width hairline divider
+- The desktop 3-part bottom bar (copyright/disclaimer/built-with-care)
+
+Mobile padding: `28px 16px 20px` (was desktop `48px 16px 32px`)
+
+**Why the wordmark works:** SOLACE at the top opens the experience. SOLACE at the bottom closes it. Brand bookends the page. Ralph Lauren / Aēsop / A24 / Studio Bun pattern. Costs nothing, signals care.
+
+### Mobile spacing token cheat sheet
+
+| Element | Mobile value | Desktop value |
+|---|---|---|
+| Hero `min-h` | none | `82vh` |
+| Hero `pt` | `[12vh]` | `0` |
+| Hero `pb` | `12` (48px) | `0` |
+| Hero `items` | `start` | `center` |
+| Headline size | `36px` | `72px` |
+| Headline leading | `1.08` | `0.95` |
+| AI section `pt` / `pb` | `8` / `8` | `16` / `14` |
+| AI card padding | `p-5` | `p-6` |
+| AI card title | `26px` | `34px` |
+| AI card body | `hidden` | visible |
+| AI grid gap | `gap-4` | `gap-6` |
+| Lab card padding | `22px 22px` | `34px 38px` |
+| Lab card pills | 1 (Think Clearly) | 2 (Editor's Pick + category) |
+| Footer padding | `28px 16px 20px` | `48px 16px 32px` |
+| Footer layout | centered 5+2 + wordmark | 3-column grid |
 
 ---
 
@@ -275,6 +355,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` — canonical tags auto-generated ✅
 - 11 pages indexed by Google
 - `clerk.try-solace.app` — "indexed without content" — not our domain, no action needed
+- **Homepage hero CTA "Begin with Breathing →" → `/tools/breathing`** — strongest internal SEO signal from highest-authority page
 
 ---
 
@@ -309,6 +390,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ## Still Needed (priority order)
 
+- [ ] **Desktop homepage audit** — same protocol as mobile audit (next session)
 - [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
@@ -329,7 +411,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 | Page | Status |
 |---|---|
-| Home | ✅ |
+| Home (mobile) | ✅ LOCKED Apr 2026 — see Mobile Homepage section above |
+| Home (desktop) | Needs audit (next session) |
 | Tools | ✅ |
 | Pricing | ✅ A$9/A$79 |
 | Lab | ✅ 15 articles |
@@ -373,7 +456,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - Read solace-master before any work
 - **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
 - **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first. Always.
-- SiteHeader.tsx and SiteFooter.tsx — **LOCKED**
+- SiteHeader.tsx — **LOCKED**
+- SiteFooter.tsx — **LOCKED** (mobile is the documented exception in the Mobile Homepage section above)
 - Background always `#090d14`
 - Never define colours inline — always `lib/design-tokens.ts`
 - Never below 0.65 opacity for functional text
@@ -389,6 +473,39 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed**
 - **Never approximate Breathing values — read the actual source and copy exactly**
 - **No sounds on Breathing or Sleep Wind-Down** — silence is intentional
+
+---
+
+## Process Lessons (Apr 2026 — Mobile Homepage Audit)
+
+These were learned the hard way during the mobile homepage redesign. Encode them so they don't have to be re-learned.
+
+### 1. One spec = one number when calibrating spacing
+When spacing values are unknown, move in **2vh / 8px increments**, never 4vh+ jumps. Bundle multiple changes only when each change is independently necessary — not because "let me solve it perfectly this time." Bundling causes cascading failures and wastes sessions. The mobile hero took 6 specs (01, 01b, 01c, 02b, 02c, 02d) to nail one number because the first specs bundled 3 changes each. Don't do this again.
+
+### 2. Real-device screenshot BEFORE every spacing spec, not just after
+The benchmark rule says screenshot at 375px before writing any spec. Extend it: when calibrating mobile spacing, also request a real iPhone screenshot AFTER the previous spec deploys, BEFORE writing the next one. DevTools emulation at 375px is necessary but not sufficient — real iPhones have safari nav chrome, status bars, dynamic islands, and tall viewports (812px+) that change how flex centering composes. Six hero specs in a row would have been one if I'd asked for the iPhone screenshot before each calibration, not after.
+
+### 3. `overflow-hidden` clips Cormorant Garamond ascenders
+Cormorant has tall ascenders that extend above the leading line. With tight `leading-[0.95]` or smaller and a parent `overflow-hidden`, the top of capital letters gets clipped. Solution: use `overflow-visible md:overflow-hidden pt-1 md:pt-0` on mobile. Or remove the wrapper if no slide-up animation needs it.
+
+### 4. `min-h-[Xvh] + items-center` on mobile = void below content
+On tall iPhones (812px+), centering content in a 55–62vh container creates 100–150px of empty space below the content. Better pattern: drop `min-h` on mobile, use `items-start` with `pt-[Nvh]` for top placement and `pb-N` for bottom space. This gives deterministic control instead of flex-distributed emptiness.
+
+### 5. Card body text on homepage = duplicate content
+If a homepage card describes a tool/article, and the destination page already has that description, the card body is duplicate content. Strip it on mobile (where space is precious). Use `hidden md:block` to keep it in DOM for SEO. Eyebrow + title + CTA is usually enough on mobile to commit to a tap.
+
+### 6. Inline styles don't respond to Tailwind breakpoints
+Components using inline `style={{padding: "34px 38px"}}` need a scoped `<style>` block with media queries to be responsive. Use the same pattern as SiteFooter.tsx — add a className, target it from a `<style>` tag. Don't try to add Tailwind classes alongside inline styles for the same property — specificity wars.
+
+### 7. Footer is part of the brand experience, not exit signage
+A "dumped list of links" footer signals an unfinished product. A designed footer with intentional composition (centered links, hairline divider, repeated wordmark) signals care. The SOLACE wordmark at the bottom bookends the experience the SOLACE logo opened at the top. Cost: ~30 lines of CSS. Value: massive perceived quality lift.
+
+### 8. Optical centering ≠ mathematical centering for letter-spaced text
+Letter-spaced text always sits slightly right of mathematical center because the letter-spacing pushes letters to the right of their box. Compensate with `paddingLeft` equal to one letter-spacing unit (e.g., `paddingLeft: "0.32em"` for `letterSpacing: "0.32em"`).
+
+### 9. Re-read solace-master.md when I think it's missing something
+When specifying changes, if I think "the routine for X isn't documented," check the file first. The routine is probably there and I just haven't internalised it.
 
 ---
 
