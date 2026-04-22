@@ -197,7 +197,7 @@ export default function FocusTimer({ userId }: Props) {
           {/* Tap hint */}
           <span
             className="[font-family:var(--font-jost)] tracking-[0.22em] uppercase"
-            style={{ fontSize: "8px", color: "rgba(180,190,200,0.50)" }}
+            style={{ fontSize: "9px", color: "rgba(232,168,62,0.65)", letterSpacing: "0.18em" }}
           >
             {!started ? "tap to start" : isRunning ? "tap to pause" : "tap to resume"}
           </span>
@@ -209,22 +209,22 @@ export default function FocusTimer({ userId }: Props) {
         <SessionDots workDone={workDone} phaseIdx={phaseIdx} started={started} />
       </div>
 
-      {/* Skip + Reset — ghost pill buttons */}
+      {/* Skip + Reset — pill buttons matching Breathing BEGIN */}
       {started && (
         <div className="flex items-center gap-3 mb-8">
           {!allDone && (
             <button
               onClick={handleSkip}
-              className="[font-family:var(--font-jost)] text-[10px] tracking-[0.18em] uppercase px-5 py-2 rounded-full transition-all duration-200"
-              style={{ border: `1px solid ${A(0.40)}`, color: A(0.80), background: A(0.06) }}
+              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 hover:opacity-90"
+              style={{ background: "rgba(232,168,62,0.85)", border: "1px solid rgba(232,168,62,0.90)", color: "rgba(10,20,0,0.95)" }}
             >
               Skip →
             </button>
           )}
           <button
             onClick={handleReset}
-            className="[font-family:var(--font-jost)] text-[10px] tracking-[0.18em] uppercase px-5 py-2 rounded-full transition-all duration-200"
-            style={{ border: "1px solid rgba(180,190,200,0.25)", color: "rgba(180,190,200,0.55)", background: "rgba(180,190,200,0.04)" }}
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer px-8 py-3 rounded-full transition-all duration-300 hover:opacity-80"
+            style={{ background: "transparent", border: "1px solid rgba(232,168,62,0.35)", color: "rgba(232,168,62,0.55)" }}
           >
             Reset
           </button>
@@ -232,14 +232,14 @@ export default function FocusTimer({ userId }: Props) {
       )}
 
       {/* Info cards — exact Breathing structure, amber tokens */}
-      <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20">
+      <div className="grid grid-cols-2 gap-2 w-full max-w-[420px] mx-auto mb-2 md:mb-20">
         {[
           { label: "Duration", value: "~2 hrs total" },
           { label: "Best for", value: "Deep work" },
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
+            className="flex flex-col items-center gap-1.5 px-4 py-5 rounded-[12px]"
             style={{ border: `1px solid ${A(0.22)}`, background: A(0.07) }}
           >
             <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]" style={{ color: A(0.65) }}>
@@ -288,7 +288,14 @@ export default function FocusTimer({ userId }: Props) {
           <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
             <div
               className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
-              style={{ border: `1px solid ${A(0.12)}`, background: A(0.03), borderTop: historyOpen ? "none" : undefined, borderRadius: historyOpen ? "0 0 14px 14px" : undefined }}
+              style={{
+                borderLeft: `1px solid ${A(0.12)}`,
+                borderRight: `1px solid ${A(0.12)}`,
+                borderBottom: `1px solid ${A(0.12)}`,
+                borderTop: historyOpen ? "none" : `1px solid ${A(0.12)}`,
+                background: A(0.03),
+                borderRadius: historyOpen ? "0 0 14px 14px" : "14px",
+              }}
             >
               <p className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center" style={{ color: "rgba(255,255,255,0.80)" }}>
                 {!history.isPaid

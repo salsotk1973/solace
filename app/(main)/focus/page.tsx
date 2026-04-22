@@ -23,7 +23,7 @@ export default async function FocusPage() {
 
   return (
     <PageShell>
-      <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[140px] pb-28">
+      <div className="relative z-10 max-w-[780px] mx-auto px-6 pt-[80px] md:pt-[140px] pb-28">
 
         {/* ── Tool header ──────────────────────────────────────────────── */}
         <header className="text-center mb-5">
