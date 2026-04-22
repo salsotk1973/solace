@@ -41,6 +41,9 @@ export default function FocusTimer({ userId }: Props) {
   const workDoneRef  = useRef(workDone);
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioCtxRef  = useRef<AudioContext | null>(null);
+  const focusBufferRef = useRef<AudioBuffer | null>(null);
+  const restBufferRef  = useRef<AudioBuffer | null>(null);
+  const doneBufferRef  = useRef<AudioBuffer | null>(null);
 
   useEffect(() => { phaseIdxRef.current  = phaseIdx;  }, [phaseIdx]);
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
@@ -62,26 +65,54 @@ export default function FocusTimer({ userId }: Props) {
     else setSoundEnabled(true); // Clear any stale state
   }, []);
 
+  // ── Preload audio files ───────────────────────────────────────────────────
+  useEffect(() => {
+    let ctx: AudioContext;
+    async function load() {
+      try {
+        ctx = new AudioContext();
+        audioCtxRef.current = ctx;
+        const [focusRes, restRes, doneRes] = await Promise.all([
+          fetch("/sounds/focus-start.mp3"),
+          fetch("/sounds/rest-start.mp3"),
+          fetch("/sounds/session-done.mp3"),
+        ]);
+        const [focusArr, restArr, doneArr] = await Promise.all([
+          focusRes.arrayBuffer(),
+          restRes.arrayBuffer(),
+          doneRes.arrayBuffer(),
+        ]);
+        const [focusBuf, restBuf, doneBuf] = await Promise.all([
+          ctx.decodeAudioData(focusArr),
+          ctx.decodeAudioData(restArr),
+          ctx.decodeAudioData(doneArr),
+        ]);
+        focusBufferRef.current = focusBuf;
+        restBufferRef.current  = restBuf;
+        doneBufferRef.current  = doneBuf;
+      } catch {}
+    }
+    void load();
+    return () => { try { ctx?.close(); } catch {} };
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("solace_focus_sound", String(soundEnabled));
   }, [soundEnabled]);
 
-  // ── Tone player ───────────────────────────────────────────────────────────
-  const playTone = useCallback((frequency: number, duration: number) => {
-    if (!soundEnabled) return;
+  // ── Sound player ──────────────────────────────────────────────────────────
+  const playSound = useCallback((buffer: AudioBuffer | null) => {
+    if (!soundEnabled || !buffer || !audioCtxRef.current) return;
     try {
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
-      const ctx  = audioCtxRef.current;
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") ctx.resume();
+      const source = ctx.createBufferSource();
+      const gain   = ctx.createGain();
+      source.buffer = buffer;
+      source.connect(gain);
       gain.connect(ctx.destination);
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-      gain.gain.setValueAtTime(0.18, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.85, ctx.currentTime);
+      source.start(ctx.currentTime);
     } catch {}
   }, [soundEnabled]);
 
@@ -115,7 +146,7 @@ export default function FocusTimer({ userId }: Props) {
       if (nextPi >= TOTAL_PHASES) {
         setRemaining(0); remainingRef.current = 0;
         setIsRunning(false); setAllDone(true);
-        playTone(528, 0.4); // Done — slightly higher, longer
+        playSound(doneBufferRef.current);
         return;
       }
 
@@ -124,24 +155,28 @@ export default function FocusTimer({ userId }: Props) {
       setPhaseIdx(nextPi); setRemaining(nextDur);
 
       if (isWorkPhase(nextPi)) {
-        playTone(440, 0.15); // Focus start — crisp
+        playSound(focusBufferRef.current);
       } else {
-        playTone(330, 0.25); // Rest start — soft
+        playSound(restBufferRef.current);
       }
     }, 1000);
 
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, phaseIdx, playTone]);
+  }, [isRunning, phaseIdx, playSound]);
 
   // ── Controls ──────────────────────────────────────────────────────────────
   function handleTap() {
-    // Unlock AudioContext on first user gesture (iOS safe)
-    if (!audioCtxRef.current) {
-      try { audioCtxRef.current = new AudioContext(); } catch {}
+    if (!started) {
+      if (audioCtxRef.current?.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      setStarted(true);
+      setIsRunning(true);
+      playSound(focusBufferRef.current);
+      return;
     }
     if (allDone) { handleReset(); return; }
-    if (!started) { setStarted(true); setIsRunning(true); }
-    else { setIsRunning((r) => !r); }
+    setIsRunning((r) => !r);
   }
 
   const handleSkip = useCallback(() => {
@@ -153,18 +188,18 @@ export default function FocusTimer({ userId }: Props) {
     if (next >= TOTAL_PHASES) {
       setIsRunning(false); setAllDone(true);
       setRemaining(0); remainingRef.current = 0;
-      playTone(528, 0.4);
+      playSound(doneBufferRef.current);
       return;
     }
     const nextDur = phaseDuration(next);
     phaseIdxRef.current = next; remainingRef.current = nextDur;
     setPhaseIdx(next); setRemaining(nextDur);
     if (isWorkPhase(next)) {
-      playTone(440, 0.15);
+      playSound(focusBufferRef.current);
     } else {
-      playTone(330, 0.25);
+      playSound(restBufferRef.current);
     }
-  }, [playTone]);
+  }, [playSound]);
 
   function handleReset() {
     if (intervalRef.current) clearInterval(intervalRef.current);
