@@ -143,15 +143,16 @@ export default function FocusTimer({ userId }: Props) {
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
-      {/* Phase label — always amber, mt-8 mobile gap from pills */}
+      {/* Phase label — always amber, forced 32px top gap from pills */}
       <p
         className={[
           "[font-family:var(--font-display)] italic font-light leading-none transition-all duration-500 text-center w-full",
           "text-[28px] md:text-[38px]",
-          "mt-8 mb-3 md:mt-0 md:mb-8",
+          "mb-3 md:mb-8",
           "text-[rgba(255,195,100,0.65)]",
           started ? "opacity-100" : "opacity-0",
         ].join(" ")}
+        style={{ marginTop: "32px" }}
       >
         {stateLabel}
       </p>
@@ -232,14 +233,14 @@ export default function FocusTimer({ userId }: Props) {
       )}
 
       {/* Info cards — exact Breathing structure, amber tokens */}
-      <div className="grid grid-cols-2 gap-2 w-full max-w-[420px] mx-auto mb-2 md:mb-20">
+      <div className="grid grid-cols-2 gap-2 max-w-[320px] mx-auto md:mx-auto mb-2 md:max-w-[420px] md:mb-20">
         {[
           { label: "Duration", value: "~2 hrs total" },
           { label: "Best for", value: "Deep work" },
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-1.5 px-4 py-5 rounded-[12px]"
+            className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
             style={{ border: `1px solid ${A(0.22)}`, background: A(0.07) }}
           >
             <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]" style={{ color: A(0.65) }}>
