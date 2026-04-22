@@ -288,7 +288,7 @@ export default function SiteFooter() {
                   fontWeight: 300,
                   fontSize: "12px",
                   lineHeight: 1.7,
-                  color: "rgba(255,255,255,0.75)",
+                  color: "rgba(255,255,255,0.65)",
                   margin: "0 auto 20px",
                   maxWidth: "320px",
                 }}
@@ -301,7 +301,7 @@ export default function SiteFooter() {
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 300,
                   fontSize: "11px",
-                  color: "rgba(255,255,255,0.50)",
+                  color: "rgba(255,255,255,0.65)",
                   margin: "0 0 32px",
                 }}
               >
@@ -314,7 +314,7 @@ export default function SiteFooter() {
                   fontWeight: 300,
                   fontSize: "18px",
                   letterSpacing: "0.32em",
-                  color: "rgba(255,255,255,0.35)",
+                  color: "rgba(255,255,255,0.55)",
                   margin: 0,
                   paddingLeft: "0.32em",
                 }}
