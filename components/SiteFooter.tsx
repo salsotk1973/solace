@@ -77,18 +77,27 @@ export default function SiteFooter() {
           .footer-bottom-right { flex: 1; }
         }
         @media (max-width: 640px) {
-          .footer-mobile-inline {
-            display: flex !important;
+          .footer-mobile-structured {
+            display: block !important;
           }
           .footer-grid {
             display: none;
           }
           .footer-mobile-padding {
-            padding: 28px 16px 20px !important;
+            padding: 32px 16px 24px !important;
           }
-          .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-          .footer-bottom-disclaimer { flex: unset; width: 100%; }
-          .footer-bottom-right { text-align: left; }
+          .footer-bottom-bar {
+            display: none !important;
+          }
+          .footer-mobile-bottom {
+            display: block !important;
+          }
+          .footer-mobile-divider {
+            display: block !important;
+          }
+          .footer-desktop-divider {
+            display: none !important;
+          }
         }
       `}</style>
 
@@ -117,36 +126,59 @@ export default function SiteFooter() {
               boxSizing: "border-box",
             }}
           >
-            {/* Mobile-only inline nav (<=640px). Replaces the 3-column grid below. */}
-            <nav
-              className="footer-mobile-inline"
-              aria-label="Footer navigation"
+            {/* Mobile-only structured footer (<=640px). Replaces the 3-column grid below. */}
+            <div className="footer-mobile-structured" style={{ display: "none" }}>
+              <nav
+                aria-label="Footer navigation"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "12px 18px",
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "13px",
+                  color: "rgba(255,255,255,0.60)",
+                  marginBottom: "16px",
+                }}
+              >
+                <Link href="/tools" className="footer-nav-link" style={navLinkStyle}>Tools</Link>
+                <Link href="/pricing" className="footer-nav-link" style={navLinkStyle}>Pricing</Link>
+                <Link href="/lab" className="footer-nav-link" style={navLinkStyle}>Lab</Link>
+                <Link href="/principles" className="footer-nav-link" style={navLinkStyle}>Principles</Link>
+                <Link href="/about" className="footer-nav-link" style={navLinkStyle}>About</Link>
+              </nav>
+              <nav
+                aria-label="Legal navigation"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "24px",
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "13px",
+                  color: "rgba(255,255,255,0.60)",
+                }}
+              >
+                <Link href="/privacy" className="footer-nav-link" style={navLinkStyle}>Privacy</Link>
+                <Link href="/terms" className="footer-nav-link" style={navLinkStyle}>Terms</Link>
+              </nav>
+            </div>
+
+            {/* Mobile-only hairline divider — soft, centered, ceremonial */}
+            <div
+              className="footer-mobile-divider"
+              aria-hidden="true"
               style={{
                 display: "none",
-                flexWrap: "wrap",
-                gap: "8px 14px",
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize: "12px",
-                color: "rgba(255,255,255,0.60)",
-                justifyContent: "flex-start",
-                alignItems: "center",
+                width: "32px",
+                height: "0.5px",
+                background: "rgba(255,255,255,0.18)",
+                margin: "32px auto 24px",
               }}
-            >
-              <Link href="/tools" className="footer-nav-link" style={navLinkStyle}>Tools</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/pricing" className="footer-nav-link" style={navLinkStyle}>Pricing</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/lab" className="footer-nav-link" style={navLinkStyle}>Lab</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/principles" className="footer-nav-link" style={navLinkStyle}>Principles</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/about" className="footer-nav-link" style={navLinkStyle}>About</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/privacy" className="footer-nav-link" style={navLinkStyle}>Privacy</Link>
-              <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-              <Link href="/terms" className="footer-nav-link" style={navLinkStyle}>Terms</Link>
-            </nav>
+            />
 
             <div className="footer-grid">
               {FOOTER_NAV.map((col) => (
@@ -197,14 +229,15 @@ export default function SiteFooter() {
               boxSizing: "border-box",
             }}
           >
+            {/* Desktop bottom bar (existing) — hidden on mobile via media query */}
             <div
+              className="footer-desktop-divider"
               style={{
                 height: "0.5px",
                 background: "rgba(255,255,255,0.08)",
                 marginBottom: "20px",
               }}
             />
-
             <div className="footer-bottom-bar">
               <p
                 className="footer-bottom-left"
@@ -244,6 +277,49 @@ export default function SiteFooter() {
                 }}
               >
                 Built with care.
+              </p>
+            </div>
+
+            {/* Mobile-only bottom block — centered disclaimer, copyright on one line, SOLACE wordmark closing */}
+            <div className="footer-mobile-bottom" style={{ display: "none", textAlign: "center" }}>
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "12px",
+                  lineHeight: 1.7,
+                  color: "rgba(255,255,255,0.75)",
+                  margin: "0 auto 20px",
+                  maxWidth: "320px",
+                }}
+              >
+                Solace is designed for adults only. It provides reflective support
+                {" — "}not medical, psychological, legal, financial, or professional advice.
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "11px",
+                  color: "rgba(255,255,255,0.50)",
+                  margin: "0 0 32px",
+                }}
+              >
+                © 2026 · Built with care.
+              </p>
+              <p
+                aria-hidden="true"
+                style={{
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontWeight: 300,
+                  fontSize: "18px",
+                  letterSpacing: "0.32em",
+                  color: "rgba(255,255,255,0.35)",
+                  margin: 0,
+                  paddingLeft: "0.32em",
+                }}
+              >
+                SOLACE
               </p>
             </div>
           </div>
