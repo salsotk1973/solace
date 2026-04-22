@@ -25,20 +25,22 @@ function pad(n: number): string              { return String(n).padStart(2, "0")
 interface Props { userId: string | null; }
 
 export default function FocusTimer({ userId }: Props) {
-  const [started,     setStarted]     = useState(false);
-  const [isRunning,   setIsRunning]   = useState(false);
-  const [phaseIdx,    setPhaseIdx]    = useState(0);
-  const [remaining,   setRemaining]   = useState(WORK_SECS);
-  const [workDone,    setWorkDone]    = useState(0);
-  const [allDone,     setAllDone]     = useState(false);
-  const [dismissed,   setDismissed]   = useState(false);
-  const [circleSize,  setCircleSize]  = useState<number>(220);
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [started,      setStarted]      = useState(false);
+  const [isRunning,    setIsRunning]    = useState(false);
+  const [phaseIdx,     setPhaseIdx]     = useState(0);
+  const [remaining,    setRemaining]    = useState(WORK_SECS);
+  const [workDone,     setWorkDone]     = useState(0);
+  const [allDone,      setAllDone]      = useState(false);
+  const [dismissed,    setDismissed]    = useState(false);
+  const [circleSize,   setCircleSize]   = useState<number>(220);
+  const [historyOpen,  setHistoryOpen]  = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   const phaseIdxRef  = useRef(phaseIdx);
   const remainingRef = useRef(remaining);
   const workDoneRef  = useRef(workDone);
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioCtxRef  = useRef<AudioContext | null>(null);
 
   useEffect(() => { phaseIdxRef.current  = phaseIdx;  }, [phaseIdx]);
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
@@ -51,6 +53,35 @@ export default function FocusTimer({ userId }: Props) {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  // ── Sound preference — load + save ────────────────────────────────────────
+  useEffect(() => {
+    const saved = localStorage.getItem("solace_focus_sound");
+    if (saved === "false") setSoundEnabled(false);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("solace_focus_sound", String(soundEnabled));
+  }, [soundEnabled]);
+
+  // ── Tone player ───────────────────────────────────────────────────────────
+  const playTone = useCallback((frequency: number, duration: number) => {
+    if (!soundEnabled) return;
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+      const ctx  = audioCtxRef.current;
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch {}
+  }, [soundEnabled]);
 
   // ── History ───────────────────────────────────────────────────────────────
   const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("focus", userId);
@@ -82,19 +113,30 @@ export default function FocusTimer({ userId }: Props) {
       if (nextPi >= TOTAL_PHASES) {
         setRemaining(0); remainingRef.current = 0;
         setIsRunning(false); setAllDone(true);
+        playTone(528, 0.4); // Done — slightly higher, longer
         return;
       }
 
       const nextDur = phaseDuration(nextPi);
       phaseIdxRef.current = nextPi; remainingRef.current = nextDur;
       setPhaseIdx(nextPi); setRemaining(nextDur);
+
+      if (isWorkPhase(nextPi)) {
+        playTone(440, 0.15); // Focus start — crisp
+      } else {
+        playTone(330, 0.25); // Rest start — soft
+      }
     }, 1000);
 
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, phaseIdx]);
+  }, [isRunning, phaseIdx, playTone]);
 
   // ── Controls ──────────────────────────────────────────────────────────────
   function handleTap() {
+    // Unlock AudioContext on first user gesture (iOS safe)
+    if (!audioCtxRef.current) {
+      try { audioCtxRef.current = new AudioContext(); } catch {}
+    }
     if (allDone) { handleReset(); return; }
     if (!started) { setStarted(true); setIsRunning(true); }
     else { setIsRunning((r) => !r); }
@@ -109,12 +151,18 @@ export default function FocusTimer({ userId }: Props) {
     if (next >= TOTAL_PHASES) {
       setIsRunning(false); setAllDone(true);
       setRemaining(0); remainingRef.current = 0;
+      playTone(528, 0.4);
       return;
     }
     const nextDur = phaseDuration(next);
     phaseIdxRef.current = next; remainingRef.current = nextDur;
     setPhaseIdx(next); setRemaining(nextDur);
-  }, []);
+    if (isWorkPhase(next)) {
+      playTone(440, 0.15);
+    } else {
+      playTone(330, 0.25);
+    }
+  }, [playTone]);
 
   function handleReset() {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -143,7 +191,36 @@ export default function FocusTimer({ userId }: Props) {
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
-      {/* Phase label — always amber, forced 32px top gap from pills */}
+      {/* Sound toggle — top-right of pill area */}
+      <div className="flex justify-end w-full max-w-[260px] md:max-w-none mb-1">
+        <button
+          onClick={() => setSoundEnabled(s => !s)}
+          className="[font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{
+            color: soundEnabled ? A(0.70) : "rgba(180,190,200,0.30)",
+            border: `1px solid ${soundEnabled ? A(0.25) : "rgba(180,190,200,0.12)"}`,
+            background: soundEnabled ? A(0.05) : "transparent",
+          }}
+          aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
+        >
+          {soundEnabled ? (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          )}
+          {soundEnabled ? "Sound on" : "Sound off"}
+        </button>
+      </div>
+
+      {/* Phase label — always amber, 12px top gap from pills */}
       <p
         className={[
           "[font-family:var(--font-display)] italic font-light leading-none transition-all duration-500 text-center w-full",
