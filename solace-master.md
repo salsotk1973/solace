@@ -26,7 +26,6 @@ Solace gives you the space to think it through — privately, gently, without ju
 - **Email:** Brevo (transactional + marketing)
 - **Caching:** Upstash Redis
 - **Analytics:** PostHog, Google Search Console
-- **Project root:** `solace-engine/`
 - **Dev server:** localhost:3001
 
 ---
@@ -50,15 +49,13 @@ Solace gives you the space to think it through — privately, gently, without ju
 ### Google Workspace ✅
 - **Plan:** Business Starter — A$11.80/month
 - **Primary inbox:** `hello@try-solace.app` — real Gmail inbox, DKIM + SPF + DMARC all verified
-- **Aliases (Send As):**
-  - `privacy@try-solace.app` → routes to `hello@try-solace.app`
-  - `legal@try-solace.app` → routes to `hello@try-solace.app`
+- **Aliases:** `privacy@` and `legal@` → route to `hello@try-solace.app`
 
 ### Brevo ✅ (Phase 1 complete)
 - **Lists:** `Solace Users` ID 3, `Solace Newsletter` ID 5
 - **Templates:** ID 1 Welcome, ID 2 Day 3, ID 3 Day 14
-- **Automation #1** — Active: list 3 → wait 3d → template 2 → wait 11d → template 3 ✅
-- **Clerk webhook** — on `user.created`: adds to list 3 + sends template 1 ✅
+- **Automation #1** active: list 3 → wait 3d → template 2 → wait 11d → template 3 ✅
+- **Clerk webhook** on `user.created`: adds to list 3 + sends template 1 ✅
 
 ### Brevo Phase 2 (post-launch)
 1. Welcome Day 2 + Day 5
@@ -70,10 +67,10 @@ Solace gives you the space to think it through — privately, gently, without ju
 
 ## Pricing (Locked)
 
-- **Free tier:** All 8 client+AI tools with limits, 7-day history, Choose 1/day
+- **Free tier:** All tools with limits, 7-day history, Choose 1/day free
 - **Paid tier:** A$9/month or A$79/year
   - Unlimited Choose, Clear Your Mind, Break It Down
-  - Full history, patterns, export, streaks, Lab digest email
+  - Full history, patterns, streaks, export, early access
 
 **Key insight:** 7-day history cutoff is the conversion trigger — day 8 is the natural upgrade moment.
 
@@ -105,11 +102,7 @@ Solace gives you the space to think it through — privately, gently, without ju
 
 ## Thought Reframer — REMOVED ✅ (Apr 2026)
 
-Removed entirely. Root cause: response was the user's own pre-selected button text — no AI, no real reframe, hollow mechanic.
-- All files deleted, routes 308 → `/tools`
-- `reframe` removed from design-tokens, middleware, sitemap, FAQ, dashboard
-- Supabase: `DELETE FROM tool_sessions WHERE tool = 'reframe'` ✅
-- Supabase schema: `reframe` removed from CHECK constraint ✅
+Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard.
 
 ---
 
@@ -142,114 +135,137 @@ Removed entirely. Root cause: response was the user's own pre-selected button te
 
 ---
 
-## Breathing Tool — Design Benchmark
+## Breathing Tool — Design Benchmark ✅
 
-Breathing is the design benchmark for all tools. 11 decisions locked:
+**Breathing is the benchmark for ALL tools.** Every tool must match Breathing exactly on all shared elements. Read Breathing source before writing any other tool spec.
 
-1. Stop button = Begin button (solid filled pill)
-2. SessionComplete = visible moment (bold, warm)
-3. Info cards: Duration + Best For only (Pattern removed), compact sizing
+### 11 decisions locked (apply to ALL tools):
+1. Stop = Begin (solid filled teal pill)
+2. SessionComplete = visible moment, slides up from bottom
+3. Info cards: Duration + Best For only, compact sizing
 4. History collapses on mobile behind toggle
 5. Begin button py-3 for 44px tap target
-6. Unselected free pill background T(0.15) minimum
-7. All text ≥ 0.65 opacity minimum
+6. Pattern pills: same exact classes as Breathing PatternSelector
+7. All text ≥ 0.65 opacity
 8. Canonical teal `#3CC0D4` everywhere
-9. Cross-links use `glassBackground()`, `glassBorder()`, `getToolRgb()` helpers
+9. Cross-links use `glassBackground()`, `glassBorder()`, `getToolRgb()`
 10. Cross-links hidden on mobile (`hidden md:block`)
-11. Tool zone: no container on mobile (transparent wrapper only)
+11. No container on mobile — elements float on dark page
+
+### Exact classes to copy (never approximate):
+- **Pattern pills mobile:** `px-2 py-1.5`, text `text-[10px]`
+- **Pattern pills desktop:** `md:px-7 md:py-3`, text `md:text-[12px]`
+- **Active pill:** `bg: rgba(60,192,212,0.22)`, `border: rgba(60,192,212,0.90)`, `color: rgba(200,248,255,1.0)`, `boxShadow: 0 0 12px rgba(60,192,212,0.25)`
+- **Inactive pill:** `bg: rgba(60,192,212,0.10)`, `border: rgba(60,192,212,0.45)`, `color: rgba(140,225,240,0.85)`
+- **Begin/Stop:** `bg-[rgba(60,192,212,0.85)] border border-[rgba(60,192,212,0.90)] text-[rgba(10,30,36,0.95)] px-8 py-3 rounded-full`
+- **Info cards:** `p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4`, border `T(0.15)`, bg `T(0.04)`
+- **Info label:** `text-[11px] tracking-[0.18em] uppercase md:text-[12px]`, color `T(0.65)`
+- **Info value:** `text-[13px] md:text-[15px]`, color `T(0.92)`
+- **History toggle:** `rounded-[14px] px-4 py-3`, bg `T(0.05)`, border `T(0.14)`, `+` icon `T(0.80)` bg `T(0.10)` border `T(0.25)`
+- **History content:** `px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]`, border `T(0.12)`, bg `T(0.03)`
+- **Page wrapper:** `max-w-[780px] mx-auto px-6 pt-[96px] md:pt-[140px] pb-28`
+- **Cycle counter:** `w-full text-center text-[10px] tracking-[0.22em] uppercase h-4`, color `rgba(100,190,210,0.38)`
 
 ### BreathingOrb — Known Issue ⚠️
-The orb animation has a flicker on phase transitions (inhale→exhale) caused by React `useState` re-renders (`setActivePhase`, `setPhaseDuration`, `setLabel`) tearing DOM mid-CSS-transition. Multiple rewrite attempts failed. **Do not attempt to fix without a proper local test environment and iterative debugging.** Current state: original React-state version restored (`e46f3ce`), flicker present but animation works.
+Flicker on phase transitions caused by React `useState` re-renders. Multiple rewrite attempts failed. Current state: original React-state version restored (`e46f3ce`). **Do not attempt without local interactive debugging.**
 
-### Breathing — Build State
-- Mobile: no glow (removed — caused contained square appearance)
-- Desktop: glow present, pulses with breathing
-- Container: removed — elements float on dark page directly
-- History toggle: mobile collapses, desktop always visible
-- SessionComplete: slides up from bottom, teal border, "Well done.", bare × dismiss
+---
+
+## Sleep Wind-Down — Build Complete ✅ (Apr 2026)
+
+### What's done
+- Benchmark applied: exact Breathing classes for pills, cards, buttons, history toggle ✅
+- Canonical teal `#3CC0D4` throughout — orb is teal (same family as Breathing) ✅
+- Orb personality: softer gradient `rgba(60,192,212,0.16)` at center with wider fade — "dissolves into dark" ✅
+- RAF loop animation: smooth continuous easing (different from Breathing's phase-based setTimeout) ✅
+- Progress ring + travelling bead — both driven by RAF `sessionProg` every frame ✅
+- Phase label inside the orb (centred absolutely), same as Breathing ✅
+- Responsive orb: 130px mobile, 228px desktop ✅
+- SessionComplete: "Rest well." — same slide-up pattern as Breathing ✅
+- Free/paid history gating via `useToolHistory` hook ✅
+- Session saved to Supabase on completion ✅
+- Cross-links: desktop only, Breathing + Choose ✅
+- Dimming vignette: **removed** — was hiding the UI ✅
+
+### Key technical decisions
+- **Bead transformOrigin:** `"50% 50%"` not `"114px 114px"` — percentage scales with SVG viewBox ✅
+- **Ring + bead driven by RAF only** — no CSS transitions on ring/bead, they fight each other ✅
+- **Stop resets ring + bead immediately** — CSS transitions don't stop on cancelAnimationFrame ✅
+- **`doSilentReset` does NOT clear `sessionComplete`** — user must dismiss "Rest well." manually ✅
+- **History card border:** `...(historyOpen && { borderTop: "none", borderRadius: "..." })` spread — never removes top border on desktop ✅
+- **Cycle counter inside the flex column** — between orb and Begin button ✅
+
+### Sleep insights (paid users)
+- `app/api/sleep/history/route.ts` returns `insights`: most used pattern, weekly comparison, best streak ✅
+- Rendered in history card identical to Breathing's patterns section ✅
+- `hooks/useToolHistory.ts` updated with optional `insights` field ✅
 
 ---
 
 ## Build Infrastructure — Fixed ✅ (Apr 2026)
 
-### Supabase Lazy-Init (critical)
-Both Supabase files had module-scope `createClient()` crashing Vercel build. Fixed with Proxy lazy-init:
-- `lib/supabase/server.ts` ✅
-- `lib/supabase.ts` ✅ (health route imports this one — was the hidden second file)
+### Supabase Lazy-Init (critical — both files fixed)
+- `lib/supabase/server.ts` — Proxy lazy-init ✅
+- `lib/supabase.ts` — Proxy lazy-init ✅ (health route imports this one)
 
-### Stripe Lazy-Init (critical)
-`new Stripe()` at module scope crashed build. Fixed with `getStripe()` lazy function in:
+### Stripe Lazy-Init (all 3 routes fixed)
 - `app/api/stripe/checkout/route.ts` ✅
 - `app/api/stripe/portal/route.ts` ✅
 - `app/api/stripe/webhooks/stripe/route.ts` ✅
 
-### GitHub Actions Secrets (all set ✅)
-All 9 secrets added via `gh secret set`:
-`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_APP_URL`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `BREVO_API_KEY`, `CLERK_WEBHOOK_SECRET`, `OPENAI_API_KEY`
-
-Note: `STRIPE_SECRET_KEY` in GitHub Actions = `sk_test_` (correct for CI). Vercel uses `sk_live_`.
-
-### Playwright CI
-- `playwright.yml` updated with all secrets
-- `e2e/clear-your-mind.spec.ts` — skips gracefully when unauthenticated (paid tool requires auth)
-- `TEST_BASE_URL=https://www.try-solace.app` in CI env
+### GitHub Actions ✅
+- All 9 secrets set via `gh secret set`
+- `playwright.yml` has all env vars
+- `e2e/clear-your-mind.spec.ts` — crisis test skipped (requires auth), page test uses `h1.first()`
+- All tests green ✅
 
 ---
 
 ## SEO ✅ (Apr 2026)
 
-- Sitemap: `/sitemap.xml` — 17 pages, submitted Apr 15, last read Apr 18, Status: Success ✅
-- Google Search Console: verified, 11 pages indexed
-- `metadataBase: new URL("https://www.try-solace.app")` added to `layout.tsx` — fixes duplicate canonical issue ✅
-- **Search Console issues:**
-  - Duplicate canonical (2 pages) — fixed by metadataBase ✅
-  - Page with redirect (2 pages) — Thought Reframer, resolves naturally
-  - Discovered not indexed (11 pages) — resolves with traffic/time
-  - Page indexed without content — `clerk.try-solace.app` (Clerk's domain, not ours, no action needed)
+- Sitemap: 17 pages, submitted Apr 15, last read Apr 18 ✅
+- `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` — canonical tags auto-generated ✅
+- 11 pages indexed by Google
+- `clerk.try-solace.app` — "indexed without content" — not our domain, no action needed
 
 ---
 
 ## Tool Build Status
 
-### Free/Paid Gating — ALL TOOLS DONE ✅
-| Tool | History API | 7-day cutoff | Upgrade prompt |
-|---|---|---|---|
-| Breathing | ✅ | ✅ | ✅ |
-| Focus Timer | ✅ | ✅ | ✅ |
-| Sleep Wind-Down | ✅ | ✅ | ✅ |
-| Mood Tracker | ✅ | ✅ | ✅ |
-| Gratitude Log | ✅ | ✅ | ✅ |
-| Choose (AI) | — | — | ✅ daily nudge |
-| Clear Your Mind (AI) | — | — | ✅ paid gate |
-| Break It Down (AI) | — | — | ✅ paid gate |
+### Free/Paid Gating
+| Tool | History API | 7-day cutoff | Upgrade prompt | SessionComplete |
+|---|---|---|---|---|
+| Breathing | ✅ | ✅ | ✅ | ✅ "Well done." |
+| Sleep Wind-Down | ✅ | ✅ | ✅ | ✅ "Rest well." |
+| Focus Timer | ✅ | ✅ | ✅ | — |
+| Mood Tracker | ✅ | ✅ | ✅ | — |
+| Gratitude Log | ✅ | ✅ | ✅ | — |
+| Choose (AI) | — | — | ✅ daily nudge | ✅ |
+| Clear Your Mind (AI) | — | — | ✅ paid gate | ✅ |
+| Break It Down (AI) | — | — | ✅ paid gate | ✅ |
 
-### AI Tools — Safety & Routing ✅
-- Crisis detection: 15/15 tests passing on production ✅
+### AI Tools ✅
+- Crisis detection: 15/15 tests passing ✅
 - Cross-tool routing: all redirects working ✅
-- Dashboard session logging: all 3 AI tools logging ✅
+- Dashboard session logging: all 3 AI tools ✅
 
 ### Stripe ✅ LIVE
-- End-to-end test PASSED (A$9 real payment → webhook → Supabase plan=paid → refunded) ✅
-- Live webhook active, 0% error rate ✅
+- End-to-end test PASSED (A$9 real payment → webhook → plan=paid → refunded) ✅
 
 ### Supabase
 - Status: Healthy, not paused
 - Plan: NANO (Free) — **upgrade to Pro at launch** ($25/month, daily backups)
 
-### PostHog ✅
-- Firing on all routes, internal users filtered
-
-### Clerk Webhook ✅
-- `user.created` → Supabase upsert + Brevo contact + welcome email
-
 ---
 
 ## Still Needed (priority order)
 
-- [ ] **BreathingOrb flicker** — needs proper local debugging, not spec-based guessing. Use Claude Code interactively with dev server running.
-- [ ] **Sleep Wind-Down** — apply Breathing benchmark (mobile layout, colours, history toggle)
-- [ ] **Global tool polish** — apply Breathing benchmark to Focus Timer, Mood Tracker, Gratitude Log
-- [ ] **Upgrade Supabase to Pro** — at launch
+- [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
+- [ ] **Focus Timer** — apply Breathing benchmark (mobile layout, exact classes, history toggle)
+- [ ] **Mood Tracker** — apply Breathing benchmark
+- [ ] **Gratitude Log** — apply Breathing benchmark
+- [ ] **SessionComplete** for Focus Timer, Mood Tracker, Gratitude Log
+- [ ] **Upgrade Supabase to Pro** — at launch ($25/month)
 - [ ] Newsletter opt-in UI (dashboard checkbox → Brevo list 5)
 - [ ] Brevo Phase 2 email sequences (post-launch)
 - [ ] Export feature (not built for any tool)
@@ -266,10 +282,10 @@ Note: `STRIPE_SECRET_KEY` in GitHub Actions = `sk_test_` (correct for CI). Verce
 | Page | Status |
 |---|---|
 | Home | ✅ |
-| Tools | ✅ Pricing A$9/A$79, FAQ 8 questions |
-| Pricing | ✅ Mobile responsive, A$9/A$79 |
-| Lab | ✅ Editor's Pick + 6 most recent |
-| Lab Archive | ✅ All 15 articles, filter pills |
+| Tools | ✅ |
+| Pricing | ✅ A$9/A$79 |
+| Lab | ✅ 15 articles |
+| Lab Archive | ✅ |
 | About | ✅ |
 | Principles | ✅ |
 | Privacy | ✅ |
@@ -280,7 +296,7 @@ Note: `STRIPE_SECRET_KEY` in GitHub Actions = `sk_test_` (correct for CI). Verce
 
 ## Lab — Human Behaviour Lab
 
-### Article Count: 15 total
+### 15 articles
 | Slug | Category |
 |---|---|
 | `why-you-cant-stop-overthinking` | think-clearly (featured) |
@@ -306,6 +322,7 @@ Note: `STRIPE_SECRET_KEY` in GitHub Actions = `sk_test_` (correct for CI). Verce
 ## Key Rules (Never Break)
 
 - Read solace-master before any work
+- **Breathing is the benchmark** — read Breathing source before writing any tool spec
 - SiteHeader.tsx and SiteFooter.tsx — **LOCKED**
 - Background always `#090d14`
 - Never define colours inline — always `lib/design-tokens.ts`
@@ -314,10 +331,11 @@ Note: `STRIPE_SECRET_KEY` in GitHub Actions = `sk_test_` (correct for CI). Verce
 - Always use Claude Code for implementation
 - `'use client'` components must return `<div>` root, never `<>` fragment
 - Specs via bash_tool, presented with present_files — **never widgets**
-- Always `await` Supabase inserts in Vercel serverless — `void` promises dropped on exit
+- Always `await` Supabase inserts in Vercel serverless
 - AI tool routes must NOT be in `isPublicRoute` in middleware.ts
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
-- Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed
+- **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed**
+- **Never approximate Breathing values — read the actual source and copy exactly**
 
 ---
 
