@@ -241,7 +241,7 @@ export default function FocusTimer({ userId }: Props) {
           <div
             key={label}
             className="flex flex-col items-center gap-1 p-2 rounded-[12px] md:gap-1.5 md:px-4 md:py-4"
-            style={{ border: `1px solid ${A(0.22)}`, background: A(0.07) }}
+            style={{ border: `1px solid ${A(0.15)}`, background: A(0.04) }}
           >
             <p className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase md:text-[12px]" style={{ color: A(0.65) }}>
               {label}
