@@ -31,7 +31,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
     <>
       <style>{`
         .featured-lab-card-link {
-          padding: 34px 38px;
+          padding: 20px 22px;
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -119,7 +119,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 300,
-                fontSize: "clamp(20px, 1.9vw, 26px)",
+                fontSize: "20px",
                 lineHeight: 1.2,
                 color: "rgba(240,234,255,0.92)",
                 margin: "0 0 12px",
