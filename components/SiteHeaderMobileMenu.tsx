@@ -61,7 +61,10 @@ export default function SiteHeaderMobileMenu({
       <div
         className="md:hidden"
         style={{
-          position: "relative",
+          position: "fixed",
+          top: "80px",
+          left: 0,
+          right: 0,
           zIndex: 2,
           overflow: "hidden",
           maxHeight: menuOpen ? "480px" : "0",
