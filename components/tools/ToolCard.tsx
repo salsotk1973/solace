@@ -48,7 +48,7 @@ export default function ToolCard({
       <style>{`
         @media (max-width: 767px) {
           .tool-card-link {
-            padding: 18px 18px 18px !important;
+            padding: 14px 18px 14px !important;
             min-height: auto !important;
           }
           .tool-card-hover-row {

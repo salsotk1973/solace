@@ -21,8 +21,8 @@ const GRID_CLASS: Record<1 | 2 | 3, string> = {
 export default function FamilyGroup({ label, cols, children }: FamilyGroupProps) {
   return (
     <div>
-      {/* Family label + thin separator */}
-      <div className="mb-5 pb-3 border-b border-[rgba(200,210,220,0.04)]">
+      {/* Family label */}
+      <div className="mb-3 md:mb-5 pb-0 md:pb-3 md:border-b md:border-[rgba(200,210,220,0.04)]">
         <p className="[font-family:var(--font-jost)] text-[10px] tracking-[0.26em] uppercase text-[rgba(200,210,220,0.65)]">
           {label}
         </p>

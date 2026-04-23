@@ -222,7 +222,7 @@ export default function ToolsPage() {
           </header>
 
           {/* ── Tool families ─────────────────────────────────────────────── */}
-          <section aria-label="Tools" className="flex flex-col gap-[24px] md:gap-[40px] mb-12 md:mb-24">
+          <section aria-label="Tools" className="flex flex-col gap-[24px] md:gap-[40px] mb-8 md:mb-24">
 
             <FamilyGroup label="AI-powered reflection" cols={3}>
               {AI_REALMS.map((t) => <ToolCard key={t.href} {...t} />)}
