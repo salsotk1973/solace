@@ -1,60 +1,91 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Props {
-  visible: boolean;
+interface SessionCompleteProps {
   isLoggedIn: boolean;
   isPaid?: boolean;
   onDismiss: () => void;
 }
 
-export default function SessionComplete({ visible, isLoggedIn, isPaid, onDismiss }: Props) {
+const T = (a: number) => `rgba(60,192,212,${a})`;
+
+export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: SessionCompleteProps) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-[550ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
-        visible
-          ? "translate-y-0 opacity-100 pointer-events-auto"
-          : "translate-y-full opacity-0 pointer-events-none"
-      }`}
+      className={[
+        "fixed bottom-0 left-0 right-0 z-50",
+        "transition-transform duration-500 ease-out",
+        visible ? "translate-y-0" : "translate-y-full",
+      ].join(" ")}
+      style={{
+        background:           "rgba(6,16,22,0.97)",
+        borderTop:            `2px solid ${T(0.55)}`,
+        backdropFilter:       "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
-      <div className="max-w-[780px] mx-auto px-6 pb-6">
-        <div className="flex items-center gap-4 bg-[rgba(16,14,8,0.94)] border border-[rgba(220,175,80,0.14)] rounded-[14px] px-6 py-4 backdrop-blur-sm">
-          {isLoggedIn ? (
-            <p className="flex-1 [font-family:var(--font-jost)] text-[13px] font-light text-[rgba(230,195,110,0.65)]">
-              Added to your jar.
-            </p>
-          ) : (
-            <>
-              <p className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(230,195,110,0.75)] whitespace-nowrap">
-                Added to your jar.
-              </p>
-              <p className="hidden sm:block flex-1 [font-family:var(--font-jost)] text-[13px] font-light text-[rgba(200,175,100,0.42)]">
-                Create a free account to keep your entries and track your streak
-              </p>
-              <Link
-                href="/sign-up"
-                className="[font-family:var(--font-jost)] text-[13px] font-light text-[rgba(230,195,110,0.85)] border border-[rgba(220,175,80,0.3)] rounded-[999px] px-4 py-2 hover:border-[rgba(220,175,80,0.6)] hover:text-[rgba(230,195,110,1)] transition-all duration-300 whitespace-nowrap ml-auto"
-              >
-                Start free →
-              </Link>
-            </>
-          )}
-          {isLoggedIn && !isPaid && (
-            <Link
-              href="/pricing"
-              className="[font-family:var(--font-jost)] text-[11px] tracking-[0.14em] uppercase text-[rgba(232,168,62,0.80)] border border-[rgba(232,168,62,0.28)] px-4 py-2 rounded-[2px] hover:border-[rgba(232,168,62,0.52)] hover:text-[rgba(255,200,100,0.95)] transition-all duration-300 whitespace-nowrap flex-shrink-0"
-            >
-              Unlock full history →
-            </Link>
-          )}
+      <div className="max-w-[720px] mx-auto px-6 py-5">
+
+        <div className="flex flex-row items-center justify-between">
+          <span
+            className="[font-family:var(--font-jost)] text-[11px] tracking-[0.26em] uppercase"
+            style={{ color: T(0.85) }}
+          >
+            Session complete
+          </span>
           <button
             onClick={onDismiss}
-            className="[font-family:var(--font-jost)] text-[18px] font-light text-[rgba(220,175,80,0.32)] hover:text-[rgba(220,175,80,0.72)] transition-colors duration-200 cursor-pointer flex-shrink-0 leading-none"
+            aria-label="Close"
+            className="text-[22px] leading-none flex items-center justify-center transition-opacity duration-200 cursor-pointer hover:opacity-60"
+            style={{ color: "rgba(255,255,255,0.65)", background: "none", border: "none", padding: "4px 0 4px 8px" }}
           >
             ×
           </button>
         </div>
+
+        <p
+          className="[font-family:var(--font-display)] italic font-light text-[24px] mt-3"
+          style={{ color: "rgba(255,255,255,0.95)" }}
+        >
+          Captured.
+        </p>
+
+        <p
+          className="[font-family:var(--font-jost)] text-[14px] leading-[1.5] font-light mt-2"
+          style={{ color: "rgba(255,255,255,0.80)" }}
+        >
+          <span className="md:hidden">Save entries and see patterns.</span>
+          <span className="hidden md:inline">Save entries and build your gratitude record with a free account.</span>
+        </p>
+
+        {!isLoggedIn && (
+          <Link
+            href="/sign-up"
+            className="mt-4 inline-flex items-center justify-center px-6 py-2.5 [font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase rounded-full transition-colors"
+            style={{ color: "rgba(60,192,212,0.95)", border: "1px solid rgba(60,192,212,0.60)" }}
+          >
+            Start free →
+          </Link>
+        )}
+        {isLoggedIn && !isPaid && (
+          <Link
+            href="/pricing"
+            className="mt-4 inline-flex items-center justify-center px-6 py-2.5 [font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase rounded-full transition-colors"
+            style={{ color: "rgba(60,192,212,0.95)", border: "1px solid rgba(60,192,212,0.60)" }}
+          >
+            Unlock full history →
+          </Link>
+        )}
+
       </div>
     </div>
   );

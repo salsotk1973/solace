@@ -23,19 +23,19 @@ export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: Sessi
     <div
       className={[
         "fixed bottom-0 left-0 right-0 z-50",
-        "transition-transform duration-500 ease-out",
+        "transition-transform duration-[550ms]",
         visible ? "translate-y-0" : "translate-y-full",
       ].join(" ")}
       style={{
-        background:           "rgba(6,16,22,0.97)",
-        borderTop:            `2px solid ${T(0.55)}`,
-        backdropFilter:       "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
+        background:               "rgba(6,16,22,0.97)",
+        borderTop:                `2px solid ${T(0.55)}`,
+        backdropFilter:           "blur(20px)",
+        WebkitBackdropFilter:     "blur(20px)",
       }}
     >
       <div className="max-w-[720px] mx-auto px-6 py-5">
 
-        {/* Eyebrow row — close inline at all breakpoints */}
         <div className="flex flex-row items-center justify-between">
           <span
             className="[font-family:var(--font-jost)] text-[11px] tracking-[0.26em] uppercase"
@@ -53,24 +53,21 @@ export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: Sessi
           </button>
         </div>
 
-        {/* Title */}
         <p
           className="[font-family:var(--font-display)] italic font-light text-[24px] mt-3"
           style={{ color: "rgba(255,255,255,0.95)" }}
         >
-          Well done.
+          Noted.
         </p>
 
-        {/* Body */}
         <p
           className="[font-family:var(--font-jost)] text-[14px] leading-[1.5] font-light mt-2"
           style={{ color: "rgba(255,255,255,0.80)" }}
         >
-          <span className="md:hidden">Save history and track streaks.</span>
-          <span className="hidden md:inline">Save history and track streaks with a free account.</span>
+          <span className="md:hidden">Save entries and see patterns.</span>
+          <span className="hidden md:inline">Save entries and see mood patterns over time with a free account.</span>
         </p>
 
-        {/* CTA */}
         {!isLoggedIn && (
           <Link
             href="/sign-up"

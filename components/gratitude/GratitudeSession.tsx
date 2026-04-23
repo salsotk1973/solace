@@ -239,9 +239,8 @@ export default function GratitudeSession({ userId }: Props) {
       )}
 
       {/* ── Session complete nudge ──────────────────────────────────────────── */}
-      {!nudgeDismissed && (
+      {showNudge && !nudgeDismissed && (
         <SessionComplete
-          visible={showNudge}
           isLoggedIn={!!userId}
           isPaid={history?.isPaid}
           onDismiss={() => setNudgeDismissed(true)}
