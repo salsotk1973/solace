@@ -113,6 +113,9 @@ const RESPONSIVE_CSS = `
     .lab-featured-category-pill {
       display: none !important;
     }
+    .lab-featured-footer {
+      display: none !important;
+    }
     .lab-featured-excerpt {
       color: rgba(255, 255, 255, 0.80) !important;
     }
@@ -408,7 +411,7 @@ export function FeaturedCard({
         </p>
 
         {/* Reading time + animated Read → */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div className="lab-featured-footer" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <span
             className="lab-featured-reading-time"
             style={{

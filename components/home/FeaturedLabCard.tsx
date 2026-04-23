@@ -67,6 +67,9 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           .featured-lab-reading-time {
             color: rgba(255, 255, 255, 0.65) !important;
           }
+          .featured-lab-footer {
+            display: none !important;
+          }
         }
       `}</style>
       <div
@@ -147,7 +150,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
               {article.excerpt}
             </p>
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px" }}>
+            <div className="featured-lab-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px" }}>
               <span
                 className="featured-lab-reading-time"
                 style={{

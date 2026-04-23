@@ -16,9 +16,6 @@ export default function LabPage() {
       <BgFlat>
         <style>{`
           @media (max-width: 767px) {
-            .lab-content-section { padding: 0 20px 48px !important; }
-            .lab-cta-section     { padding: 48px 24px !important; }
-            .lab-newsletter-section { padding: 48px 24px 64px !important; }
             .lab-cta-body        { line-height: 1.55 !important; }
             .lab-newsletter-body { line-height: 1.55 !important; }
           }
@@ -90,10 +87,9 @@ export default function LabPage() {
             SECTIONS 2–4 — FILTER PILLS + FEATURED + ARTICLE GRID
         ════════════════════════════════════════════════════════════════════ */}
         <section
-          className="lab-content-section"
+          className="lab-content-section px-5 pb-12 md:px-10 md:pb-20"
           style={{
             width:     '100%',
-            padding:   '0 40px 80px',
             boxSizing: 'border-box',
           }}
         >
@@ -106,10 +102,9 @@ export default function LabPage() {
             SECTION 5 — TOOLS CTA
         ════════════════════════════════════════════════════════════════════ */}
         <section
-          className="lab-cta-section"
+          className="lab-cta-section py-12 px-6 md:py-[120px] md:px-10"
           style={{
             width:     '100%',
-            padding:   '120px 40px',
             boxSizing: 'border-box',
             textAlign: 'center',
           }}
@@ -171,10 +166,9 @@ export default function LabPage() {
             Fully transparent — no background, no borders, no shadows
         ════════════════════════════════════════════════════════════════════ */}
         <section
-          className="lab-newsletter-section"
+          className="lab-newsletter-section pt-12 pb-16 px-6 md:pt-[100px] md:pb-[110px] md:px-10"
           style={{
             width:         '100%',
-            padding:       '100px 40px 110px',
             boxSizing:     'border-box',
             display:       'flex',
             flexDirection: 'column',

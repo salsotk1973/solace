@@ -53,6 +53,9 @@ export default function NewsletterForm() {
         }
         .newsletter-form input  { flex: 1; min-width: 180px; }
         .newsletter-form button { flex-shrink: 0; }
+        .newsletter-form input::placeholder {
+          color: rgba(255, 255, 255, 0.65);
+        }
 
         @media (max-width: 480px) {
           .newsletter-form         { flex-direction: column; gap: 8px; }
@@ -75,7 +78,7 @@ export default function NewsletterForm() {
             background:   'rgba(255,255,255,0.03)',
             fontFamily:   "'Jost', sans-serif",
             fontWeight:   300,
-            fontSize:     '13px',
+            fontSize:     '14px',
             color:        'rgba(200,192,235,0.8)',
             outline:      'none',
             boxSizing:    'border-box',
