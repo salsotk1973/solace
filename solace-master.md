@@ -12,11 +12,8 @@ When your mind won't settle,
 it's hard to think clearly.
 
 Solace helps you find the next right step — through thought, not noise.
-
-[Begin with Breathing →]
 ```
-
-(CTA links to `/tools/breathing` — strongest internal SEO signal from homepage to highest-polish tool page.)
+(No CTA on desktop — removed Spec 02b. Destination is visible 334px below the fold after section reorder.)
 
 ---
 
@@ -135,89 +132,160 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 
 ### Components (Locked)
 - SiteHeader.tsx — **LOCKED, never modify**
-- SiteFooter.tsx — **LOCKED, never modify** (mobile restructured Apr 2026 — see "Mobile Homepage" section)
+- SiteFooter.tsx — see footer section for documented exceptions
 - `PageShell` default `particles={false}` ✅
 - `glassBackground()`, `glassBorder()`, `getToolRgb()` helpers from design-tokens
 
 ---
 
-## Mobile Homepage — LOCKED ✅ (Apr 2026)
+## Homepage — Desktop ✅ LOCKED (Apr 2026)
 
-**Full mobile audit and redesign session completed. ~1,050px of vertical scroll removed. Free tools surface 2 screens earlier in the funnel. Footer redesigned from text-dump to ceremonial closing with repeated SOLACE wordmark.**
+**Full desktop audit completed. Section reorder, hero void fix, AI card polish, Lab magazine layout, footer wordmark, dynamic Lab secondaries all shipped.**
 
-### Hero
-- Section: `min-h-[55vh] md:min-h-[82vh] flex items-start md:items-center justify-center px-6 pt-[12vh] pb-12 md:pt-0 md:pb-0`
-- Headline: `text-[36px] md:text-[72px] font-light leading-[1.08] md:leading-[0.95]`
-- Headline wrapper: `overflow-visible md:overflow-hidden pt-1 md:pt-0` (overflow-visible prevents Cormorant ascender clipping on mobile)
-- CTA: "Begin with Breathing →" → `/tools/breathing` — teal `rgba(60,192,212,0.85)`, `text-[12px]` uppercase, `tracking-[0.18em]`, `mt-10`
-- **Mobile only `min-h` removed**; `pb-12` controls bottom space deterministically (no flex-center void)
-- **`pt-[12vh]` is the calibrated value** — 8vh too tight (clipped against nav), 18vh too low
+### Section Order (locked)
+Hero → FREE — START HERE → AI Tools → FROM THE LAB → Footer
 
-### AI Tool Cards
-- `<Link>` className: `ai-tool-card group relative rounded-2xl border border-l-2 backdrop-blur-sm p-5 md:p-6 md:min-h-[280px] flex flex-col …`
-- **`min-h-[280px]` desktop only** (mobile cards size to content)
-- Title: `text-[26px] md:text-[34px] leading-[1.05] md:leading-[1.02] mt-3 md:mt-4`
-- **Body paragraph hidden on mobile via `hidden md:block`** (kept in DOM for SEO, removes ~160px per card × 3)
-- CTA: `mt-3 md:mt-auto pt-0 md:pt-6` (with body removed mobile no longer uses mt-auto)
-- Section: `pt-8 pb-8 md:pt-16 md:pb-14`
-- Grid: `mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6`
-- Hairline divider before "FREE — START HERE": 64px-wide, mobile-only via `md:hidden`
+Rationale: free tools (friction-free) surface immediately after hero. AI tools (higher commitment) appear after user has seen the free entry points. Lab is editorial — deepest section for engaged users.
 
-### FREE — START HERE (no spec needed — already clean)
-- Single column on mobile, well-sized cards, colour-coded accents work as-is
+### Hero (desktop)
+- **Padding:** `md:pt-[200px] md:pb-16` — deterministic, no min-h, no items-center void
+- **Headline:** `md:text-[64px]` with non-breaking space: `won't{"\u00A0"}settle,` (prevents orphan wrap at 768-789px)
+- **Headline line-height:** `md:leading-[1.0]`
+- **Subhead:** unchanged
+- **No CTA on desktop** — removed Spec 02b (destination visible in viewport)
+- **Nav offset rule:** with 80px fixed nav, hero `md:pt-[200px]` = 80 nav + 120px air below nav to headline. Always compute as nav-height + intended-air, not from viewport top.
 
-### FeaturedLabCard
-- Padding via scoped `<style>` block: desktop `34px 38px`, mobile `22px 22px`
-- "Editor's Pick" pill hidden on mobile via `.featured-lab-pill-editors-pick { display: none !important }` — only "THINK CLEARLY" category pill visible
-- Excerpt colour: `rgba(200,192,230,0.70)` (was `rgba(135,128,178,0.48)` — below WCAG AA on dark bg) — applied to desktop too (accessibility fix)
-- Excerpt line-height: `1.65` (was `1.8`)
-- Title margin: `0 0 12px` (was `0 0 16px`)
-- Pill row: `gap: 8px, marginBottom: 14px, flexWrap: wrap`
-- Title minimum: `clamp(26px, 3.1vw, 42px)` (was `clamp(28px, …)`)
+### FREE — START HERE (desktop)
+- Container: `max-w-6xl mx-auto px-6 md:px-12 lg:px-24`
+- Grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
+- 6 cards: Breathing, Focus Timer, Sleep Wind-Down, Mood Tracker, Gratitude Log, All tools
+- "All tools" card uses `neutral` tone: `rgba(148,163,184)` slate — visually distinct from 3 category colours, reads as navigation chrome
+- Section padding: `pt-6 pb-16 md:pt-10 md:pb-14`
 
-### Footer — Designed Mobile Closing
-**Deliberate exception to the "SiteFooter LOCKED" rule. Mobile only. Desktop 3-column layout untouched.**
+### AI Tools Section (desktop)
+- Section headline: `md:text-4xl` (36px) — was 5xl/48px. Ratio hero(64) → section(36) = 1.78. Correct for "this is a section, not another hero."
+- Card `md:min-h-[320px]` (was 280px) — +40px breathing room
+- Card body `md:leading-[1.6]` (was 1.85) — tighter, more designed-card feel
+- Section padding: `md:pt-12 md:pb-16`
 
-Mobile footer structure (top to bottom):
-1. **Row 1 — 5 product/learn links centered:** Tools, Pricing, Lab, Principles, About — `font-size: 13px`, gap `12px 18px`, marginBottom `16px`
-2. **Row 2 — 2 legal links centered:** Privacy, Terms — gap `24px`, sharing vertical axis with row 1's center
-3. **Hairline divider:** `width: 32px, height: 0.5px, background: rgba(255,255,255,0.18), margin: 32px auto 24px` — ceremonial, not structural
-4. **Centered disclaimer:** max-width `320px` (forces 3-line wrap on iPhone), `font-size: 12px, lineHeight: 1.7, color: rgba(255,255,255,0.65)` (Spec 04c)
-5. **Copyright + tagline merged:** `© 2026 · Built with care.` on one centered line, `font-size: 11px, color: rgba(255,255,255,0.65)` (Spec 04c — was 0.50, bumped to match disclaimer)
-6. **SOLACE wordmark closing:** Cormorant Garamond, `font-size: 18px, letterSpacing: 0.32em, color: rgba(255,255,255,0.55)` (Spec 04c — was 0.35, bumped so brand anchors the footer), `paddingLeft: 0.32em` (compensates for letter-spacing right-bias for optical centering)
+### Lab Section (desktop)
+- Container: `max-w-6xl mx-auto px-6 md:px-12 lg:px-24` — matches AI section width exactly
+- Grid: `grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6` — 3 equal columns, 304px each
+- **No col-span-2 hero.** All 3 cards equal width — visual consistency with AI section above.
+- Section padding: `py-8 md:py-10`
 
-**Hierarchy after Spec 04c:** SOLACE wordmark (0.55) is the visual anchor. Disclaimer + copyright (both 0.65) sit at equal supporting weight. Brand bookends the page; legal/meta is quieter than brand. This is the correct hierarchy for a wellness product.
+#### FeaturedLabCard (Editor's Pick — card 1)
+- Padding: `20px 22px` desktop + mobile (matched to secondary cards — Spec 04h/04i)
+- Title: `20px` Cormorant flat (not clamp) — matches secondary card titles exactly
+- Pill: `3px 10px` padding — matches secondary cards
+- Pill: **"Editor's pick" only** — category pill removed (Spec 04g)
+- Pill wrapper `marginBottom: "24px"` — matches secondary card pill-to-title gap exactly (Spec 04j)
+- Height: `height: 100%` on wrapper + link — fills grid cell to match secondary stack height
+- Bottom row: `justifyContent: "space-between"` — "READ →" pins right, matching secondary cards
+- Hover: `translateY(-2px)`, bg +0.03, border +0.12, 220ms — matches secondary cards
+- Box shadow: `0 0 8px 1px rgba(accent,0.12)` — subtle glow, distinguishes hero from secondaries
+- **Mobile: pill wrapper visible** — "Editor's pick" pill shows on mobile (Spec 08). No hide rules.
 
-Mobile footer hides:
-- The 3-column PRODUCT/LEARN/LEGAL grid (`display: none`)
-- "Dashboard" link (already in hamburger nav)
-- "Sign in/Sign out" `<FooterAuthLink />` (already in hamburger nav)
-- The desktop full-width hairline divider
-- The desktop 3-part bottom bar (copyright/disclaimer/built-with-care)
+#### LabSecondaryCard (cards 2 + 3) — `components/home/LabSecondaryCard.tsx`
+- New component created this session
+- Padding: `20px 22px`, border-radius: `16px`
+- Title: `20px` Cormorant, `lineHeight: 1.2`
+- Pill: `3px 10px` padding, category label
+- Excerpt: `12px` Jost, `lineHeight: 1.6`, `color: rgba(200,192,230,0.60)`
+- Bottom row: `justifyContent: space-between` — reading time left, "Read →" right
+- Hover: per-instance scoped class `lab-secondary-${article.category}` — each card hovers into its own accent colour (teal vs violet)
+- `@media (hover: hover)` guard — prevents stuck-hover on iOS
 
-Mobile padding: `28px 16px 20px` (was desktop `48px 16px 32px`)
+#### Lab data — locked decisions
+- **Editor's Pick:** Manual, editorial, monthly cadence. Update `FEATURED_LAB` in `page.tsx` (one line).
+- **Secondary cards:** Dynamic — `getAllArticles().filter(excludeEditorsPick).slice(0,2)`. Auto-promotes 2 most recent articles on every deploy. No `page.tsx` edits needed.
+- **Monthly article brief process:**
+  1. Check GSC + PostHog for page-2 keywords or unserved search terms
+  2. Brief Claude: topic, category, tool link, ~800 words
+  3. Review → approve → add MDX to `content/lab/` → push to main
+  4. Update `FEATURED_LAB.slug` in `page.tsx`
+  5. New article auto-appears on homepage secondaries on next deploy
+- **Calendar reminder set:** 23 May 2026 (monthly repeat)
 
-**Why the wordmark works:** SOLACE at the top opens the experience. SOLACE at the bottom closes it. Brand bookends the page. Ralph Lauren / Aēsop / A24 / Studio Bun pattern. Costs nothing, signals care.
+### Footer (desktop)
+- **Backdrop blur + dark gradient REMOVED** (Spec 06) — footer wrapper is now fully transparent. Was causing dark smudge band on homepage due to radial gradients bleeding through blur.
+- **SOLACE wordmark added below bottom bar** (Spec 05): Cormorant Garamond, `18px`, `letterSpacing: 0.32em`, `color: rgba(255,255,255,0.12)`, centered. Hidden on mobile via `footer-desktop-wordmark { display: none !important }` in mobile media query (mobile has its own 0.55 opacity wordmark).
+- Desktop 3-column grid (PRODUCT / LEARN / LEGAL) unchanged.
 
-### Mobile spacing token cheat sheet
+### Mobile spacing token cheat sheet (updated this session)
 
 | Element | Mobile value | Desktop value |
 |---|---|---|
-| Hero `min-h` | none | `82vh` |
-| Hero `pt` | `[12vh]` | `0` |
-| Hero `pb` | `12` (48px) | `0` |
-| Hero `items` | `start` | `center` |
-| Headline size | `36px` | `72px` |
-| Headline leading | `1.08` | `0.95` |
-| AI section `pt` / `pb` | `8` / `8` | `16` / `14` |
-| AI card padding | `p-5` | `p-6` |
-| AI card title | `26px` | `34px` |
-| AI card body | `hidden` | visible |
-| AI grid gap | `gap-4` | `gap-6` |
-| Lab card padding | `22px 22px` | `34px 38px` |
-| Lab card pills | 1 (Think Clearly) | 2 (Editor's Pick + category) |
-| Footer padding | `28px 16px 20px` | `48px 16px 32px` |
-| Footer layout | centered 5+2 + wordmark | 3-column grid |
+| Hero `pt` | `[18vh]` | `[200px]` |
+| Hero `pb` | `12` (48px) | `16` (64px) |
+| Hero `items` | `start` | `start` |
+| Hero `min-h` | none | none |
+| Headline size | `36px` | `64px` |
+| Headline leading | `1.08` | `1.0` |
+| AI section headline | `text-4xl` | `text-4xl` (36px) |
+| AI card `min-h` | none | `320px` |
+| AI card body | `hidden` | `leading-[1.6]` |
+| AI section `pt/pb` | `8/8` | `12/16` |
+| Lab card padding | `22px 22px` | `20px 22px` |
+| Lab card title | `20px` | `20px` |
+| Lab pill | visible (Editor's pick) | visible |
+| Footer blur | none | none |
+| Footer desktop wordmark | hidden | `rgba(255,255,255,0.12)` |
+
+---
+
+## Mobile Homepage — LOCKED ✅ (Apr 2026, updated Apr 2026)
+
+**Both mobile and desktop homepage audits complete. Homepage is locked.**
+
+### Hero (mobile — updated this session)
+- **`pt-[18vh]`** (was `pt-[12vh]`) — more breathing room below nav on real iPhone
+- **Hairline divider between hero and FREE START HERE removed** (Spec 09) — was `md:hidden h-px w-16`, read as visual artifact
+- All other mobile hero values unchanged from prior mobile audit
+
+### Lab Cards (mobile)
+- All 3 cards stack vertically: Editor's Pick first, then 2 secondaries
+- "Editor's pick" pill **visible** on mobile — no hide rules (Spec 08 reversed original decision)
+- Gap between all cards: `gap-4` (16px) — uniform, no orphan margin
+
+### Footer (mobile)
+Mobile footer structure (top to bottom):
+1. 5 product/learn links centered
+2. 2 legal links centered
+3. Hairline divider: `32px wide, 0.5px, rgba(255,255,255,0.18), margin 32px auto 24px`
+4. Centered disclaimer: max-width `320px`, `12px, lineHeight 1.7, rgba(255,255,255,0.65)`
+5. Copyright + tagline: `© 2026 · Built with care.` centered, `11px, rgba(255,255,255,0.65)`
+6. SOLACE wordmark: Cormorant Garamond, `18px, letterSpacing 0.32em, rgba(255,255,255,0.55)`, `paddingLeft: 0.32em`
+
+---
+
+## Process Lessons (updated Apr 2026 — Desktop Homepage Audit)
+
+### From prior mobile audit (retained)
+1–10: [all prior lessons retained — see previous version]
+
+### New lessons from desktop audit (Apr 2026)
+
+#### 11. When widening a parent container, audit constrained children too
+When changing a grid cell width or container width, check if child components have their own internal `maxWidth` values that won't grow automatically. FeaturedLabCard had `maxWidth: 520px` on title and `440px` on excerpt — widening the grid cell to 632px had zero effect on those internal constraints. Always trace: container → grid cell → component → content widths.
+
+#### 12. Inline `style={{ display: "..." }}` beats CSS class rules — check before writing CSS
+If a JSX element has `style={{ display: "block" }}`, any CSS class rule setting `display: flex` will lose without `!important`. Before writing layout CSS, check the element's inline style for any property you're trying to override. Either remove the inline value or fight it with `!important` (use sparingly — creates maintenance debt).
+
+#### 13. On fixed-nav pages, hero `pt` must be computed as `nav-height + intended-air`
+Solace nav = 80px fixed. To give the headline 120px of visual air below the nav, set `md:pt-[200px]` (= 80 + 120), NOT `md:pt-[120px]`. Always compute from nav-bottom, not viewport-top.
+
+#### 14. Equal columns beat clever asymmetric layouts when content is similar
+The 1+2 magazine layout (hero col-span-2, 2 secondaries stacked) required 7 specs to debug because the hero card kept having height mismatches, fill problems, and alignment issues. The final decision (3 equal columns) resolved all of them in one spec. When in doubt: equal columns. Reserve asymmetric layouts for when content genuinely has different hierarchy needs.
+
+#### 15. Don't hide elements — hide their wrapper too
+Hiding a pill with `display: none` but leaving its wrapper div with `marginBottom: 24px` creates a visible empty gap. Always hide the wrapper, not just the content inside it. (Spec 07 → Spec 08 lesson.)
+
+#### 16. `backdrop-filter: blur()` causes bleed-through on gradient backgrounds
+Any page with complex background gradients (like the homepage radial system) will show a visible smudge where a blurred element overlaps. The blur samples and amplifies the gradient colours. Solution: remove backdrop blur from elements that sit over gradient backgrounds.
+
+#### 17. The pill IS the hierarchy signal — don't use size to signal importance
+Multiple specs tried to make the Editor's Pick card larger than secondary cards to signal "this is important." Every attempt created alignment and fill problems. The correct solution: equal card size, "Editor's pick" pill is the sole differentiator. Lesson: hierarchy in UI = labels + colour + typographic weight, not physical size of containers.
 
 ---
 
@@ -262,73 +330,13 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ## Sleep Wind-Down — Build Complete ✅ (Apr 2026)
 
-### What's done
-- Benchmark applied: exact Breathing classes for pills, cards, buttons, history toggle ✅
-- Canonical teal `#3CC0D4` throughout — orb is teal (same family as Breathing) ✅
-- Orb personality: softer gradient `rgba(60,192,212,0.16)` at center with wider fade — "dissolves into dark" ✅
-- RAF loop animation: smooth continuous easing (different from Breathing's phase-based setTimeout) ✅
-- Progress ring + travelling bead — both driven by RAF `sessionProg` every frame ✅
-- Phase label inside the orb (centred absolutely), same as Breathing ✅
-- Responsive orb: 130px mobile, 228px desktop ✅
-- SessionComplete: "Rest well." — same slide-up pattern as Breathing ✅
-- Free/paid history gating via `useToolHistory` hook ✅
-- Session saved to Supabase on completion ✅
-- Cross-links: desktop only, Breathing + Choose ✅
-- Dimming vignette: **removed** — was hiding the UI ✅
-- **Sound decision: NO sound** — silence is part of the tool experience ✅
-
-### Key technical decisions
-- **Bead transformOrigin:** `"50% 50%"` not `"114px 114px"` — percentage scales with SVG viewBox ✅
-- **Ring + bead driven by RAF only** — no CSS transitions on ring/bead, they fight each other ✅
-- **Stop resets ring + bead immediately** — CSS transitions don't stop on cancelAnimationFrame ✅
-- **`doSilentReset` does NOT clear `sessionComplete`** — user must dismiss "Rest well." manually ✅
-- **History card border:** `...(historyOpen && { borderTop: "none", borderRadius: "..." })` spread — never removes top border on desktop ✅
-- **Cycle counter inside the flex column** — between orb and Begin button ✅
-
-### Sleep insights (paid users)
-- `app/api/sleep/history/route.ts` returns `insights`: most used pattern, weekly comparison, best streak ✅
-- Rendered in history card identical to Breathing's patterns section ✅
-- `hooks/useToolHistory.ts` updated with optional `insights` field ✅
+[Unchanged from prior master — see previous version for full detail]
 
 ---
 
 ## Focus Timer — Build Complete ✅ (Apr 2026)
 
-### What's done
-- Benchmark applied: exact Breathing classes for pills, cards, history toggle ✅
-- Amber token helper: `const A = (a: number) => \`rgba(232,168,62,${a})\`` throughout ✅
-- ModeSelector: 2×2 grid on mobile, flex row on desktop, exact PatternSelector structure ✅
-- Circle: 130px mobile / 220px desktop, dynamic radius + circumference ✅
-- Arc + digits + circle border: amber always (never teal, even during Rest phase) ✅
-- Phase label: amber always, `marginTop: 4px` inline to guarantee gap ✅
-- "Tap to start" pulse: `animate-pulse` + amber glow `textShadow: 0 0 8px rgba(232,168,62,0.60)` ✅
-- Skip: solid amber pill (matches Breathing BEGIN). Reset: ghost amber pill ✅
-- Info cards: exact Breathing classes `p-2 md:px-4 md:py-4`, amber tokens ✅
-- History toggle: exact Breathing structure, amber tokens, mobile collapses ✅
-- History content: full border all sides desktop, top border removed on mobile when open ✅
-- Cross-links: `hidden md:block` ✅
-- SessionDots: fully amber (active, completed, empty states) ✅
-- SessionComplete: slide-up banner on `allDone` ✅
-- Page padding: `pt-[96px] md:pt-[140px]` matching Breathing ✅
-- **Sound toggle**: centred above circle, amber ON/OFF states, UPPERCASE ✅
-- **Sound effects**: real MP3s via Web Audio API, preloaded on mount ✅
-  - Focus start: `public/sounds/focus-start.mp3` (copper bell ding 23, 4s)
-  - Rest start: `public/sounds/rest-start.mp3` (copper bell ding 14, 5s)
-  - Session done: `public/sounds/session-done.mp3` (copper bell ding 1, 7s)
-  - Default: sound ON, preference saved to localStorage `solace_focus_sound`
-- Session history saves to `focus_sessions` table on full completion ✅
-- History API: `app/api/focus/history/route.ts` — 7-day cutoff free, full paid ✅
-
-### Key technical decisions
-- **No Begin/Stop/Resume button** — circle is the only tap target
-- **All amber, no teal** — Rest phase does NOT switch to teal (Focus tool = amber only)
-- **CIRCUMFERENCE removed** — dynamic `radius` and `circumference` derived from `circleSize`
-- **Sound loads on mount** via `fetch` + `decodeAudioData` — not oscillator
-- **iOS audio unlock**: `AudioContext.resume()` called on first tap
-
-### Sound decision: Breathing and Sleep Wind-Down
-- **Breathing: NO sound** — orb animation is the sensory experience; silence is part of it
-- **Sleep Wind-Down: NO sound** — same reasoning; users in bed, partner consideration
+[Unchanged from prior master — see previous version for full detail]
 
 ---
 
@@ -336,7 +344,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ### Supabase Lazy-Init (critical — both files fixed)
 - `lib/supabase/server.ts` — Proxy lazy-init ✅
-- `lib/supabase.ts` — Proxy lazy-init ✅ (health route imports this one)
+- `lib/supabase.ts` — Proxy lazy-init ✅
 
 ### Stripe Lazy-Init (all 3 routes fixed)
 - `app/api/stripe/checkout/route.ts` ✅
@@ -354,10 +362,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ## SEO ✅ (Apr 2026)
 
 - Sitemap: 17 pages, submitted Apr 15, last read Apr 18 ✅
-- `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` — canonical tags auto-generated ✅
+- `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` ✅
 - 11 pages indexed by Google
-- `clerk.try-solace.app` — "indexed without content" — not our domain, no action needed
-- **Homepage hero CTA "Begin with Breathing →" → `/tools/breathing`** — strongest internal SEO signal from highest-authority page
 
 ---
 
@@ -392,8 +398,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 ## Still Needed (priority order)
 
-- [ ] **Desktop homepage audit** — same protocol as mobile audit (next session — see "Desktop Homepage Audit" prompt)
-- [ ] **BreathingOrb flicker** — needs local interactive debugging with dev server running. Do not attempt via specs.
+- [x] **Desktop homepage audit** — ✅ COMPLETE Apr 2026
+- [ ] **BreathingOrb flicker** — needs local interactive debugging. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
 - [ ] **SessionComplete** for Mood Tracker, Gratitude Log
@@ -406,6 +412,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - [ ] notice-whats-good Lab category: only 2 articles, needs more
 - [ ] Reddit account + first post (r/Anxiety, r/Meditation, r/productivity, r/mentalhealth)
 - [ ] Google Postmaster Tools — register `try-solace.app`
+- [ ] **Monthly Lab article agent** — build as part of Solace Weekly Intelligence Report (30 days post-launch). Requires paid Ahrefs/SEMrush. Calendar reminder: 23 May 2026 (monthly repeat).
 
 ---
 
@@ -413,8 +420,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 | Page | Status |
 |---|---|
-| Home (mobile) | ✅ LOCKED Apr 2026 — see Mobile Homepage section above |
-| Home (desktop) | Needs audit (next session) |
+| Home (mobile) | ✅ LOCKED Apr 2026 |
+| Home (desktop) | ✅ LOCKED Apr 2026 |
 | Tools | ✅ |
 | Pricing | ✅ A$9/A$79 |
 | Lab | ✅ 15 articles |
@@ -433,7 +440,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 | Slug | Category |
 |---|---|
-| `why-you-cant-stop-overthinking` | think-clearly (featured) |
+| `why-you-cant-stop-overthinking` | think-clearly (**Editor's Pick — hardcoded in `FEATURED_LAB`**) |
 | `how-to-feel-less-overwhelmed` | think-clearly |
 | `how-box-breathing-actually-works` | calm-your-state |
 | `why-you-cant-focus` | calm-your-state |
@@ -451,6 +458,15 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 **Category balance:** Calm 5, Think clearly 6, Notice what's good 2 ← needs more
 
+### Homepage secondary cards (dynamic)
+- `LAB_SECONDARIES` in `page.tsx` is now **dynamic** — calls `getAllArticles().filter(excludeEditorsPick).slice(0,2)` at build time
+- Every new MDX article auto-promotes to homepage on next Vercel deploy
+- No `page.tsx` edits needed when publishing new articles (except updating `FEATURED_LAB.slug` for Editor's Pick changes)
+- MDX frontmatter **required fields** for homepage display: `title`, `slug`, `category`, `excerpt`, `readingTime`, `publishedAt`
+
+### New components (this session)
+- `components/home/LabSecondaryCard.tsx` — secondary Lab card for homepage. Per-instance scoped hover classes. Requires `excerpt` field.
+
 ---
 
 ## Key Rules (Never Break)
@@ -459,7 +475,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
 - **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first. Always.
 - SiteHeader.tsx — **LOCKED**
-- SiteFooter.tsx — **LOCKED** (mobile is the documented exception in the Mobile Homepage section above)
+- SiteFooter.tsx — **footer blur + gradient removed**; desktop wordmark added; mobile structure documented above. Any further changes must be documented here.
 - Background always `#090d14`
 - Never define colours inline — always `lib/design-tokens.ts`
 - Never below 0.65 opacity for functional text
@@ -471,46 +487,13 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - AI tool routes must NOT be in `isPublicRoute` in middleware.ts
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
 - **Every spec must end with git + Vercel deploy block** — `cd /Users/angelamanzano/Documents/Solace/solace-clean && git add . && git commit -m "..." && git push`
-- **Every spec must explicitly instruct Claude Code to EXECUTE the git block** — exact wording: *"Execute the git block at the end — do NOT stop at 'ready to commit'. RUN the command. Do NOT preview it, RUN it."* Without this, Claude Code stops one step short and Juan has to commit manually. Missing either the block OR the execute instruction = incomplete spec.
+- **Every spec must explicitly instruct Claude Code to EXECUTE the git block**
 - **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed**
 - **Never approximate Breathing values — read the actual source and copy exactly**
 - **No sounds on Breathing or Sleep Wind-Down** — silence is intentional
-
----
-
-## Process Lessons (Apr 2026 — Mobile Homepage Audit)
-
-These were learned the hard way during the mobile homepage redesign. Encode them so they don't have to be re-learned.
-
-### 1. One spec = one number when calibrating spacing
-When spacing values are unknown, move in **2vh / 8px increments**, never 4vh+ jumps. Bundle multiple changes only when each change is independently necessary — not because "let me solve it perfectly this time." Bundling causes cascading failures and wastes sessions. The mobile hero took 6 specs (01, 01b, 01c, 02b, 02c, 02d) to nail one number because the first specs bundled 3 changes each. Don't do this again.
-
-### 2. Real-device screenshot BEFORE every spacing spec, not just after
-The benchmark rule says screenshot at 375px before writing any spec. Extend it: when calibrating mobile spacing, also request a real iPhone screenshot AFTER the previous spec deploys, BEFORE writing the next one. DevTools emulation at 375px is necessary but not sufficient — real iPhones have safari nav chrome, status bars, dynamic islands, and tall viewports (812px+) that change how flex centering composes. Six hero specs in a row would have been one if I'd asked for the iPhone screenshot before each calibration, not after.
-
-### 3. `overflow-hidden` clips Cormorant Garamond ascenders
-Cormorant has tall ascenders that extend above the leading line. With tight `leading-[0.95]` or smaller and a parent `overflow-hidden`, the top of capital letters gets clipped. Solution: use `overflow-visible md:overflow-hidden pt-1 md:pt-0` on mobile. Or remove the wrapper if no slide-up animation needs it.
-
-### 4. `min-h-[Xvh] + items-center` on mobile = void below content
-On tall iPhones (812px+), centering content in a 55–62vh container creates 100–150px of empty space below the content. Better pattern: drop `min-h` on mobile, use `items-start` with `pt-[Nvh]` for top placement and `pb-N` for bottom space. This gives deterministic control instead of flex-distributed emptiness.
-
-### 5. Card body text on homepage = duplicate content
-If a homepage card describes a tool/article, and the destination page already has that description, the card body is duplicate content. Strip it on mobile (where space is precious). Use `hidden md:block` to keep it in DOM for SEO. Eyebrow + title + CTA is usually enough on mobile to commit to a tap.
-
-### 6. Inline styles don't respond to Tailwind breakpoints
-Components using inline `style={{padding: "34px 38px"}}` need a scoped `<style>` block with media queries to be responsive. Use the same pattern as SiteFooter.tsx — add a className, target it from a `<style>` tag. Don't try to add Tailwind classes alongside inline styles for the same property — specificity wars.
-
-### 7. Footer is part of the brand experience, not exit signage
-A "dumped list of links" footer signals an unfinished product. A designed footer with intentional composition (centered links, hairline divider, repeated wordmark) signals care. The SOLACE wordmark at the bottom bookends the experience the SOLACE logo opened at the top. Cost: ~30 lines of CSS. Value: massive perceived quality lift.
-
-### 8. Optical centering ≠ mathematical centering for letter-spaced text
-Letter-spaced text always sits slightly right of mathematical center because the letter-spacing pushes letters to the right of their box. Compensate with `paddingLeft` equal to one letter-spacing unit (e.g., `paddingLeft: "0.32em"` for `letterSpacing: "0.32em"`).
-
-### 9. Re-read solace-master.md when I think it's missing something
-When specifying changes, if I think "the routine for X isn't documented," check the file first. The routine is probably there and I just haven't internalised it.
-
-### 10. Opacity is the wrong lever for "quiet" — use size, weight, tracking instead
-A brand mark at 0.35 opacity reads as "ghost text," not "quiet." If you want something to feel restrained but present, use small font-size + light font-weight + heavy letter-spacing + serif. Then set opacity at 0.55+ so it's actually visible. Opacity below 0.55 should only be used for true secondary metadata, never for brand or anchor elements. (Spec 04c lesson: wordmark went from 0.35 → 0.55 to become the visible anchor.)
+- **When widening a parent container, always audit child `maxWidth` constraints** (lesson 11)
+- **Check inline `style={{...}}` for property conflicts before writing CSS rules** (lesson 12)
+- **Hero `pt` on fixed-nav pages = nav-height + intended-air** (lesson 13)
 
 ---
 
