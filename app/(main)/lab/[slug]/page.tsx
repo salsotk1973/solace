@@ -138,7 +138,23 @@ export default async function ArticlePage(
   return (
     <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
       <BgFlat>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
+        .article-end-cta-btn {
+          transition: background 200ms ease-out, border-color 200ms ease-out, box-shadow 220ms ease-out;
+        }
+        .article-end-cta-btn:hover {
+          background: rgba(${ctaRgb}, 0.14) !important;
+          border-color: rgba(${ctaRgb}, 0.55) !important;
+          box-shadow: 0 0 18px 2px rgba(${ctaRgb}, 0.25);
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .article-end-cta-btn {
+            transition: background 200ms ease-out, border-color 200ms ease-out, box-shadow 220ms ease-out, transform 200ms ease-out;
+          }
+          .article-end-cta-btn:hover {
+            transform: translateY(-1px);
+          }
+        }
         .article-back-link {
           display: inline-flex;
           align-items: center;
@@ -166,7 +182,7 @@ export default async function ArticlePage(
           display: inline-block;
           transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
         }
-      `}</style>
+      `}} />
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -318,6 +334,7 @@ export default async function ArticlePage(
               </p>
               <Link
                 href={article.toolCta!.href}
+                className="article-end-cta-btn"
                 style={{
                   display:        'inline-flex',
                   alignItems:     'center',
