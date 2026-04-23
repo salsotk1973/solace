@@ -14,6 +14,15 @@ export default function LabPage() {
   return (
     <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
       <BgFlat>
+        <style>{`
+          @media (max-width: 767px) {
+            .lab-content-section { padding: 0 20px 48px !important; }
+            .lab-cta-section     { padding: 48px 24px !important; }
+            .lab-newsletter-section { padding: 48px 24px 64px !important; }
+            .lab-cta-body        { line-height: 1.55 !important; }
+            .lab-newsletter-body { line-height: 1.55 !important; }
+          }
+        `}</style>
 
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 1 — HERO
@@ -81,6 +90,7 @@ export default function LabPage() {
             SECTIONS 2–4 — FILTER PILLS + FEATURED + ARTICLE GRID
         ════════════════════════════════════════════════════════════════════ */}
         <section
+          className="lab-content-section"
           style={{
             width:     '100%',
             padding:   '0 40px 80px',
@@ -96,6 +106,7 @@ export default function LabPage() {
             SECTION 5 — TOOLS CTA
         ════════════════════════════════════════════════════════════════════ */}
         <section
+          className="lab-cta-section"
           style={{
             width:     '100%',
             padding:   '120px 40px',
@@ -135,6 +146,7 @@ export default function LabPage() {
             </h2>
 
             <p
+              className="lab-cta-body"
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
@@ -159,6 +171,7 @@ export default function LabPage() {
             Fully transparent — no background, no borders, no shadows
         ════════════════════════════════════════════════════════════════════ */}
         <section
+          className="lab-newsletter-section"
           style={{
             width:         '100%',
             padding:       '100px 40px 110px',
@@ -201,6 +214,7 @@ export default function LabPage() {
           </h2>
 
           <p
+            className="lab-newsletter-body"
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,

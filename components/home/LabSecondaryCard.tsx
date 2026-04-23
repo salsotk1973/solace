@@ -68,7 +68,7 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
             letter-spacing: 0.18em !important;
           }
           .${scopeClass} h3 {
-            font-size: 22px !important;
+            font-size: clamp(22px, 2.4vw, 28px) !important;
           }
           .${scopeClass} .lab-home-secondary-excerpt {
             display: none !important;

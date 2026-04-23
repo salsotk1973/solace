@@ -99,7 +99,7 @@ const RESPONSIVE_CSS = `
       letter-spacing: 0.18em !important;
     }
     .lab-article-card h3 {
-      font-size: 22px !important;
+      font-size: clamp(22px, 2.4vw, 28px) !important;
     }
     .lab-featured-card-link {
       padding: 14px 18px 14px !important;
