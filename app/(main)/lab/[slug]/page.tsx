@@ -293,6 +293,7 @@ export default async function ArticlePage(
                   lineHeight: 1.5,
                   color:      'rgba(255,255,255,0.72)',
                   margin:     '0 0 20px',
+                  textWrap:   'pretty',
                 }}
               >
                 This is what {article.toolCta!.label.replace(/^Try\s+/i, '')} was built for.
