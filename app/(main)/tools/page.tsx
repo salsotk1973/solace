@@ -195,7 +195,7 @@ export default function ToolsPage() {
         <div className="max-w-[900px] mx-auto px-6">
 
           {/* ── Hero ──────────────────────────────────────────────────────── */}
-          <header className="text-center pt-[180px] pb-[48px]">
+          <header className="text-center pt-[100px] md:pt-[180px] pb-[32px] md:pb-[48px]">
             <p
               className="text-[11px] tracking-[0.26em] uppercase mb-4"
               style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.secondary }}
@@ -222,7 +222,7 @@ export default function ToolsPage() {
           </header>
 
           {/* ── Tool families ─────────────────────────────────────────────── */}
-          <section aria-label="Tools" className="flex flex-col gap-[40px] mb-24">
+          <section aria-label="Tools" className="flex flex-col gap-[24px] md:gap-[40px] mb-12 md:mb-24">
 
             <FamilyGroup label="AI-powered reflection" cols={3}>
               {AI_REALMS.map((t) => <ToolCard key={t.href} {...t} />)}
@@ -239,7 +239,8 @@ export default function ToolsPage() {
           </section>
 
           {/* ── SEO content ───────────────────────────────────────────────── */}
-          <section className="max-w-[680px] mx-auto mb-24">
+          {/* hidden md:block — content stays in DOM for crawlers, hidden visually on mobile to reduce scroll */}
+          <section className="hidden md:block max-w-[680px] mx-auto mb-24">
             <h2
               className="font-light text-[32px] leading-snug mb-8"
               style={{ fontFamily: "var(--font-display)", color: TEXT_COLOURS.body }}
@@ -270,9 +271,9 @@ export default function ToolsPage() {
           </section>
 
           {/* ── FAQ ───────────────────────────────────────────────────────── */}
-          <section className="max-w-[680px] mx-auto mb-24">
+          <section className="max-w-[680px] mx-auto mb-12 md:mb-24">
             <p
-              className="text-[11px] tracking-[0.24em] uppercase mb-8"
+              className="text-[11px] tracking-[0.24em] uppercase mb-6 md:mb-8"
               style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.secondary }}
             >
               Common questions
@@ -282,7 +283,7 @@ export default function ToolsPage() {
 
           {/* ── Upgrade strip ─────────────────────────────────────────────── */}
           <p
-            className="text-center text-[13px] font-[300] mb-24 max-w-[800px] mx-auto leading-relaxed"
+            className="text-center text-[13px] font-[300] mb-12 md:mb-24 max-w-[800px] mx-auto leading-relaxed"
             style={{ fontFamily: "var(--font-jost)", color: TEXT_COLOURS.body }}
           >
             The free tools above are always free.{" "}
