@@ -40,11 +40,6 @@ const SESSION_C  = 2 * Math.PI * SESSION_R; // ~741.4
 
 type ActivePhase = PhaseType | "idle";
 
-const GLOW_MIN_SCALE   = 1.05;
-const GLOW_MAX_SCALE   = 1.30;
-const GLOW_MIN_OPACITY = 0.28;
-const GLOW_MAX_OPACITY = 0.55;
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -78,15 +73,6 @@ export default function BreathingOrb({
   const [phaseDuration,  setPhaseDuration]  = useState(1.5);
   const [label,          setLabel]          = useState("");
   const [cycleLabel,     setCycleLabel]     = useState("");
-  const [isMobile,       setIsMobile]       = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   useEffect(() => {
     onCycleChangeRef.current   = onCycleChange;
@@ -206,28 +192,25 @@ export default function BreathingOrb({
     };
   }, [isRunning, pattern]);
 
-  const displayPhase      = isRunning ? activePhase   : "idle"  as ActivePhase;
+  const displayPhase      = isRunning ? activePhase   : "idle" as ActivePhase;
   const displayLabel      = isRunning ? label         : "";
   const displayCycleLabel = isRunning ? cycleLabel    : "";
   const displayDuration   = isRunning ? phaseDuration : 1.5;
   const orbScale          = displayPhase === "inhale" || displayPhase === "hold-in" ? ORB_MAX : ORB_MIN;
-  const glowActive        = displayPhase === "inhale" || displayPhase === "hold-in";
   const running           = isRunning && displayPhase !== "idle";
   const orbTransition     = `transform ${displayDuration}s ease-in-out, filter ${displayDuration}s ease-in-out`;
-  const glowScale         = glowActive ? GLOW_MAX_SCALE   : GLOW_MIN_SCALE;
-  const glowOpacity       = glowActive ? GLOW_MAX_OPACITY : GLOW_MIN_OPACITY;
 
-  // Mobile brightness: sphere brightens on inhale, dims on exhale (replaces halo on mobile)
+  // Brightness-breathing: sphere brightens on inhale, dims on exhale (all screens)
+  // Range 0.85–1.35 keeps colour identity (below 0.80 ghosts on #090d14; above 1.40 washes out)
   const brightness =
-    !isMobile         ? 1    :
-    displayPhase === "inhale"   ? 1.25 :
-    displayPhase === "hold-in"  ? 1.25 :
-    displayPhase === "exhale"   ? 0.75 :
-    displayPhase === "hold-out" ? 0.75 :
+    displayPhase === "inhale"   ? 1.35 :
+    displayPhase === "hold-in"  ? 1.35 :
+    displayPhase === "exhale"   ? 0.85 :
+    displayPhase === "hold-out" ? 0.85 :
     /* idle */                    1.0;
 
   // Derived pixel sizes
-  const innerPx  = Math.round(192 * sc); // orb sphere + glow size
+  const innerPx  = Math.round(192 * sc); // orb sphere size
   const offsetPx = Math.round(24  * sc); // top/left offset
 
   // ── JSX ───────────────────────────────────────────────────────────────────
@@ -238,27 +221,9 @@ export default function BreathingOrb({
       {/* ── Orb stage ──────────────────────────────────────────────────── */}
       <div className="relative" style={{ width: size, height: size, overflow: "visible" }}>
 
-        {/* Base glow layer — hidden on mobile via CSS (.glow-idle) */}
+        {/* Orb sphere — brightness() filter animates with phase (CSS sets solid-teal gradient) */}
         <div
-          className="glow-idle absolute z-0 rounded-full pointer-events-none"
-          style={{
-            animation:      "none",
-            width:          `${innerPx}px`,
-            height:         `${innerPx}px`,
-            left:           `${offsetPx}px`,
-            top:            `${offsetPx}px`,
-            background:     "rgba(45, 212, 191, 0.65)",
-            filter:         "blur(32px)",
-            opacity:        glowOpacity,
-            transform:      `scale(${glowScale})`,
-            transformOrigin:"center",
-            transition:     `opacity ${displayDuration}s ease-in-out, transform ${displayDuration}s ease-in-out`,
-          }}
-        />
-
-        {/* Orb sphere — on mobile, brightness() animates with phase instead of glow */}
-        <div
-          className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(100,210,200,0.18)_0%,rgba(55,170,165,0.14)_38%,rgba(22,100,110,0.12)_72%,rgba(10,50,65,0.10)_100%)]"
+          className="orb-idle absolute rounded-full z-10"
           style={{
             width:          `${innerPx}px`,
             height:         `${innerPx}px`,
@@ -328,7 +293,7 @@ export default function BreathingOrb({
 
         {/* Phase label */}
         <span
-          className="breathing-phase-text absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out"
+          className="breathing-phase-text absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out"
           style={{ opacity: running ? 0.88 : 0 }}
         >
           {displayLabel}
