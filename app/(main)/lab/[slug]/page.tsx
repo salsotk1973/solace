@@ -7,7 +7,7 @@ import LabToolCta            from '@/components/lab/LabToolCta'
 import RelatedArticles       from '@/components/lab/RelatedArticles'
 import PageShell             from '@/components/PageShell'
 import BgFlat                from '@/components/backgrounds/BgFlat'
-import { getLabCategoryRgb } from '@/lib/design-tokens'
+import { getLabCategoryRgb, getToolRgb } from '@/lib/design-tokens'
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
@@ -91,13 +91,30 @@ export default async function ArticlePage(
     .filter(a => a.slug !== slug)
     .slice(0, 2)
 
-  // Category accent colour — derived from design tokens
+  // Category accent colour — used for article header pill
   const _rgb     = getLabCategoryRgb(article.category).replace(/, /g, ',')
   const accent   = `rgba(${_rgb},1)`
   const accentBg = `rgba(${_rgb},0.08)`
 
   // Determine whether a specific tool CTA should show
   const hasTool = !!article.toolCta && article.toolCta.href !== '/tools'
+
+  // Derive CTA button color from the linked TOOL's category (not the article's)
+  const HREF_TO_TOOL_SLUG: Record<string, string> = {
+    'clear-your-mind': 'clear',
+    'choose':          'choose',
+    'break-it-down':   'breakdown',
+    'breathing':       'breathing',
+    'sleep':           'sleep',
+    'focus':           'focus',
+    'mood':            'mood',
+    'gratitude':       'gratitude',
+  }
+  const toolHrefSegment  = article.toolCta?.href.replace(/^\/tools\//, '').replace(/^\//, '') ?? ''
+  const toolSlugForColor = HREF_TO_TOOL_SLUG[toolHrefSegment] ?? null
+  const ctaRgb    = toolSlugForColor ? getToolRgb(toolSlugForColor).replace(/, /g, ',') : _rgb
+  const ctaAccent   = `rgba(${ctaRgb},1)`
+  const ctaAccentBg = `rgba(${ctaRgb},0.08)`
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', {
     day:   'numeric',
@@ -266,6 +283,7 @@ export default async function ArticlePage(
                 label={article.toolCta!.label}
                 href={article.toolCta!.href}
                 category={article.category}
+                subtitle={article.toolCta!.description}
               />
             )}
 
@@ -305,14 +323,14 @@ export default async function ArticlePage(
                   alignItems:     'center',
                   padding:        '10px 24px',
                   borderRadius:   '4px',
-                  border:         `0.5px solid ${accent.replace('1)', '0.28)')}`,
-                  background:     accentBg,
+                  border:         `0.5px solid ${ctaAccent.replace('1)', '0.28)')}`,
+                  background:     ctaAccentBg,
                   fontFamily:     "'Jost', sans-serif",
                   fontWeight:     400,
                   fontSize:       '12px',
                   letterSpacing:  '0.12em',
                   textTransform:  'uppercase',
-                  color:          accent,
+                  color:          ctaAccent,
                   textDecoration: 'none',
                 }}
               >

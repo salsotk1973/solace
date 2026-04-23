@@ -7,6 +7,7 @@ interface Props {
   href:      string
   category:  LabArticle['category']
   toolSlug?: string   // when present, drives colour from tool token instead of category
+  subtitle?: string   // override the default "Free to use. No account needed." copy
 }
 
 // Map URL path segments to TOOL_CATEGORY slugs
@@ -26,7 +27,7 @@ function resolveSlug(href: string): string | null {
   return PATH_TO_SLUG[segment] ?? null
 }
 
-export default function LabToolCta({ label, href, category, toolSlug }: Props) {
+export default function LabToolCta({ label, href, category, toolSlug, subtitle }: Props) {
   // Resolve tool slug from href if not explicitly passed
   const slug = toolSlug ?? resolveSlug(href)
 
@@ -109,7 +110,7 @@ export default function LabToolCta({ label, href, category, toolSlug }: Props) {
           margin:     '0 0 24px',
         }}
       >
-        Free to use. No account needed.
+        {subtitle ?? 'Free to use. No account needed.'}
       </p>
 
       {/* CTA button */}
@@ -131,7 +132,7 @@ export default function LabToolCta({ label, href, category, toolSlug }: Props) {
           textDecoration: 'none',
         }}
       >
-        Try it free →
+        {label} →
       </Link>
     </div>
   )
