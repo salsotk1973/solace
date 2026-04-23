@@ -160,11 +160,6 @@ export default function HomePage() {
 
         <section id="free-tools" className="free-tools-section pt-6 pb-16 md:pt-10 md:pb-14">
           <div className="max-w-6xl mx-auto px-6 md:px-12 lg:px-24">
-            <div
-              aria-hidden="true"
-              className="mb-10 md:hidden h-px w-16"
-              style={{ background: "rgba(255,255,255,0.10)" }}
-            />
             <p
               className="text-[11px] tracking-[0.2em] uppercase"
               style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, color: TEXT_COLOURS.secondary }}
