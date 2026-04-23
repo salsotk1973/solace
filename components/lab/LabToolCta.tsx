@@ -70,6 +70,11 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
             letter-spacing: 0.10em !important;
           }
         }
+        @media (max-width: 768px) {
+          .${btnClass}-arrow {
+            display: none;
+          }
+        }
       `}</style>
 
       <div
@@ -164,7 +169,7 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
             maxWidth:       '100%',
           }}
         >
-          {`${label} →`}
+          {`${label} `}<span className={`${btnClass}-arrow`}>→</span>
         </Link>
       </div>
     </>
