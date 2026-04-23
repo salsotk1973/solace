@@ -116,10 +116,6 @@ export default function SiteFooter() {
             margin: "0 auto",
             maxWidth: "1440px",
             padding: "8px 24px 28px",
-            background:
-              "linear-gradient(0deg, rgba(9,13,20,0.85) 0%, rgba(9,13,20,0.60) 50%, rgba(9,13,20,0.0) 100%)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
           }}
         >
           <div
