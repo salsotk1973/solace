@@ -18,6 +18,15 @@ export default function LabArchivePage() {
     <PageShell particles={false}>
       <BgFlat>
         <style dangerouslySetInnerHTML={{ __html: ARCHIVE_CSS }} />
+        <style>{`
+          .archive-back-link:hover {
+            color: rgba(200,185,255,0.90) !important;
+            border-bottom-color: rgba(200,185,255,0.35) !important;
+          }
+          .archive-back-link:hover .archive-back-arrow {
+            transform: translateX(-4px);
+          }
+        `}</style>
         {/* Hero */}
         <section style={{
           width:         '100%',
@@ -31,22 +40,33 @@ export default function LabArchivePage() {
           {/* Back link */}
           <Link
             href="/lab"
+            className="archive-back-link"
             style={{
               fontFamily:     "'Jost', sans-serif",
               fontWeight:     400,
-              fontSize:       '11px',
-              letterSpacing:  '0.16em',
+              fontSize:       '12px',
+              letterSpacing:  '0.14em',
               textTransform:  'uppercase',
-              color:          'rgba(170,158,220,0.55)',
+              color:          'rgba(255,255,255,0.65)',
               textDecoration: 'none',
               display:        'inline-flex',
               alignItems:     'center',
-              gap:            '6px',
+              gap:            '8px',
               marginBottom:   '32px',
-              transition:     'color 0.3s ease',
+              transition:     'color 0.3s ease, border-bottom-color 0.3s ease',
+              paddingBottom:  '2px',
+              borderBottom:   '1px solid transparent',
             }}
           >
-            ← Lab
+            <span
+              className="archive-back-arrow"
+              style={{
+                fontSize:   '14px',
+                display:    'inline-block',
+                transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1)',
+              }}
+            >←</span>
+            The Lab
           </Link>
 
           <p style={{
