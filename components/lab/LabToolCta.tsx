@@ -66,7 +66,7 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
         @media (max-width: 360px) {
           .${btnClass} {
             font-size: 11px !important;
-            padding: 9px 18px !important;
+            padding: 9px 14px !important;
             letter-spacing: 0.10em !important;
           }
         }
@@ -141,7 +141,8 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
           {subtitle ?? 'Free to use. No account needed.'}
         </p>
 
-        {/* CTA button */}
+        {/* CTA button — single template string with nbsp before arrow prevents React comment
+            node creating an iOS Safari soft-break opportunity (nowrap alone is insufficient) */}
         <Link
           href={href}
           className={btnClass}
@@ -163,7 +164,7 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
             maxWidth:       '100%',
           }}
         >
-          {label} →
+          {`${label} →`}
         </Link>
       </div>
     </>

@@ -158,7 +158,7 @@ export default async function ArticlePage(
         @media (max-width: 360px) {
           .article-end-cta-btn {
             font-size: 11px !important;
-            padding: 9px 18px !important;
+            padding: 9px 14px !important;
             letter-spacing: 0.10em !important;
           }
         }
@@ -360,7 +360,7 @@ export default async function ArticlePage(
                   maxWidth:       '100%',
                 }}
               >
-                {article.toolCta!.label} →
+                {`${article.toolCta!.label} →`}
               </Link>
             </div>
           )}
