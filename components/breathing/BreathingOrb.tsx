@@ -78,6 +78,15 @@ export default function BreathingOrb({
   const [phaseDuration,  setPhaseDuration]  = useState(1.5);
   const [label,          setLabel]          = useState("");
   const [cycleLabel,     setCycleLabel]     = useState("");
+  const [isMobile,       setIsMobile]       = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     onCycleChangeRef.current   = onCycleChange;
@@ -197,16 +206,25 @@ export default function BreathingOrb({
     };
   }, [isRunning, pattern]);
 
-  const displayPhase     = isRunning ? activePhase   : "idle"  as ActivePhase;
-  const displayLabel     = isRunning ? label         : "";
-  const displayCycleLabel = isRunning ? cycleLabel   : "";
-  const displayDuration  = isRunning ? phaseDuration : 1.5;
-  const orbScale         = displayPhase === "inhale" || displayPhase === "hold-in" ? ORB_MAX : ORB_MIN;
-  const glowActive       = displayPhase === "inhale" || displayPhase === "hold-in";
-  const running          = isRunning && displayPhase !== "idle";
-  const orbTransition    = `transform ${displayDuration}s ease-in-out, filter ${displayDuration}s ease-in-out`;
-  const glowScale        = glowActive ? GLOW_MAX_SCALE   : GLOW_MIN_SCALE;
-  const glowOpacity      = glowActive ? GLOW_MAX_OPACITY : GLOW_MIN_OPACITY;
+  const displayPhase      = isRunning ? activePhase   : "idle"  as ActivePhase;
+  const displayLabel      = isRunning ? label         : "";
+  const displayCycleLabel = isRunning ? cycleLabel    : "";
+  const displayDuration   = isRunning ? phaseDuration : 1.5;
+  const orbScale          = displayPhase === "inhale" || displayPhase === "hold-in" ? ORB_MAX : ORB_MIN;
+  const glowActive        = displayPhase === "inhale" || displayPhase === "hold-in";
+  const running           = isRunning && displayPhase !== "idle";
+  const orbTransition     = `transform ${displayDuration}s ease-in-out, filter ${displayDuration}s ease-in-out`;
+  const glowScale         = glowActive ? GLOW_MAX_SCALE   : GLOW_MIN_SCALE;
+  const glowOpacity       = glowActive ? GLOW_MAX_OPACITY : GLOW_MIN_OPACITY;
+
+  // Mobile brightness: sphere brightens on inhale, dims on exhale (replaces halo on mobile)
+  const brightness =
+    !isMobile         ? 1    :
+    displayPhase === "inhale"   ? 1.25 :
+    displayPhase === "hold-in"  ? 1.25 :
+    displayPhase === "exhale"   ? 0.75 :
+    displayPhase === "hold-out" ? 0.75 :
+    /* idle */                    1.0;
 
   // Derived pixel sizes
   const innerPx  = Math.round(192 * sc); // orb sphere + glow size
@@ -220,9 +238,9 @@ export default function BreathingOrb({
       {/* ── Orb stage ──────────────────────────────────────────────────── */}
       <div className="relative" style={{ width: size, height: size, overflow: "visible" }}>
 
-        {/* Base glow layer */}
+        {/* Base glow layer — hidden on mobile via CSS (.glow-idle) */}
         <div
-          className="absolute z-0 rounded-full pointer-events-none"
+          className="glow-idle absolute z-0 rounded-full pointer-events-none"
           style={{
             animation:      "none",
             width:          `${innerPx}px`,
@@ -238,7 +256,7 @@ export default function BreathingOrb({
           }}
         />
 
-        {/* Orb sphere */}
+        {/* Orb sphere — on mobile, brightness() animates with phase instead of glow */}
         <div
           className="orb-idle absolute rounded-full z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(100,210,200,0.18)_0%,rgba(55,170,165,0.14)_38%,rgba(22,100,110,0.12)_72%,rgba(10,50,65,0.10)_100%)]"
           style={{
@@ -247,7 +265,7 @@ export default function BreathingOrb({
             top:            `${offsetPx}px`,
             left:           `${offsetPx}px`,
             animation:      "none",
-            filter:         "blur(0px)",
+            filter:         `brightness(${brightness})`,
             transform:      `scale(${orbScale})`,
             transition:     orbTransition,
           }}
@@ -310,7 +328,7 @@ export default function BreathingOrb({
 
         {/* Phase label */}
         <span
-          className="absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out"
+          className="breathing-phase-text absolute inset-0 z-30 flex items-center justify-center [font-family:var(--font-display)] italic font-light text-[22px] text-[rgba(180,235,245,0.88)] pointer-events-none select-none transition-opacity duration-[220ms] ease-in-out"
           style={{ opacity: running ? 0.88 : 0 }}
         >
           {displayLabel}
@@ -318,7 +336,7 @@ export default function BreathingOrb({
       </div>
 
       {/* ── Cycle counter ──────────────────────────────────────────────── */}
-      <p className="w-full text-center [font-family:var(--font-jost)] text-[10px] tracking-[0.22em] uppercase text-[rgba(100,190,210,0.38)] h-4">
+      <p className="w-full text-center [font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase text-[rgba(180,235,245,0.78)] h-5">
         {displayCycleLabel}
       </p>
     </div>

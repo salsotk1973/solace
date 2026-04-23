@@ -23,7 +23,7 @@ const FAQS = [
   },
   {
     q: "What's the difference between free and paid?",
-    a: "All eight tools are free to try. A free account gives you 7 days of session history and one AI session per day with Choose. A paid account (A$9/month or A$79/year) unlocks full history, unlimited AI sessions, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
+    a: "Five tools are fully free — Breathing, Sleep Wind-Down, Focus Timer, Mood Tracker, and Gratitude Log. You also get one Choose session per day free. A free account keeps 7 days of session history. A paid account (A$9/month or A$79/year) unlocks unlimited Choose, the two AI tools (Clear Your Mind and Break It Down), full session history, and mood patterns over time. Most people upgrade around day 8 — the moment history starts to matter.",
   },
   {
     q: "Is my data private?",

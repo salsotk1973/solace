@@ -434,3 +434,26 @@ body {
     font-size: 0.94rem;
   }
 }
+
+/* ── Breathing orb — mobile redesign ─────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  /* Remove blur halo on mobile (rendering artifact at narrow viewports) */
+  .glow-idle {
+    display: none !important;
+  }
+
+  /* Boost orb centre alpha so brightness() animation reads as a solid teal body */
+  .orb-idle {
+    background: radial-gradient(circle at 50% 44%,
+      rgba(100,210,200,0.32) 0%,
+      rgba(55,170,165,0.24) 38%,
+      rgba(22,100,110,0.18) 72%,
+      rgba(10,50,65,0.14) 100%) !important;
+  }
+
+  /* Phase text: brighter white-teal so it reads over both bright and dim sphere */
+  .breathing-phase-text {
+    color: rgba(235,250,255,0.95) !important;
+  }
+}
