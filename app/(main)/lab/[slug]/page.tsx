@@ -121,6 +121,35 @@ export default async function ArticlePage(
   return (
     <PageShell particles={false} style={{ color: 'rgba(225,218,252,0.85)' }}>
       <BgFlat>
+      <style>{`
+        .article-back-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'Jost', sans-serif;
+          font-weight: 400;
+          font-size: 12px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.65);
+          text-decoration: none;
+          padding-bottom: 2px;
+          border-bottom: 1px solid transparent;
+          transition: color 0.2s ease-out, border-bottom-color 0.2s ease-out;
+        }
+        .article-back-link:hover {
+          color: rgba(200,185,255,0.90);
+          border-bottom-color: rgba(200,185,255,0.35);
+        }
+        .article-back-link:hover .article-back-arrow {
+          transform: translateX(-4px);
+        }
+        .article-back-arrow {
+          font-size: 14px;
+          display: inline-block;
+          transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+        }
+      `}</style>
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -138,18 +167,9 @@ export default async function ArticlePage(
 
           {/* ── 1. Back link ──────────────────────────────────────────────── */}
           <div style={{ marginBottom: '48px' }}>
-            <Link
-              href="/lab"
-              style={{
-                fontFamily:     "'Jost', sans-serif",
-                fontWeight:     400,
-                fontSize:       '12px',
-                letterSpacing:  '0.08em',
-                color:          'rgba(130,118,185,0.42)',
-                textDecoration: 'none',
-              }}
-            >
-              ← The Lab
+            <Link href="/lab" className="article-back-link">
+              <span className="article-back-arrow">←</span>
+              The Lab
             </Link>
           </div>
 
@@ -304,25 +324,10 @@ export default async function ArticlePage(
           <RelatedArticles articles={related} />
 
           {/* ── 6. Back to Lab ────────────────────────────────────────────── */}
-          <div
-            style={{
-              marginTop: '64px',
-              textAlign: 'center',
-            }}
-          >
-            <Link
-              href="/lab"
-              style={{
-                fontFamily:     "'Jost', sans-serif",
-                fontWeight:     400,
-                fontSize:       '11px',
-                letterSpacing:  '0.16em',
-                textTransform:  'uppercase',
-                color:          'rgba(130,118,185,0.38)',
-                textDecoration: 'none',
-              }}
-            >
-              ← Back to the Lab
+          <div style={{ marginTop: '64px', textAlign: 'center' }}>
+            <Link href="/lab" className="article-back-link">
+              <span className="article-back-arrow">←</span>
+              The Lab
             </Link>
           </div>
 

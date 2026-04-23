@@ -5,6 +5,43 @@ import Link from 'next/link'
 import type { LabArticle } from '@/lib/lab'
 import { getLabCategoryRgb } from '@/lib/design-tokens'
 
+const RELATED_CSS = `
+  @media (max-width: 639px) {
+    .related-grid {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+    .related-card {
+      padding: 14px 18px !important;
+      border-radius: 16px !important;
+    }
+    .related-card-pill-wrapper {
+      margin-bottom: 8px !important;
+    }
+    .related-card-pill {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.18em !important;
+    }
+    .related-card h3 {
+      font-size: clamp(22px, 2.4vw, 28px) !important;
+      margin-bottom: 8px !important;
+    }
+    .related-card p {
+      font-size: 13px !important;
+      line-height: 1.5 !important;
+      color: rgba(255,255,255,0.65) !important;
+      margin-bottom: 0 !important;
+    }
+    .related-card-footer {
+      display: none !important;
+    }
+  }
+`
+
 function RelatedCard({ article }: { article: LabArticle }) {
   const [hovered, setHovered] = useState(false)
   const _rgb   = getLabCategoryRgb(article.category).replace(/, /g, ',')
@@ -14,6 +51,7 @@ function RelatedCard({ article }: { article: LabArticle }) {
   return (
     <Link
       href={`/lab/${article.slug}`}
+      className="related-card"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -50,8 +88,9 @@ function RelatedCard({ article }: { article: LabArticle }) {
       />
 
       {/* Category pill */}
-      <div style={{ marginBottom: '16px' }}>
+      <div className="related-card-pill-wrapper" style={{ marginBottom: '16px' }}>
         <span
+          className="related-card-pill"
           style={{
             display:       'inline-block',
             padding:       '4px 12px',
@@ -106,6 +145,7 @@ function RelatedCard({ article }: { article: LabArticle }) {
 
       {/* Bottom: X MIN READ → */}
       <div
+        className="related-card-footer"
         style={{
           paddingTop: '16px',
           borderTop:  `0.5px solid ${accent.replace('1)', '0.08)')}`,
@@ -134,34 +174,38 @@ export default function RelatedArticles({ articles }: { articles: LabArticle[] }
   if (articles.length === 0) return null
 
   return (
-    <section style={{ marginTop: '80px' }}>
-      {/* Heading */}
-      <p
-        style={{
-          fontFamily:    "'Jost', sans-serif",
-          fontWeight:    400,
-          fontSize:      '10px',
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color:         'rgba(130,112,200,0.42)',
-          margin:        '0 0 28px',
-        }}
-      >
-        More from the Lab
-      </p>
+    <>
+      <style>{RELATED_CSS}</style>
+      <section style={{ marginTop: '80px' }}>
+        {/* Heading */}
+        <p
+          style={{
+            fontFamily:    "'Jost', sans-serif",
+            fontWeight:    400,
+            fontSize:      '11px',
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color:         'rgba(255,255,255,0.65)',
+            margin:        '0 0 28px',
+          }}
+        >
+          More from the Lab
+        </p>
 
-      {/* Grid — 2 cols */}
-      <div
-        style={{
-          display:             'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap:                 '16px',
-        }}
-      >
-        {articles.map(article => (
-          <RelatedCard key={article.slug} article={article} />
-        ))}
-      </div>
-    </section>
+        {/* Grid — 2 cols desktop, 1 col mobile */}
+        <div
+          className="related-grid"
+          style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap:                 '16px',
+          }}
+        >
+          {articles.map(article => (
+            <RelatedCard key={article.slug} article={article} />
+          ))}
+        </div>
+      </section>
+    </>
   )
 }
