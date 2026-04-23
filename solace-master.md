@@ -8,9 +8,7 @@
 
 **Hero copy (locked, mobile + desktop):**
 ```
-When your mind won't settle,
-it's hard to think clearly.
-
+When your mind won't settle, it's hard to think clearly.
 Solace helps you find the next right step — through thought, not noise.
 ```
 (No CTA on desktop — removed Spec 02b. Destination is visible 334px below the fold after section reorder.)
@@ -103,7 +101,6 @@ Solace helps you find the next right step — through thought, not noise.
 ---
 
 ## Thought Reframer — REMOVED ✅ (Apr 2026)
-
 Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard.
 
 ---
@@ -259,12 +256,38 @@ Mobile footer structure (top to bottom):
 
 ---
 
-## Process Lessons (updated Apr 2026 — Desktop Homepage Audit)
+## Tools Page — LOCKED ✅ (Apr 2026)
+
+**Mobile audit T1-T4 shipped and live. Tools page is locked on mobile. Desktop unchanged and untouched.**
+
+### ToolCard (mobile — scoped style)
+- Padding: `14px 18px 14px` (compact, tighter than desktop)
+- `min-height: auto` — **desktop min-height explicitly overridden on mobile**. Never inherit desktop calibration into mobile.
+- Hover-row: `display: none` — phantom footer hover indicators dead on touch devices, hidden entirely
+- Description: `13px / line-height 1.5` (was 14px / 1.72 on desktop — desktop calibration too loose for mobile column width)
+
+### FamilyGroup (mobile)
+- Eyebrow: `margin-bottom: 3` (12px), `padding-bottom: 0`
+- Divider: `md-only` — **mobile has no divider between family groups**. Spacing is carried by the eyebrow + card gap, not by a horizontal rule.
+
+### page.tsx (mobile structural changes)
+- Hero: `padding-top: 100` — matches tools hero offset below nav
+- Gap: `24` between family groups
+- **SEO essay: `hidden md:block`** — essay is in DOM (Google reads it via mobile-first indexing of source HTML), but visually hidden on mobile. Keeps mobile page clean while preserving SEO value.
+- FAQ: `margin-bottom: 12`
+
+### Scoping rule (locked)
+- All mobile ToolCard overrides are **scoped** — they do not bleed into desktop.
+- Use media queries or mobile-specific class variants. **Never change desktop ToolCard to fix mobile.**
+
+---
+
+## Process Lessons (updated Apr 2026 — Desktop Homepage + Tools Page audits)
 
 ### From prior mobile audit (retained)
 1–10: [all prior lessons retained — see previous version]
 
-### New lessons from desktop audit (Apr 2026)
+### Lessons from desktop homepage audit (Apr 2026)
 
 #### 11. When widening a parent container, audit constrained children too
 When changing a grid cell width or container width, check if child components have their own internal `maxWidth` values that won't grow automatically. FeaturedLabCard had `maxWidth: 520px` on title and `440px` on excerpt — widening the grid cell to 632px had zero effect on those internal constraints. Always trace: container → grid cell → component → content widths.
@@ -286,6 +309,20 @@ Any page with complex background gradients (like the homepage radial system) wil
 
 #### 17. The pill IS the hierarchy signal — don't use size to signal importance
 Multiple specs tried to make the Editor's Pick card larger than secondary cards to signal "this is important." Every attempt created alignment and fill problems. The correct solution: equal card size, "Editor's pick" pill is the sole differentiator. Lesson: hierarchy in UI = labels + colour + typographic weight, not physical size of containers.
+
+### Lessons from Tools Page mobile audit (Apr 2026)
+
+#### 18. Phantom hover footers are dead on mobile — `display: none` them
+Hover-row indicators ("tap to open", trailing arrows, footer chrome visible on desktop hover) serve zero purpose on touch devices. They take vertical space for no affordance. Always set `display: none` on mobile rather than trying to "soften" or "fade" them. Dead pixels = dead, not dim.
+
+#### 19. `min-height` calibrated for desktop is wrong for mobile — override to `auto`
+A card `min-height` that looks balanced at desktop column widths (300px+) creates empty vertical air at mobile widths (343px). Never inherit desktop `min-height` into mobile. Either scope the value per breakpoint or explicitly set `min-height: auto` on mobile.
+
+#### 20. Desktop font sizes don't translate — recalibrate for mobile column width
+Body `14px / line-height 1.72` reads fine in a 320px-wide desktop card. In a 311px mobile card with 36px horizontal padding taken out, that same spec reads loose and wastes 2-3 lines of vertical space. Drop to `13px / 1.5` for mobile. Typography calibrations are not breakpoint-agnostic.
+
+#### 21. SEO essays: `hidden md:block` keeps DOM, hides visual
+When a page needs an SEO essay (long-tail keywords, tool context) but the essay clutters mobile UX, `hidden md:block` is the correct pattern. Google's mobile-first indexer reads the source HTML, not the rendered viewport — the essay is indexed regardless of visibility. Mobile users get a clean page, Google gets the content. Never `remove` SEO content to improve mobile UX.
 
 ---
 
@@ -329,13 +366,11 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## Sleep Wind-Down — Build Complete ✅ (Apr 2026)
-
 [Unchanged from prior master — see previous version for full detail]
 
 ---
 
 ## Focus Timer — Build Complete ✅ (Apr 2026)
-
 [Unchanged from prior master — see previous version for full detail]
 
 ---
@@ -360,7 +395,6 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ---
 
 ## SEO ✅ (Apr 2026)
-
 - Sitemap: 17 pages, submitted Apr 15, last read Apr 18 ✅
 - `metadataBase: new URL("https://www.try-solace.app")` in `layout.tsx` ✅
 - 11 pages indexed by Google
@@ -399,6 +433,7 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 ## Still Needed (priority order)
 
 - [x] **Desktop homepage audit** — ✅ COMPLETE Apr 2026
+- [x] **Tools page mobile audit** — ✅ COMPLETE Apr 2026
 - [ ] **BreathingOrb flicker** — needs local interactive debugging. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
@@ -422,7 +457,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 |---|---|
 | Home (mobile) | ✅ LOCKED Apr 2026 |
 | Home (desktop) | ✅ LOCKED Apr 2026 |
-| Tools | ✅ |
+| Tools (mobile) | ✅ LOCKED Apr 2026 |
+| Tools (desktop) | ✅ |
 | Pricing | ✅ A$9/A$79 |
 | Lab | ✅ 15 articles |
 | Lab Archive | ✅ |
@@ -494,6 +530,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - **When widening a parent container, always audit child `maxWidth` constraints** (lesson 11)
 - **Check inline `style={{...}}` for property conflicts before writing CSS rules** (lesson 12)
 - **Hero `pt` on fixed-nav pages = nav-height + intended-air** (lesson 13)
+- **Mobile `min-height` must override desktop — never inherit** (lesson 19)
+- **SEO essays use `hidden md:block` — never remove DOM content to clean mobile UX** (lesson 21)
 
 ---
 
