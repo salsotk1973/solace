@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import SiteHeaderAuthControls from "@/components/SiteHeaderAuthControls";
 
@@ -17,15 +18,83 @@ export default function SiteHeaderMobileMenu({
   isSignedIn: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const onResize = () => {
       if (window.innerWidth >= 768) setMenuOpen(false);
     };
-
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  const drawer = (
+    <div
+      className="md:hidden"
+      style={{
+        position: "fixed",
+        top: "80px",
+        left: 0,
+        right: 0,
+        zIndex: 79,
+        overflow: "hidden",
+        maxHeight: menuOpen ? "480px" : "0",
+        transition: "max-height 0.42s cubic-bezier(0.22,1,0.36,1)",
+        pointerEvents: menuOpen ? "auto" : "none",
+        background: "rgba(9,13,20,0.96)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+      }}
+    >
+      <nav
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          padding: "8px 24px 28px",
+          borderTop: "0.5px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        {navItems.map((item) => (
+          <Link
+            key={item.label}
+            href={item.href}
+            onClick={() => setMenuOpen(false)}
+            className="site-header-mobile-link"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 400,
+              fontSize: "16px",
+              letterSpacing: "0.02em",
+              color: "rgba(215,210,240,0.82)",
+              textDecoration: "none",
+              padding: "14px 0",
+              borderBottom: "0.5px solid rgba(255,255,255,0.05)",
+              transition: "color 200ms ease",
+            }}
+          >
+            {item.label}
+          </Link>
+        ))}
+
+        <div
+          style={{
+            height: "0.5px",
+            background: "rgba(255,255,255,0.08)",
+            margin: "16px 0",
+          }}
+        />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <SiteHeaderAuthControls
+            mobile
+            isSignedIn={isSignedIn}
+            onNavigate={() => setMenuOpen(false)}
+          />
+        </div>
+      </nav>
+    </div>
+  );
 
   return (
     <>
@@ -57,71 +126,7 @@ export default function SiteHeaderMobileMenu({
         {menuOpen ? "×" : "≡"}
       </button>
 
-      {/* Mobile dropdown */}
-      <div
-        className="md:hidden"
-        style={{
-          position: "fixed",
-          top: "80px",
-          left: 0,
-          right: 0,
-          zIndex: 2,
-          overflow: "hidden",
-          maxHeight: menuOpen ? "480px" : "0",
-          transition: "max-height 0.42s cubic-bezier(0.22,1,0.36,1)",
-          pointerEvents: menuOpen ? "auto" : "none",
-          background: "rgba(9,13,20,0.96)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-        }}
-      >
-        <nav
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            padding: "8px 24px 28px",
-            borderTop: "0.5px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setMenuOpen(false)}
-              className="site-header-mobile-link"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: "16px",
-                letterSpacing: "0.02em",
-                color: "rgba(215,210,240,0.82)",
-                textDecoration: "none",
-                padding: "14px 0",
-                borderBottom: "0.5px solid rgba(255,255,255,0.05)",
-                transition: "color 200ms ease",
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-
-          <div
-            style={{
-              height: "0.5px",
-              background: "rgba(255,255,255,0.08)",
-              margin: "16px 0",
-            }}
-          />
-
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <SiteHeaderAuthControls
-              mobile
-              isSignedIn={isSignedIn}
-              onNavigate={() => setMenuOpen(false)}
-            />
-          </div>
-        </nav>
-      </div>
+      {mounted && createPortal(drawer, document.body)}
     </>
   );
 }
