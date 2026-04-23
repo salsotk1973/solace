@@ -184,7 +184,6 @@ Rationale: free tools (friction-free) surface immediately after hero. AI tools (
 - **Mobile: pill wrapper visible** — "Editor's pick" pill shows on mobile (Spec 08). No hide rules.
 
 #### LabSecondaryCard (cards 2 + 3) — `components/home/LabSecondaryCard.tsx`
-- New component created this session
 - Padding: `20px 22px`, border-radius: `16px`
 - Title: `20px` Cormorant, `lineHeight: 1.2`
 - Pill: `3px 10px` padding, category label
@@ -209,7 +208,7 @@ Rationale: free tools (friction-free) surface immediately after hero. AI tools (
 - **SOLACE wordmark added below bottom bar** (Spec 05): Cormorant Garamond, `18px`, `letterSpacing: 0.32em`, `color: rgba(255,255,255,0.12)`, centered. Hidden on mobile via `footer-desktop-wordmark { display: none !important }` in mobile media query (mobile has its own 0.55 opacity wordmark).
 - Desktop 3-column grid (PRODUCT / LEARN / LEGAL) unchanged.
 
-### Mobile spacing token cheat sheet (updated this session)
+### Mobile spacing token cheat sheet
 
 | Element | Mobile value | Desktop value |
 |---|---|---|
@@ -231,14 +230,13 @@ Rationale: free tools (friction-free) surface immediately after hero. AI tools (
 
 ---
 
-## Mobile Homepage — LOCKED ✅ (Apr 2026, updated Apr 2026)
+## Mobile Homepage — LOCKED ✅ (Apr 2026)
 
 **Both mobile and desktop homepage audits complete. Homepage is locked.**
 
-### Hero (mobile — updated this session)
+### Hero (mobile)
 - **`pt-[18vh]`** (was `pt-[12vh]`) — more breathing room below nav on real iPhone
 - **Hairline divider between hero and FREE START HERE removed** (Spec 09) — was `md:hidden h-px w-16`, read as visual artifact
-- All other mobile hero values unchanged from prior mobile audit
 
 ### Lab Cards (mobile)
 - All 3 cards stack vertically: Editor's Pick first, then 2 secondaries
@@ -282,7 +280,92 @@ Mobile footer structure (top to bottom):
 
 ---
 
-## Process Lessons (updated Apr 2026 — Desktop Homepage + Tools Page audits)
+## Lab Landing Page — LOCKED ✅ (Apr 2026)
+
+**Mobile audit completed in 3 rounds (R1-R3). Lab landing page (`/lab`) is locked on both breakpoints. Desktop was always good — mobile required structural rebuild.**
+
+### Mobile Lab Landing — what shipped (R1 + R2 + R3)
+
+#### LabSecondaryCard (mobile — scoped overrides)
+- **Eyebrow:** Plain small-caps label (no pill chrome) — `font-size: 11px`, `letter-spacing: 0.18em`, `text-transform: uppercase`, color = category accent (teal/gold/violet from design-tokens)
+- **No background, no border, no padding-as-pill** on mobile — just text. Saves ~20px vertical per card.
+- **Title:** Reduced from desktop 20px to mobile size that fits long titles in 1-2 lines (Cormorant)
+- **Excerpt:** `display: none` on mobile — dropped entirely (excerpts answer the curiosity gap and slow click-through; titles do the work)
+- **Reading time ("X MIN READ"):** `display: none` on mobile — metadata, not hierarchy. Wrapper hidden too (lesson 15)
+- **Padding:** `14px 18px 14px` (matches Tools ToolCard mobile)
+- **`min-height: auto`** on mobile — overrides desktop calibration (lesson 19)
+
+#### FeaturedLabCard (Editor's Pick — mobile scoped overrides)
+- **One pill only:** "Editor's Pick" — category pill removed (lesson 17 — pill IS the hierarchy signal)
+- **Excerpt:** Kept on mobile (Editor's Pick is editorial — its job is to persuade, not just scan)
+- **Excerpt color:** `rgba(255,255,255,0.80)` — body text floor
+- **Reading time:** `display: none` on mobile — consistent with secondary cards (R3 decision)
+- **Padding:** `14px 18px 14px` mobile (matches secondary cards)
+- **Desktop:** unchanged
+
+#### Closing CTA section ("These ideas come to life in the tools.")
+- **Mobile padding-top:** Reduced from desktop-calibrated value to ~48-64px — eliminated viewport-sized dead space between "BROWSE ALL ARTICLES →" and the closing eyebrow
+- **Body text "Eight tools for breathing, focus, sleep, decisions, and AI-powered reflection."** — color `rgba(255,255,255,0.80)` body floor, `14px` minimum, `line-height: 1.5-1.6`
+- **Stale copy fix (R1):** Was "Nine tools for breathing, focus, sleep, thought reframing, and AI-powered reflection." Thought Reframer removed Apr 2026. Now reads "Eight tools..." with "decisions" replacing "thought reframing" (covers Choose + Break It Down — reinforces paid-tier value prop)
+
+#### Weekly Dispatch newsletter section
+- **Body text "No noise. One piece of honest writing about how we think and feel — straight to your inbox."** — color `rgba(255,255,255,0.80)` body floor on mobile
+- **Email input placeholder ("enter your email"):** `color: rgba(255,255,255,0.65)`, `font-size: 14px` — applied globally (mobile + desktop) — placeholder readability isn't viewport-specific
+
+#### "BROWSE ALL ARTICLES →" link
+- Mobile readability: `rgba(255,255,255,0.65)` minimum, 12px minimum
+- Mobile spacing: tight to cards above (24-32px gap)
+
+### Lab landing — what stayed unchanged
+- Hero ("Understand yourself / a little better.") — mobile + desktop
+- Newsletter form layout
+- All desktop styling — entirely untouched (except global placeholder color and stale copy fix)
+
+### Lab landing — design rationale (locked)
+- Editor's Pick = editorial hero. Keeps excerpt + larger card. Job: persuade.
+- Secondary cards = scan. No excerpt, no reading time on mobile. Job: title-driven click-through.
+- Curiosity gap principle: titles unanswered = clicks. Excerpts that answer = bounces.
+- Pattern matches NYT, Atlantic, Stratechery on mobile — listings are denser than feature pages.
+
+---
+
+## Lab Archive Page — LOCKED ✅ (Apr 2026)
+
+**Mobile audit shipped. Lab archive page (`/lab/archive`) is locked on both breakpoints. Desktop was perfect — only mobile changed.**
+
+### ArchiveCard (mobile — scoped overrides, more compact than Lab landing secondary)
+- **Eyebrow:** Plain small-caps label (no pill chrome) — same as Lab landing pattern
+- **`margin-bottom: 8px`** below eyebrow (tighter than Lab landing's 12px — Archive is denser)
+- **Reading time ("X MIN READ"):** `display: none` on mobile (consistent with Lab landing)
+- **Title:** Mobile-specific font-size to fit all titles in max 2 lines (smaller than Lab landing if needed)
+- **Padding:** `12px 16px 12px` (tighter than Lab landing's `14px 18px 14px`)
+- **`min-height: auto`** on mobile (lesson 19)
+- **Border-radius:** `14px` mobile (slightly tighter than landing)
+- **Card gap:** `12px` between cards mobile (down from desktop 16-24px)
+
+### Hero, filter pills, "← LAB" back link
+- All unchanged — looked good in audit, no changes needed
+- Filter pills (`All / Calm your state / Think clearly / Notice what's good`) intentionally KEEP their pill chrome — they're interactive controls, not passive metadata. Different visual treatment from card category labels is correct (lesson 24).
+
+### Archive — design rationale (locked)
+**Archive is reference, not browse.** Different job-to-be-done from Lab landing:
+- **Landing:** Editorial discovery. Hero + curated 6 secondaries. "Show me what's interesting."
+- **Archive:** Index. All 15 articles. "Scan, filter, find, click."
+
+Therefore archive cards are MORE compact than landing cards even though they share the design system. Visual hierarchy via:
+- Smaller cards = more visible per scroll = faster scanning (target: 3-4 cards per mobile viewport)
+- Same colour system (Calm/Clarity/Decide) = users can colour-scan if they remember a category
+- Plain labels (no pill chrome) = cleaner, more list-like, less marketing-card feel
+
+This pattern matches editorial archive UIs (NYT archive, Atlantic archive) — listings are denser than feature pages, and within listings, archives are denser than landings.
+
+### Density target (achieved)
+- ~3-4 cards visible per mobile viewport (up from ~1.2 pre-fix)
+- ~5 swipes to scan all 15 articles (down from ~13 pre-fix)
+
+---
+
+## Process Lessons
 
 ### From prior mobile audit (retained)
 1–10: [all prior lessons retained — see previous version]
@@ -302,7 +385,7 @@ Solace nav = 80px fixed. To give the headline 120px of visual air below the nav,
 The 1+2 magazine layout (hero col-span-2, 2 secondaries stacked) required 7 specs to debug because the hero card kept having height mismatches, fill problems, and alignment issues. The final decision (3 equal columns) resolved all of them in one spec. When in doubt: equal columns. Reserve asymmetric layouts for when content genuinely has different hierarchy needs.
 
 #### 15. Don't hide elements — hide their wrapper too
-Hiding a pill with `display: none` but leaving its wrapper div with `marginBottom: 24px` creates a visible empty gap. Always hide the wrapper, not just the content inside it. (Spec 07 → Spec 08 lesson.)
+Hiding a pill with `display: none` but leaving its wrapper div with `marginBottom: 24px` creates a visible empty gap. Always hide the wrapper, not just the content inside it.
 
 #### 16. `backdrop-filter: blur()` causes bleed-through on gradient backgrounds
 Any page with complex background gradients (like the homepage radial system) will show a visible smudge where a blurred element overlaps. The blur samples and amplifies the gradient colours. Solution: remove backdrop blur from elements that sit over gradient backgrounds.
@@ -323,6 +406,20 @@ Body `14px / line-height 1.72` reads fine in a 320px-wide desktop card. In a 311
 
 #### 21. SEO essays: `hidden md:block` keeps DOM, hides visual
 When a page needs an SEO essay (long-tail keywords, tool context) but the essay clutters mobile UX, `hidden md:block` is the correct pattern. Google's mobile-first indexer reads the source HTML, not the rendered viewport — the essay is indexed regardless of visibility. Mobile users get a clean page, Google gets the content. Never `remove` SEO content to improve mobile UX.
+
+### Lessons from Lab landing + Lab archive mobile audits (Apr 2026)
+
+#### 22. Card density follows job-to-be-done, not design-system uniformity
+Lab landing secondary cards and Lab archive cards share the same content model (article preview), the same colour system, and live on related pages. But they have different jobs: landing = editorial discovery, archive = index/scan. Density should follow job, not design-system consistency. Archive cards are MORE compact than landing cards on purpose. Never enforce visual uniformity at the cost of usability — the design system serves the job, not the other way around.
+
+#### 23. Editorial cards keep their excerpt; scan cards drop it
+Excerpt copy on a card answers the curiosity gap that the title creates. On editorial/hero cards (Editor's Pick) where the job is persuasion, the excerpt earns its space. On scan cards (secondary cards on a listing, archive cards) where the job is title-driven click-through, the excerpt slows the user and reduces clicks. The unanswered question drives the click. Drop excerpts on scan-mode cards; keep them on persuade-mode cards.
+
+#### 24. Filled pills = interactive control. Plain labels = passive metadata.
+The Lab archive filter pills (`All / Calm your state / Think clearly / Notice what's good`) keep their filled pill shape because they're tappable controls — the pill shape signals "I am a toggle." The card category labels (`CALM YOUR STATE` on a card) drop the pill chrome on mobile because they're passive metadata, not interactive. Same visual element, different jobs, different correct treatment. Don't enforce visual consistency between elements that have different interaction roles.
+
+#### 25. Diagnose before you fix — open DevTools when a CSS issue is mysterious
+The "dead space between BROWSE ALL ARTICLES and the closing CTA" issue persisted across two rounds of fixing because the spec said "find the culprit" without forcing actual diagnostic inspection. When a layout issue isn't responding to fixes, the spec must require Claude Code to open DevTools, inspect the element tree, identify the actual offending property/value, and only then write the override. Saves rounds of guessing. The diagnostic step is not optional.
 
 ---
 
@@ -434,6 +531,8 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 
 - [x] **Desktop homepage audit** — ✅ COMPLETE Apr 2026
 - [x] **Tools page mobile audit** — ✅ COMPLETE Apr 2026
+- [x] **Lab landing mobile audit** — ✅ COMPLETE Apr 2026 (R1+R2+R3)
+- [x] **Lab archive mobile audit** — ✅ COMPLETE Apr 2026
 - [ ] **BreathingOrb flicker** — needs local interactive debugging. Do not attempt via specs.
 - [ ] **Mood Tracker** — apply Breathing benchmark
 - [ ] **Gratitude Log** — apply Breathing benchmark
@@ -459,9 +558,11 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 | Home (desktop) | ✅ LOCKED Apr 2026 |
 | Tools (mobile) | ✅ LOCKED Apr 2026 |
 | Tools (desktop) | ✅ |
+| Lab landing (mobile) | ✅ LOCKED Apr 2026 |
+| Lab landing (desktop) | ✅ LOCKED Apr 2026 |
+| Lab archive (mobile) | ✅ LOCKED Apr 2026 |
+| Lab archive (desktop) | ✅ LOCKED Apr 2026 |
 | Pricing | ✅ A$9/A$79 |
-| Lab | ✅ 15 articles |
-| Lab Archive | ✅ |
 | About | ✅ |
 | Principles | ✅ |
 | Privacy | ✅ |
@@ -500,8 +601,10 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - No `page.tsx` edits needed when publishing new articles (except updating `FEATURED_LAB.slug` for Editor's Pick changes)
 - MDX frontmatter **required fields** for homepage display: `title`, `slug`, `category`, `excerpt`, `readingTime`, `publishedAt`
 
-### New components (this session)
-- `components/home/LabSecondaryCard.tsx` — secondary Lab card for homepage. Per-instance scoped hover classes. Requires `excerpt` field.
+### Components
+- `components/home/LabSecondaryCard.tsx` — secondary Lab card for homepage. Per-instance scoped hover classes. Mobile-scoped overrides documented in Lab Landing section.
+- `components/home/FeaturedLabCard.tsx` — Editor's Pick card for homepage. Mobile-scoped overrides documented in Lab Landing section.
+- Lab archive card component — mobile-scoped overrides documented in Lab Archive section.
 
 ---
 
@@ -532,6 +635,10 @@ Flicker on phase transitions caused by React `useState` re-renders. Multiple rew
 - **Hero `pt` on fixed-nav pages = nav-height + intended-air** (lesson 13)
 - **Mobile `min-height` must override desktop — never inherit** (lesson 19)
 - **SEO essays use `hidden md:block` — never remove DOM content to clean mobile UX** (lesson 21)
+- **Card density follows job-to-be-done, not design-system uniformity** (lesson 22) — archive cards are denser than landing cards by design
+- **Editorial cards keep excerpts; scan cards drop them** (lesson 23) — Editor's Pick keeps excerpt, secondary/archive cards don't
+- **Filled pills = interactive controls. Plain labels = passive metadata.** (lesson 24) — never enforce visual uniformity between elements with different interaction roles
+- **Diagnose before fixing — open DevTools when a layout issue is mysterious** (lesson 25) — diagnostic step is not optional
 
 ---
 
