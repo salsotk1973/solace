@@ -62,8 +62,8 @@ export default async function SiteHeader() {
           style={{
             position: "absolute",
             top: 0,
-            left: "max(24px, calc(50% - 696px))",
-            right: "max(24px, calc(50% - 696px))",
+            left: "max(0px, calc(50% - 696px))",
+            right: "max(0px, calc(50% - 696px))",
             height: "80px",
             background:
               "linear-gradient(180deg, rgba(9,13,20,0.85) 0%, rgba(9,13,20,0.60) 50%, rgba(9,13,20,0.0) 100%)",
