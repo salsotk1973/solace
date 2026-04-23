@@ -54,6 +54,10 @@ export default function ToolCard({
           .tool-card-hover-row {
             display: none !important;
           }
+          .tool-card-description {
+            font-size: 13px !important;
+            line-height: 1.5 !important;
+          }
         }
       `}</style>
     <Link
@@ -147,6 +151,7 @@ export default function ToolCard({
 
       {/* Description */}
       <p
+        className="tool-card-description"
         style={{
           fontFamily: "var(--font-jost, 'Jost', sans-serif)",
           fontWeight: 300,
