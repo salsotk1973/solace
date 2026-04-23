@@ -61,12 +61,6 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           .featured-lab-card-link {
             padding: 22px 22px;
           }
-          .featured-lab-pill-editors-pick {
-            display: none !important;
-          }
-          .featured-lab-pill-wrapper {
-            display: none !important;
-          }
         }
       `}</style>
       <div
