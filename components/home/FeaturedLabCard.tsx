@@ -59,7 +59,13 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
         }
         @media (max-width: 640px) {
           .featured-lab-card-link {
-            padding: 22px 22px;
+            padding: 14px 18px 14px !important;
+          }
+          .featured-lab-excerpt {
+            color: rgba(255, 255, 255, 0.80) !important;
+          }
+          .featured-lab-reading-time {
+            color: rgba(255, 255, 255, 0.65) !important;
           }
         }
       `}</style>
@@ -127,6 +133,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
             </h2>
 
             <p
+              className="featured-lab-excerpt"
               style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 300,
@@ -142,6 +149,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px" }}>
               <span
+                className="featured-lab-reading-time"
                 style={{
                   fontFamily: "'Jost', sans-serif",
                   fontWeight: 400,

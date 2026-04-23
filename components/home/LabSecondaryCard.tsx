@@ -54,6 +54,29 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
             border-color: rgba(${_rgb},0.28);
           }
         }
+        @media (max-width: 767px) {
+          .${scopeClass} {
+            padding: 14px 18px 14px !important;
+            min-height: auto !important;
+          }
+          .${scopeClass} .lab-home-secondary-pill {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            font-size: 11px !important;
+            letter-spacing: 0.18em !important;
+          }
+          .${scopeClass} h3 {
+            font-size: 22px !important;
+          }
+          .${scopeClass} .lab-home-secondary-excerpt {
+            display: none !important;
+          }
+          .${scopeClass} .lab-home-secondary-footer {
+            display: none !important;
+          }
+        }
       `}</style>
       <Link
         href={`/lab/${article.slug}`}
@@ -61,6 +84,7 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
       >
         <div>
           <span
+            className="lab-home-secondary-pill"
             style={{
               ...PILL_BASE,
               background: catBg,
@@ -84,6 +108,7 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
             {article.title}
           </h3>
           <p
+            className="lab-home-secondary-excerpt"
             style={{
               fontFamily: "'Jost', sans-serif",
               fontWeight: 300,
@@ -97,6 +122,7 @@ export default function LabSecondaryCard({ article }: { article: LabSecondaryArt
           </p>
         </div>
         <div
+          className="lab-home-secondary-footer"
           style={{
             display: "flex",
             alignItems: "center",

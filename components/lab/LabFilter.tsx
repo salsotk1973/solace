@@ -74,24 +74,9 @@ const RESPONSIVE_CSS = `
       grid-template-columns: 1fr;
     }
     .lab-article-card {
-      flex-direction: row !important;
-      align-items: flex-start;
-      padding: 20px 18px !important;
-      gap: 16px;
-    }
-    .lab-card-left {
-      display: flex !important;
-      flex-direction: column;
-      flex: 0 0 44%;
-      min-width: 0;
-    }
-    .lab-card-right {
-      display: flex !important;
-      flex-direction: column;
-      flex: 1;
-      min-width: 0;
-      justify-content: flex-start;
-      gap: 8px;
+      flex-direction: column !important;
+      padding: 14px 18px 14px !important;
+      min-height: auto !important;
     }
     .lab-card-excerpt {
       display: none !important;
@@ -100,27 +85,43 @@ const RESPONSIVE_CSS = `
       display: none !important;
     }
     .lab-card-pill-row {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      justify-content: space-between !important;
       margin-bottom: 10px !important;
-      gap: 8px;
     }
     .lab-card-reading-time {
-      display: inline !important;
-      order: 2;
-      flex-shrink: 0;
-      white-space: nowrap;
+      display: none !important;
+    }
+    .lab-card-pill-row > span:first-child {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      font-size: 11px !important;
+      letter-spacing: 0.18em !important;
+    }
+    .lab-article-card h3 {
+      font-size: 22px !important;
     }
     .lab-featured-card-link {
-      padding: 28px 24px !important;
+      padding: 14px 18px 14px !important;
     }
     .lab-featured-card-root {
       margin-bottom: 28px !important;
     }
     .lab-featured-title {
       font-size: 26px !important;
+    }
+    .lab-featured-category-pill {
+      display: none !important;
+    }
+    .lab-featured-excerpt {
+      color: rgba(255, 255, 255, 0.80) !important;
+    }
+    .lab-featured-reading-time {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+    .lab-browse-all {
+      margin-top: 24px;
+      margin-bottom: 48px;
     }
   }
 
@@ -368,7 +369,7 @@ export function FeaturedCard({
           <span style={{ ...PILL_BASE, background: accent.replace('1)', '0.10)'), border: `0.5px solid ${accent.replace('1)', '0.30)')}`, color: accent }}>
             Editor&apos;s pick
           </span>
-          <span style={{ ...PILL_BASE, background: catBg, border: `0.5px solid ${accent.replace('1)', '0.2)')}`, color: accent }}>
+          <span className="lab-featured-category-pill" style={{ ...PILL_BASE, background: catBg, border: `0.5px solid ${accent.replace('1)', '0.2)')}`, color: accent }}>
             {article.category.replace(/-/g, ' ')}
           </span>
         </div>
@@ -392,6 +393,7 @@ export function FeaturedCard({
 
         {/* Excerpt */}
         <p
+          className="lab-featured-excerpt"
           style={{
             fontFamily: "'Jost', sans-serif",
             fontWeight: 300,
@@ -408,6 +410,7 @@ export function FeaturedCard({
         {/* Reading time + animated Read → */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <span
+            className="lab-featured-reading-time"
             style={{
               fontFamily:    "'Jost', sans-serif",
               fontWeight:    400,
@@ -470,7 +473,7 @@ function BrowseAllLink() {
         fontSize:       '12px',
         letterSpacing:  '0.14em',
         textTransform:  'uppercase' as const,
-        color:          hovered ? 'rgba(200,185,255,0.90)' : 'rgba(170,158,220,0.65)',
+        color:          hovered ? 'rgba(200,185,255,0.90)' : 'rgba(255,255,255,0.65)',
         textDecoration: 'none',
         display:        'inline-flex',
         alignItems:     'center',

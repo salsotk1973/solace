@@ -147,7 +147,7 @@ export default function LabPage() {
                 marginRight:'auto',
               }}
             >
-              Nine tools for breathing, focus, sleep, thought reframing, and AI‑powered reflection.
+              Eight tools for breathing, focus, sleep, decisions, and AI‑powered reflection.
             </p>
 
             <LabCtaButton href="/tools" label="Explore the tools" />
