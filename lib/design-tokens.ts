@@ -57,18 +57,22 @@ export const TOOL_CATEGORY: Record<string, CategoryKey> = {
 // Helper: get colour hex for a tool slug
 export function getToolColour(toolSlug: string): string {
   const cat = TOOL_CATEGORY[toolSlug]
-  return cat ? CATEGORY_COLOURS[cat].hex : '#3CC0D4'
+  if (!cat) throw new Error(`getToolColour: unknown toolSlug "${toolSlug}"`)
+  return CATEGORY_COLOURS[cat].hex
 }
 
 // Helper: get rgb string for a tool slug (for rgba usage)
 export function getToolRgb(toolSlug: string): string {
   const cat = TOOL_CATEGORY[toolSlug]
-  return cat ? CATEGORY_COLOURS[cat].rgb : '60, 192, 212'
+  if (!cat) throw new Error(`getToolRgb: unknown toolSlug "${toolSlug}"`)
+  return CATEGORY_COLOURS[cat].rgb
 }
 
 // Helper: get category for a tool slug
 export function getToolCategory(toolSlug: string): CategoryKey {
-  return TOOL_CATEGORY[toolSlug] ?? 'calm'
+  const cat = TOOL_CATEGORY[toolSlug]
+  if (!cat) throw new Error(`getToolCategory: unknown toolSlug "${toolSlug}"`)
+  return cat
 }
 
 // Helper: get colour for a Lab category slug

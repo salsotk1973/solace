@@ -489,7 +489,7 @@ export default function FocusTimer({ userId }: Props) {
 
       {/* Session complete */}
       {allDone && !dismissed && (
-        <SessionComplete isLoggedIn={!!userId} isPaid={history?.isPaid} onDismiss={() => setDismissed(true)} />
+        <SessionComplete onClose={() => setDismissed(true)} />
       )}
 
     </div>

@@ -620,9 +620,7 @@ export default function SleepOrb({ userId }: Props) {
       {/* Session complete — same as Breathing */}
       {sessionComplete && !dismissed && (
         <SessionComplete
-          isLoggedIn={!!userId}
-          isPaid={history?.isPaid}
-          onDismiss={() => setDismissed(true)}
+          onClose={() => setDismissed(true)}
         />
       )}
     </div>

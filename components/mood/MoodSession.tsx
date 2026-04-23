@@ -372,9 +372,7 @@ export default function MoodSession({ userId }: Props) {
       {/* ── Nudge ────────────────────────────────────────────────────────── */}
       {showNudge && !nudgeDismissed && (
         <SessionComplete
-          isLoggedIn={!!userId}
-          isPaid={history?.isPaid}
-          onDismiss={() => setNudgeDismissed(true)}
+          onClose={() => setNudgeDismissed(true)}
         />
       )}
     </>

@@ -2,16 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getToolRgb } from "@/lib/design-tokens";
 
-interface SessionCompleteProps {
-  isLoggedIn: boolean;
-  isPaid?: boolean;
-  onDismiss: () => void;
+// EXPECTED ACCENT: #E8A83E gold (Clarity) — if eyebrow ships teal, this is wrong
+const accent = getToolRgb("gratitude");
+const A = (a: number) => `rgba(${accent}, ${a})`;
+
+const TITLE = "Captured.";
+const BODY_MOBILE = "Save entries and see patterns.";
+const BODY_DESKTOP = "Save entries and build your gratitude record with a free account.";
+
+interface Props {
+  onClose: () => void;
 }
 
-const T = (a: number) => `rgba(60,192,212,${a})`;
+function handleCtaClick(action: "start_free" | "all_tools") {
+  if (typeof window !== "undefined" && (window as any).posthog) {
+    (window as any).posthog.capture("session_complete_cta_clicked", { action });
+  }
+}
 
-export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: SessionCompleteProps) {
+export default function SessionComplete({ onClose }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -27,65 +38,74 @@ export default function SessionComplete({ isLoggedIn, isPaid, onDismiss }: Sessi
         visible ? "translate-y-0" : "translate-y-full",
       ].join(" ")}
       style={{
-        background:           "rgba(6,16,22,0.97)",
-        borderTop:            `2px solid ${T(0.55)}`,
-        backdropFilter:       "blur(20px)",
+        background: "rgba(6,16,22,0.97)",
+        borderTop: `2px solid ${A(0.55)}`,
+        backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
     >
-      <div className="max-w-[720px] mx-auto px-6 py-5">
-
+      <div className="max-w-[720px] mx-auto px-6 py-4 md:px-8 md:py-6">
+        {/* Row 1: eyebrow + close */}
         <div className="flex flex-row items-center justify-between">
           <span
             className="[font-family:var(--font-jost)] text-[11px] tracking-[0.26em] uppercase"
-            style={{ color: T(0.85) }}
+            style={{ color: A(0.85) }}
           >
-            Session complete
+            SESSION COMPLETE
           </span>
           <button
-            onClick={onDismiss}
+            onClick={onClose}
             aria-label="Close"
-            className="text-[22px] leading-none flex items-center justify-center transition-opacity duration-200 cursor-pointer hover:opacity-60"
-            style={{ color: "rgba(255,255,255,0.65)", background: "none", border: "none", padding: "4px 0 4px 8px" }}
+            className="text-[18px] leading-none text-[rgba(255,255,255,0.65)] hover:text-[rgba(255,255,255,0.95)] transition-colors cursor-pointer"
+            style={{ background: "none", border: "none", padding: "4px 0 4px 8px" }}
           >
-            ×
+            ✕
           </button>
         </div>
 
-        <p
-          className="[font-family:var(--font-display)] italic font-light text-[24px] mt-3"
+        {/* Row 2: title */}
+        <h2
+          className="mt-1 [font-family:var(--font-display)] italic font-light text-[22px] md:text-[28px] leading-[1.15]"
           style={{ color: "rgba(255,255,255,0.95)" }}
         >
-          Captured.
-        </p>
+          {TITLE}
+        </h2>
 
+        {/* Row 3: body — full width */}
         <p
-          className="[font-family:var(--font-jost)] text-[14px] leading-[1.5] font-light mt-2"
+          className="mt-1 [font-family:var(--font-jost)] text-[13px] md:text-[14px] leading-[1.5] font-light"
           style={{ color: "rgba(255,255,255,0.80)" }}
         >
-          <span className="md:hidden">Save entries and see patterns.</span>
-          <span className="hidden md:inline">Save entries and build your gratitude record with a free account.</span>
+          <span className="md:hidden">{BODY_MOBILE}</span>
+          <span className="hidden md:inline">{BODY_DESKTOP}</span>
         </p>
 
-        {!isLoggedIn && (
+        {/* Row 4: dual CTA — primary + secondary */}
+        <div className="mt-3 flex flex-row items-center gap-3 max-[349px]:flex-col max-[349px]:items-stretch max-[349px]:gap-2">
           <Link
             href="/sign-up"
-            className="mt-4 inline-flex items-center justify-center px-6 py-2.5 [font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase rounded-full transition-colors"
-            style={{ color: "rgba(60,192,212,0.95)", border: "1px solid rgba(60,192,212,0.60)" }}
+            onClick={() => handleCtaClick("start_free")}
+            className="inline-flex items-center justify-center px-4 py-2 [font-family:var(--font-jost)] text-[10px] tracking-[0.20em] uppercase rounded-full transition-colors"
+            style={{
+              border: `1px solid ${A(0.70)}`,
+              color: A(0.95),
+              backgroundColor: A(0.08),
+            }}
           >
             Start free →
           </Link>
-        )}
-        {isLoggedIn && !isPaid && (
           <Link
-            href="/pricing"
-            className="mt-4 inline-flex items-center justify-center px-6 py-2.5 [font-family:var(--font-jost)] text-[12px] tracking-[0.22em] uppercase rounded-full transition-colors"
-            style={{ color: "rgba(60,192,212,0.95)", border: "1px solid rgba(60,192,212,0.60)" }}
+            href="/tools"
+            onClick={() => handleCtaClick("all_tools")}
+            className="inline-flex items-center justify-center px-4 py-2 [font-family:var(--font-jost)] text-[10px] tracking-[0.20em] uppercase rounded-full transition-colors"
+            style={{
+              border: `1px solid ${A(0.35)}`,
+              color: A(0.70),
+            }}
           >
-            Unlock full history →
+            All tools →
           </Link>
-        )}
-
+        </div>
       </div>
     </div>
   );
