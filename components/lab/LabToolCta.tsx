@@ -63,6 +63,13 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
             transform: translateY(-1px);
           }
         }
+        @media (max-width: 360px) {
+          .${btnClass} {
+            font-size: 11px !important;
+            padding: 9px 18px !important;
+            letter-spacing: 0.10em !important;
+          }
+        }
       `}</style>
 
       <div
@@ -152,6 +159,8 @@ export default function LabToolCta({ label, href, category, toolSlug, subtitle }
             textTransform:  'uppercase',
             color:          accent,
             textDecoration: 'none',
+            whiteSpace:     'nowrap',
+            maxWidth:       '100%',
           }}
         >
           {label} →
