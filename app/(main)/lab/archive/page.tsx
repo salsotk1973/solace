@@ -88,11 +88,13 @@ export default function LabArchivePage() {
         </section>
 
         {/* Filter + Grid */}
-        <section style={{
-          width:     '100%',
-          padding:   '0 40px 100px',
-          boxSizing: 'border-box',
-        }}>
+        <section
+          className="px-4 pb-16 md:px-10 md:pb-[100px]"
+          style={{
+            width:     '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <LabArchiveFilter articles={articles} />
           </div>
