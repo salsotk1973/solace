@@ -44,11 +44,24 @@ export default function ToolCard({
   const shadow       = `0 12px 60px ${glass(colour, 0.18)}`
 
   return (
+    <>
+      <style>{`
+        @media (max-width: 767px) {
+          .tool-card-link {
+            padding: 18px 18px 18px !important;
+            min-height: auto !important;
+          }
+          .tool-card-hover-row {
+            display: none !important;
+          }
+        }
+      `}</style>
     <Link
       href={href}
       prefetch={false}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="tool-card-link"
       style={{
         position:             "relative",
         display:              "flex",
@@ -150,6 +163,7 @@ export default function ToolCard({
 
       {/* Bottom row — "Begin ›" appears only on hover */}
       <div
+        className="tool-card-hover-row"
         style={{
           marginTop:  "28px",
           paddingTop: "16px",
@@ -190,5 +204,6 @@ export default function ToolCard({
         </span>
       </div>
     </Link>
+    </>
   )
 }
