@@ -64,6 +64,9 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           .featured-lab-pill-editors-pick {
             display: none !important;
           }
+          .featured-lab-pill-wrapper {
+            display: none !important;
+          }
         }
       `}</style>
       <div
@@ -101,7 +104,7 @@ export default function FeaturedLabCard({ article }: { article: FeaturedLabArtic
           />
 
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+            <div className="featured-lab-pill-wrapper" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
               <span
                 className="featured-lab-pill-editors-pick"
                 style={{
