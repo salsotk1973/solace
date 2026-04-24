@@ -54,25 +54,53 @@ export const TOOL_CATEGORY: Record<string, CategoryKey> = {
   breakdown: 'decide',
 }
 
+// Direct tool → RGB lookup (covers tool slugs + category aliases)
+const TOOL_RGB: Record<string, string> = {
+  // Calm category
+  breathing: '60, 192, 212',
+  sleep:     '60, 192, 212',
+  // Clarity category
+  focus:     '232, 168, 62',
+  mood:      '232, 168, 62',
+  gratitude: '232, 168, 62',
+  clear:     '232, 168, 62',
+  // Decide category
+  choose:    '124, 111, 205',
+  breakdown: '124, 111, 205',
+  // Category aliases
+  calm:      '60, 192, 212',
+  clarity:   '232, 168, 62',
+  decide:    '124, 111, 205',
+}
+
+const NEUTRAL_FALLBACK = '180, 180, 180'
+
+// Helper: get rgb string for a tool slug (for rgba usage)
+// NEVER throws — warns in dev, returns neutral grey in prod
+export function getToolRgb(key: string): string {
+  const val = TOOL_RGB[key]
+  if (val) return val
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(`[getToolRgb] Unknown key "${key}". Add it to TOOL_RGB in lib/design-tokens.ts.`)
+  }
+  return NEUTRAL_FALLBACK
+}
+
 // Helper: get colour hex for a tool slug
 export function getToolColour(toolSlug: string): string {
   const cat = TOOL_CATEGORY[toolSlug]
-  if (!cat) throw new Error(`getToolColour: unknown toolSlug "${toolSlug}"`)
+  if (!cat) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`[getToolColour] Unknown toolSlug "${toolSlug}".`)
+    }
+    return '#B4B4B4'
+  }
   return CATEGORY_COLOURS[cat].hex
-}
-
-// Helper: get rgb string for a tool slug (for rgba usage)
-export function getToolRgb(toolSlug: string): string {
-  const cat = TOOL_CATEGORY[toolSlug]
-  if (!cat) throw new Error(`getToolRgb: unknown toolSlug "${toolSlug}"`)
-  return CATEGORY_COLOURS[cat].rgb
 }
 
 // Helper: get category for a tool slug
 export function getToolCategory(toolSlug: string): CategoryKey {
-  const cat = TOOL_CATEGORY[toolSlug]
-  if (!cat) throw new Error(`getToolCategory: unknown toolSlug "${toolSlug}"`)
-  return cat
+  return TOOL_CATEGORY[toolSlug] ?? 'calm'
 }
 
 // Helper: get colour for a Lab category slug
