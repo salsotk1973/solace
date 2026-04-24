@@ -273,8 +273,7 @@ export default function BreathingSession({ userId }: Props) {
               style={{
                 borderColor: T(0.14),
                 background:  T(0.03),
-                borderTop:   historyOpen ? "none" : undefined,
-                borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
+                ...(historyOpen ? { borderTop: "none", borderRadius: "0 0 14px 14px" } : {}),
               }}
             >
               <p

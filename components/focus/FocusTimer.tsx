@@ -69,6 +69,14 @@ export default function FocusTimer({ userId }: Props) {
     else setSoundEnabled(true); // Clear any stale state
   }, []);
 
+  // ── Enforce silent-loop element is truly muted on mount ──────────────────
+  useEffect(() => {
+    if (silentAudioRef.current) {
+      silentAudioRef.current.volume = 0;
+      silentAudioRef.current.muted = true;
+    }
+  }, []);
+
   // ── Prefetch raw audio on mount (no AudioContext — defer to first gesture) ──
   useEffect(() => {
     async function prefetch() {
@@ -139,6 +147,7 @@ export default function FocusTimer({ userId }: Props) {
   function startSilentLoop() {
     if (!silentAudioRef.current) return;
     silentAudioRef.current.volume = 0;
+    silentAudioRef.current.muted = true;
     silentAudioRef.current.play().catch(() => {});
   }
 
@@ -267,7 +276,7 @@ export default function FocusTimer({ userId }: Props) {
     <div className="flex flex-col items-center w-full">
 
       {/* iOS silent-mode override: keeps Web Audio audible even with mute switch engaged */}
-      <audio ref={silentAudioRef} src="/audio/silent-loop.mp3" loop preload="auto" playsInline style={{ display: "none" }} />
+      <audio ref={silentAudioRef} src="/audio/silent-loop.mp3" loop muted preload="auto" playsInline style={{ display: "none" }} />
 
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
@@ -502,8 +511,7 @@ export default function FocusTimer({ userId }: Props) {
               style={{
                 borderColor: A(0.14),
                 background: A(0.03),
-                borderTop: historyOpen ? "none" : undefined,
-                borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
+                ...(historyOpen ? { borderTop: "none", borderRadius: "0 0 14px 14px" } : {}),
               }}
             >
               <p className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center" style={{ color: "rgba(255,255,255,0.80)" }}>
