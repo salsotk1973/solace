@@ -40,7 +40,11 @@ export default function FocusTimer({ userId }: Props) {
   const remainingRef = useRef(remaining);
   const workDoneRef  = useRef(workDone);
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const audioCtxRef  = useRef<AudioContext | null>(null);
+  const audioCtxRef    = useRef<AudioContext | null>(null);
+  const silentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const focusArrRef    = useRef<ArrayBuffer | null>(null);
+  const restArrRef     = useRef<ArrayBuffer | null>(null);
+  const doneArrRef     = useRef<ArrayBuffer | null>(null);
   const focusBufferRef = useRef<AudioBuffer | null>(null);
   const restBufferRef  = useRef<AudioBuffer | null>(null);
   const doneBufferRef  = useRef<AudioBuffer | null>(null);
@@ -65,35 +69,30 @@ export default function FocusTimer({ userId }: Props) {
     else setSoundEnabled(true); // Clear any stale state
   }, []);
 
-  // ── Preload audio files ───────────────────────────────────────────────────
+  // ── Prefetch raw audio on mount (no AudioContext — defer to first gesture) ──
   useEffect(() => {
-    let ctx: AudioContext;
-    async function load() {
+    async function prefetch() {
       try {
-        ctx = new AudioContext();
-        audioCtxRef.current = ctx;
-        const [focusRes, restRes, doneRes] = await Promise.all([
+        const [fr, rr, dr] = await Promise.all([
           fetch("/sounds/focus-start.mp3"),
           fetch("/sounds/rest-start.mp3"),
           fetch("/sounds/session-done.mp3"),
         ]);
-        const [focusArr, restArr, doneArr] = await Promise.all([
-          focusRes.arrayBuffer(),
-          restRes.arrayBuffer(),
-          doneRes.arrayBuffer(),
+        const [fa, ra, da] = await Promise.all([
+          fr.arrayBuffer(), rr.arrayBuffer(), dr.arrayBuffer(),
         ]);
-        const [focusBuf, restBuf, doneBuf] = await Promise.all([
-          ctx.decodeAudioData(focusArr),
-          ctx.decodeAudioData(restArr),
-          ctx.decodeAudioData(doneArr),
-        ]);
-        focusBufferRef.current = focusBuf;
-        restBufferRef.current  = restBuf;
-        doneBufferRef.current  = doneBuf;
+        focusArrRef.current = fa;
+        restArrRef.current  = ra;
+        doneArrRef.current  = da;
       } catch {}
     }
-    void load();
-    return () => { try { ctx?.close(); } catch {} };
+    void prefetch();
+    return () => {
+      silentAudioRef.current?.pause();
+      if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
+        audioCtxRef.current.close().catch(() => {});
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -115,6 +114,47 @@ export default function FocusTimer({ userId }: Props) {
       source.start(ctx.currentTime);
     } catch {}
   }, [soundEnabled]);
+
+  // ── iOS audio unlock helpers ──────────────────────────────────────────────
+
+  function getAudioCtx(): AudioContext {
+    if (!audioCtxRef.current) {
+      const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      audioCtxRef.current = new Ctx();
+    }
+    if (audioCtxRef.current.state === "suspended") {
+      void audioCtxRef.current.resume();
+    }
+    return audioCtxRef.current;
+  }
+
+  function unlockIOSAudio(ctx: AudioContext) {
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start(0);
+  }
+
+  function startSilentLoop() {
+    if (!silentAudioRef.current) return;
+    silentAudioRef.current.volume = 0;
+    silentAudioRef.current.play().catch(() => {});
+  }
+
+  async function ensureBuffersDecoded(ctx: AudioContext) {
+    if (focusBufferRef.current) return;
+    try {
+      const [fb, rb, db] = await Promise.all([
+        focusArrRef.current ? ctx.decodeAudioData(focusArrRef.current.slice(0)) : null,
+        restArrRef.current  ? ctx.decodeAudioData(restArrRef.current.slice(0))  : null,
+        doneArrRef.current  ? ctx.decodeAudioData(doneArrRef.current.slice(0))  : null,
+      ]);
+      if (fb) focusBufferRef.current = fb;
+      if (rb) restBufferRef.current  = rb;
+      if (db) doneBufferRef.current  = db;
+    } catch {}
+  }
 
   // ── History ───────────────────────────────────────────────────────────────
   const { history, loadHistory, shouldShowUpgradePrompt } = useToolHistory("focus", userId);
@@ -165,11 +205,12 @@ export default function FocusTimer({ userId }: Props) {
   }, [isRunning, phaseIdx, playSound]);
 
   // ── Controls ──────────────────────────────────────────────────────────────
-  function handleTap() {
+  async function handleTap() {
     if (!started) {
-      if (audioCtxRef.current?.state === "suspended") {
-        audioCtxRef.current.resume();
-      }
+      const ctx = getAudioCtx();
+      unlockIOSAudio(ctx);
+      startSilentLoop();
+      await ensureBuffersDecoded(ctx);
       setStarted(true);
       setIsRunning(true);
       playSound(focusBufferRef.current);
@@ -225,13 +266,20 @@ export default function FocusTimer({ userId }: Props) {
   return (
     <div className="flex flex-col items-center w-full">
 
+      {/* iOS silent-mode override: keeps Web Audio audible even with mute switch engaged */}
+      <audio ref={silentAudioRef} src="/audio/silent-loop.mp3" loop preload="auto" playsInline style={{ display: "none" }} />
+
       {/* Mode selector */}
       <ModeSelector disabled={started && !allDone} />
 
       {/* Sound toggle — desktop only, above phase label */}
       <div className="hidden md:flex justify-center w-full mb-4">
         <button
-          onClick={() => setSoundEnabled(s => !s)}
+          onClick={() => {
+            const enabling = !soundEnabled;
+            setSoundEnabled(enabling);
+            if (enabling) { const ctx = getAudioCtx(); unlockIOSAudio(ctx); startSilentLoop(); }
+          }}
           className="[font-family:var(--font-jost)] text-[11px] tracking-[0.22em] uppercase cursor-pointer transition-all duration-200 flex items-center gap-2 px-6 py-2.5 rounded-full"
           style={{
             color: soundEnabled ? A(1.0) : A(0.45),
@@ -277,7 +325,11 @@ export default function FocusTimer({ userId }: Props) {
 
         {/* Sound toggle — mobile only, absolutely right of circle */}
         <button
-          onClick={() => setSoundEnabled(s => !s)}
+          onClick={() => {
+            const enabling = !soundEnabled;
+            setSoundEnabled(enabling);
+            if (enabling) { const ctx = getAudioCtx(); unlockIOSAudio(ctx); startSilentLoop(); }
+          }}
           className="absolute md:hidden [font-family:var(--font-jost)] text-[9px] tracking-[0.18em] uppercase cursor-pointer transition-all duration-200 flex flex-col items-center gap-1 px-2 py-2 rounded-full"
           style={{
             left: `calc(100% + 10px)`,
@@ -348,11 +400,10 @@ export default function FocusTimer({ userId }: Props) {
             {/* Tap hint */}
             <span
               className={[
-                "[font-family:var(--font-jost)] tracking-[0.18em] uppercase transition-all duration-500",
+                "[font-family:var(--font-jost)] text-[11px] md:text-[13px] tracking-[0.18em] uppercase transition-all duration-500",
                 !started ? "animate-pulse" : "",
               ].join(" ")}
               style={{
-                fontSize: "9px",
                 color: !started ? "rgba(232,168,62,0.90)" : "rgba(232,168,62,0.55)",
                 textShadow: !started ? "0 0 8px rgba(232,168,62,0.60)" : "none",
               }}
@@ -447,14 +498,12 @@ export default function FocusTimer({ userId }: Props) {
           {/* Content */}
           <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
             <div
-              className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
+              className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px] md:border"
               style={{
-                borderLeft: `1px solid ${A(0.12)}`,
-                borderRight: `1px solid ${A(0.12)}`,
-                borderBottom: `1px solid ${A(0.12)}`,
-                borderTop: historyOpen ? "none" : `1px solid ${A(0.12)}`,
+                borderColor: A(0.14),
                 background: A(0.03),
-                borderRadius: historyOpen ? "0 0 14px 14px" : "14px",
+                borderTop: historyOpen ? "none" : undefined,
+                borderRadius: historyOpen ? "0 0 14px 14px" : undefined,
               }}
             >
               <p className="[font-family:var(--font-jost)] text-[12px] md:text-[13px] font-light leading-relaxed text-center" style={{ color: "rgba(255,255,255,0.80)" }}>

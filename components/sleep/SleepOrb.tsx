@@ -451,11 +451,10 @@ export default function SleepOrb({ userId }: Props) {
             {/* History content — EXACT same structure as Breathing */}
             <div className={`${historyOpen ? "block" : "hidden"} md:block ${historyOpen ? "mb-6" : "mb-4"}`}>
               <div
-                className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px]"
+                className="px-3 py-3 md:px-5 md:py-4 md:rounded-[14px] md:border"
                 style={{
-                  border:     `1px solid ${T(0.12)}`,
-                  background: T(0.03),
-                  // Only remove top border/radius when toggle is open — never affects desktop
+                  borderColor: T(0.14),
+                  background:  T(0.03),
                   ...(historyOpen && {
                     borderTop:    "none",
                     borderRadius: "0 0 14px 14px",
