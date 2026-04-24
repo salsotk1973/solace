@@ -409,7 +409,7 @@ export default function FocusTimer({ userId }: Props) {
             {/* Tap hint */}
             <span
               className={[
-                "[font-family:var(--font-jost)] text-[11px] md:text-[13px] tracking-[0.18em] uppercase transition-all duration-500",
+                "[font-family:var(--font-jost)] text-[10px] md:text-[13px] tracking-[0.18em] uppercase transition-all duration-500",
                 !started ? "animate-pulse" : "",
               ].join(" ")}
               style={{
