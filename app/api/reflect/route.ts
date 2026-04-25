@@ -1,4 +1,23 @@
+/**
+ * LEGACY ENDPOINT — auth-gated mitigation only.
+ *
+ * This endpoint exists for the disabled tool-interface system at
+ * `app/(main)/tools/[slugdisabled]/` (default fallback + decision-filter slug).
+ * The route folder is intentionally named `[slugdisabled]` to disable it
+ * without deleting the code. As of 26 April 2026 the endpoint receives no
+ * traffic from any active Solace UI surface.
+ *
+ * Auth gate added 26 April 2026 to prevent unauthenticated abuse (bot scans
+ * draining OpenAI tokens). Scheduled for full removal post-launch via a
+ * dedicated "remove legacy tool-interface" spec — see Tech Debt section in
+ * solace-master.md.
+ *
+ * DO NOT WIRE NEW FRONTEND CALLERS TO THIS ENDPOINT.
+ * If you need an AI tool, use /api/choose, /api/clear-your-mind, or
+ * /api/break-it-down — or build a new dedicated route.
+ */
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import {
   isSolaceCrisisInput,
@@ -21,6 +40,14 @@ function getOpenAIClient() {
 }
 
 export async function POST(request: Request) {
+  const { userId } = await auth();
+  if (!userId) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = (await request.json()) as ReflectRequestBody;
     const question = body.question?.trim() ?? "";
