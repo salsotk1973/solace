@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Lock } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import AIToolInputSection from "@/components/tools/AIToolInputSection";
+import AuthMessage from "@/components/shared/AuthMessage";
 import { postJsonWithTimeout } from "@/lib/solace/client-request";
 import {
   isSolaceClientTimeoutError,
@@ -320,7 +320,7 @@ export default function ChoosePage() {
   const [redirectTitle, setRedirectTitle] = useState("");
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(false);
-  const [isDailyLimitReached, setIsDailyLimitReached] = useState(false);
+  const [authVariant, setAuthVariant] = useState<'logged-out' | 'quota-exhausted' | null>(null);
   const [showNudge, setShowNudge] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -413,7 +413,7 @@ export default function ChoosePage() {
     setRedirectTitle("");
     setIsButtonReady(false);
     setIsUnavailable(false);
-    setIsDailyLimitReached(false);
+    setAuthVariant(null);
     setOrbState("converging");
 
     const startedAt = Date.now();
@@ -435,6 +435,13 @@ export default function ChoosePage() {
       const toolRedirect = Boolean(data?.isToolRedirect);
 
       if (!res.ok) {
+        if (res.status === 401 || data?.error === "Unauthorized" || data?.error === "auth_required") {
+          setAuthVariant("logged-out");
+          setHasResult(true);
+          setOrbState("settled");
+          return;
+        }
+
         if (data?.error === SOLACE_UNAVAILABLE_ERROR) {
           setIsUnavailable(true);
           setHasResult(true);
@@ -443,7 +450,7 @@ export default function ChoosePage() {
         }
 
         if (data?.error === "daily_limit_reached") {
-          setIsDailyLimitReached(true);
+          setAuthVariant("quota-exhausted");
           setHasResult(true);
           setOrbState("settled");
           return;
@@ -510,6 +517,7 @@ export default function ChoosePage() {
       setIsToolRedirect(false);
       setRedirectTarget(null);
       setRedirectTitle("");
+      setAuthVariant(null);
       setHasResult(true);
       setOrbState("settled");
       setIsButtonReady(false);
@@ -530,7 +538,7 @@ export default function ChoosePage() {
     setRedirectTitle("");
     setIsButtonReady(false);
     setIsUnavailable(false);
-    setIsDailyLimitReached(false);
+    setAuthVariant(null);
     setOrbState("idle");
 
     requestAnimationFrame(() => {
@@ -555,6 +563,7 @@ export default function ChoosePage() {
             <ChooseAlignmentOrb state={orbState} />
           </div>
 
+          {!authVariant && (
           <AIToolInputSection
             onSubmit={handleSubmit}
             formOffsetTop={66}
@@ -598,6 +607,7 @@ export default function ChoosePage() {
               </button>
             }
           />
+          )}
 
           <section className="response-zone" aria-live="polite">
             {isLoading ? (
@@ -626,36 +636,12 @@ export default function ChoosePage() {
                   </button>
                 </div>
               </>
-            ) : isDailyLimitReached ? (
-              <>
-                <div className="response-card">
-                  <div className="response-card-label">Daily session used</div>
-                  <div className="response-copy">
-                    <p className="response-text">
-                      You&apos;ve used your free session for today. Come back tomorrow, or unlock unlimited sessions with Solace Pro.
-                    </p>
-                  </div>
-                  <div style={{ marginTop: "20px", textAlign: "center" }}>
-                    <Link
-                      href="/pricing"
-                      className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(124,111,205,0.80)] border border-[rgba(124,111,205,0.28)] px-5 py-2 rounded-full hover:border-[rgba(124,111,205,0.52)] hover:text-[rgba(124,111,205,1)] transition-all duration-300 inline-block"
-                    >
-                      Unlock unlimited sessions →
-                    </Link>
-                  </div>
-                </div>
-                <div className="actions actions-followup">
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    className="secondary-button"
-                  >
-                    <span className="button-glass-sheen" />
-                    <span className="button-glass-tint" />
-                    <span className="button-label">Try another decision</span>
-                  </button>
-                </div>
-              </>
+            ) : authVariant ? (
+              <AuthMessage
+                toolKey="choose"
+                variant={authVariant}
+                onClose={handleReset}
+              />
             ) : (
               <>
                 <div

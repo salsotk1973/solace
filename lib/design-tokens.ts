@@ -50,8 +50,10 @@ export const TOOL_CATEGORY: Record<string, CategoryKey> = {
   mood: 'clarity',
   gratitude: 'clarity',
   clear: 'clarity',
+  'clear-your-mind': 'clarity',
   choose: 'decide',
   breakdown: 'decide',
+  'break-it-down': 'decide',
 }
 
 // Direct tool → RGB lookup (covers tool slugs + category aliases)
@@ -60,13 +62,15 @@ const TOOL_RGB: Record<string, string> = {
   breathing: '60, 192, 212',
   sleep:     '60, 192, 212',
   // Clarity category
-  focus:     '232, 168, 62',
-  mood:      '232, 168, 62',
-  gratitude: '232, 168, 62',
-  clear:     '232, 168, 62',
+  focus:            '232, 168, 62',
+  mood:             '232, 168, 62',
+  gratitude:        '232, 168, 62',
+  clear:            '232, 168, 62',
+  'clear-your-mind': '232, 168, 62',
   // Decide category
-  choose:    '124, 111, 205',
-  breakdown: '124, 111, 205',
+  choose:          '124, 111, 205',
+  breakdown:       '124, 111, 205',
+  'break-it-down': '124, 111, 205',
   // Category aliases
   calm:      '60, 192, 212',
   clarity:   '232, 168, 62',

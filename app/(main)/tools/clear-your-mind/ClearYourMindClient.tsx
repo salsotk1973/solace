@@ -2,7 +2,6 @@
 
 // /app/tools/clear-your-mind/page.tsx
 
-import Link from "next/link";
 import {
   type CSSProperties,
   FormEvent,
@@ -15,6 +14,7 @@ import {
 import { Lock } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import AIToolInputSection from "@/components/tools/AIToolInputSection";
+import AuthMessage from "@/components/shared/AuthMessage";
 import { submitClearYourMindThoughts } from "@/lib/solace/clear-your-mind/client";
 import { SOLACE_CRISIS_FALLBACK } from "@/lib/solace/safety";
 
@@ -990,8 +990,12 @@ export default function ClearYourMindPage() {
           setIsUnavailable(true);
           return;
         }
-        if (result.error === "upgrade_required" || result.error === "auth_required") {
-          setAccessError(result.error);
+        if (result.error === "Unauthorized" || result.error === "auth_required") {
+          setAccessError("auth_required");
+          return;
+        }
+        if (result.error === "upgrade_required") {
+          setAccessError("upgrade_required");
           return;
         }
         setError(result.error);
@@ -1219,35 +1223,11 @@ export default function ClearYourMindPage() {
               </div>
             </>
           ) : accessError ? (
-            <>
-              <div className="response-card">
-                <div className="response-card-label">
-                  {accessError === "auth_required" ? "Members only" : "Solace Pro"}
-                </div>
-                <div className="response-copy">
-                  <p className="response-text">
-                    {accessError === "auth_required"
-                      ? "Clear Your Mind is available to Solace members. Sign in to continue."
-                      : "Clear Your Mind is a Solace Pro feature. Upgrade to access unlimited sessions."}
-                  </p>
-                </div>
-                <div style={{ marginTop: "20px", textAlign: "center" }}>
-                  <Link
-                    href={accessError === "auth_required" ? "/sign-in" : "/pricing"}
-                    className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(96,192,168,0.80)] border border-[rgba(96,192,168,0.28)] px-5 py-2 rounded-full hover:border-[rgba(96,192,168,0.52)] hover:text-[rgba(96,192,168,1)] transition-all duration-300 inline-block"
-                  >
-                    {accessError === "auth_required" ? "Sign in →" : "Unlock Solace Pro →"}
-                  </Link>
-                </div>
-              </div>
-              <div className="actions actions-followup">
-                <button type="button" onClick={handleReset} className="secondary-button">
-                  <span className="button-glass-sheen" />
-                  <span className="button-glass-tint" />
-                  <span className="button-label">Clear another thought</span>
-                </button>
-              </div>
-            </>
+            <AuthMessage
+              toolKey="clear-your-mind"
+              variant={accessError === "auth_required" ? "logged-out" : "paid-required"}
+              onClose={handleReset}
+            />
           ) : error ? (
             <>
               <div className="response-card">

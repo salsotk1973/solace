@@ -5,6 +5,7 @@ import { Lock } from "lucide-react";
 import { CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import PageShell from "@/components/PageShell";
 import AIToolInputSection from "@/components/tools/AIToolInputSection";
+import AuthMessage from "@/components/shared/AuthMessage";
 import { postJsonWithTimeout } from "@/lib/solace/client-request";
 import {
   isSolaceClientTimeoutError,
@@ -316,8 +317,14 @@ export default function BreakItDownPage() {
           return;
         }
         const errorCode = (data as { error?: string } | null)?.error;
-        if (errorCode === "upgrade_required" || errorCode === "auth_required") {
-          setAccessError(errorCode);
+        if (errorCode === "Unauthorized" || errorCode === "auth_required") {
+          setAccessError("auth_required");
+          setHasResult(true);
+          setOrbPhase("settled");
+          return;
+        }
+        if (errorCode === "upgrade_required") {
+          setAccessError("upgrade_required");
           setHasResult(true);
           setOrbPhase("settled");
           return;
@@ -605,35 +612,11 @@ export default function BreakItDownPage() {
               </div>
             </>
           ) : accessError ? (
-            <>
-              <div className="response-card">
-                <div className="response-card-label">
-                  {accessError === "auth_required" ? "Members only" : "Solace Pro"}
-                </div>
-                <div className="response-copy">
-                  <p className="response-text">
-                    {accessError === "auth_required"
-                      ? "Break It Down is available to Solace members. Sign in to continue."
-                      : "Break It Down is a Solace Pro feature. Upgrade to access unlimited sessions."}
-                  </p>
-                </div>
-                <div style={{ marginTop: "20px", textAlign: "center" }}>
-                  <Link
-                    href={accessError === "auth_required" ? "/sign-in" : "/pricing"}
-                    className="[font-family:var(--font-jost)] text-[11px] tracking-[0.18em] uppercase text-[rgba(124,111,205,0.80)] border border-[rgba(124,111,205,0.28)] px-5 py-2 rounded-full hover:border-[rgba(124,111,205,0.52)] hover:text-[rgba(124,111,205,1)] transition-all duration-300 inline-block"
-                  >
-                    {accessError === "auth_required" ? "Sign in →" : "Unlock Solace Pro →"}
-                  </Link>
-                </div>
-              </div>
-              <div className="actions actions-followup">
-                <button type="button" onClick={handleReset} className="secondary-button">
-                  <span className="button-glass-sheen" />
-                  <span className="button-glass-tint" />
-                  <span className="button-label">Break down something else</span>
-                </button>
-              </div>
-            </>
+            <AuthMessage
+              toolKey="break-it-down"
+              variant={accessError === "auth_required" ? "logged-out" : "paid-required"}
+              onClose={handleReset}
+            />
           ) : (
             <>
               <div
