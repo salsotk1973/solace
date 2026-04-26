@@ -12,11 +12,12 @@ When your mind won't settle, it's hard to think clearly.
 Solace helps you find the next right step — through thought, not noise.
 ```
 
+**Launch date: 15 April 2026.** Solace is LIVE in production with real users. Every change ships to production traffic. Apply post-launch risk discipline to all specs (smallest correct change, mitigate before cleanup, verify deploys against live DOM).
+
 ---
 
 ## Tech Stack
-
-- **Frontend:** Next.js 15, TypeScript, Tailwind CSS
+- **Frontend:** Next.js 15 (Turbopack), TypeScript, Tailwind CSS
 - **Auth:** Clerk
 - **Database:** Supabase (with RLS enabled)
 - **Payments:** Stripe (LIVE mode active)
@@ -30,7 +31,6 @@ Solace helps you find the next right step — through thought, not noise.
 ---
 
 ## Domain & Infrastructure
-
 - **Production domain:** `try-solace.app` (Cloudflare Registrar)
 - **Canonical URL:** `https://www.try-solace.app`
 - **GitHub:** `https://github.com/salsotk1973/solace` — `main` is deploy branch
@@ -88,13 +88,61 @@ Breathing, Sleep Wind-Down (Calm) · Focus Timer, Mood Tracker, Gratitude Log (C
 
 ### The 3 AI Tools
 - **Choose** — Decide (violet) — 1/day free, unlimited paid
-- **Clear Your Mind** — Clarity (gold) — paid only
+- **Clear Your Mind** — **Clarity (GOLD)** — paid only ⚠️ NOT violet — easy mistake
 - **Break It Down** — Decide (violet) — paid only
+
+**TRAP:** "All AI tools = violet" is wrong. Clear Your Mind is gold. Always verify against this table when colour-mapping AI tool components.
 
 ---
 
-## Thought Reframer — REMOVED ✅ (Apr 2026)
-Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard. **All Lab article references cleaned up Apr 2026** (see Lab section).
+## Removed / Deprecated
+
+### Thought Reframer — REMOVED ✅ (Apr 2026)
+Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from design-tokens, middleware, sitemap, FAQ, dashboard. All 15 Lab article references cleaned up.
+
+### `/api/reflect` — Auth-gated legacy endpoint (Apr 2026)
+- Used only by disabled `app/(main)/tools/[slugdisabled]/` via `components/tool-interface/ThreadContainer.tsx`
+- The `[slugdisabled]` folder rename is a Next.js soft-delete pattern — functionally disables the route without deleting code
+- Endpoint receives no traffic from any active Solace UI
+- Auth-gated 26 Apr 2026 to prevent unauthenticated abuse (bot scans draining OpenAI tokens)
+- Defence-in-depth: middleware + in-route `auth()` check
+- LEGACY comment block in `app/api/reflect/route.ts` documents removal plan
+
+---
+
+## Tech Debt — Post-Launch (deferred, do NOT bundle with feature work)
+
+### Remove legacy tool-interface system
+- Delete `app/(main)/tools/[slugdisabled]/`
+- Delete `components/tool-interface/ThreadContainer.tsx` and dependencies
+- Delete `app/api/reflect/`
+- **Audit before removing:** `tool-interface/` may import shared components used elsewhere. Run grep for every component import in that directory across the codebase. Remove only files with zero external references.
+- Estimated effort: 30-min spec, low risk if audit is clean.
+- Dedicated spec only — never bundle with feature work.
+
+### Vercel "middleware → proxy" file convention
+- Build log warns: *"The 'middleware' file convention is deprecated. Please use 'proxy' instead."*
+- Next.js 16 future-deprecation warning. Build still succeeds. Production unaffected.
+- Wait for Clerk to publish guidance on `proxy.ts` migration before renaming. Clerk SDK assumes `middleware.ts` by default.
+- Revisit when Clerk publishes migration guide.
+
+### Vercel env-var hygiene
+- Several Production-scoped secrets currently selected as "All Environments" → "Sensitive" toggle blocked because Sensitive isn't supported on Development.
+- Action: uncheck Development on each, enable Sensitive, save.
+- Variables: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BREVO_API_KEY`, `CLERK_WEBHOOK_SECRET`, `CLERK_SECRET_KEY`, `OPENAI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Local dev uses `.env.local`, not Vercel Development env — safe to remove.
+- **Critical reminder:** `.env.local` lives ONLY on Juan's laptop. Back it up to password manager (1Password, Bitwarden) as a Secure Note. Never commit. Confirm `.gitignore` includes `.env.local`.
+
+### PostHog local dev (resolved)
+- `.env.local` was missing `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` → console error on `localhost:3001`. Production unaffected (vars set in Vercel).
+- Fix: copy both `NEXT_PUBLIC_POSTHOG_*` lines from Vercel dashboard to `.env.local`. Restart `npm run dev`.
+- For full local/prod env-var sync: `vercel env pull .env.from-vercel --environment=production` then diff against `.env.local`.
+
+### Mood + Gratitude SessionComplete
+- Apply Breathing benchmark to both. Messages already locked: Mood `Noted.` / Gratitude `Captured.`
+
+### BreathingOrb flicker on phase transitions
+- Original React-state version restored (`e46f3ce`). Do NOT attempt without local interactive debugging.
 
 ---
 
@@ -105,6 +153,7 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 - **Canonical teal:** `#3CC0D4` = `rgba(60,192,212,a)` — `T = (a) => \`rgba(60,192,212,${a})\``
 - **Category colours:** import from `lib/design-tokens.ts` — never hardcode
 - **`getToolRgb(tool)` helper** — derive canonical RGB from tool slug
+- **`getToolRgb()` rule (lesson 42):** covers all tool + category keys; warns in dev on unknown key; falls back to neutral grey in prod. **NEVER throws.** Throwing on unknown key crashes entire pages — caused the Mood + Gratitude outage Apr 24.
 
 ### Typography
 - **Display/headlines:** Cormorant Garamond (serif)
@@ -117,9 +166,15 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 - **Never below 0.65 for functional text**
 
 ### Font Size Floors
-- Labels: 11px minimum
+- Labels: 11px minimum (functional/body text)
 - Body: 13px minimum
 - Values: 14px minimum
+- **Exception:** labels embedded in tight visual containers (timer circle, badge, pill) may use 10px. The 11px floor applies to body/functional text, not shape-embedded captions.
+
+### Border Rule (lesson 43)
+- Always use the shorthand `borderColor` CSS property when setting all four sides equal.
+- Per-side properties (`borderTopColor`, `borderRightColor`, etc.) = 4 chances to forget one side and ship a white-line-on-dark bug.
+- `rounded-X` without a corresponding `border-X` (or visible border colour) = invisible rounded corners — caused the Full History card "missing top edge" bug Apr 2026.
 
 ### Components (Locked)
 - **SiteHeader.tsx — LOCKED with one documented exception** (see SiteHeader section)
@@ -135,7 +190,6 @@ Removed entirely. Routes 308 → `/tools`. All DB records deleted. Removed from 
 **SiteHeader.tsx is LOCKED. One documented modification was made Apr 2026 to fix mobile full-width.**
 
 ### The fix (DO NOT REVERT)
-
 The header's background gradient div uses inline styles. Original (broken):
 ```
 left: max(24px, calc(50% - 696px));
@@ -148,20 +202,6 @@ left: max(0px, calc(50% - 696px));
 right: max(0px, calc(50% - 696px));
 ```
 
-The `24px` floor created a 24px gap on each side of the header background at every viewport below ~1488px — most visibly on mobile (48px of dead horizontal space).
-
-### Math reference
-
-| Viewport | Offset | Behaviour |
-|---|---|---|
-| 375px | 0px | Full-width gradient (mobile) |
-| 430px | 0px | Full-width gradient |
-| 768px | 0px | Full-width gradient (tablet) |
-| 1024px | 0px | Full-width gradient |
-| 1440px | 0px | Full-width gradient (standard desktop) |
-| 1622px | 115px | Centred under 1440px content area |
-| 1920px | 240px | Centred under 1440px content area |
-
 **Hard rule: Never revert `max(0px, ...)` back to `max(24px, ...)`.**
 
 ---
@@ -170,27 +210,9 @@ The `24px` floor created a 24px gap on each side of the header background at eve
 
 **Component:** `components/SiteHeaderMobileMenu.tsx`
 
-### Root cause (now fixed)
-SiteHeader has `backdrop-filter: blur(12px)`. Per CSS spec, ancestors with `transform`, `filter`, `backdrop-filter`, `perspective`, or `will-change` become the containing block for descendant `position: fixed` elements. The drawer's `position: fixed; left: 0; right: 0` therefore anchored to SiteHeader (not viewport) and inherited internal width constraints → dark strips on mobile.
+Drawer rendered via React Portal to `document.body` to escape SiteHeader's `backdrop-filter` containing block.
 
-### The fix (commit `1af867e` + portal refactor)
-
-Drawer rendered via React Portal to `document.body`:
-```tsx
-import { createPortal } from "react-dom";
-
-const drawerContent = (
-  <div style={{ position: "fixed", top: 80, left: 0, right: 0, width: "100vw" }}>
-    {/* drawer children */}
-  </div>
-);
-
-return typeof window !== "undefined"
-  ? createPortal(drawerContent, document.body)
-  : null;
-```
-
-**Hard rule: Never inline the drawer back into SiteHeader.** Must remain rendered via portal to escape the backdrop-filter containing block.
+**Hard rule: Never inline the drawer back into SiteHeader.** Must remain rendered via portal.
 
 ---
 
@@ -210,45 +232,18 @@ Hero → FREE — START HERE → AI Tools → FROM THE LAB → Footer
 - Container `max-w-6xl mx-auto px-6 md:px-12 lg:px-24`
 - Grid `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
 - 6 cards (Breathing, Focus Timer, Sleep Wind-Down, Mood Tracker, Gratitude Log, All tools)
-- "All tools" card uses `neutral` slate
-- Section padding `pt-6 pb-16 md:pt-10 md:pb-14`
 
 ### AI Tools (desktop)
 - Section headline `md:text-4xl` (36px)
 - Card `md:min-h-[320px]`, body `md:leading-[1.6]`
-- Section padding `md:pt-12 md:pb-16`
 
 ### Lab Section (desktop)
-- Container matches AI section width
-- Grid `grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6`
 - 3 equal columns. **No col-span-2 hero.**
 - Section padding `py-8 md:py-10`
 
-#### FeaturedLabCard (Editor's Pick)
-- Padding `20px 22px`
-- Title `20px` Cormorant flat
-- Pill `3px 10px` — "Editor's pick" only
-- Pill wrapper `marginBottom: 24px`
-- Bottom row `justifyContent: space-between`
-- Hover `translateY(-2px)`, bg +0.03, border +0.12, 220ms
-- Box shadow `0 0 8px 1px rgba(accent,0.12)`
-
-#### LabSecondaryCard (cards 2 + 3)
-- Padding `20px 22px`, border-radius `16px`
-- Title `20px` Cormorant, lineHeight `1.2`
-- Excerpt `12px` Jost, lineHeight `1.6`
-- Per-instance hover scope class `lab-secondary-${article.category}`
-- `@media (hover: hover)` guard
-
-#### Lab data
-- **Editor's Pick:** Manual via `FEATURED_LAB` in `page.tsx`
-- **Secondary cards:** Dynamic via `getAllArticles().filter(excludeEditorsPick).slice(0,2)`
-- Calendar reminder set: 23 May 2026 (monthly)
-
 ### Footer (desktop)
-- Backdrop blur + dark gradient REMOVED (was bleeding through gradients)
+- Backdrop blur + dark gradient REMOVED
 - SOLACE wordmark below bottom bar: Cormorant 18px, `letterSpacing: 0.32em`, `rgba(255,255,255,0.12)`
-- Hidden on mobile via `footer-desktop-wordmark { display: none !important }`
 
 ---
 
@@ -273,187 +268,113 @@ Hero → FREE — START HERE → AI Tools → FROM THE LAB → Footer
 
 ---
 
-## Tools Page — LOCKED ✅ (Apr 2026)
+## Tools, Lab landing, Lab archive, Article template, Article CTAs
 
-### ToolCard (mobile scoped)
-- Padding `14px 18px 14px`
-- `min-height: auto` — desktop calibration overridden
-- Hover-row `display: none`
-- Description `13px / 1.5`
-
-### FamilyGroup (mobile)
-- Eyebrow `mb-3 pb-0`
-- Divider `md-only`
-
-### page.tsx (mobile)
-- Hero `padding-top: 100`
-- Gap `24` between groups
-- **SEO essay `hidden md:block`** — DOM kept, hidden on mobile
-- FAQ `mb-12`
-
-**Scoping rule:** All mobile ToolCard overrides scoped — never modify desktop to fix mobile.
+(Locked Apr 2026 — see prior master version for full details. No changes this update cycle.)
 
 ---
 
-## Lab Landing Page — LOCKED ✅ (Apr 2026)
+## SessionComplete v3 — LOCKED ✅ (Apr 2026)
 
-### Mobile Lab Landing (R1 + R2 + R3)
+### Architecture
+Per-tool components extracted into separate files (one for each of Breathing, Sleep, Focus, Mood, Gratitude). Mood was extracted from inline JSX inside MoodSession.tsx.
 
-#### LabSecondaryCard (mobile scoped)
-- Eyebrow: plain small-caps label (no pill chrome) — 11px Jost, 0.18em, uppercase, category color
-- Title reduced from desktop 20px to fit 1-2 lines
-- Excerpt `display: none` on mobile
-- Reading time `display: none` on mobile (wrapper hidden too)
-- Padding `14px 18px 14px`
-- `min-height: auto`
+### Layout (mobile)
+Compact two-row mobile layout:
+- Row 1: eyebrow + close (✕)
+- Row 2: title (Cormorant italic)
+- Row 3: full-width body
+- Row 4: dual CTA — primary (solid-tinted) START FREE + ghost ALL TOOLS
 
-#### FeaturedLabCard (mobile scoped)
-- One pill only: "Editor's Pick"
-- Excerpt KEPT on mobile (editorial — persuade, not just scan)
-- Excerpt color `rgba(255,255,255,0.80)`
-- Reading time `display: none` (R3)
-- Padding `14px 18px 14px`
+### Dual CTA pattern (lesson 38 — conversion protection)
+- Primary: solid-tinted in tool's accent colour (`bg: rgba(accent, 0.08-0.10)`, `border: rgba(accent, 0.70)`, `color: rgba(accent, 0.95)`)
+- Secondary: ghost in tool's accent colour (`border: rgba(accent, 0.35)`, `color: rgba(accent, 0.70)`)
+- Stacks vertically below 350px viewport
 
-#### Closing CTA section
-- Mobile padding-top reduced to ~48-64px
-- Body text `rgba(255,255,255,0.80)`, 14px, lh 1.5-1.6
-- Stale copy fixed: "Eight tools for breathing, focus, sleep, decisions, and AI-powered reflection." (was "Nine tools... thought reframing")
+### Per-tool locked copy
+| Tool | Title | Body | Primary | Secondary |
+|---|---|---|---|---|
+| Breathing | `Well done.` | `Save history and track streaks with a free account.` | `START FREE →` | `ALL TOOLS →` |
+| Sleep Wind-Down | `Rest well.` | `Save history and track streaks.` | `START FREE →` | `ALL TOOLS →` |
+| Focus Timer | `Good work.` | `Save sessions and track focus patterns with a free account.` | `START FREE →` | `ALL TOOLS →` |
+| Mood Tracker | `Noted.` | TBD | `START FREE →` | `ALL TOOLS →` |
+| Gratitude Log | `Captured.` | TBD | `START FREE →` | `ALL TOOLS →` |
 
-#### Weekly Dispatch
-- Body text `rgba(255,255,255,0.80)`
-- Email placeholder `rgba(255,255,255,0.65)`, 14px (global)
+### Three-layer colour enforcement (lesson 37)
+1. `getToolRgb()` audit — function returns the right RGB string
+2. EXPECTED ACCENT comments inline in each SessionComplete file:
+   ```ts
+   // EXPECTED ACCENT:
+   //   breathing  → 60, 192, 212 (teal, Calm)
+   //   sleep      → 60, 192, 212 (teal, Calm)
+   //   focus      → 232, 168, 62 (gold, Clarity)
+   //   mood       → 232, 168, 62 (gold, Clarity)
+   //   gratitude  → 232, 168, 62 (gold, Clarity)
+   ```
+3. Pre-deploy DevTools paste verification (bash query rgba values on live page)
 
-#### "BROWSE ALL ARTICLES →" link (locked benchmark)
-- Jost, sans-serif
-- 12px, 400 weight
-- letter-spacing 1.68px (`tracking-[0.14em]`)
-- color `rgba(255, 255, 255, 0.65)`
-- uppercase
-
-### Lab landing rationale (locked)
-- Editor's Pick = editorial hero, keeps excerpt, larger card
-- Secondary cards = scan, no excerpt, no reading time on mobile
-- Curiosity gap principle: titles unanswered = clicks; excerpts that answer = bounces
-
----
-
-## Lab Archive Page — LOCKED ✅ (Apr 2026)
-
-### ArchiveCard (mobile scoped — denser than landing)
-- Eyebrow: plain small-caps label (no pill chrome)
-- `margin-bottom: 8px` below eyebrow
-- Reading time `display: none`
-- Title fits in max 2 lines
-- Padding `12px 16px 12px`
-- `min-height: auto`
-- Border-radius `14px`
-- Card gap `12px`
-
-### Filter pills (KEEP pill chrome)
-- Filter pills are interactive controls — DIFFERENT visual treatment from passive metadata labels (lesson 24)
-
-### Back-link "← THE LAB" (locked Apr 2026)
-- Jost, 12px, 400, `tracking-[0.14em]`, uppercase
-- color `rgba(255, 255, 255, 0.65)`, hover `rgba(255, 255, 255, 0.85)` 200ms
-- "THE LAB" not "Back to Lab" — destination naming, NYT/Atlantic pattern, stronger SEO anchor
-- Was "← Lab" at `rgba(170, 158, 220, 0.55)` (below 0.65 floor + purple)
-
-### Archive density target
-- 3-4 cards per mobile viewport (was 1.2 pre-fix)
-- ~5 swipes to scan all 15 articles (was 13)
+### PostHog event tracking
+Both CTAs fire `session_complete_cta_clicked` with `action: 'start_free' | 'all_tools'`.
 
 ---
 
-## Article Template — LOCKED ✅ (Apr 2026)
+## AI Tools Auth UX — LOCKED ✅ (Apr 2026)
 
-### Back-links (header + footer)
-Both header and footer back-links unified to `← THE LAB`:
-- Jost, 12px, 400, `tracking-[0.14em]`, uppercase
-- color `rgba(255, 255, 255, 0.65)`, hover `rgba(255, 255, 255, 0.85)` 200ms
-- Was: header "← The Lab" at purple 0.42; footer "← Back to the Lab" at purple 0.38
+### Architecture
+Shared `components/shared/AuthMessage.tsx` component handles all unauthenticated/quota-exhausted/paid-required states for the 3 AI tools.
 
-### "MORE FROM THE LAB" eyebrow
-- color `rgba(255, 255, 255, 0.65)` (was purple 0.42)
-- 11px (master floor)
+### Trigger conditions
+| Tool | 401 (logged out) | 403 (free plan) | 429 (quota) |
+|---|---|---|---|
+| Choose | `logged-out` | — | `quota-exhausted` |
+| Clear Your Mind | `logged-out` | `paid-required` | — |
+| Break It Down | `logged-out` | `paid-required` | — |
 
-### Related cards mobile
-- Single column, full width
-- Plain small-caps label (no pill chrome on mobile)
-- Padding `14px 18px 14px`
-- "X MIN READ" hidden on mobile
-- **Excerpt KEPT** (intentional divergence from Lab landing — lesson 22/23: article footer = retention, not discovery)
-- Desktop unchanged: 2-column, pill chrome, padding preserved
+**Status code discipline (lesson 49):** API routes must return distinct codes (401/403/429) so the frontend can pick the right variant. One status code for all failures = ambiguous frontend state.
 
-### Article italic Cormorant headline ("This is what X was built for.")
-- `text-wrap: pretty` applied — prevents orphan widow
-- Browser auto-fixes on iOS 17.4+ / Chrome 117+ / Safari 17.4+
-- Graceful degradation on older browsers
+### Locked copy
+| Tool | Variant | Title | Body | Primary | Secondary |
+|---|---|---|---|---|---|
+| Choose | logged-out | `Almost there.` | `Choose is part of your free account. Sign in to continue your decision.` | `SIGN IN →` | `CREATE ACCOUNT →` |
+| Choose | quota-exhausted | `That's today's session.` | `Choose is one decision per day on the free plan. Tomorrow it resets — or unlock unlimited now.` | `UPGRADE →` | `BACK TO TOOLS →` |
+| Clear Your Mind | logged-out | `Almost there.` | `Clear Your Mind is part of a paid account. Sign in to keep going.` | `SIGN IN →` | `CREATE ACCOUNT →` |
+| Clear Your Mind | paid-required | `One step away.` | `Clear Your Mind is part of the paid plan. Unlock it for A$9/month.` | `UPGRADE →` | `BACK TO TOOLS →` |
+| Break It Down | logged-out | `Almost there.` | `Break It Down is part of a paid account. Sign in to keep going.` | `SIGN IN →` | `CREATE ACCOUNT →` |
+| Break It Down | paid-required | `One step away.` | `Break It Down is part of the paid plan. Unlock it for A$9/month.` | `UPGRADE →` | `BACK TO TOOLS →` |
+
+### Per-tool canonical colour
+- Choose → violet (Decide)
+- **Clear Your Mind → gold (Clarity)** ⚠️ not violet
+- Break It Down → violet (Decide)
+
+### Layout
+On 401/403/429, the entire form/results area is replaced with `<AuthMessage>` panel. No partial state.
 
 ---
 
-## Lab Article Tool CTAs — LOCKED ✅ (Apr 2026)
+## Focus Timer — sound architecture (Apr 2026)
 
-### Thought Reframer cleanup (deployed Apr 2026)
-All 6 affected articles fixed. Zero TR references remain in any article.
+### Sounds
+- `/sounds/focus-start.mp3` — start of focus block
+- `/sounds/rest-start.mp3` — start of rest block
+- `/sounds/session-done.mp3` — full Pomodoro complete
+- `/audio/silent-loop.mp3` — iOS Web Audio unlock loop (must be ≤ 3 KB; verify silence audibly before shipping)
 
-#### Worry article — full restructure
-**Slug + title preserved for SEO** (`how-to-stop-worrying-about-things-you-cant-control`)
-- Cut "The only question that cuts through" section (didn't map to any current tool)
-- Renamed "What to do when the answer is no" → "What actually helps"
-- Added bridging paragraph
-- Mid-article CTA: Clear Your Mind
-- End CTA: Clear Your Mind (single — multi-tool ending REJECTED, see lesson 31)
-- ~150 words removed, ~50 added
-- Title untouched (preserves SEO target)
+### One sound set for all presets (lesson 48 — locked product decision)
+Pomodoro 25/5, Custom, Deep Work, Flow ALL use the same 3 sounds. Sound personalisation per preset rejected pre-launch — complexity outweighs differentiation. Revisit only if post-launch data shows mute-rate varies meaningfully between presets.
 
-#### 5 articles — secondary mention swaps
-| Article | Replacement tool |
-|---|---|
-| how-box-breathing-actually-works | Sleep Wind-Down |
-| why-you-cant-focus | Clear Your Mind |
-| how-to-wind-down-before-sleep | Clear Your Mind |
-| why-you-feel-anxious-for-no-reason | Clear Your Mind |
-| how-to-actually-rest | Clear Your Mind |
+### iOS Safari Web Audio unlock pattern (lesson 40)
+Three things together; missing any one = silent on mobile:
+1. AudioContext created/resumed inside user-gesture handler (not at component mount)
+2. 1-sample silent buffer played on first gesture to unlock
+3. Silent `<audio loop muted volume:0>` element override iPhone silent switch
+   - File must be truly silent (verify ≤ 3 KB)
+   - `muted` attribute in JSX (compile-time guarantee)
+   - `volume: 0` set on ref (belt + braces)
 
-4 of 5 → Clear Your Mind (cognitive uncluttering = TR's old job, paid → conversion). 1 → Sleep Wind-Down (somatic content fit).
-
-### CTA card design (locked Apr 2026)
-
-#### Card background derives from canonical tool color
-Format: `linear-gradient(145deg, rgba(${rgb}, 0.06), rgba(${rgb}, 0.02), rgba(${rgb}, 0.04))` over `#0a0e15` base. **No hardcoded background gradients.** Uses `getToolRgb(tool)` helper.
-
-Border: `0.5px solid rgba(${rgb}, 0.18)`.
-
-### CTA button design (locked Apr 2026)
-
-#### Layout
-- Button label rendered as single template string with `\u00A0` before arrow: `{`Try ${toolName}\u00A0→`}`
-  - Prevents React HTML comment between text nodes (iOS Safari nowrap edge case)
-- `white-space: nowrap`, `max-width: 100%`
-
-#### Typography (default ≥360px)
-- 12px Jost, 400, `letter-spacing: 0.12em`, uppercase
-- Padding `10px 24px`, border-radius `4px`
-- Border `1px solid rgba(${rgb}, 0.28)`
-- Background `rgba(${rgb}, 0.08)`
-- Color `rgb(${rgb})`
-
-#### iPhone SE fallback (≤360px)
-- 11px font, `letter-spacing: 0.10em`, padding `9px 14px`
-
-#### Mobile arrow hide (mid-article CTA only — Apr 2026)
-- Arrow `→` wrapped in `<span className="cta-button-arrow">`
-- `@media (max-width: 768px) { .cta-button-arrow { display: none; } }`
-- End CTA keeps arrow on all viewports (different visual moment, more weight)
-
-#### Hover (desktop)
-- Transition `200ms ease-out` on bg + border + box-shadow + transform
-- Hover bg → `rgba(${rgb}, 0.14)`, border → `rgba(${rgb}, 0.55)`
-- Glow `box-shadow: 0 0 18px 2px rgba(${rgb}, 0.25)`
-- Lift `translateY(-1px)` gated by `prefers-reduced-motion`
-
-### CTA color derivation rule (locked)
-End-of-article CTA button color derives from the **linked tool's category**, NOT the article's category. Article in Calm category linking to Clarity tool shows GOLD button (matching tool), not teal (matching article). Tool color is identity; article color is context.
+### Timer label typography
+- `text-[10px] md:text-[13px]` for `tap to start` / `tap to resume` / `tap to pause`
+- 10px exception to 11px floor — labels embedded in tight visual containers permitted
 
 ---
 
@@ -469,91 +390,27 @@ End-of-article CTA button color derives from the **linked tool's category**, NOT
 | Lab landing (desktop) | ✅ LOCKED Apr 2026 |
 | Lab archive (mobile) | ✅ LOCKED Apr 2026 |
 | Lab archive (desktop) | ✅ LOCKED Apr 2026 |
-| Article template | ✅ LOCKED Apr 2026 (back-links + related cards mobile + headline orphan) |
-| Article CTAs | ✅ LOCKED Apr 2026 (canonical color, hover, button copy, mobile arrow hide) |
-| All 15 Lab articles | ✅ Zero TR references, all CTAs current tools |
+| Article template | ✅ LOCKED Apr 2026 |
+| Article CTAs | ✅ LOCKED Apr 2026 |
+| All 15 Lab articles | ✅ Zero TR references |
 | SiteHeader | ✅ LOCKED Apr 2026 (with documented exception) |
 | Mobile menu drawer | ✅ LOCKED Apr 2026 (React Portal) |
 | Pricing | ✅ A$9/A$79 |
 | About / Principles / Privacy / Terms | ✅ |
 | Dashboard | ✅ All 8 tools, AI sessions logging |
+| **SessionComplete (Breathing, Sleep, Focus)** | ✅ LOCKED Apr 2026 (v3 dual-CTA) |
+| **SessionComplete (Mood, Gratitude)** | ⏳ Pending Breathing-benchmark application |
+| **AI tools auth UX** | ✅ LOCKED Apr 2026 (AuthMessage shared component) |
+| **/api/reflect** | ✅ Auth-gated Apr 2026 (legacy, scheduled for post-stable-month removal) |
 
 ---
 
 ## Lab — Human Behaviour Lab
 
 ### 15 articles
-
-| Slug | Category | Linked tool |
-|---|---|---|
-| `why-you-cant-stop-overthinking` | think-clearly | Clear Your Mind (**Editor's Pick**) |
-| `how-to-feel-less-overwhelmed` | think-clearly | Break It Down |
-| `how-box-breathing-actually-works` | calm-your-state | Breathing |
-| `why-you-cant-focus` | calm-your-state | Focus Timer |
-| `how-to-wind-down-before-sleep` | calm-your-state | Sleep Wind-Down |
-| `what-is-cognitive-reframing` | think-clearly | Clear Your Mind |
-| `how-to-track-your-mood` | think-clearly | Mood Tracker |
-| `does-gratitude-journalling-work` | notice-whats-good | Gratitude Log |
-| `how-to-make-a-hard-decision` | think-clearly | Choose |
-| `what-is-the-human-behaviour-lab` | think-clearly | Clear Your Mind |
-| `why-you-feel-anxious-for-no-reason` | calm-your-state | Breathing |
-| `how-to-stop-worrying-about-things-you-cant-control` | calm-your-state | **Clear Your Mind** (cross-category — gold button on calm article) |
-| `what-is-decision-fatigue` | think-clearly | Choose |
-| `how-to-stop-being-so-hard-on-yourself` | notice-whats-good | Gratitude Log |
-| `how-to-actually-rest` | calm-your-state | Breathing |
+(Same as previous master — zero TR references, all CTAs current tools.)
 
 **Category balance:** Calm 5, Think clearly 6, Notice what's good 2 ← needs more
-
-### Components
-- `components/home/LabSecondaryCard.tsx`
-- `components/home/FeaturedLabCard.tsx`
-- Lab archive card + article CTA card/button — all locked Apr 2026
-
----
-
-## Breathing Tool — Design Benchmark ✅
-
-**Breathing is the benchmark for ALL tools.** Take live screenshots of both tools side-by-side BEFORE writing any spec.
-
-### 11 decisions locked (apply to ALL tools):
-1. Stop = Begin (solid filled teal pill)
-2. SessionComplete visible moment
-3. Info cards: Duration + Best For only, compact
-4. History collapses on mobile
-5. Begin button `py-3` for 44px tap target
-6. Pattern pills exact classes
-7. All text ≥ 0.65 opacity
-8. Canonical teal `#3CC0D4`
-9. Cross-links use `glassBackground()`, `glassBorder()`, `getToolRgb()`
-10. Cross-links hidden on mobile
-11. No container on mobile
-
-### BreathingOrb — Known Issue ⚠️
-Flicker on phase transitions. Original React-state version restored (`e46f3ce`). **Do not attempt without local interactive debugging.**
-
----
-
-## Build Infrastructure — Fixed ✅ (Apr 2026)
-
-### Supabase Lazy-Init ✅
-- `lib/supabase/server.ts` Proxy lazy-init
-- `lib/supabase.ts` Proxy lazy-init
-
-### Stripe Lazy-Init ✅
-- `app/api/stripe/checkout/route.ts`
-- `app/api/stripe/portal/route.ts`
-- `app/api/stripe/webhooks/stripe/route.ts`
-
-### GitHub Actions ✅
-- All 9 secrets set
-- All tests green
-
----
-
-## SEO ✅ (Apr 2026)
-- Sitemap: 17 pages, submitted Apr 15, last read Apr 18
-- `metadataBase` set in `layout.tsx`
-- 11 pages indexed by Google
 
 ---
 
@@ -561,21 +418,22 @@ Flicker on phase transitions. Original React-state version restored (`e46f3ce`).
 
 ### Free/Paid Gating
 
-| Tool | History API | 7-day cutoff | Upgrade prompt | SessionComplete |
+| Tool | History API | 7-day cutoff | Upgrade prompt | SessionComplete v3 |
 |---|---|---|---|---|
 | Breathing | ✅ | ✅ | ✅ | ✅ |
 | Sleep Wind-Down | ✅ | ✅ | ✅ | ✅ |
 | Focus Timer | ✅ | ✅ | ✅ | ✅ |
-| Mood Tracker | ✅ | ✅ | ✅ | — |
-| Gratitude Log | ✅ | ✅ | ✅ | — |
-| Choose (AI) | — | — | ✅ daily nudge | ✅ |
-| Clear Your Mind (AI) | — | — | ✅ paid gate | ✅ |
-| Break It Down (AI) | — | — | ✅ paid gate | ✅ |
+| Mood Tracker | ✅ | ✅ | ✅ | ⏳ |
+| Gratitude Log | ✅ | ✅ | ✅ | ⏳ |
+| Choose (AI) | — | — | ✅ AuthMessage | ✅ |
+| Clear Your Mind (AI) | — | — | ✅ AuthMessage | ✅ |
+| Break It Down (AI) | — | — | ✅ AuthMessage | ✅ |
 
 ### AI Tools ✅
 - Crisis detection: 15/15 tests passing
 - Cross-tool routing: working
 - Dashboard session logging: all 3 AI tools
+- Auth UX: AuthMessage component handles 401/403/429 distinctly
 
 ### Stripe ✅ LIVE
 - End-to-end test PASSED (A$9 real payment → webhook → plan=paid → refunded)
@@ -584,107 +442,84 @@ Flicker on phase transitions. Original React-state version restored (`e46f3ce`).
 
 ## Still Needed (priority order)
 
-- [x] Desktop homepage audit ✅ Apr 2026
-- [x] Tools page mobile audit ✅ Apr 2026
-- [x] Lab landing mobile audit ✅ Apr 2026 (R1+R2+R3)
-- [x] Lab archive mobile audit ✅ Apr 2026
-- [x] Header background full-width mobile ✅ Apr 2026
-- [x] Mobile menu drawer full-width ✅ Apr 2026 (React Portal)
-- [x] Archive back-link upgrade ✅ Apr 2026
-- [x] Article template back-links + related cards ✅ Apr 2026
-- [x] Article headline orphan ✅ Apr 2026 (`text-wrap: pretty`)
-- [x] All TR references cleaned across 15 articles ✅ Apr 2026
-- [x] Worry article restructured ✅ Apr 2026
-- [x] CTA card canonical colors ✅ Apr 2026
-- [x] CTA button hover glow + lift ✅ Apr 2026
-- [x] CTA button arrow orphan (iOS Safari) ✅ Apr 2026
-- [ ] CTA button mid-article arrow hide on mobile (deployed pending verification)
+- [x] All Apr 2026 audits complete
+- [x] SessionComplete v3 for Breathing, Sleep, Focus
+- [x] AI tools AuthMessage component shipped
+- [x] /api/reflect auth-gated
+- [ ] **iPhone Focus sound verification** — Juan to test on real device, silent switch ON and OFF
+- [ ] **SessionComplete v3 for Mood + Gratitude** — apply Breathing benchmark
 - [ ] **BreathingOrb flicker** — needs local interactive debugging
-- [ ] **Mood Tracker** — apply Breathing benchmark
-- [ ] **Gratitude Log** — apply Breathing benchmark
-- [ ] SessionComplete for Mood Tracker, Gratitude Log
+- [ ] Vercel env-var hygiene — uncheck Development, enable Sensitive on production secrets
+- [ ] `.env.local` backup to password manager
 - [ ] Upgrade Supabase to Pro at launch ($25/month)
 - [ ] Newsletter opt-in UI (dashboard checkbox → Brevo list 5)
-- [ ] Brevo Phase 2 email sequences (post-launch)
+- [ ] Brevo Phase 2 email sequences
 - [ ] Export feature (not built for any tool)
 - [ ] PostHog saved insights (after 7 days traffic)
-- [ ] Sitemap update — add Lab article URLs post-launch
+- [ ] Sitemap update — add Lab article URLs
 - [ ] notice-whats-good Lab category needs more articles (only 2)
 - [ ] Reddit account + first post
 - [ ] Google Postmaster Tools — register `try-solace.app`
-- [ ] Monthly Lab article agent (30 days post-launch, calendar 23 May 2026)
+- [ ] Monthly Lab article agent (calendar 23 May 2026)
+- [ ] **Tech Debt:** remove legacy tool-interface system (post-stable-month, dedicated spec)
+- [ ] **Tech Debt:** middleware → proxy file rename (after Clerk migration guide)
 
 ---
 
 ## Process Lessons
 
-### Pre-existing (1-21)
-1-21: see prior version of master — covering layout, hero/nav, container relationships, mobile breakpoint discipline, SEO essay handling.
+### 1-21 (pre-existing)
+See prior master version — layout, hero/nav, container relationships, mobile breakpoint discipline, SEO essay handling.
 
-### Lessons from Lab landing + archive audits (Apr 2026)
+### 22-41 (pre-existing)
+Card density vs uniformity (22), editorial vs scan cards (23), pills vs labels (24), DevTools-first diagnosis (25), LOCK doesn't mean bug-free (26), JS inspection before guessing CSS (27), `position: fixed` containing-block escape (28), `text-wrap: pretty` (29), audit content when deleting tools (30), one-article-one-tool-one-CTA (31), reference-read working component before writing CTAs (32), audit copy semantic accuracy when copying (33), component colour from semantic data not contextual (34), hardcoded backgrounds defeat colour systems (35), interactive elements need hover (36), measure before resizing (37), iOS Safari + nowrap + React HTML comments (38), DOM-tree check when CSS computes correct (39), container relationship not control size (40), inspect DevTools before writing another spec (41).
 
-**22. Card density follows job-to-be-done, not design-system uniformity.** Lab landing secondary cards and Lab archive cards share content model but have different jobs (discovery vs scan). Density follows job, not consistency. Archive cards are MORE compact than landing cards on purpose.
+### Apr 24-26 2026 cycle (42-55)
 
-**23. Editorial cards keep their excerpt; scan cards drop it.** Excerpt copy on a card answers the curiosity gap that the title creates. On editorial/hero cards (Editor's Pick) where job is persuasion, excerpt earns space. On scan cards (secondary on listing, archive cards) where job is title-driven click-through, excerpt slows the user. Drop excerpts on scan-mode cards; keep them on persuade-mode cards.
+**42. Never ship "throw on unknown key" without first auditing every caller passes a known key.** The previous lesson was "silent fallbacks cause silent bugs" — that's true, but throws cause LOUD bugs (production outages). The correct defense is: cover all keys + warn in dev + fallback to safe neutral in prod. Caused the Mood + Gratitude page outage Apr 24.
 
-**24. Filled pills = interactive control. Plain labels = passive metadata.** Lab archive filter pills keep filled pill shape because tappable; card category labels drop the pill chrome on mobile because passive. Same visual element, different jobs, different correct treatment. Don't enforce visual consistency between elements with different interaction roles.
+**43. CSS border shorthand beats per-side properties.** `borderColor: X` covers all 4 sides; `borderTopColor: X` + 3 more is 4 chances to forget one and ship a white-line-on-dark bug. Use shorthand unless there's a specific reason to set sides individually. `rounded-X` without `border-X` (or visible border colour) = invisible corners.
 
-**25. Diagnose before you fix — open DevTools when a CSS issue is mysterious.** When a layout issue isn't responding to fixes, the spec must require Claude Code to inspect the element tree, identify the actual offending property/value, then write the override. Diagnostic step is not optional.
+**44. Verify any "silent" asset is actually silent.** File size is a tell: true silence at 64kbps mono = ~2-3KB. Anything more contains audio. Open the file before shipping. The 15.8KB "silent-loop.mp3" was actually a bell sound — caused desktop ghost-bell.
 
-### Lessons from header full-width + drawer fix (Apr 2026)
+**45. One component, one element.** When a JSX element renders a critical singleton (audio sink, portal, global toast), verify `document.querySelectorAll(selector).length === 1` at runtime. Double-render = duplicated side-effects. `hidden md:block` + `md:hidden` wrapping the SAME component mounts it twice — both run `useEffect`s.
 
-**26. When a component is LOCKED, the bug might be IN the locked component.** Three rounds of failed fixes happened because the SiteHeader LOCK made everyone (including me) assume the bug had to be in a child component. Actual bug was a one-line CSS expression INSIDE SiteHeader.tsx. **A LOCK means "don't modify casually", not "the bug can't be here."** When external fixes fail, lift the lock surgically with documentation.
+**46. Verify the component renders exactly once before chasing platform bugs.** A double-mounted component with side-effects produces non-deterministic behaviour that LOOKS like a platform bug. Count the components first. Saved hours of false iOS-audio diagnosis.
 
-**27. Use JavaScript inspection in the browser before guessing CSS.** When a CSS bug isn't responding to fixes, run JavaScript queries against the live DOM to extract actual rendered values and inline styles. Don't write more CSS specs without diagnostic data.
+**47. Next.js streaming SSR leaves DOM artefacts.** A `<div id="S:0" style="display:none">` containing pre-hydration HTML can persist in the DOM. Counts of `querySelectorAll(...).length === 2` may be a single React component + its SSR scaffold, not a true double-render. Verify by checking `offsetParent === null` and checking ancestor tree, not just count.
 
-**28. `position: fixed` does NOT escape ancestors with `transform`, `filter`, `backdrop-filter`, `perspective`, or `will-change`.** Standard CSS gotcha. Fix: use React Portal (`createPortal`) to render at `document.body` level, escaping all ancestor containing blocks.
+**48. One sound set for all Focus presets.** Locked product decision. Sound personality per preset considered and rejected. Complexity cost outweighs differentiation pre-launch. Revisit only if post-launch data shows sound-mute-rate varies meaningfully between presets.
 
-### Lessons from article template + headline (Apr 2026)
+**49. Status codes are the API of failure mode.** When a frontend needs to distinguish "logged out" / "needs paid plan" / "quota exhausted", the API must return distinct codes (401/403/429). One code for all = ambiguous state. Spec the route's failure responses as carefully as success.
 
-**29. Use `text-wrap: pretty` for short editorial headlines that mix static + dynamic text.** When a headline like "This is what [X] was built for." has variable middle content and italic typography, line breaks are unpredictable and orphans common. `text-wrap: pretty` is the modern CSS solution — one property, browser-handled, graceful fallback. Better than per-string non-breaking spaces because it's structural and survives copy changes. Reserve for short headlines/CTAs only.
+**50. Orphan API routes are vulnerabilities.** Any unused server route still runs and may be unprotected. When migrating frontend code, audit and delete the corresponding API endpoints. Run grep for frontend references to every `/api/*` path quarterly.
 
-### Lessons from Thought Reframer cleanup (Apr 2026)
+**51. "Logged-out user reached this page" is a conversion moment, not an error.** Treating 401 as a UX moment with warmth + clear CTA recovers users who would otherwise bounce. Apply the same pattern to any future protected feature.
 
-**30. When deleting a tool, audit ALL content that references it.** TR was deleted in code (routes 308'd, DB cleared), but 6 of 15 Lab articles still referenced it. Search-and-grep across `content/` is mandatory whenever any tool is removed.
+**52. Mitigate first, clean up second.** When a security/cost issue is found in legacy code with non-trivial dependencies, the immediate fix is the gate (auth check, rate limit). Cleanup belongs in a dedicated spec with proper audit. Bundling cleanup with mitigation introduces regression risk on a live product.
 
-**31 (REVISED). Multi-tool endings are wrong.** Initial impulse was to map an article that taught 3+ moves to 3+ tools. In practice, rendered as a menu, broke conversion focus, implementation rendered as plain text instead of buttons. **One article = one tool = one CTA.** If article body teaches multiple moves not mapping to one tool, REWRITE the body to focus on moves that DO — don't dilute the CTA. **Articles serve tools; tools don't serve articles.**
+**53. `[slug]` → `[slugdisabled]` is a valid Next.js soft-delete pattern.** Functionally disables a dynamic route without removing the code. Use when the code is referenced by other dependencies that aren't ready to be removed. Document the disable + removal plan in a code comment so future devs don't re-enable it.
 
-### Lessons from CTA implementation (Apr 2026)
+**54. Defence in depth: middleware AND in-route auth.** Don't rely on one layer alone. Middleware is the primary gate; in-route `auth()` is the safety net if middleware ever changes. Both are cheap; either alone is brittle.
 
-**32. When a previous deploy rendered CTAs as plain text, future spec MUST require Claude Code to first read a working CTA component before writing changes.** The failure mode of "wrote plain markdown link instead of using the CTA component" is preventable by mandating the reference-read step.
-
-**33. When copying a working component pattern, audit the COPY for semantic accuracy.** Pattern-copy is fast but blind — "Free to use. No account needed." was ported onto a paid tool from a free-tool article without semantic check. Verify every claim against the linked tool's actual properties (free/paid, login/no-login, category) when copying CTA structures.
-
-**34. Component color must derive from semantic data, not contextual data.** End-CTA button inheriting article's category color is a category error — button represents a tool, so its color must match the tool. When a component visually represents an entity, its visual properties must derive from THAT entity's data — never from surrounding context.
-
-**35. Hardcoded backgrounds defeat color systems.** A correctly-colored border can't visually compete with a saturated wrong-colored background. Color systems work top-down: large surface (background) > medium surface (border) > small accent (text/icon). When implementing canonical color treatments, prioritise the LARGEST visible surface first.
-
-**36. Interactive elements without hover feedback feel broken on desktop.** A button that doesn't respond to mouse-over reads as decorative or disabled. Always include hover states for interactive elements; gate motion via `prefers-reduced-motion`.
-
-**37. When text wraps unexpectedly, measure before resizing.** When a layout issue can be either "size mismatch" or "wrap behaviour," measure both before choosing the fix. Wrap-permission fixes preserve the design system; resizing fixes erode it.
-
-**38. When `white-space: nowrap` doesn't prevent wrapping on iOS Safari, check for React-emitted HTML comments between text nodes.** React + Next.js production builds sometimes emit `<!-- -->` between adjacent text nodes from interpolated JSX. iOS Safari treats these comments as soft break points that nowrap doesn't reliably honor. Fix: render the entire label as a single template string with explicit non-breaking space where needed.
-
-**39. When measurement says a CSS fix should work but the visual bug persists, the bug isn't in the CSS — it's in the DOM structure.** When computed styles look correct but visual behavior is wrong, inspect the DOM tree (innerHTML, child nodes). Structure may differ from what the JSX implies.
-
-**40. When a button looks "lost" in its container, change the container relationship — not just the button size.** When a control feels visually wrong inside its container, examine the layout relationship (width, alignment, justification) BEFORE adjusting the control's intrinsic styling.
-
-**41. When a deploy "didn't take effect," inspect via DevTools FIRST — before writing another spec.** Multiple times this session, a spec apparently didn't ship and my reflex was to write a new spec. The right move is always: inspect the live DOM, confirm what shipped, then decide. Specs based on the assumption that the previous spec shipped are dangerous when it didn't.
+**55. Security/auth fixes require live-production verification before claiming "shipped."** "Tested locally" or "git pushed" is insufficient. Every spec involving auth/security gates must include: `curl -X POST <production URL>` test from logged-out terminal, and pasting back the actual status code + response body to Juan. Caused a 30-minute false-alarm on `/api/reflect` Apr 26 where I tested before Vercel finished deploying.
 
 ---
 
 ## Key Rules (Never Break)
 
 - Read solace-master before any work
+- **Solace is LIVE post-launch.** Every change ships to production. Apply post-launch risk discipline (smallest correct change, mitigate before cleanup).
 - **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
 - **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first.
-- **SiteHeader.tsx — LOCKED with one documented exception** (`max(0px, ...)` background offset). Never revert to `max(24px, ...)`.
+- **SiteHeader.tsx — LOCKED with one documented exception** (`max(0px, ...)` background offset). Never revert.
 - **SiteHeaderMobileMenu.tsx — locked at portal pattern.** Never inline back into SiteHeader.
 - **SiteFooter.tsx** — blur removed; desktop wordmark added; mobile structure documented.
 - Background always `#090d14`
 - Never define colours inline — always `lib/design-tokens.ts`
+- **`getToolRgb()` covers all keys + warns in dev + fallbacks in prod. Never throws.** (lesson 42)
 - Never below 0.65 opacity for functional text
-- Never below 11px for visible text
+- Never below 11px for visible body/functional text (lesson: shape-embedded labels permitted at 10px)
 - Always use Claude Code for implementation
 - `'use client'` components must return `<div>` root, never `<>` fragment
 - Specs via bash_tool, presented with present_files — **never widgets**
@@ -693,33 +528,22 @@ Flicker on phase transitions. Original React-state version restored (`e46f3ce`).
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
 - **Every spec must end with git + Vercel deploy block** — `cd /Users/angelamanzano/Documents/Solace/solace-clean && git add . && git commit -m "..." && git push`
 - **Every spec must explicitly instruct Claude Code to EXECUTE the git block**
-- **Verify Vercel deployment is Current AND check live bundle before claiming fix is deployed** (lesson 41)
+- **Verify Vercel deployment is Current AND check live DOM before claiming fix is deployed** (lesson 41)
+- **Security/auth fixes require live-production curl verification, not 'shipped'** (lesson 55)
 - **Never approximate Breathing values** — read actual source and copy exactly
 - **No sounds on Breathing or Sleep Wind-Down** — silence intentional
-- When widening a parent container, audit child `maxWidth` constraints (lesson 11)
-- Check inline `style={{...}}` for property conflicts before writing CSS rules (lesson 12)
-- Hero `pt` on fixed-nav pages = nav-height + intended-air (lesson 13)
-- Mobile `min-height` must override desktop — never inherit (lesson 19)
-- SEO essays use `hidden md:block` — never remove DOM content to clean mobile UX (lesson 21)
-- Card density follows job-to-be-done, not design-system uniformity (lesson 22)
-- Editorial cards keep excerpts; scan cards drop them (lesson 23)
-- Filled pills = interactive controls. Plain labels = passive metadata. (lesson 24)
-- Diagnose before fixing — open DevTools when layout issue is mysterious (lesson 25)
-- A LOCK doesn't mean the bug can't be inside the locked component (lesson 26)
-- Use JavaScript inspection before guessing CSS (lesson 27)
-- `position: fixed` does NOT escape `transform`/`filter`/`backdrop-filter`/`perspective`/`will-change` ancestors — use React Portal (lesson 28)
-- Use `text-wrap: pretty` for short editorial headlines (lesson 29)
-- When deleting a tool, audit all content referencing it (lesson 30)
-- **One article = one tool = one CTA. Articles serve tools.** (lesson 31)
-- When copying CTA pattern, audit copy for semantic accuracy (lesson 33)
-- Component color derives from semantic data (the tool), not contextual (the article) (lesson 34)
-- Hardcoded backgrounds defeat color systems — prioritise largest visible surface (lesson 35)
-- Interactive elements without hover feedback feel broken on desktop (lesson 36)
-- Measure before resizing when text wraps unexpectedly (lesson 37)
-- iOS Safari + nowrap + React HTML comments = single-string template fix (lesson 38)
-- When CSS computes correct but renders wrong, check DOM tree (lesson 39)
-- When a control looks lost in its container, change the container relationship (lesson 40)
-- **When a deploy "didn't take effect," inspect DevTools FIRST before writing another spec** (lesson 41)
+- **Border colour: shorthand `borderColor` over per-side properties** (lesson 43)
+- **Verify "silent" assets are actually silent** — file size ≤ 3KB tell (lesson 44)
+- **Singleton DOM elements: verify `querySelectorAll(...).length === 1` at runtime** (lesson 45)
+- **Component double-render check before platform-specific debugging** (lesson 46)
+- **Distinguish SSR scaffold vs real double-render** via `offsetParent` and ancestor tree (lesson 47)
+- **Status codes 401/403/429 distinct in API responses for distinct failure modes** (lesson 49)
+- **Quarterly grep audit for orphan `/api/*` routes** (lesson 50)
+- **401/403/429 are conversion moments — render Solace-voice messages, not raw JSON** (lesson 51)
+- **Mitigate first, clean up second on a live product** (lesson 52)
+- **`[slugdisabled]` folder rename = soft-delete; document plan in code** (lesson 53)
+- **Middleware AND in-route auth — defence in depth** (lesson 54)
+- (All previous lessons 1-41 retained as Key Rules — see prior master version)
 
 ---
 
