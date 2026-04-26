@@ -12,7 +12,7 @@ When your mind won't settle, it's hard to think clearly.
 Solace helps you find the next right step — through thought, not noise.
 ```
 
-**Launch date: 15 April 2026.** Solace is LIVE in production with real users. Every change ships to production traffic. Apply post-launch risk discipline to all specs (smallest correct change, mitigate before cleanup, verify deploys against live DOM).
+**Launch date: 15 April 2026.** Solace is LIVE in production with real users. Every change ships to production traffic. Apply post-launch risk discipline to all specs (smallest correct change, mitigate before cleanup, verify deploys against live DOM, verify in BOTH signed-in and signed-out states).
 
 ---
 
@@ -372,6 +372,9 @@ Three things together; missing any one = silent on mobile:
    - `muted` attribute in JSX (compile-time guarantee)
    - `volume: 0` set on ref (belt + braces)
 
+### iPhone silent switch (lesson 58 — locked product decision)
+Sound respects iOS silent switch by design. Forcing audio through silent mode rejected as anti-pattern — fragile, increasingly Apple-restricted, ships defensively. Default platform behaviour is correct. Revisit only if user feedback specifically demands override.
+
 ### Timer label typography
 - `text-[10px] md:text-[13px]` for `tap to start` / `tap to resume` / `tap to pause`
 - 10px exception to 11px floor — labels embedded in tight visual containers permitted
@@ -402,6 +405,9 @@ Three things together; missing any one = silent on mobile:
 | **SessionComplete (Mood, Gratitude)** | ⏳ Pending Breathing-benchmark application |
 | **AI tools auth UX** | ✅ LOCKED Apr 2026 (AuthMessage shared component) |
 | **/api/reflect** | ✅ Auth-gated Apr 2026 (legacy, scheduled for post-stable-month removal) |
+| **Focus Timer iOS sound (signed-out)** | ✅ FIXED Apr 26 (middleware static asset exclusion) |
+| **Focus Timer iOS silent switch** | ✅ Respects platform default (lesson 58) |
+| **Focus Timer ghost bell desktop** | ✅ Resolved Apr 26 (no longer firing after 7+ min observation) |
 
 ---
 
@@ -446,7 +452,8 @@ Three things together; missing any one = silent on mobile:
 - [x] SessionComplete v3 for Breathing, Sleep, Focus
 - [x] AI tools AuthMessage component shipped
 - [x] /api/reflect auth-gated
-- [ ] **iPhone Focus sound verification** — Juan to test on real device, silent switch ON and OFF
+- [x] **Focus Timer iOS sound** — fixed via middleware static asset exclusion (Apr 26)
+- [x] **Focus Timer ghost bell** — resolved (Apr 26)
 - [ ] **SessionComplete v3 for Mood + Gratitude** — apply Breathing benchmark
 - [ ] **BreathingOrb flicker** — needs local interactive debugging
 - [ ] Vercel env-var hygiene — uncheck Development, enable Sensitive on production secrets
@@ -474,7 +481,7 @@ See prior master version — layout, hero/nav, container relationships, mobile b
 ### 22-41 (pre-existing)
 Card density vs uniformity (22), editorial vs scan cards (23), pills vs labels (24), DevTools-first diagnosis (25), LOCK doesn't mean bug-free (26), JS inspection before guessing CSS (27), `position: fixed` containing-block escape (28), `text-wrap: pretty` (29), audit content when deleting tools (30), one-article-one-tool-one-CTA (31), reference-read working component before writing CTAs (32), audit copy semantic accuracy when copying (33), component colour from semantic data not contextual (34), hardcoded backgrounds defeat colour systems (35), interactive elements need hover (36), measure before resizing (37), iOS Safari + nowrap + React HTML comments (38), DOM-tree check when CSS computes correct (39), container relationship not control size (40), inspect DevTools before writing another spec (41).
 
-### Apr 24-26 2026 cycle (42-55)
+### Apr 24-26 2026 cycle (42-58)
 
 **42. Never ship "throw on unknown key" without first auditing every caller passes a known key.** The previous lesson was "silent fallbacks cause silent bugs" — that's true, but throws cause LOUD bugs (production outages). The correct defense is: cover all keys + warn in dev + fallback to safe neutral in prod. Caused the Mood + Gratitude page outage Apr 24.
 
@@ -504,12 +511,22 @@ Card density vs uniformity (22), editorial vs scan cards (23), pills vs labels (
 
 **55. Security/auth fixes require live-production verification before claiming "shipped."** "Tested locally" or "git pushed" is insufficient. Every spec involving auth/security gates must include: `curl -X POST <production URL>` test from logged-out terminal, and pasting back the actual status code + response body to Juan. Caused a 30-minute false-alarm on `/api/reflect` Apr 26 where I tested before Vercel finished deploying.
 
+**56. When excluding static assets from middleware, exclude BY BOTH directory path AND file extension.** The directory rule (`/sounds`, `/audio`) covers the canonical location. The extension rule (`.mp3`, `.wav`, `.ogg`) prevents recurrence if assets are ever moved or duplicated to a new path. Defence-in-depth costs nothing. Pattern: `(?!_next|sounds|audio|...|mp3|wav|ogg|...)` — directory exclusions plus extension exclusions side-by-side.
+
+**57. When a static asset (image, MP3, font, video) appears not to load, the FIRST diagnostic is `curl -I` to the asset URL from a logged-out terminal.** Static assets going through auth middleware is one of the most common Next.js + Clerk gotchas. Three minutes of curl beats three days of speculation. The "iOS Safari Web Audio is broken" rabbit hole consumed multiple specs — the actual bug was a one-line middleware regex. Run `curl -I` BEFORE any platform-specific hypothesis.
+
+**58. iOS silent switch behaviour is a product decision, not a bug.** Forcing audio through silent mode is fragile, increasingly Apple-restricted, and contradicts user intent (silent switch = "I don't want sounds right now"). Default to respecting the switch. Document the expectation only if user feedback specifically demands override — not preemptively.
+
+**59. Verify in BOTH signed-in and signed-out states before claiming "fixed."** Bugs that only surface in one auth state are common. The iOS sound bug went unnoticed for weeks because Juan tested signed-IN on laptop / signed-OUT on iPhone — the cross-test never triggered. Every post-launch fix involving any user-facing feature requires: (1) signed-in test, (2) signed-out test, (3) state-transition test (sign in/out flow). On every device class that matters.
+
+**60. The user's "still doesn't work" is more accurate than my "shipped successfully."** When user reports persist after a fix claims to be deployed, the user is right. The fix didn't take, OR the fix targeted the wrong cause, OR a different bug surfaced. NEVER push back with "but the spec was implemented correctly." Re-diagnose from zero. Caused the iOS sound saga to extend across multiple specs — every "shipped" claim was correct but irrelevant because the diagnoses were wrong.
+
 ---
 
 ## Key Rules (Never Break)
 
 - Read solace-master before any work
-- **Solace is LIVE post-launch.** Every change ships to production. Apply post-launch risk discipline (smallest correct change, mitigate before cleanup).
+- **Solace is LIVE post-launch.** Every change ships to production. Apply post-launch risk discipline (smallest correct change, mitigate before cleanup, verify in BOTH signed-in and signed-out states).
 - **Breathing is the benchmark** — take live screenshots of both tools side-by-side before writing any spec
 - **BENCHMARK RULE:** Screenshot both tools at 375px before reading any source code. Visual first.
 - **SiteHeader.tsx — LOCKED with one documented exception** (`max(0px, ...)` background offset). Never revert.
@@ -525,11 +542,15 @@ Card density vs uniformity (22), editorial vs scan cards (23), pills vs labels (
 - Specs via bash_tool, presented with present_files — **never widgets**
 - Always `await` Supabase inserts in Vercel serverless
 - AI tool routes must NOT be in `isPublicRoute` in middleware.ts
+- **Static asset paths AND extensions MUST be in middleware matcher exclusion** — `/sounds`, `/audio`, `.mp3`, `.wav`, `.ogg` (lesson 56)
 - Never use module-scope `createClient()` or `new Stripe()` — always lazy-init
 - **Every spec must end with git + Vercel deploy block** — `cd /Users/angelamanzano/Documents/Solace/solace-clean && git add . && git commit -m "..." && git push`
 - **Every spec must explicitly instruct Claude Code to EXECUTE the git block**
 - **Verify Vercel deployment is Current AND check live DOM before claiming fix is deployed** (lesson 41)
 - **Security/auth fixes require live-production curl verification, not 'shipped'** (lesson 55)
+- **Static asset failures: `curl -I` to the asset URL FIRST, before any platform-specific hypothesis** (lesson 57)
+- **Verify fixes in BOTH signed-in and signed-out states on every device class** (lesson 59)
+- **User's "still doesn't work" overrides my "shipped" — re-diagnose from zero** (lesson 60)
 - **Never approximate Breathing values** — read actual source and copy exactly
 - **No sounds on Breathing or Sleep Wind-Down** — silence intentional
 - **Border colour: shorthand `borderColor` over per-side properties** (lesson 43)
@@ -543,6 +564,7 @@ Card density vs uniformity (22), editorial vs scan cards (23), pills vs labels (
 - **Mitigate first, clean up second on a live product** (lesson 52)
 - **`[slugdisabled]` folder rename = soft-delete; document plan in code** (lesson 53)
 - **Middleware AND in-route auth — defence in depth** (lesson 54)
+- **iOS silent switch = respect platform default** (lesson 58)
 - (All previous lessons 1-41 retained as Key Rules — see prior master version)
 
 ---
